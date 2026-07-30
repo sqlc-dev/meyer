@@ -5,6 +5,7 @@ BeginStmt{
   Span: 65:98
   Type: TransactionType(IMMEDIATE)
   HasType: true
+  HasTransaction: true
   Name: Ident{
     Span: 93:97
     Name: "name"
@@ -14,6 +15,7 @@ BeginStmt{
 CommitStmt{
   Span: 99:118
   Keyword: "COMMIT"
+  HasTransaction: true
 }
 CommitStmt{
   Span: 119:123
@@ -24,11 +26,13 @@ RollbackStmt{
 }
 RollbackStmt{
   Span: 134:170
+  HasTransaction: true
   Savepoint: Ident{
     Span: 168:169
     Name: "s"
     Raw: "s"
   }
+  SavepointKeyword: true
 }
 SavepointStmt{
   Span: 171:183
@@ -40,6 +44,7 @@ SavepointStmt{
 }
 ReleaseStmt{
   Span: 184:204
+  SavepointKeyword: true
   Name: Ident{
     Span: 202:203
     Name: "s"

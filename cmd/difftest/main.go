@@ -36,6 +36,8 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/sqlc-dev/meyer/ast"
+	"github.com/sqlc-dev/meyer/internal/dump"
 	"github.com/sqlc-dev/meyer/internal/sqlitesrc"
 	"github.com/sqlc-dev/meyer/internal/testfile"
 	"github.com/sqlc-dev/meyer/lexer"
@@ -66,6 +68,7 @@ func main() {
 		testdata = flag.String("testdata", "parser/testdata", "corpus directory")
 		files    = flag.String("files", "", "comma-separated corpus file base names (default: all)")
 		per      = flag.Int("per", 24, "mutations per corpus case")
+		depth    = flag.Int("depth", 1, "mutation rounds; 2 applies a second edit to each result")
 		seed     = flag.Int64("seed", 1, "PRNG seed")
 		jobs     = flag.Int("j", runtime.NumCPU(), "oracle worker processes")
 		examples = flag.Int("examples", 3, "reproducers to print per kind of disagreement")
@@ -76,6 +79,15 @@ func main() {
 	inputs, err := loadCorpus(*testdata, *files)
 	if err != nil {
 		fatal(err)
+	}
+	// The hand-written snapshot inputs are a dense tour of the node set, so
+	// mutating them reaches constructs the corpus barely contains.
+	if *files == "" {
+		extra, err := loadSnapshotInputs(*testdata)
+		if err != nil {
+			fatal(err)
+		}
+		inputs = append(inputs, extra...)
 	}
 	fmt.Printf("mutating %d corpus cases, %d mutations each\n", len(inputs), *per)
 
@@ -100,6 +112,14 @@ func main() {
 			for src := range work {
 				for _, m := range mutations(src, *per, rng) {
 					check(r, m, rep)
+					// A second edit reaches shapes one cannot: two
+					// unbalanced brackets, a keyword in a position only
+					// another edit could open up.
+					for d := 1; d < *depth; d++ {
+						for _, m2 := range mutations(m, 2, rng) {
+							check(r, m2, rep)
+						}
+					}
 				}
 			}
 		}(w)
@@ -168,6 +188,9 @@ func check(r *sqlitesrc.Runner, sql string, rep *report) {
 	}
 	switch {
 	case exp.OK && pe == nil:
+		// Both accepted, so this is also a free renderer test: mutated SQL
+		// that still parses is a shape nobody wrote on purpose.
+		checkRoundTrip(sql, rep)
 	case exp.OK:
 		rep.add("meyer rejects, SQLite accepts", sql, pe.Message, "accepted")
 	case pe == nil:
@@ -178,6 +201,25 @@ func check(r *sqlitesrc.Runner, sql string, rep *report) {
 		rep.add("different offset", sql,
 			fmt.Sprintf("%s at %d", pe.Message, pe.Offset),
 			fmt.Sprintf("%s at %d", exp.Message, exp.Offset))
+	}
+}
+
+// checkRoundTrip renders an accepted parse back to SQL and re-parses it;
+// the two trees must match, ignoring spans and Raw text.
+func checkRoundTrip(sql string, rep *report) {
+	first, err := parser.ParseString(sql)
+	if err != nil {
+		return
+	}
+	rendered := ast.Statements(first)
+	second, err := parser.ParseString(rendered)
+	if err != nil {
+		rep.add("rendered SQL does not parse", sql, err.Error(), rendered)
+		return
+	}
+	want := dump.Stmts(first, dump.Structure)
+	if got := dump.Stmts(second, dump.Structure); got != want {
+		rep.add("round trip changed the tree", sql, rendered, "")
 	}
 }
 
@@ -283,6 +325,29 @@ func loadCorpus(dir, files string) ([]string, error) {
 		}
 		for _, c := range cases {
 			out = append(out, c.SQL)
+		}
+	}
+	return out, nil
+}
+
+// loadSnapshotInputs returns each statement of testdata/ast/*.sql.
+func loadSnapshotInputs(dir string) ([]string, error) {
+	paths, err := filepath.Glob(filepath.Join(dir, "ast", "*.sql"))
+	if err != nil {
+		return nil, err
+	}
+	var out []string
+	for _, path := range paths {
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+		stmts, err := parser.ParseString(string(data))
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", path, err)
+		}
+		for _, st := range stmts {
+			out = append(out, string(data)[st.Pos():st.End()])
 		}
 	}
 	return out, nil

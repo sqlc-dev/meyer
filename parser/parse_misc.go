@@ -25,22 +25,23 @@ func (p *parser) parseBegin() ast.Stmt {
 		p.advance()
 		n.Type, n.HasType = ast.TxnExclusive, true
 	}
-	n.Name = p.parseTransOpt()
+	n.HasTransaction, n.Name = p.parseTransOpt()
 	n.Span = p.span(start)
 	return n
 }
 
-// parseTransOpt implements "trans_opt".
+// parseTransOpt implements "trans_opt". TO cannot be a name, so
+// "ROLLBACK TRANSACTION TO x" reads TRANSACTION as the bare keyword.
 //
 //	trans_opt ::= . / TRANSACTION. / TRANSACTION nm.
-func (p *parser) parseTransOpt() *ast.Ident {
+func (p *parser) parseTransOpt() (bool, *ast.Ident) {
 	if !p.accept(token.TRANSACTION) {
-		return nil
+		return false, nil
 	}
 	if token.IsName(p.cur().Kind) {
-		return p.expectName()
+		return true, p.expectName()
 	}
-	return nil
+	return true, nil
 }
 
 // parseCommit implements COMMIT and its END synonym.
@@ -49,7 +50,7 @@ func (p *parser) parseTransOpt() *ast.Ident {
 func (p *parser) parseCommit() ast.Stmt {
 	t := p.advance()
 	n := &ast.CommitStmt{Keyword: strings.ToUpper(t.Text)}
-	n.Name = p.parseTransOpt()
+	n.HasTransaction, n.Name = p.parseTransOpt()
 	n.Span = p.span(t.Pos)
 	return n
 }
@@ -61,9 +62,9 @@ func (p *parser) parseCommit() ast.Stmt {
 func (p *parser) parseRollback() ast.Stmt {
 	start := p.expect(token.ROLLBACK).Pos
 	n := &ast.RollbackStmt{}
-	n.Name = p.parseTransOpt()
+	n.HasTransaction, n.Name = p.parseTransOpt()
 	if p.accept(token.TO) {
-		p.accept(token.SAVEPOINT) // savepoint_opt ::= SAVEPOINT. / .
+		n.SavepointKeyword = p.accept(token.SAVEPOINT) // savepoint_opt
 		n.Savepoint = p.expectName()
 	}
 	n.Span = p.span(start)
@@ -85,8 +86,8 @@ func (p *parser) parseSavepoint() ast.Stmt {
 //	cmd ::= RELEASE savepoint_opt nm.
 func (p *parser) parseRelease() ast.Stmt {
 	start := p.expect(token.RELEASE).Pos
-	p.accept(token.SAVEPOINT)
-	n := &ast.ReleaseStmt{Name: p.expectName()}
+	n := &ast.ReleaseStmt{SavepointKeyword: p.accept(token.SAVEPOINT)}
+	n.Name = p.expectName()
 	n.Span = p.span(start)
 	return n
 }

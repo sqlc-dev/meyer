@@ -617,15 +617,18 @@ func write(b *strings.Builder, n Node) {
 				x.kw("EXCLUSIVE")
 			}
 		}
-		writeTransOpt(b, t.Name)
+		writeTransOpt(b, t.HasTransaction, t.Name)
 	case *CommitStmt:
 		x.kw(t.Keyword)
-		writeTransOpt(b, t.Name)
+		writeTransOpt(b, t.HasTransaction, t.Name)
 	case *RollbackStmt:
 		x.kw("ROLLBACK")
-		writeTransOpt(b, t.Name)
+		writeTransOpt(b, t.HasTransaction, t.Name)
 		if t.Savepoint != nil {
 			x.kw("TO")
+			if t.SavepointKeyword {
+				x.kw("SAVEPOINT")
+			}
 			x.kw(t.Savepoint.Raw)
 		}
 	case *SavepointStmt:
@@ -633,6 +636,9 @@ func write(b *strings.Builder, n Node) {
 		x.kw(t.Name.Raw)
 	case *ReleaseStmt:
 		x.kw("RELEASE")
+		if t.SavepointKeyword {
+			x.kw("SAVEPOINT")
+		}
 		x.kw(t.Name.Raw)
 	case *AttachStmt:
 		x.kw("ATTACH")
@@ -691,15 +697,17 @@ func write(b *strings.Builder, n Node) {
 	}
 }
 
-// writeTransOpt renders "trans_opt". A transaction name is only reachable
-// through the TRANSACTION keyword.
-func writeTransOpt(b *strings.Builder, name *Ident) {
-	if name == nil {
+// writeTransOpt renders "trans_opt". The keyword can appear without a name,
+// so it is tracked separately.
+func writeTransOpt(b *strings.Builder, hasKeyword bool, name *Ident) {
+	if !hasKeyword {
 		return
 	}
 	x := w{b}
 	x.kw("TRANSACTION")
-	x.kw(name.Raw)
+	if name != nil {
+		x.kw(name.Raw)
+	}
 }
 
 func writeDrop(b *strings.Builder, kind string, ifExists bool, name *QualifiedName) {

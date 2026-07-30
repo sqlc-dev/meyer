@@ -14,9 +14,13 @@ const (
 //	cmd ::= BEGIN transtype trans_opt.
 type BeginStmt struct {
 	Span
-	Type    TransactionType `json:"type,omitempty"`
-	HasType bool            `json:"hasType,omitempty"`
-	Name    *Ident          `json:"name,omitempty"`
+	Type TransactionType `json:"type,omitempty"`
+	// HasType and HasTransaction record keywords that carry no meaning but
+	// are part of the source: "trans_opt ::= TRANSACTION" has no name, so
+	// Name alone cannot say whether the keyword was written.
+	HasType        bool   `json:"hasType,omitempty"`
+	HasTransaction bool   `json:"hasTransaction,omitempty"`
+	Name           *Ident `json:"name,omitempty"`
 }
 
 func (*BeginStmt) stmtNode()          {}
@@ -27,8 +31,9 @@ func (n *BeginStmt) Children() []Node { return nodes(n.Name) }
 //	cmd ::= COMMIT|END trans_opt.
 type CommitStmt struct {
 	Span
-	Keyword string `json:"keyword"` // "COMMIT" or "END"
-	Name    *Ident `json:"name,omitempty"`
+	Keyword        string `json:"keyword"` // "COMMIT" or "END"
+	HasTransaction bool   `json:"hasTransaction,omitempty"`
+	Name           *Ident `json:"name,omitempty"`
 }
 
 func (*CommitStmt) stmtNode()          {}
@@ -40,8 +45,10 @@ func (n *CommitStmt) Children() []Node { return nodes(n.Name) }
 //	cmd ::= ROLLBACK trans_opt TO savepoint_opt nm.
 type RollbackStmt struct {
 	Span
-	Name      *Ident `json:"name,omitempty"`      // TRANSACTION <name>
-	Savepoint *Ident `json:"savepoint,omitempty"` // TO [SAVEPOINT] <name>
+	HasTransaction   bool   `json:"hasTransaction,omitempty"`
+	Name             *Ident `json:"name,omitempty"`      // TRANSACTION <name>
+	Savepoint        *Ident `json:"savepoint,omitempty"` // TO [SAVEPOINT] <name>
+	SavepointKeyword bool   `json:"savepointKeyword,omitempty"`
 }
 
 func (*RollbackStmt) stmtNode()          {}
@@ -63,7 +70,8 @@ func (n *SavepointStmt) Children() []Node { return nodes(n.Name) }
 //	cmd ::= RELEASE savepoint_opt nm.
 type ReleaseStmt struct {
 	Span
-	Name *Ident `json:"name"`
+	SavepointKeyword bool   `json:"savepointKeyword,omitempty"`
+	Name             *Ident `json:"name"`
 }
 
 func (*ReleaseStmt) stmtNode()          {}
