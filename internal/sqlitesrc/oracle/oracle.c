@@ -51,6 +51,12 @@
 ** also perturbs sqlite3_error_offset. Opening :memory: is cheap next to
 ** starting a process, which is the cost this mode exists to avoid. A new
 ** connection is not enough on its own -- see resetGlobals.
+**
+** With -seeds <file.db>, nothing is classified: the SQL strings in the
+** database's "xsql" table are written to stdout in the same framing -batch
+** reads, so difftest can feed SQLite's own fuzz corpus back through it.
+** This is the one mode that executes anything, and it executes only that
+** one SELECT, against a read-only connection.
 */
 #include "sqlite3.h"
 #include <stdio.h>
