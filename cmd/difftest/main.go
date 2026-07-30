@@ -72,6 +72,7 @@ func main() {
 		jobs     = flag.Int("j", runtime.NumCPU(), "oracle worker processes")
 		examples = flag.Int("examples", 3, "reproducers to print per kind of disagreement")
 		maxLen   = flag.Int("maxlen", 4096, "skip corpus cases longer than this")
+		fuzzdata = flag.Bool("fuzzdata", true, "also use SQLite's test/fuzzdata*.db inputs")
 	)
 	flag.Parse()
 
@@ -88,12 +89,20 @@ func main() {
 		}
 		inputs = append(inputs, extra...)
 	}
-	fmt.Printf("mutating %d corpus cases, %d mutations each\n", len(inputs), *per)
 
 	// Build the oracle once, before the workers race for it.
 	if _, err := sqlitesrc.Oracle(*cacheDir); err != nil {
 		fatal(err)
 	}
+	if *fuzzdata && *files == "" {
+		seeds, err := sqlitesrc.FuzzSeeds(*cacheDir)
+		if err != nil {
+			fatal(err)
+		}
+		fmt.Printf("%d inputs from SQLite's fuzzdata databases\n", len(seeds))
+		inputs = append(inputs, seeds...)
+	}
+	fmt.Printf("checking %d inputs, %d mutations each\n", len(inputs), *per)
 
 	rep := &report{examples: *examples, buckets: map[string]*bucket{}}
 	work := make(chan string)
@@ -109,6 +118,9 @@ func main() {
 			defer r.Close()
 			rng := rand.New(rand.NewSource(*seed + int64(w)*1e6))
 			for src := range work {
+				// The input itself matters, not just its mutations: the
+				// fuzzdata seeds are already adversarial.
+				check(r, src, rep)
 				for _, m := range mutations(src, *per, rng) {
 					check(r, m, rep)
 					// Further edits reach shapes one cannot: two unbalanced
@@ -319,8 +331,11 @@ func (r *report) add(kind, sql, got, want string) {
 	}
 	b.n++
 	if len(b.shown) < r.examples {
-		b.shown = append(b.shown, fmt.Sprintf("  sql:  %q\n    meyer:  %s\n    sqlite: %s",
-			strings.TrimSpace(sql), got, want))
+		// Quoted, and not trimmed: a reproducer often turns on a byte that
+		// prints as nothing, and one that begins or ends in whitespace is
+		// the interesting case, not the noisy one.
+		b.shown = append(b.shown, fmt.Sprintf("  sql:  %q\n    meyer:  %q\n    sqlite: %q",
+			sql, got, want))
 	}
 }
 

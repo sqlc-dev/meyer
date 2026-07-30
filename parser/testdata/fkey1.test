@@ -236,7 +236,6 @@ stmt 29 ok
 stmt 57 ok
 stmt 156 ok
 stmt 186 ok
-stmt 228 ok
 stmt 229 ok
 stmt 299 err 1 -1 323 no such table: sqlsim4
 ==== 8.2

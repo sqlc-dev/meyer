@@ -312,6 +312,34 @@ func TestNulTerminatesInput(t *testing.T) {
 	}
 }
 
+// A NUL ends whatever token is being scanned, not just the token stream.
+// SQLite cannot see past it, so an unterminated quote stops there and is
+// illegal rather than running to the end of the Go string, and a "--"
+// comment stops there rather than at the newline after it.
+func TestNulTerminatesToken(t *testing.T) {
+	for _, tt := range []struct {
+		src  string
+		want []token.Kind
+	}{
+		{"[a\x00b]", []token.Kind{token.ILLEGAL}},
+		{"'a\x00b'", []token.Kind{token.ILLEGAL}},
+		{"\"a\x00b\"", []token.Kind{token.ILLEGAL}},
+		{"--x\x00\n1", nil},
+		{"/*x\x00*/ 1", nil},
+		{"1 /*\x00", []token.Kind{token.INTEGER, token.SLASH, token.STAR}},
+	} {
+		var got []token.Kind
+		for _, tok := range Lex(tt.src) {
+			if tok.Kind != token.EOF {
+				got = append(got, tok.Kind)
+			}
+		}
+		if !slices.Equal(got, tt.want) {
+			t.Errorf("Lex(%q) = %v, want %v", tt.src, got, tt.want)
+		}
+	}
+}
+
 func TestLexNeverLoops(t *testing.T) {
 	// Every byte value must produce progress, on its own and after a name.
 	for b := 0; b < 256; b++ {

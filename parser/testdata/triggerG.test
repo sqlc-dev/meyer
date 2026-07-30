@@ -25,7 +25,6 @@ stmt 155 ok
 stmt 177 err 1 -1 225 no such table: main.t3
 stmt 352 err 1 -1 383 no such table: t3
 stmt 383 err 1 -1 414 no such table: t3
-stmt 414 ok
 ==== 110
 
   SELECT b FROM t2 ORDER BY b;

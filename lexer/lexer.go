@@ -99,6 +99,11 @@ type cursor struct {
 
 // at returns z[off] relative to the token start, or 0 past the end, standing
 // in for the terminator a C string would have.
+//
+// Every scan reads through it, so an embedded NUL byte ends a token exactly
+// where the end of the input would: an unterminated "'" or "[" stops there
+// and is TK_ILLEGAL, and a "--" comment stops there rather than at the next
+// newline. SQLite cannot tell the two apart, and neither may meyer.
 func (c cursor) at(off int) byte {
 	if c.i+off < len(c.src) {
 		return c.src[c.i+off]
@@ -118,7 +123,7 @@ func scan(src string, i int) (token.Kind, int) {
 
 	case isSpaceStart(c): // CC_SPACE
 		n := 1
-		for i+n < len(src) && isSpace(src[i+n]) {
+		for isSpace(z.at(n)) {
 			n++
 		}
 		return token.SPACE, n
@@ -126,7 +131,7 @@ func scan(src string, i int) (token.Kind, int) {
 	case c == '-': // CC_MINUS
 		if z.at(1) == '-' {
 			n := 2
-			for i+n < len(src) && src[i+n] != '\n' {
+			for c := z.at(n); c != 0 && c != '\n'; c = z.at(n) {
 				n++
 			}
 			return token.COMMENT, n
@@ -158,14 +163,13 @@ func scan(src string, i int) (token.Kind, int) {
 		// not an error; tokenize.test relies on this.
 		n := 3
 		prev := z.at(2)
-		for ; i+n < len(src); n++ {
-			if prev == '*' && src[i+n] == '/' {
-				n++
-				break
+		for !(prev == '*' && z.at(n) == '/') {
+			if prev = z.at(n); prev == 0 {
+				return token.COMMENT, n
 			}
-			prev = src[i+n]
+			n++
 		}
-		return token.COMMENT, n
+		return token.COMMENT, n + 1
 
 	case c == '%':
 		return token.REM, 1
@@ -219,18 +223,17 @@ func scan(src string, i int) (token.Kind, int) {
 		delim := c
 		n := 1
 		var last byte
-		for ; i+n < len(src); n++ {
-			last = src[i+n]
-			if last == delim {
-				if z.at(n+1) == delim {
-					n++
-					continue
-				}
+		for {
+			if last = z.at(n); last == 0 {
 				break
 			}
-		}
-		if i+n >= len(src) {
-			last = 0
+			if last == delim {
+				if z.at(n+1) != delim {
+					break
+				}
+				n++ // a doubled delimiter is an escaped one
+			}
+			n++
 		}
 		switch {
 		case last == '\'':
@@ -252,8 +255,8 @@ func scan(src string, i int) (token.Kind, int) {
 
 	case c == '[': // CC_QUOTE2
 		n := 1
-		for ; i+n < len(src); n++ {
-			if src[i+n] == ']' {
+		for ; z.at(n) != 0; n++ {
+			if z.at(n) == ']' {
 				return token.ID, n + 1
 			}
 		}
@@ -261,7 +264,7 @@ func scan(src string, i int) (token.Kind, int) {
 
 	case c == '?': // CC_VARNUM
 		n := 1
-		for i+n < len(src) && isDigit(src[i+n]) {
+		for isDigit(z.at(n)) {
 			n++
 		}
 		return token.VARIABLE, n

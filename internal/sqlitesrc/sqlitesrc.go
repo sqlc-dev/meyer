@@ -10,6 +10,7 @@ package sqlitesrc
 import (
 	"archive/zip"
 	"bufio"
+	"bytes"
 	"crypto/sha256"
 	"fmt"
 	"io"
@@ -17,6 +18,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	_ "embed"
@@ -42,7 +44,11 @@ const (
 // Oracle returns the path to the compiled oracle binary, downloading the
 // pinned amalgamation and building it on first use.
 func Oracle(cacheDir string) (string, error) {
-	oracle := filepath.Join(cacheDir, "oracle-"+Version)
+	// The name carries a digest of oracle.c as well as the SQLite version,
+	// so editing the oracle rebuilds it instead of silently reusing the
+	// binary built from the previous source.
+	sum := sha256.Sum256(oracleSource)
+	oracle := filepath.Join(cacheDir, fmt.Sprintf("oracle-%s-%x", Version, sum[:4]))
 	if _, err := os.Stat(oracle); err == nil {
 		return oracle, nil
 	}
@@ -78,7 +84,7 @@ func Oracle(cacheDir string) (string, error) {
 // test/*.test scripts, downloading and unpacking them on first use.
 func TestScripts(cacheDir string) (string, error) {
 	testDir := filepath.Join(cacheDir, "sqlite-src-"+Version, "test")
-	if _, err := os.Stat(filepath.Join(testDir, "select1.test")); err == nil {
+	if _, err := os.Stat(filepath.Join(testDir, "fuzzdata1.db")); err == nil {
 		return testDir, nil
 	}
 	zipPath, err := download(cacheDir, "sqlite-src-"+Version+".zip", srcSHA)
@@ -86,7 +92,12 @@ func TestScripts(cacheDir string) (string, error) {
 		return "", err
 	}
 	only := func(name string) bool {
-		return strings.Contains(name, "/test/") && strings.HasSuffix(name, ".test")
+		if !strings.Contains(name, "/test/") {
+			return false
+		}
+		// The fuzzdata databases come along for FuzzSeeds.
+		return strings.HasSuffix(name, ".test") ||
+			(strings.Contains(name, "/fuzzdata") && strings.HasSuffix(name, ".db"))
 	}
 	if err := unzip(zipPath, cacheDir, only); err != nil {
 		return "", err
@@ -162,6 +173,59 @@ func unzip(zipPath, destDir string, keep func(string) bool) error {
 		}
 	}
 	return nil
+}
+
+// FuzzSeeds returns the SQL fuzz inputs SQLite ships in test/fuzzdata*.db:
+// tens of thousands of strings that have broken a SQLite parser at some
+// point. PLAN.md wants them as fuzz seeds rather than vendored, so they are
+// read out through the oracle on demand. They are a very different input
+// distribution from anything a mutation of valid SQL produces.
+func FuzzSeeds(cacheDir string) ([]string, error) {
+	oracle, err := Oracle(cacheDir)
+	if err != nil {
+		return nil, err
+	}
+	testDir, err := TestScripts(cacheDir)
+	if err != nil {
+		return nil, err
+	}
+	paths, err := filepath.Glob(filepath.Join(testDir, "fuzzdata*.db"))
+	if err != nil {
+		return nil, err
+	}
+	var out []string
+	for _, path := range paths {
+		cmd := exec.Command(oracle, "-seeds", path)
+		cmd.Stderr = os.Stderr
+		stdout, err := cmd.Output()
+		if err != nil {
+			return nil, fmt.Errorf("oracle -seeds %s: %w", path, err)
+		}
+		seeds, err := parseRecords(stdout)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", path, err)
+		}
+		out = append(out, seeds...)
+	}
+	return out, nil
+}
+
+// parseRecords splits the length-prefixed stream the oracle writes.
+func parseRecords(data []byte) ([]string, error) {
+	var out []string
+	for len(data) > 0 {
+		nl := bytes.IndexByte(data, '\n')
+		if nl < 0 {
+			return nil, fmt.Errorf("truncated record header")
+		}
+		n, err := strconv.Atoi(string(data[:nl]))
+		if err != nil || n < 0 || nl+1+n > len(data) {
+			return nil, fmt.Errorf("bad record header %q", data[:nl])
+		}
+		out = append(out, string(data[nl+1:nl+1+n]))
+		data = data[nl+1+n:]
+	}
+	return out, nil
 }
 
 // Runner drives one long-lived oracle process in batch mode. Starting a

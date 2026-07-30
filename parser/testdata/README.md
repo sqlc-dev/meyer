@@ -20,12 +20,15 @@ own goldens; they never outrank the accept/reject corpus below.
 - **Source of the expectations**: a real SQLite build. Every statement of
   every case is prepared independently with `sqlite3_prepare_v2` against an
   empty in-memory database (nothing is executed) using the oracle program in
-  `cmd/regenerate-parse/oracle.c`, compiled against the pinned amalgamation.
-  The raw per-statement outcomes (OK, or result code + error offset +
-  `pzTail` + exact error message) are stored in the corpus files. `pzTail`
-  records how far SQLite's parser got: a grammar action can fail part-way
-  through a statement and leave the rest of it unparsed, and the harness
-  needs to know which text was never verified.
+  `internal/sqlitesrc/oracle/oracle.c`, compiled against the pinned
+  amalgamation. The raw per-statement outcomes (OK, or result code + error
+  offset + exact error message, either way with `pzTail`) are stored in the
+  corpus files. `pzTail` records how far SQLite's parser got, and the
+  harness needs it to know which text was never verified: a grammar action
+  can fail part-way through a statement and leave the rest of it unparsed,
+  and a statement that prepared fine may still have had text after it that
+  `sqlite3_complete` failed to split off. A `pzTail` that reached the end of
+  the statement is left out of the file, which is the usual case.
 
 ## Pinned SQLite release
 

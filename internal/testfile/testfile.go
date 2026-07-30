@@ -42,8 +42,13 @@ type StmtResult struct {
 	OK        bool   // sqlite3_prepare_v2 returned SQLITE_OK
 	RC        int    // prepare result code when !OK
 	ErrOffset int    // sqlite3_error_offset within the case SQL; -1 if unknown
-	Tail      int    // pzTail within the case SQL: how far the parser got
 	Message   string // sqlite3_errmsg when !OK
+
+	// Tail is pzTail within the case SQL: how far the parser got. On an OK
+	// result 0 is the common case and means "all of it" -- a successful
+	// prepare always consumes at least one statement, so a recorded tail is
+	// never 0.
+	Tail int
 }
 
 // Case is a single corpus entry.
@@ -126,10 +131,7 @@ func IsSyntaxError(msg string) bool {
 func (c *Case) Expected() Expectation {
 	var unreached []Range
 	for i, r := range c.Results {
-		if r.OK {
-			continue
-		}
-		if IsSyntaxError(r.Message) {
+		if !r.OK && IsSyntaxError(r.Message) {
 			// Ranges collected from earlier statements still apply: a
 			// parser that trips over unverified text never reaches this.
 			return Expectation{
@@ -137,8 +139,12 @@ func (c *Case) Expected() Expectation {
 				Unreached: unreached,
 			}
 		}
-		// A semantic failure means the statement parsed -- but only as far
-		// as the parser had got when the grammar action raised it. A
+		if r.OK && r.Tail == 0 {
+			continue // prepare consumed everything it was given
+		}
+		// The statement parsed, but only as far as pzTail: a semantic
+		// failure stops where the grammar action raised it, and a
+		// successful prepare stops at the first statement it was handed. A
 		// statement runs to the start of the next one, or to the end of the
 		// case for the last.
 		end := len(c.SQL)
@@ -233,6 +239,13 @@ func ParseResultLine(line string) (StmtResult, error) {
 	if parts[1] == "ok" {
 		return StmtResult{Offset: off, OK: true}, nil
 	}
+	if tail, found := strings.CutPrefix(parts[1], "ok "); found {
+		n, err := strconv.Atoi(tail)
+		if err != nil {
+			return StmtResult{}, fmt.Errorf("malformed tail in %q", line)
+		}
+		return StmtResult{Offset: off, OK: true, Tail: n}, nil
+	}
 	fields := strings.SplitN(strings.TrimPrefix(parts[1], "err "), " ", 4)
 	if !strings.HasPrefix(parts[1], "err ") || len(fields) != 4 {
 		return StmtResult{}, fmt.Errorf("malformed result line %q", line)
@@ -263,8 +276,10 @@ func Write(path string, cases []Case) error {
 		b.WriteString(resultMarker)
 		b.WriteString("\n")
 		for _, r := range c.Results {
-			if r.OK {
+			if r.OK && r.Tail == 0 {
 				fmt.Fprintf(&b, "stmt %d ok\n", r.Offset)
+			} else if r.OK {
+				fmt.Fprintf(&b, "stmt %d ok %d\n", r.Offset, r.Tail)
 			} else {
 				fmt.Fprintf(&b, "stmt %d err %d %d %d %s\n",
 					r.Offset, r.RC, r.ErrOffset, r.Tail, r.Message)

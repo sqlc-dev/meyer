@@ -9,7 +9,6 @@ stmt 60 err 1 -1 88 no such table: new view
 ;
   SELECT * FROM sqlite_master WHERE name = 'new view';
 ----
-stmt 0 ok
 stmt 1 ok
 ==== 2.3
 
