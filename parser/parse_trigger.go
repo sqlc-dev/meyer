@@ -35,9 +35,9 @@ func (p *parser) parseCreateTrigger(start int, temp bool) ast.Stmt {
 	}
 	switch p.cur().Kind {
 	case token.DELETE, token.INSERT:
-		n.Event = strings.ToUpper(p.advance().Text)
+		n.Event = strings.ToUpper(p.text(p.advance()))
 	case token.UPDATE:
-		n.Event = strings.ToUpper(p.advance().Text)
+		n.Event = strings.ToUpper(p.text(p.advance()))
 		if p.accept(token.OF) {
 			n.UpdateOf = p.parseIDList()
 		}

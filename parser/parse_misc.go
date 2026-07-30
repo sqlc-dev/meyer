@@ -49,7 +49,7 @@ func (p *parser) parseTransOpt() (bool, *ast.Ident) {
 //	cmd ::= COMMIT|END trans_opt.
 func (p *parser) parseCommit() ast.Stmt {
 	t := p.advance()
-	n := &ast.CommitStmt{Keyword: strings.ToUpper(t.Text)}
+	n := &ast.CommitStmt{Keyword: strings.ToUpper(p.text(t))}
 	n.HasTransaction, n.Name = p.parseTransOpt()
 	n.Span = p.span(t.Pos)
 	return n
@@ -151,7 +151,7 @@ func (p *parser) parsePragmaValue() string {
 	case token.PLUS, token.MINUS:
 		return p.parseSignedNumber()
 	case token.INTEGER, token.FLOAT, token.ON, token.DELETE, token.DEFAULT:
-		return p.advance().Text
+		return p.text(p.advance())
 	}
 	return p.expectName().Raw
 }

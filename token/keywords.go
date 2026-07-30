@@ -1,5 +1,10 @@
 package token
 
+import (
+	"slices"
+	"strings"
+)
+
 // keywords maps the upper-case spelling of every SQLite keyword to its token
 // kind. Transcribed from aKeywordTable[] in tool/mkkeywordhash.c, resolved
 // for the feature set of the pinned build (see parser/testdata/README.md):
@@ -212,31 +217,93 @@ var fallback = func() [KindCount]bool {
 	return t
 }()
 
-// maxKeywordLen is the length of CURRENT_TIMESTAMP, the longest keyword.
-const maxKeywordLen = 17
+// The lengths of BY and of CURRENT_TIMESTAMP, the shortest and longest
+// keywords.
+const (
+	minKeywordLen = 2
+	maxKeywordLen = 17
+)
+
+// keywordRow is one row of the shape-indexed table Lookup searches.
+type keywordRow struct {
+	name string
+	kind Kind
+}
+
+// keywordTable holds every keyword sorted by length and then alphabetically,
+// so that all the keywords sharing a length and a first letter are adjacent.
+// keywordShape indexes it by exactly those two things, giving the offset and
+// count of the run an identifier of that shape has to be compared against.
+//
+// Length and first letter are free to compute and between them they are very
+// nearly a perfect hash -- 147 keywords fall into 93 groups, the largest of
+// four. That beats hashing the spelling: keywordCode() in SQLite computes one
+// from the first byte, the last byte and the length, but it takes the
+// remainder mod a prime to mix them, and a parser that reads a keyword per
+// few bytes of input should not be doing a division.
+var (
+	keywordTable []keywordRow
+	keywordShape [maxKeywordLen + 1][26]struct{ lo, n uint8 }
+)
+
+func init() {
+	names := make([]string, 0, len(keywords))
+	for name := range keywords {
+		names = append(names, name)
+	}
+	slices.SortFunc(names, func(a, b string) int {
+		if d := len(a) - len(b); d != 0 {
+			return d
+		}
+		return strings.Compare(a, b)
+	})
+	keywordTable = make([]keywordRow, len(names))
+	for i, name := range names {
+		keywordTable[i] = keywordRow{name, keywords[name]}
+		g := &keywordShape[len(name)][name[0]-'A']
+		if g.n == 0 {
+			g.lo = uint8(i)
+		}
+		g.n++
+	}
+}
 
 // Lookup returns the keyword kind for an identifier spelling, or ID if it is
 // not a keyword. Matching is ASCII case-insensitive, as in keywordCode().
 //
-// The upper-casing is done into a stack array rather than with
-// strings.ToUpper, because this runs once per identifier token and the
-// compiler turns m[string(b[:n])] into an allocation-free lookup.
+// This runs once per identifier token, so it neither allocates nor copies:
+// the candidates are found from the length and first letter alone, and each
+// is compared against the input a byte at a time, upper-casing as it goes.
 func Lookup(name string) Kind {
-	if len(name) > maxKeywordLen {
+	if len(name) < minKeywordLen || len(name) > maxKeywordLen {
 		return ID
 	}
-	var buf [maxKeywordLen]byte
+	c := name[0] &^ 0x20 // upper-case, for a letter
+	if c < 'A' || c > 'Z' {
+		return ID
+	}
+	g := keywordShape[len(name)][c-'A']
+	for _, e := range keywordTable[g.lo : g.lo+g.n] {
+		if equalUpper(name, e.name) {
+			return e.kind
+		}
+	}
+	return ID
+}
+
+// equalUpper reports whether name upper-cased equals kw, which is already
+// upper case and the same length.
+func equalUpper(name, kw string) bool {
 	for i := 0; i < len(name); i++ {
 		c := name[i]
 		if c >= 'a' && c <= 'z' {
 			c -= 'a' - 'A'
 		}
-		buf[i] = c
+		if c != kw[i] {
+			return false
+		}
 	}
-	if k, ok := keywords[string(buf[:len(name)])]; ok {
-		return k
-	}
-	return ID
+	return true
 }
 
 // CanFallback reports whether k is in SQLite's %fallback ID set.

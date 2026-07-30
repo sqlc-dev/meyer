@@ -241,7 +241,7 @@ func (p *parser) expect(k token.Kind) token.Token {
 // same position.
 func (p *parser) checkIllegal() {
 	if t := p.toks[p.i]; t.Kind == token.ILLEGAL {
-		p.fail(`unrecognized token: "`+t.Text+`"`, t.Pos)
+		p.fail(`unrecognized token: "`+p.text(t)+`"`, t.Pos)
 	}
 }
 
@@ -259,7 +259,7 @@ func (p *parser) syntaxErrorAt(t token.Token) {
 		// whose text is empty, which %syntax_error reports this way.
 		p.fail("incomplete input", t.Pos)
 	}
-	p.fail(`near "`+t.Text+`": syntax error`, t.Pos)
+	p.fail(`near "`+p.text(t)+`": syntax error`, t.Pos)
 }
 
 // fail aborts the parse with one of SQLite's messages.
@@ -400,7 +400,7 @@ func (p *parser) expectName() *ast.Ident {
 	if !token.IsName(p.cur().Kind) {
 		p.syntaxError()
 	}
-	return identOf(p.advance())
+	return p.identOf(p.advance())
 }
 
 // expectIDS implements the "ids" class: ID | STRING.
@@ -408,21 +408,22 @@ func (p *parser) expectIDS() *ast.Ident {
 	if !token.IsIDS(p.cur().Kind) {
 		p.syntaxError()
 	}
-	return identOf(p.advance())
+	return p.identOf(p.advance())
 }
 
 // identOf builds an Ident from an accepted name token, undoing SQLite's four
 // quoting styles.
-func identOf(t token.Token) *ast.Ident {
-	id := &ast.Ident{Span: spanOf(t), Raw: t.Text, Name: t.Text}
-	if len(t.Text) >= 2 {
-		switch t.Text[0] {
+func (p *parser) identOf(t token.Token) *ast.Ident {
+	raw := p.text(t)
+	id := &ast.Ident{Span: spanOf(t), Raw: raw, Name: raw}
+	if len(raw) >= 2 {
+		switch raw[0] {
 		case '"', '\'', '`':
-			id.Quote = ast.QuoteStyle(t.Text[0])
-			id.Name = dequote(t.Text, t.Text[0])
+			id.Quote = ast.QuoteStyle(raw[0])
+			id.Name = dequote(raw, raw[0])
 		case '[':
 			id.Quote = ast.QuoteSquare
-			id.Name = t.Text[1 : len(t.Text)-1]
+			id.Name = raw[1 : len(raw)-1]
 		}
 	}
 	return id
@@ -435,10 +436,13 @@ func dequote(s string, delim byte) string {
 	if n := len(body); n > 0 && body[n-1] == delim {
 		body = body[:n-1]
 	}
-	d := string([]byte{delim})
-	if !strings.Contains(body, d) {
+	// The overwhelmingly common case is a name with no escaped delimiter in
+	// it, and that one must not copy or allocate: the body is a slice of the
+	// input already.
+	if strings.IndexByte(body, delim) < 0 {
 		return body
 	}
+	d := string([]byte{delim})
 	return strings.ReplaceAll(body, d+d, d)
 }
 
@@ -471,3 +475,7 @@ func (p *parser) xfullname() (*ast.QualifiedName, *ast.Ident) {
 	}
 	return name, alias
 }
+
+// text is the spelling of t. The lexer records only the byte range, so this
+// is the one place that turns a token back into the source it came from.
+func (p *parser) text(t token.Token) string { return p.src[t.Pos:t.End] }

@@ -288,7 +288,7 @@ func (p *parser) parseDefaultValue() ast.Expr {
 	if !token.IsID(p.cur().Kind) {
 		p.syntaxError()
 	}
-	return identOf(p.advance())
+	return p.identOf(p.advance())
 }
 
 // atTerm reports whether the lookahead begins a "term": a literal constant.
@@ -312,7 +312,7 @@ func (p *parser) parseGenerated() (ast.Expr, *ast.Ident) {
 	x := p.parseExpr(precLowest)
 	p.expect(token.RP)
 	if token.IsPlainID(p.cur().Kind) {
-		return x, identOf(p.advance())
+		return x, p.identOf(p.advance())
 	}
 	return x, nil
 }
@@ -381,7 +381,7 @@ func (p *parser) parseReferences() *ast.ForeignKeyClause {
 			arg := &ast.ForeignKeyArg{}
 			switch p.cur().Kind {
 			case token.INSERT, token.DELETE, token.UPDATE:
-				arg.Event = p.advance().Text
+				arg.Event = p.text(p.advance())
 			default:
 				p.syntaxError()
 			}

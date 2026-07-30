@@ -240,7 +240,7 @@ func mutations(src string, n int, rng *rand.Rand) []string {
 		case 1: // delete a token
 			add(src[:t.Pos] + src[t.End:])
 		case 2: // duplicate a token
-			add(src[:t.End] + " " + t.Text + src[t.End:])
+			add(src[:t.End] + " " + t.Text(src) + src[t.End:])
 		case 3: // replace a token
 			add(src[:t.Pos] + injections[rng.Intn(len(injections))] + src[t.End:])
 		case 4: // insert a token

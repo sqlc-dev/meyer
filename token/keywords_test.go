@@ -117,3 +117,41 @@ func TestFallbackSetMatchesUpstream(t *testing.T) {
 		}
 	}
 }
+
+// TestLookup exercises the shape index directly. The corpus reaches it too,
+// but only through whatever spellings SQLite's test suite happens to use: a
+// group that the length-and-first-letter index pointed at the wrong run of
+// the table would go unnoticed for any keyword that suite never writes.
+func TestLookup(t *testing.T) {
+	for name, want := range keywords {
+		for _, spelling := range []string{name, strings.ToLower(name), mixedCase(name)} {
+			if got := Lookup(spelling); got != want {
+				t.Errorf("Lookup(%q) = %v, want %v", spelling, got, want)
+			}
+		}
+	}
+	// Non-keywords, including the shapes the index has to reject before it
+	// can subscript anything: too short, too long, and not starting with a
+	// letter.
+	for _, name := range []string{
+		"", "a", "_", "1", "zz", "users", "created_at", "selects", "seleect",
+		"_select", "1select", "current_timestampx", "CURRENT_TIMESTAMPX",
+		"\xff\xfe", "{", "|abc",
+	} {
+		if got := Lookup(name); got != ID {
+			t.Errorf("Lookup(%q) = %v, want ID", name, got)
+		}
+	}
+}
+
+// mixedCase upper-cases the even-numbered bytes of an upper-case word and
+// lower-cases the rest.
+func mixedCase(s string) string {
+	b := []byte(strings.ToLower(s))
+	for i := 0; i < len(b); i += 2 {
+		if b[i] >= 'a' && b[i] <= 'z' {
+			b[i] -= 'a' - 'A'
+		}
+	}
+	return string(b)
+}
