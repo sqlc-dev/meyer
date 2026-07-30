@@ -78,6 +78,10 @@ func (p *parser) parseCreateTrigger(start int, temp bool) ast.Stmt {
 //	trigger_cmd ::= insert_cmd INTO xfullname idlist_opt select upsert.
 //	trigger_cmd ::= DELETE FROM xfullname tridxby where_opt.
 //	trigger_cmd ::= select.
+//
+// "tridxby" is "indexed_opt" with a tailored error message, which SQLite
+// raises from a grammar action rather than the grammar, so meyer accepts it
+// wherever the top-level statements do.
 func (p *parser) parseTriggerCmd() ast.Stmt {
 	start := p.cur().Pos
 	switch p.cur().Kind {
@@ -86,7 +90,7 @@ func (p *parser) parseTriggerCmd() ast.Stmt {
 		n := &ast.UpdateStmt{}
 		n.OrConflict = p.parseOrConflict()
 		n.Table, n.Alias = p.xfullname()
-		n.IndexedBy, n.NotIndexed = p.parseTriggerIndexedBy()
+		n.IndexedBy, n.NotIndexed = p.parseIndexedOpt() // tridxby
 		p.expect(token.SET)
 		n.Set = p.parseSetList()
 		if p.accept(token.FROM) {
@@ -121,7 +125,7 @@ func (p *parser) parseTriggerCmd() ast.Stmt {
 		p.expect(token.FROM)
 		n := &ast.DeleteStmt{}
 		n.Table, n.Alias = p.xfullname()
-		n.IndexedBy, n.NotIndexed = p.parseTriggerIndexedBy()
+		n.IndexedBy, n.NotIndexed = p.parseIndexedOpt() // tridxby
 		if p.accept(token.WHERE) {
 			n.Where = p.parseExpr(precLowest)
 		}
@@ -129,14 +133,4 @@ func (p *parser) parseTriggerCmd() ast.Stmt {
 		return n
 	}
 	return p.parseSelect()
-}
-
-// parseTriggerIndexedBy implements "tridxby". Both non-empty alternatives
-// exist only so SQLite can produce a tailored message ("the INDEXED BY
-// clause is not allowed on UPDATE or DELETE statements within triggers"),
-// which is a grammar action and so not a parse error: meyer accepts them.
-//
-//	tridxby ::= . / INDEXED BY nm. / NOT INDEXED.
-func (p *parser) parseTriggerIndexedBy() (*ast.Ident, bool) {
-	return p.parseIndexedOpt()
 }

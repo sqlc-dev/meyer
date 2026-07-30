@@ -527,6 +527,7 @@ SelectStmt{
           Span: 462:470
           Expr: NullCheckExpr{
             Span: 462:470
+            Test: NullTest(ISNULL)
             X: Ident{
               Span: 462:463
               Name: "x"
@@ -538,7 +539,7 @@ SelectStmt{
           Span: 472:481
           Expr: NullCheckExpr{
             Span: 472:481
-            Not: true
+            Test: NullTest(NOTNULL)
             X: Ident{
               Span: 472:473
               Name: "x"
@@ -550,7 +551,7 @@ SelectStmt{
           Span: 483:493
           Expr: NullCheckExpr{
             Span: 483:493
-            Not: true
+            Test: NullTest(NOT NULL)
             X: Ident{
               Span: 483:484
               Name: "x"

@@ -233,13 +233,25 @@ type IsExpr struct {
 func (*IsExpr) exprNode()          {}
 func (n *IsExpr) Children() []Node { return nodes(n.X, n.Y) }
 
+// NullTest distinguishes the three spellings of a postfix null test. They
+// are not interchangeable: "expr NOT NULL" takes its precedence from NOT,
+// while ISNULL and NOTNULL are comparison-level operators, so "NOT x NOTNULL"
+// and "NOT x NOT NULL" are different trees.
+type NullTest int
+
+const (
+	TestIsNull       NullTest = iota // ISNULL
+	TestNotNull                      // NOTNULL
+	TestNotNullWords                 // NOT NULL
+)
+
 // NullCheckExpr is a postfix null test.
 //
 //	expr ::= expr ISNULL|NOTNULL. / expr ::= expr NOT NULL.
 type NullCheckExpr struct {
 	Span
-	Not bool `json:"not"` // NOTNULL / NOT NULL
-	X   Expr `json:"x"`
+	Test NullTest `json:"test"`
+	X    Expr     `json:"x"`
 }
 
 func (*NullCheckExpr) exprNode()          {}

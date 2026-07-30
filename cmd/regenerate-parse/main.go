@@ -69,12 +69,11 @@ func main() {
 	)
 	flag.Parse()
 
-	// Workers each own an oracle process; the pinned build is compiled on
-	// the first call, before any of them start.
+	// Workers each own an oracle process; the pinned build is compiled once
+	// here, before any of them start.
 	if _, err := sqlitesrc.Oracle(*cacheDir); err != nil {
 		fatal(err)
 	}
-	oracle := func() (*sqlitesrc.Runner, error) { return sqlitesrc.NewRunner(*cacheDir) }
 	testDir, err := sqlitesrc.TestScripts(*cacheDir)
 	if err != nil {
 		fatal(err)
@@ -107,7 +106,7 @@ func main() {
 			fatal(fmt.Errorf("%s: %w", name, err))
 		}
 
-		cases, stats, err := regenerateFile(oracle, testDir, *testdata, name, *jobs)
+		cases, stats, err := regenerateFile(*cacheDir, testDir, *testdata, name, *jobs)
 		if err != nil {
 			fatal(fmt.Errorf("%s: %w", name, err))
 		}
@@ -139,16 +138,12 @@ func main() {
 		totals.SkippedSubst, totals.SkippedForm)
 }
 
-// newRunner starts an oracle process; regenerateFile calls it once per
-// worker.
-type newRunner func() (*sqlitesrc.Runner, error)
-
 func fatal(err error) {
 	fmt.Fprintln(os.Stderr, "regenerate-parse:", err)
 	os.Exit(1)
 }
 
-func regenerateFile(oracle newRunner, testDir, outDir, name string, jobs int) ([]testfile.Case, tclextract.Stats, error) {
+func regenerateFile(cacheDir, testDir, outDir, name string, jobs int) ([]testfile.Case, tclextract.Stats, error) {
 	src, err := os.ReadFile(filepath.Join(testDir, name+".test"))
 	if err != nil {
 		return nil, tclextract.Stats{}, err
@@ -171,7 +166,7 @@ func regenerateFile(oracle newRunner, testDir, outDir, name string, jobs int) ([
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			r, err := oracle()
+			r, err := sqlitesrc.NewRunner(cacheDir)
 			if err != nil {
 				fail(err)
 				for range work { // drain so producers are not blocked

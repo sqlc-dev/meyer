@@ -149,11 +149,7 @@ func (p *parser) parsePragma() ast.Stmt {
 func (p *parser) parsePragmaValue() string {
 	switch p.cur().Kind {
 	case token.PLUS, token.MINUS:
-		sign := p.advance().Text
-		if !p.at(token.INTEGER) && !p.at(token.FLOAT) {
-			p.syntaxError()
-		}
-		return sign + p.advance().Text
+		return p.parseSignedNumber()
 	case token.INTEGER, token.FLOAT, token.ON, token.DELETE, token.DEFAULT:
 		return p.advance().Text
 	}

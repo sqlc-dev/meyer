@@ -20,9 +20,13 @@ type Node interface {
 	Children() []Node
 }
 
-// Stmt is implemented by all statement nodes.
+// Stmt is implemented by all statement nodes. SetSpan is part of the
+// interface because the parser widens a statement's span once it has seen
+// the terminating semicolon, and a node that could not be widened would get
+// a quietly wrong span rather than a compile error.
 type Stmt interface {
 	Node
+	SetSpan(Span)
 	stmtNode()
 }
 

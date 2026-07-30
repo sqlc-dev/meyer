@@ -6,6 +6,7 @@
 package lexer
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/sqlc-dev/meyer/token"
@@ -55,7 +56,7 @@ func TestOperators(t *testing.T) {
 		{"a - -b", []token.Kind{token.ID, token.MINUS, token.MINUS, token.ID}},
 	}
 	for _, tt := range tests {
-		if got := kinds(tt.src); !equalKinds(got, tt.want) {
+		if got := kinds(tt.src); !slices.Equal(got, tt.want) {
 			t.Errorf("Lex(%q) = %v, want %v", tt.src, got, tt.want)
 		}
 	}
@@ -211,7 +212,7 @@ func TestWhitespaceAndComments(t *testing.T) {
 		{"\xef\xbb\xbfSELECT", []string{"SELECT"}},
 	}
 	for _, tt := range tests {
-		if got := texts(tt.src); !equalStrings(got, tt.want) {
+		if got := texts(tt.src); !slices.Equal(got, tt.want) {
 			t.Errorf("Lex(%q) texts = %q, want %q", tt.src, got, tt.want)
 		}
 	}
@@ -321,28 +322,4 @@ func TestLexNeverLoops(t *testing.T) {
 			}
 		}
 	}
-}
-
-func equalKinds(a, b []token.Kind) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
-func equalStrings(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
 }

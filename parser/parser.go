@@ -298,7 +298,7 @@ func (p *parser) parseScript() []ast.Stmt {
 			p.syntaxError()
 		}
 		p.flushDeferred()
-		setStmtSpan(stmt, start, end)
+		stmt.SetSpan(ast.Span{Start: start, Stop: end})
 		stmts = append(stmts, stmt)
 	}
 	return stmts
@@ -383,14 +383,6 @@ func (p *parser) span(start int) ast.Span {
 	return ast.Span{Start: start, Stop: p.prevEnd()}
 }
 
-// setStmtSpan widens a statement's span to cover its terminating semicolon.
-// Every node embeds ast.Span, which supplies SetSpan.
-func setStmtSpan(stmt ast.Stmt, start, end int) {
-	if s, ok := stmt.(interface{ SetSpan(ast.Span) }); ok {
-		s.SetSpan(ast.Span{Start: start, Stop: end})
-	}
-}
-
 // Name productions. parse.y expresses these as token classes plus the
 // %fallback ID set; token.IsName and friends encode the membership, and
 // these helpers turn an accepted token into an Ident.
@@ -414,11 +406,7 @@ func (p *parser) expectIDS() *ast.Ident {
 // identOf builds an Ident from an accepted name token, undoing SQLite's four
 // quoting styles.
 func identOf(t token.Token) *ast.Ident {
-	id := &ast.Ident{
-		Span: ast.Span{Start: t.Pos, Stop: t.End},
-		Raw:  t.Text,
-		Name: t.Text,
-	}
+	id := &ast.Ident{Span: spanOf(t), Raw: t.Text, Name: t.Text}
 	if len(t.Text) >= 2 {
 		switch t.Text[0] {
 		case '"', '\'', '`':

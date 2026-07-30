@@ -4,7 +4,6 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -55,38 +54,8 @@ func TestASTSnapshots(t *testing.T) {
 			}
 			if got != string(want) {
 				t.Errorf("%s: snapshot mismatch (run: go test ./parser -update)\n%s",
-					golden, snapshotDiff(string(want), got))
+					golden, firstDiff(string(want), got))
 			}
 		})
 	}
-}
-
-// snapshotDiff reports the first few differing lines, which is enough to see
-// what moved without printing a whole tree.
-func snapshotDiff(want, got string) string {
-	wl, gl := strings.Split(want, "\n"), strings.Split(got, "\n")
-	var b strings.Builder
-	shown := 0
-	for i := 0; i < len(wl) || i < len(gl) || shown < 5; i++ {
-		if i >= len(wl) && i >= len(gl) {
-			break
-		}
-		var a, c string
-		if i < len(wl) {
-			a = wl[i]
-		}
-		if i < len(gl) {
-			c = gl[i]
-		}
-		if a == c {
-			continue
-		}
-		b.WriteString("  line " + strconv.Itoa(i+1) + "\n    want: " + a + "\n    got:  " + c + "\n")
-		shown++
-		if shown == 5 {
-			b.WriteString("  ...\n")
-			break
-		}
-	}
-	return b.String()
 }

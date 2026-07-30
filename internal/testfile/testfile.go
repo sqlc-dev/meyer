@@ -184,7 +184,7 @@ func Read(path string) ([]Case, error) {
 		c.SQL = sql.String()
 		i++ // skip "----"
 		for i < len(lines) && strings.HasPrefix(lines[i], "stmt ") {
-			r, err := parseResultLine(strings.TrimRight(lines[i], "\n"))
+			r, err := ParseResultLine(strings.TrimRight(lines[i], "\n"))
 			if err != nil {
 				return nil, fmt.Errorf("%s:%d: %w", path, i+1, err)
 			}
@@ -196,7 +196,10 @@ func Read(path string) ([]Case, error) {
 	return cases, nil
 }
 
-func parseResultLine(line string) (StmtResult, error) {
+// ParseResultLine decodes one "stmt ..." line of oracle output. It is
+// exported because the oracle runner in internal/sqlitesrc reads the same
+// lines live, and a wire format with two decoders drifts.
+func ParseResultLine(line string) (StmtResult, error) {
 	rest := strings.TrimPrefix(line, "stmt ")
 	parts := strings.SplitN(rest, " ", 2)
 	if len(parts) != 2 {
@@ -224,18 +227,12 @@ func parseResultLine(line string) (StmtResult, error) {
 	}, nil
 }
 
-// CheckCase reports whether a case can be represented in the file format
-// (SQL must not collide with the markers, messages must be single-line).
-func CheckCase(c Case) error {
-	return checkWritable(c)
-}
-
 // Write renders cases to path. It refuses SQL that would be ambiguous with
 // the file format's markers.
 func Write(path string, cases []Case) error {
 	var b strings.Builder
 	for _, c := range cases {
-		if err := checkWritable(c); err != nil {
+		if err := CheckCase(c); err != nil {
 			return err
 		}
 		b.WriteString(caseMarker)
@@ -256,16 +253,18 @@ func Write(path string, cases []Case) error {
 	return os.WriteFile(path, []byte(b.String()), 0o644)
 }
 
-func checkWritable(c Case) error {
-	if c.Name == "" || strings.ContainsAny(c.Name, "\n") {
+// CheckCase reports whether a case can be represented in the file format:
+// its SQL must not collide with the markers, and its messages must be
+// single-line.
+func CheckCase(c Case) error {
+	if c.Name == "" || strings.Contains(c.Name, "\n") {
 		return fmt.Errorf("invalid case name %q", c.Name)
 	}
 	if !strings.HasSuffix(c.SQL, "\n") {
 		return fmt.Errorf("case %q: SQL must end with a newline", c.Name)
 	}
 	for _, line := range strings.Split(c.SQL, "\n") {
-		if strings.HasPrefix(line, caseMarker) || strings.TrimRight(line, " \t") == resultMarker ||
-			strings.HasPrefix(line, "==== ") {
+		if strings.HasPrefix(line, caseMarker) || strings.TrimRight(line, " \t") == resultMarker {
 			return fmt.Errorf("case %q: SQL line collides with file format marker: %q", c.Name, line)
 		}
 	}

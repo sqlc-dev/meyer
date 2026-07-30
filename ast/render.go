@@ -132,11 +132,7 @@ func write(b *strings.Builder, n Node) {
 		write(b, t.Y)
 	case *NullCheckExpr:
 		write(b, t.X)
-		if t.Not {
-			x.kw("NOT NULL")
-		} else {
-			x.kw("ISNULL")
-		}
+		x.kw(t.Test.String())
 	case *BetweenExpr:
 		write(b, t.X)
 		if t.Not {
@@ -1222,6 +1218,8 @@ func (k LiteralKind) String() string {
 	return name(int(k), "NULL", "INTEGER", "FLOAT", "STRING", "BLOB",
 		"CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP")
 }
+
+func (t NullTest) String() string { return name(int(t), "ISNULL", "NOTNULL", "NOT NULL") }
 
 func (k ParamKind) String() string {
 	return name(int(k), "?", "?NNN", ":name", "@name", "$name")

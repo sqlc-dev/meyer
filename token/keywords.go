@@ -241,6 +241,13 @@ func CanFallback(k Kind) bool { return fallback[k] }
 //	%token_class idj  ID|INDEXED|JOIN_KW.
 //	nm ::= idj. / nm ::= STRING.
 
+// IsPlainID reports whether k is TK_ID, or a keyword that becomes one
+// through %fallback. It is not one of parse.y's token classes: it is the
+// bare ID terminal, which a few rules use directly.
+//
+//	generated ::= LP expr RP ID.
+func IsPlainID(k Kind) bool { return k == ID || fallback[k] }
+
 // IsID reports whether k satisfies the "id" class (ID|INDEXED).
 func IsID(k Kind) bool { return k == ID || k == INDEXED || fallback[k] }
 

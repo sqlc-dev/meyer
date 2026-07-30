@@ -17,7 +17,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	_ "embed"
@@ -218,7 +217,7 @@ func (r *Runner) Run(sql string) ([]testfile.StmtResult, error) {
 			results[len(results)-1].Message += "\n" + line
 			continue
 		}
-		res, err := parseResultLine(line)
+		res, err := testfile.ParseResultLine(line)
 		if err != nil {
 			return nil, err
 		}
@@ -230,33 +229,4 @@ func (r *Runner) Run(sql string) ([]testfile.StmtResult, error) {
 func (r *Runner) Close() error {
 	r.in.Close()
 	return r.cmd.Wait()
-}
-
-// parseResultLine reads one "stmt ..." line of oracle output. The format is
-// documented in oracle/oracle.c and mirrored by internal/testfile.
-func parseResultLine(line string) (testfile.StmtResult, error) {
-	fields := strings.SplitN(line, " ", 3)
-	if len(fields) != 3 || fields[0] != "stmt" {
-		return testfile.StmtResult{}, fmt.Errorf("malformed oracle line %q", line)
-	}
-	off, err := strconv.Atoi(fields[1])
-	if err != nil {
-		return testfile.StmtResult{}, fmt.Errorf("malformed oracle line %q", line)
-	}
-	if fields[2] == "ok" {
-		return testfile.StmtResult{Offset: off, OK: true}, nil
-	}
-	rest := strings.SplitN(strings.TrimPrefix(fields[2], "err "), " ", 4)
-	if !strings.HasPrefix(fields[2], "err ") || len(rest) != 4 {
-		return testfile.StmtResult{}, fmt.Errorf("malformed oracle line %q", line)
-	}
-	rc, err1 := strconv.Atoi(rest[0])
-	erroff, err2 := strconv.Atoi(rest[1])
-	tail, err3 := strconv.Atoi(rest[2])
-	if err1 != nil || err2 != nil || err3 != nil {
-		return testfile.StmtResult{}, fmt.Errorf("malformed oracle line %q", line)
-	}
-	return testfile.StmtResult{
-		Offset: off, RC: rc, ErrOffset: erroff, Tail: tail, Message: rest[3],
-	}, nil
 }

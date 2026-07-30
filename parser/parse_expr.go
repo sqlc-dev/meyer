@@ -172,9 +172,13 @@ func (p *parser) parseOperators(x ast.Expr, min int, stopAtAnd bool) ast.Expr {
 				return x
 			}
 			p.advance()
+			test := ast.TestIsNull
+			if t.Kind == token.NOTNULL {
+				test = ast.TestNotNull
+			}
 			x = &ast.NullCheckExpr{
 				Span: ast.Span{Start: x.Pos(), Stop: p.prevEnd()},
-				Not:  t.Kind == token.NOTNULL,
+				Test: test,
 				X:    x,
 			}
 		case token.IS:
@@ -219,7 +223,11 @@ func (p *parser) parseOperators(x ast.Expr, min int, stopAtAnd bool) ast.Expr {
 			switch next {
 			case token.NULL:
 				p.advance()
-				x = &ast.NullCheckExpr{Span: ast.Span{Start: x.Pos(), Stop: p.prevEnd()}, Not: true, X: x}
+				x = &ast.NullCheckExpr{
+					Span: ast.Span{Start: x.Pos(), Stop: p.prevEnd()},
+					Test: ast.TestNotNullWords,
+					X:    x,
+				}
 			case token.LIKE_KW, token.MATCH:
 				x = p.parseLike(x, true)
 			case token.BETWEEN:

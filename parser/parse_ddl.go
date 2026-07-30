@@ -310,7 +310,7 @@ func (p *parser) parseGenerated() (ast.Expr, *ast.Ident) {
 	p.expect(token.LP)
 	x := p.parseExpr(precLowest)
 	p.expect(token.RP)
-	if k := p.cur().Kind; k == token.ID || token.CanFallback(k) {
+	if token.IsPlainID(p.cur().Kind) {
 		return x, identOf(p.advance())
 	}
 	return x, nil
