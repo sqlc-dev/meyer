@@ -23,7 +23,9 @@ import (
 // A NUL byte terminates the input, matching SQLite, whose tokenizer walks a
 // NUL-terminated buffer.
 func Lex(src string) []token.Token {
-	var toks []token.Token
+	// SQL averages a little over four bytes per token including the
+	// separators, so this usually gets the whole stream in one allocation.
+	toks := make([]token.Token, 0, len(src)/4+8)
 	i := 0
 	for i < len(src) {
 		kind, n := scan(src, i)
@@ -86,17 +88,30 @@ func resolveWindowKeywords(toks []token.Token) {
 	}
 }
 
+// cursor is the input plus the offset of the token being scanned. It exists
+// so that "at" can be a method rather than a closure: sqlite3GetToken reads
+// past the token freely, relying on the C string's NUL terminator, and a
+// closure capturing the offset would allocate once per token.
+type cursor struct {
+	src string
+	i   int
+}
+
+// at returns z[off] relative to the token start, or 0 past the end, standing
+// in for the terminator a C string would have.
+func (c cursor) at(off int) byte {
+	if c.i+off < len(c.src) {
+		return c.src[c.i+off]
+	}
+	return 0
+}
+
 // scan returns the kind and byte length of the token beginning at src[i].
 // It mirrors the switch on aiClass[] in sqlite3GetToken(); the character
 // classes are spelled out as predicates instead of a lookup table.
 func scan(src string, i int) (token.Kind, int) {
+	z := cursor{src, i}
 	c := src[i]
-	at := func(off int) byte { // z[off], with the C string's implicit NUL
-		if i+off < len(src) {
-			return src[i+off]
-		}
-		return 0
-	}
 	switch {
 	case c == 0:
 		return token.EOF, 0
@@ -109,15 +124,15 @@ func scan(src string, i int) (token.Kind, int) {
 		return token.SPACE, n
 
 	case c == '-': // CC_MINUS
-		if at(1) == '-' {
+		if z.at(1) == '-' {
 			n := 2
 			for i+n < len(src) && src[i+n] != '\n' {
 				n++
 			}
 			return token.COMMENT, n
 		}
-		if at(1) == '>' {
-			if at(2) == '>' {
+		if z.at(1) == '>' {
+			if z.at(2) == '>' {
 				return token.PTR, 3
 			}
 			return token.PTR, 2
@@ -136,13 +151,13 @@ func scan(src string, i int) (token.Kind, int) {
 		return token.STAR, 1
 
 	case c == '/': // CC_SLASH
-		if at(1) != '*' || at(2) == 0 {
+		if z.at(1) != '*' || z.at(2) == 0 {
 			return token.SLASH, 1
 		}
 		// An unterminated /* comment runs to the end of the input and is
 		// not an error; tokenize.test relies on this.
 		n := 3
-		prev := at(2)
+		prev := z.at(2)
 		for ; i+n < len(src); n++ {
 			if prev == '*' && src[i+n] == '/' {
 				n++
@@ -156,13 +171,13 @@ func scan(src string, i int) (token.Kind, int) {
 		return token.REM, 1
 
 	case c == '=': // CC_EQ
-		if at(1) == '=' {
+		if z.at(1) == '=' {
 			return token.EQ, 2
 		}
 		return token.EQ, 1
 
 	case c == '<': // CC_LT
-		switch at(1) {
+		switch z.at(1) {
 		case '=':
 			return token.LE, 2
 		case '>':
@@ -173,7 +188,7 @@ func scan(src string, i int) (token.Kind, int) {
 		return token.LT, 1
 
 	case c == '>': // CC_GT
-		switch at(1) {
+		switch z.at(1) {
 		case '=':
 			return token.GE, 2
 		case '>':
@@ -182,13 +197,13 @@ func scan(src string, i int) (token.Kind, int) {
 		return token.GT, 1
 
 	case c == '!': // CC_BANG
-		if at(1) != '=' {
+		if z.at(1) != '=' {
 			return token.ILLEGAL, 1
 		}
 		return token.NE, 2
 
 	case c == '|': // CC_PIPE
-		if at(1) != '|' {
+		if z.at(1) != '|' {
 			return token.BITOR, 1
 		}
 		return token.CONCAT, 2
@@ -207,7 +222,7 @@ func scan(src string, i int) (token.Kind, int) {
 		for ; i+n < len(src); n++ {
 			last = src[i+n]
 			if last == delim {
-				if at(n+1) == delim {
+				if z.at(n+1) == delim {
 					n++
 					continue
 				}
@@ -227,13 +242,13 @@ func scan(src string, i int) (token.Kind, int) {
 		}
 
 	case c == '.': // CC_DOT
-		if !isDigit(at(1)) {
+		if !isDigit(z.at(1)) {
 			return token.DOT, 1
 		}
-		return scanNumber(src, i, at)
+		return scanNumber(z)
 
 	case isDigit(c): // CC_DIGIT
-		return scanNumber(src, i, at)
+		return scanNumber(z)
 
 	case c == '[': // CC_QUOTE2
 		n := 1
@@ -252,22 +267,22 @@ func scan(src string, i int) (token.Kind, int) {
 		return token.VARIABLE, n
 
 	case c == '$' || c == '@' || c == '#' || c == ':': // CC_DOLLAR, CC_VARALPHA
-		return scanVariable(src, i, at)
+		return scanVariable(z)
 
 	case c == 'x' || c == 'X': // CC_X: blob literal, otherwise an identifier
-		if at(1) == '\'' {
+		if z.at(1) == '\'' {
 			n := 2
-			for isHex(at(n)) {
+			for isHex(z.at(n)) {
 				n++
 			}
 			kind := token.BLOB
-			if at(n) != '\'' || n%2 != 0 {
+			if z.at(n) != '\'' || n%2 != 0 {
 				kind = token.ILLEGAL
-				for at(n) != 0 && at(n) != '\'' {
+				for z.at(n) != 0 && z.at(n) != '\'' {
 					n++
 				}
 			}
-			if at(n) != 0 {
+			if z.at(n) != 0 {
 				n++
 			}
 			return kind, n
@@ -275,20 +290,20 @@ func scan(src string, i int) (token.Kind, int) {
 		return scanIdent(src, i, 1)
 
 	case c == 0xef: // CC_BOM
-		if at(1) == 0xbb && at(2) == 0xbf {
+		if z.at(1) == 0xbb && z.at(2) == 0xbf {
 			return token.SPACE, 3
 		}
 		return scanIdent(src, i, 1)
 
 	case isKeywordStart(c): // CC_KYWD0
-		if !isKeywordChar(at(1)) {
+		if !isKeywordChar(z.at(1)) {
 			return scanIdent(src, i, 1)
 		}
 		n := 2
-		for isKeywordChar(at(n)) {
+		for isKeywordChar(z.at(n)) {
 			n++
 		}
-		if isIDChar(at(n)) {
+		if isIDChar(z.at(n)) {
 			return scanIdent(src, i, n+1)
 		}
 		return token.Lookup(src[i : i+n]), n
@@ -314,13 +329,13 @@ func scanIdent(src string, i, n int) (token.Kind, int) {
 // QNUMBER for the grammar to validate). A number immediately followed by an
 // identifier character is TK_ILLEGAL, so "1abc" is one bad token rather than
 // two good ones.
-func scanNumber(src string, i int, at func(int) byte) (token.Kind, int) {
+func scanNumber(z cursor) (token.Kind, int) {
 	kind := token.INTEGER
 	n := 0
-	if at(0) == '0' && (at(1) == 'x' || at(1) == 'X') && isHex(at(2)) {
+	if z.at(0) == '0' && (z.at(1) == 'x' || z.at(1) == 'X') && isHex(z.at(2)) {
 		for n = 3; ; n++ {
-			if !isHex(at(n)) {
-				if at(n) == '_' {
+			if !isHex(z.at(n)) {
+				if z.at(n) == '_' {
 					kind = token.QNUMBER
 				} else {
 					break
@@ -329,21 +344,21 @@ func scanNumber(src string, i int, at func(int) byte) (token.Kind, int) {
 		}
 	} else {
 		for n = 0; ; n++ {
-			if !isDigit(at(n)) {
-				if at(n) == '_' {
+			if !isDigit(z.at(n)) {
+				if z.at(n) == '_' {
 					kind = token.QNUMBER
 				} else {
 					break
 				}
 			}
 		}
-		if at(n) == '.' {
+		if z.at(n) == '.' {
 			if kind == token.INTEGER {
 				kind = token.FLOAT
 			}
 			for n++; ; n++ {
-				if !isDigit(at(n)) {
-					if at(n) == '_' {
+				if !isDigit(z.at(n)) {
+					if z.at(n) == '_' {
 						kind = token.QNUMBER
 					} else {
 						break
@@ -351,14 +366,14 @@ func scanNumber(src string, i int, at func(int) byte) (token.Kind, int) {
 				}
 			}
 		}
-		if (at(n) == 'e' || at(n) == 'E') &&
-			(isDigit(at(n+1)) || ((at(n+1) == '+' || at(n+1) == '-') && isDigit(at(n+2)))) {
+		if (z.at(n) == 'e' || z.at(n) == 'E') &&
+			(isDigit(z.at(n+1)) || ((z.at(n+1) == '+' || z.at(n+1) == '-') && isDigit(z.at(n+2)))) {
 			if kind == token.INTEGER {
 				kind = token.FLOAT
 			}
 			for n += 2; ; n++ {
-				if !isDigit(at(n)) {
-					if at(n) == '_' {
+				if !isDigit(z.at(n)) {
+					if z.at(n) == '_' {
 						kind = token.QNUMBER
 					} else {
 						break
@@ -367,7 +382,7 @@ func scanNumber(src string, i int, at func(int) byte) (token.Kind, int) {
 			}
 		}
 	}
-	for isIDChar(at(n)) {
+	for isIDChar(z.at(n)) {
 		kind = token.ILLEGAL
 		n++
 	}
@@ -377,19 +392,19 @@ func scanNumber(src string, i int, at func(int) byte) (token.Kind, int) {
 // scanVariable implements the CC_DOLLAR/CC_VARALPHA case: the ?, :name,
 // @name and $name bind-parameter spellings, including the TCL-style
 // "$foo(bar)" and "$foo::bar" suffixes SQLite accepts.
-func scanVariable(src string, i int, at func(int) byte) (token.Kind, int) {
+func scanVariable(z cursor) (token.Kind, int) {
 	kind := token.VARIABLE
 	nid := 0
 	n := 1
-	for ; at(n) != 0; n++ {
-		c := at(n)
+	for ; z.at(n) != 0; n++ {
+		c := z.at(n)
 		switch {
 		case isIDChar(c):
 			nid++
 		case c == '(' && nid > 0:
 			for {
 				n++
-				c = at(n)
+				c = z.at(n)
 				if c == 0 || isSpace(c) || c == ')' {
 					break
 				}
@@ -403,7 +418,7 @@ func scanVariable(src string, i int, at func(int) byte) (token.Kind, int) {
 				kind = token.ILLEGAL
 			}
 			return kind, n
-		case c == ':' && at(n+1) == ':':
+		case c == ':' && z.at(n+1) == ':':
 			n++
 		default:
 			if nid == 0 {

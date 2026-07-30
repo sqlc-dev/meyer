@@ -37,6 +37,15 @@ const (
 	precUnary      = 12 // BITNOT, and the [BITNOT] mark on unary PLUS/MINUS
 )
 
+// binaryOps maps the operator tokens that need no special handling to their
+// AST operator.
+var binaryOps = map[token.Kind]ast.Operator{
+	token.LT: ast.OpLt, token.LE: ast.OpLe, token.GT: ast.OpGt, token.GE: ast.OpGe,
+	token.BITAND: ast.OpBitAnd, token.BITOR: ast.OpBitOr,
+	token.LSHIFT: ast.OpLShift, token.RSHIFT: ast.OpRShift,
+	token.STAR: ast.OpMul, token.SLASH: ast.OpDiv, token.REM: ast.OpMod,
+}
+
 // parseExpr parses an expression, consuming operators of precedence min and
 // above.
 func (p *parser) parseExpr(min int) ast.Expr {
@@ -113,20 +122,12 @@ func (p *parser) parseOperators(x ast.Expr, min int, stopAtAnd bool) ast.Expr {
 			if precRelational < min {
 				return x
 			}
-			op := map[token.Kind]ast.Operator{
-				token.LT: ast.OpLt, token.LE: ast.OpLe,
-				token.GT: ast.OpGt, token.GE: ast.OpGe,
-			}[t.Kind]
-			x = p.binary(x, op, precRelational)
+			x = p.binary(x, binaryOps[t.Kind], precRelational)
 		case token.BITAND, token.BITOR, token.LSHIFT, token.RSHIFT:
 			if precBitwise < min {
 				return x
 			}
-			op := map[token.Kind]ast.Operator{
-				token.BITAND: ast.OpBitAnd, token.BITOR: ast.OpBitOr,
-				token.LSHIFT: ast.OpLShift, token.RSHIFT: ast.OpRShift,
-			}[t.Kind]
-			x = p.binary(x, op, precBitwise)
+			x = p.binary(x, binaryOps[t.Kind], precBitwise)
 		case token.PLUS, token.MINUS:
 			if precAdd < min {
 				return x
@@ -140,10 +141,7 @@ func (p *parser) parseOperators(x ast.Expr, min int, stopAtAnd bool) ast.Expr {
 			if precMul < min {
 				return x
 			}
-			op := map[token.Kind]ast.Operator{
-				token.STAR: ast.OpMul, token.SLASH: ast.OpDiv, token.REM: ast.OpMod,
-			}[t.Kind]
-			x = p.binary(x, op, precMul)
+			x = p.binary(x, binaryOps[t.Kind], precMul)
 		case token.CONCAT:
 			if precConcat < min {
 				return x
