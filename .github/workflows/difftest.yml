@@ -3,8 +3,9 @@
 # This is separate from CI because it downloads the pinned SQLite release
 # and compiles it, which the ordinary test run must not depend on. It is the
 # only thing that exercises error fidelity at scale: the vendored corpus is
-# almost all valid SQL, so mutating it is how divergent messages and offsets
-# get found.
+# almost all valid SQL, so mutating it -- and mutating the ~36k inputs of
+# SQLite's own fuzzdata databases, which are the opposite -- is how
+# divergent messages and offsets get found.
 name: difftest
 
 on:

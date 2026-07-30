@@ -63,8 +63,10 @@ so conformance is defined three ways, in decreasing order of authority:
 Plus two searches for cases the corpus does not contain: a fuzz target
 asserting that arbitrary bytes terminate without panicking, that a rejection
 is always a `*parser.Error`, and that anything accepted survives the round
-trip; and `cmd/difftest`, which mutates corpus SQL one token at a time and
-checks meyer against a live SQLite build, message and byte offset included.
+trip; and `cmd/difftest`, which checks meyer against a live SQLite build,
+message and byte offset included, over corpus SQL and the ~36k inputs of
+SQLite's own `fuzzdata` databases — each one directly and then mutated a
+token at a time.
 
 ## Acknowledgments
 

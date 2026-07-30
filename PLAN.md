@@ -180,7 +180,11 @@ domain):
   merely "terminate without panic".)*
 - **sqllogictest** (~millions of statements, license: "no attribution
   required") — bulk smoke corpus; low grammar diversity. Optional, behind an
-  env-var-gated test, not vendored.
+  env-var-gated test, not vendored. *(Not built. Everything else the tests
+  download is pinned by SHA-256; sqllogictest is distributed as a Fossil
+  checkout with no stable release artifact to pin, and what it would add is
+  volume of ordinary SELECTs — the axis `cmd/difftest` is already furthest
+  along. Worth revisiting only if a pinnable mirror appears.)*
 
 Tooling (`cmd/regenerate`):
 
