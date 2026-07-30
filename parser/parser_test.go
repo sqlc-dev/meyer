@@ -8,11 +8,23 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/sqlc-dev/meyer/internal/testfile"
 	"github.com/sqlc-dev/meyer/parser"
 )
+
+// TestParseReader covers the io.Reader entry point once, so that the corpus
+// harness can call ParseString directly: routing 21,000 cases through a
+// reader and a per-case context costs a quarter of the run for no coverage.
+func TestParseReader(t *testing.T) {
+	stmts, err := parser.Parse(context.Background(), strings.NewReader("SELECT 1; SELECT 2"))
+	if err != nil || len(stmts) != 2 {
+		t.Fatalf("Parse = %d statements, %v; want 2, nil", len(stmts), err)
+	}
+	if _, err := parser.Parse(context.Background(), strings.NewReader("SELECT")); err == nil {
+		t.Fatal("Parse accepted an incomplete statement")
+	}
+}
 
 // -check-parse re-runs todo cases; those that now pass are removed from the
 // metadata sidecar (logged as "PARSE PASSES NOW") so progress is committed
@@ -20,14 +32,7 @@ import (
 var checkParse = flag.Bool("check-parse", false, "re-run todo cases and update metadata for those that pass")
 
 func TestParse(t *testing.T) {
-	paths, err := filepath.Glob(filepath.Join("testdata", "*.test"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(paths) == 0 {
-		t.Fatal("no corpus files; run go run ./cmd/regenerate-parse")
-	}
-	for _, path := range paths {
+	for _, path := range corpusFiles(t) {
 		t.Run(strings.TrimSuffix(filepath.Base(path), ".test"), func(t *testing.T) {
 			t.Parallel()
 			runFile(t, path)
@@ -79,9 +84,7 @@ func runFile(t *testing.T, path string) {
 // the identical message and byte offset on rejection. SQLite reports -1 from
 // sqlite3_error_offset for errors it cannot place, and those are not checked.
 func runCase(c testfile.Case) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	_, err := parser.Parse(ctx, strings.NewReader(c.SQL))
+	_, err := parser.ParseString(c.SQL)
 	exp := c.Expected()
 	if exp.OK {
 		if err != nil {

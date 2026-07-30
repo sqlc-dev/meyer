@@ -16,6 +16,7 @@ package dump
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/sqlc-dev/meyer/ast"
@@ -56,6 +57,25 @@ func Stmts(stmts []ast.Stmt, opts Options) string {
 		b.WriteByte('\n')
 	}
 	return b.String()
+}
+
+// FirstDiff reports the first differing line of two dumps, with its number,
+// so a failure names the field that changed instead of printing two trees.
+func FirstDiff(want, got string) string {
+	wl, gl := strings.Split(want, "\n"), strings.Split(got, "\n")
+	for i := 0; i < len(wl) || i < len(gl); i++ {
+		var a, b string
+		if i < len(wl) {
+			a = wl[i]
+		}
+		if i < len(gl) {
+			b = gl[i]
+		}
+		if a != b {
+			return "  line " + strconv.Itoa(i+1) + "\n    want: " + a + "\n    got:  " + b
+		}
+	}
+	return ""
 }
 
 type dumper struct {

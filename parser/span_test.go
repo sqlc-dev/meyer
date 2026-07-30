@@ -1,8 +1,6 @@
 package parser_test
 
 import (
-	"path/filepath"
-	"strings"
 	"sync/atomic"
 	"testing"
 
@@ -23,32 +21,16 @@ import (
 //   - statements are disjoint and in source order, so the text between two
 //     of them (where the "-- name:" comments live) is unambiguous.
 func TestSpans(t *testing.T) {
-	paths, err := filepath.Glob(filepath.Join("testdata", "*.test"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(paths) == 0 {
-		t.Fatal("no corpus files; run go run ./cmd/regenerate-parse")
-	}
 	var checked atomic.Int64
 	t.Cleanup(func() { t.Logf("checked spans of %d cases", checked.Load()) })
-	for _, path := range paths {
-		t.Run(strings.TrimSuffix(filepath.Base(path), ".test"), func(t *testing.T) {
-			t.Parallel()
-			cases, err := testfile.Read(path)
-			if err != nil {
-				t.Fatal(err)
-			}
-			for _, c := range cases {
-				stmts, err := parser.ParseString(c.SQL)
-				if err != nil {
-					continue
-				}
-				checked.Add(1)
-				checkStmtSpans(t, c, stmts)
-			}
-		})
-	}
+	forEachCorpusCase(t, func(t *testing.T, c testfile.Case) {
+		stmts, err := parser.ParseString(c.SQL)
+		if err != nil {
+			return
+		}
+		checked.Add(1)
+		checkStmtSpans(t, c, stmts)
+	})
 }
 
 func checkStmtSpans(t *testing.T, c testfile.Case, stmts []ast.Stmt) {

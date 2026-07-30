@@ -54,7 +54,7 @@ func TestASTSnapshots(t *testing.T) {
 			}
 			if got != string(want) {
 				t.Errorf("%s: snapshot mismatch (run: go test ./parser -update)\n%s",
-					golden, firstDiff(string(want), got))
+					golden, dump.FirstDiff(string(want), got))
 			}
 		})
 	}

@@ -22,6 +22,8 @@ import (
 	_ "embed"
 
 	"github.com/sqlc-dev/meyer/internal/testfile"
+	"github.com/sqlc-dev/meyer/lexer"
+	"github.com/sqlc-dev/meyer/token"
 )
 
 //go:embed oracle/oracle.c
@@ -229,4 +231,57 @@ func (r *Runner) Run(sql string) ([]testfile.StmtResult, error) {
 func (r *Runner) Close() error {
 	r.in.Close()
 	return r.cmd.Wait()
+}
+
+// SplitDiffers reports whether Run would cut a script into statements
+// somewhere the tokenizer would not, which makes its verdict incomparable
+// with a parser's.
+//
+// The oracle splits the way the sqlite3 shell does, with sqlite3_complete,
+// whose scanner is much cruder than the tokenizer: it understands strings,
+// the four quoting styles and comments, but nothing else. So a ";" ends a
+// statement for it even inside brackets, and even inside a token the real
+// tokenizer would have swallowed whole -- ":v(a;b)" is one bind parameter
+// to the tokenizer and two statements to sqlite3_complete. Any caller of
+// Run inherits this, which is why it lives here rather than in one of them.
+func SplitDiffers(sql string) bool {
+	depth := 0
+	for _, t := range lexer.Lex(sql) {
+		switch t.Kind {
+		case token.LP:
+			depth++
+		case token.RP:
+			if depth > 0 {
+				depth--
+			}
+		case token.SEMI:
+			if depth > 0 {
+				return true
+			}
+		default:
+			if strings.Contains(t.Text, ";") && !completeUnderstands(t) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// completeUnderstands reports whether sqlite3_complete skips over a token
+// the same way the tokenizer does. The closed quoted forms it does, blob
+// literals included, since it reads their body as a single-quoted string.
+// An unterminated one it does not: in ":v('(%d)',changes());" the tokenizer
+// swallows the first quote into the bind parameter and finds a string
+// starting at the second, while sqlite3_complete pairs the two.
+func completeUnderstands(t token.Token) bool {
+	switch t.Kind {
+	case token.STRING, token.BLOB:
+		return true
+	case token.ID:
+		switch t.Text[0] {
+		case '"', '`', '[':
+			return true
+		}
+	}
+	return false
 }

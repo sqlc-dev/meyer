@@ -2,12 +2,11 @@ package parser_test
 
 import (
 	"errors"
-	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/sqlc-dev/meyer/ast"
 	"github.com/sqlc-dev/meyer/internal/dump"
+	"github.com/sqlc-dev/meyer/internal/roundtrip"
 	"github.com/sqlc-dev/meyer/internal/testfile"
 	"github.com/sqlc-dev/meyer/parser"
 )
@@ -86,15 +85,9 @@ func FuzzParse(f *testing.F) {
 			}
 			return
 		}
-		rendered := ast.Statements(stmts)
-		again, err := parser.ParseString(rendered)
-		if err != nil {
-			t.Fatalf("rendered SQL does not parse: %v\n  input:    %q\n  rendered: %q",
-				err, src, rendered)
-		}
-		if want, got := dump.Stmts(stmts, dump.Structure), dump.Stmts(again, dump.Structure); want != got {
-			t.Fatalf("round trip changed the tree\n  input:    %q\n  rendered: %q\n%s",
-				src, rendered, firstDiff(want, got))
+		if r := roundtrip.Check(stmts); !r.Ok {
+			t.Fatalf("%s\n  input:    %q\n  rendered: %q\n%s",
+				r.Reason, src, r.Rendered, dump.FirstDiff(r.Want, r.Got))
 		}
 	})
 }
@@ -104,12 +97,8 @@ func FuzzParse(f *testing.F) {
 // on each -short invocation, so this takes a deterministic slice.
 func corpusSeeds(f *testing.F) []string {
 	f.Helper()
-	paths, err := filepath.Glob(filepath.Join("testdata", "*.test"))
-	if err != nil {
-		f.Fatal(err)
-	}
 	var out []string
-	for _, path := range paths {
+	for _, path := range corpusFiles(f) {
 		cases, err := testfile.Read(path)
 		if err != nil {
 			f.Fatal(err)

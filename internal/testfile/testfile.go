@@ -67,6 +67,16 @@ type Expectation struct {
 	// that reaches the end of the input includes the offset one past it,
 	// which is where a parser reports running out of input.
 	Unreached []Range
+
+	// Truncated reports that the last statement failed with a non-syntax
+	// message raised while its own last token was the lookahead. SQLite
+	// stopped there, so it never reached the end of the input and could not
+	// notice that the input was cut short: "CREATE TABLE aux1.t1(" is
+	// "unknown database aux1" to SQLite and "incomplete input" to a parser
+	// that reads to the end. pzTail cannot separate the two, because the
+	// statement's last token is also the end of the input, so the case
+	// simply cannot say who is right.
+	Truncated bool
 }
 
 // Range is a half-open byte range of a case's SQL.
@@ -145,7 +155,18 @@ func (c *Case) Expected() Expectation {
 		}
 		unreached = append(unreached, Range{Start: r.Tail, End: end})
 	}
-	return Expectation{OK: true, Offset: -1, Unreached: unreached}
+	return Expectation{
+		OK: true, Offset: -1, Unreached: unreached, Truncated: c.truncated(),
+	}
+}
+
+// truncated implements Expectation.Truncated; see its documentation.
+func (c *Case) truncated() bool {
+	if len(c.Results) == 0 {
+		return false
+	}
+	last := c.Results[len(c.Results)-1]
+	return !last.OK && !IsSyntaxError(last.Message) && last.Tail >= len(c.SQL)
 }
 
 const (

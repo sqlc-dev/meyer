@@ -36,13 +36,12 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/sqlc-dev/meyer/ast"
 	"github.com/sqlc-dev/meyer/internal/dump"
+	"github.com/sqlc-dev/meyer/internal/roundtrip"
 	"github.com/sqlc-dev/meyer/internal/sqlitesrc"
 	"github.com/sqlc-dev/meyer/internal/testfile"
 	"github.com/sqlc-dev/meyer/lexer"
 	"github.com/sqlc-dev/meyer/parser"
-	"github.com/sqlc-dev/meyer/token"
 )
 
 // injections are the tokens a mutation may splice in. They are chosen to
@@ -147,7 +146,7 @@ func main() {
 
 // check asks both parsers about one input and records any disagreement.
 func check(r *sqlitesrc.Runner, sql string, rep *report) {
-	if splitDiffers(sql) {
+	if sqlitesrc.SplitDiffers(sql) {
 		rep.skipped.Add(1)
 		return
 	}
@@ -159,18 +158,12 @@ func check(r *sqlitesrc.Runner, sql string, rep *report) {
 	c := testfile.Case{SQL: sql, Results: results}
 	exp := c.Expected()
 
-	// A grammar action that fails on the last token of a statement leaves
-	// pzTail at the end of the input, so nothing marks the statement as
-	// abandoned -- yet SQLite stopped feeding tokens and can no longer
-	// notice that the input was truncated. "CREATE TABLE aux1.t1(" is
-	// "unknown database aux1" to SQLite and "incomplete input" to meyer,
-	// and the corpus cannot say which is right.
-	if exp.OK && truncatedAtEnd(sql, results) {
+	if exp.OK && exp.Truncated {
 		rep.skipped.Add(1)
 		return
 	}
 
-	_, perr := parser.ParseString(sql)
+	stmts, perr := parser.ParseString(sql)
 	var pe *parser.Error
 	if perr != nil {
 		var ok bool
@@ -191,7 +184,9 @@ func check(r *sqlitesrc.Runner, sql string, rep *report) {
 	case exp.OK && pe == nil:
 		// Both accepted, so this is also a free renderer test: mutated SQL
 		// that still parses is a shape nobody wrote on purpose.
-		checkRoundTrip(sql, rep)
+		if r := roundtrip.Check(stmts); !r.Ok {
+			rep.add(r.Reason, sql, r.Rendered, dump.FirstDiff(r.Want, r.Got))
+		}
 	case exp.OK:
 		rep.add("meyer rejects, SQLite accepts", sql, pe.Message, "accepted")
 	case pe == nil:
@@ -203,88 +198,6 @@ func check(r *sqlitesrc.Runner, sql string, rep *report) {
 			fmt.Sprintf("%s at %d", pe.Message, pe.Offset),
 			fmt.Sprintf("%s at %d", exp.Message, exp.Offset))
 	}
-}
-
-// checkRoundTrip renders an accepted parse back to SQL and re-parses it;
-// the two trees must match, ignoring spans and Raw text.
-func checkRoundTrip(sql string, rep *report) {
-	first, err := parser.ParseString(sql)
-	if err != nil {
-		return
-	}
-	rendered := ast.Statements(first)
-	second, err := parser.ParseString(rendered)
-	if err != nil {
-		rep.add("rendered SQL does not parse", sql, err.Error(), rendered)
-		return
-	}
-	want := dump.Stmts(first, dump.Structure)
-	if got := dump.Stmts(second, dump.Structure); got != want {
-		rep.add("round trip changed the tree", sql, rendered, "")
-	}
-}
-
-// splitDiffers reports whether the oracle would cut the script into
-// statements somewhere meyer would not, which makes the two incomparable.
-//
-// The oracle splits the way the sqlite3 shell does, with sqlite3_complete,
-// whose scanner is much cruder than the tokenizer: it understands strings,
-// the four quoting styles and comments, but nothing else. So a ";" ends a
-// statement for it even inside brackets, and even inside a token the real
-// tokenizer would have swallowed whole -- ":v(a;b)" is one bind parameter
-// to the tokenizer and two statements to sqlite3_complete.
-func splitDiffers(sql string) bool {
-	depth := 0
-	for _, t := range lexer.Lex(sql) {
-		switch t.Kind {
-		case token.LP:
-			depth++
-		case token.RP:
-			if depth > 0 {
-				depth--
-			}
-		case token.SEMI:
-			if depth > 0 {
-				return true
-			}
-		default:
-			if strings.Contains(t.Text, ";") && !completeUnderstands(t) {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-// completeUnderstands reports whether sqlite3_complete skips over a token
-// the same way the tokenizer does. The closed quoted forms it does, blob
-// literals included, since it reads their body as a single-quoted string.
-// An unterminated one it does not: in ":v('(%d)',changes());" the tokenizer
-// swallows the first quote into the bind parameter and finds a string
-// starting at the second, while sqlite3_complete pairs the two.
-func completeUnderstands(t token.Token) bool {
-	switch t.Kind {
-	case token.STRING, token.BLOB:
-		return true
-	case token.ID:
-		switch t.Text[0] {
-		case '"', '`', '[':
-			return true
-		}
-	}
-	return false
-}
-
-// truncatedAtEnd reports whether the last statement failed with a
-// non-syntax message raised while its last token was the lookahead. SQLite
-// abandons the parse there, so it never reaches the end of the input and
-// never reports the truncation.
-func truncatedAtEnd(sql string, results []testfile.StmtResult) bool {
-	if len(results) == 0 {
-		return false
-	}
-	last := results[len(results)-1]
-	return !last.OK && !testfile.IsSyntaxError(last.Message) && last.Tail >= len(sql)
 }
 
 // mutations derives up to n one-edit variants of src. Every edit works on
