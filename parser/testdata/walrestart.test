@@ -1,0 +1,40 @@
+==== 1.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA journal_mode = wal;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<20
+  ) 
+  INSERT INTO t1 SELECT NULL, randomblob(600) FROM s;
+  CREATE INDEX i1 ON t1(b);
+  PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 55 ok
+stmt 100 err 1 -1 228 no such table: t1
+stmt 228 err 1 -1 256 no such table: main.t1
+stmt 256 ok
+==== 1.1
+
+  UPDATE t1 SET b=randomblob(600);
+  PRAGMA wal_checkpoint;
+----
+stmt 0 err 1 -1 35 no such table: t1
+stmt 35 ok
+==== 1.2
+
+  PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+==== 1.4
+
+  PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+==== 1.5
+
+  PRAGMA integrity_check
+----
+stmt 0 ok

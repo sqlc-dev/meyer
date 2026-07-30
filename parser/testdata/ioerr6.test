@@ -1,0 +1,4 @@
+==== 1.2
+ PRAGMA integrity_check
+----
+stmt 0 ok

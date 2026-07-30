@@ -1,0 +1,35 @@
+==== vtab3-1.1
+
+    CREATE TABLE elephant(
+      name VARCHAR(32), 
+      color VARCHAR(16), 
+      age INTEGER, 
+      UNIQUE(name, color)
+    );
+----
+stmt 0 ok
+==== vtab3-1.5
+
+    SELECT name FROM sqlite_master WHERE type = 'table';
+----
+stmt 0 ok
+==== vtab3-1.6
+
+    SELECT name FROM sqlite_master WHERE type = 'table';
+----
+stmt 0 ok
+==== vtab3-1.6.dup1
+
+    SELECT name FROM sqlite_master WHERE type = 'table';
+----
+stmt 0 ok
+==== vtab3-generated
+
+      SELECT name FROM sqlite_master WHERE type = 'table';
+----
+stmt 0 ok
+==== vtab3-1.8.2
+
+    SELECT name FROM sqlite_master WHERE type = 'table';
+----
+stmt 0 ok

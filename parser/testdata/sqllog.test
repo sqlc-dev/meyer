@@ -1,0 +1,14 @@
+==== 2.1
+
+  INSERT INTO t1 VALUES(4, 5);
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 31 no such table: t1
+stmt 31 err 1 -1 51 no such table: t1
+==== 2.3
+
+  INSERT INTO t1 VALUES(6, 7);
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 31 no such table: t1
+stmt 31 err 1 -1 51 no such table: t1

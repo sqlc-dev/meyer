@@ -1,0 +1,413 @@
+==== limit-1.0
+SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 24 no such table: t1
+==== limit-1.1
+SELECT count(*) FROM t1 LIMIT  5
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== limit-1.2.1
+SELECT x FROM t1 ORDER BY x LIMIT 5
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== limit-1.2.2
+SELECT x FROM t1 ORDER BY x LIMIT 5 OFFSET 2
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== limit-1.2.3
+SELECT x FROM t1 ORDER BY x+1 LIMIT 5 OFFSET -2
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== limit-1.2.4
+SELECT x FROM t1 ORDER BY x+1 LIMIT 2, -5
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== limit-1.2.5
+SELECT x FROM t1 ORDER BY x+1 LIMIT -2, 5
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== limit-1.2.6
+SELECT x FROM t1 ORDER BY x+1 LIMIT -2, -5
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== limit-1.2.7
+SELECT x FROM t1 ORDER BY x LIMIT 2, 5
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== limit-1.3
+SELECT x FROM t1 ORDER BY x LIMIT 5 OFFSET 5
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== limit-1.4.1
+SELECT x FROM t1 ORDER BY x LIMIT 50 OFFSET 30
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== limit-1.4.2
+SELECT x FROM t1 ORDER BY x LIMIT 30, 50
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== limit-1.5
+SELECT x FROM t1 ORDER BY x LIMIT 50 OFFSET 50
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== limit-1.6
+SELECT * FROM t1 AS a, t1 AS b ORDER BY a.x, b.x LIMIT 5
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== limit-1.7
+SELECT * FROM t1 AS a, t1 AS b ORDER BY a.x, b.x LIMIT 5 OFFSET 32
+----
+stmt 0 err 1 -1 67 no such table: t1
+==== limit-2.1
+
+      CREATE VIEW v1 AS SELECT * FROM t1 LIMIT 2;
+      SELECT count(*) FROM (SELECT * FROM v1);
+----
+stmt 0 ok
+stmt 50 err 1 -1 97 no such table: v1
+==== limit-2.2
+
+    CREATE TABLE t2 AS SELECT * FROM t1 LIMIT 2;
+    SELECT count(*) FROM t2;
+----
+stmt 0 err 1 -1 49 no such table: t1
+stmt 49 err 1 -1 78 no such table: t2
+==== limit-2.3
+
+      SELECT count(*) FROM t1 WHERE rowid IN (SELECT rowid FROM t1 LIMIT 2);
+----
+stmt 0 err 1 -1 77 no such table: t1
+==== limit-3.1
+
+      SELECT z FROM (SELECT y*10+x AS z FROM t1 ORDER BY x LIMIT 10)
+      ORDER BY z LIMIT 5;
+----
+stmt 0 err 1 -1 95 no such table: t1
+==== limit-4.2
+
+    SELECT x FROM t3 LIMIT 2 OFFSET 10000
+----
+stmt 0 err 1 -1 43 no such table: t3
+==== limit-4.3
+
+    CREATE TABLE t4 AS SELECT x,
+       'abcdefghijklmnopqrstuvwyxz ABCDEFGHIJKLMNOPQRSTUVWYXZ' || x ||
+       'abcdefghijklmnopqrstuvwyxz ABCDEFGHIJKLMNOPQRSTUVWYXZ' || x ||
+       'abcdefghijklmnopqrstuvwyxz ABCDEFGHIJKLMNOPQRSTUVWYXZ' || x ||
+       'abcdefghijklmnopqrstuvwyxz ABCDEFGHIJKLMNOPQRSTUVWYXZ' || x ||
+       'abcdefghijklmnopqrstuvwyxz ABCDEFGHIJKLMNOPQRSTUVWYXZ' || x AS y
+    FROM t3 LIMIT 1000;
+    SELECT x FROM t4 ORDER BY y DESC LIMIT 1 OFFSET 999;
+----
+stmt 0 err 1 -1 414 no such table: t3
+stmt 414 err 1 -1 471 no such table: t4
+==== limit-5.1
+
+    CREATE TABLE t5(x,y);
+    INSERT INTO t5 SELECT x-y, x+y FROM t1 WHERE x BETWEEN 10 AND 15
+        ORDER BY x LIMIT 2;
+    SELECT * FROM t5 ORDER BY x;
+----
+stmt 0 ok
+stmt 26 err 1 -1 123 no such table: t5
+stmt 123 err 1 -1 156 no such table: t5
+==== limit-5.2
+
+    DELETE FROM t5;
+    INSERT INTO t5 SELECT x-y, x+y FROM t1 WHERE x BETWEEN 10 AND 15
+        ORDER BY x DESC LIMIT 2;
+    SELECT * FROM t5 ORDER BY x;
+----
+stmt 0 err 1 -1 20 no such table: t5
+stmt 20 err 1 -1 122 no such table: t5
+stmt 122 err 1 -1 155 no such table: t5
+==== limit-5.3
+
+    DELETE FROM t5;
+    INSERT INTO t5 SELECT x-y, x+y FROM t1 WHERE x ORDER BY x DESC LIMIT 31;
+    SELECT * FROM t5 ORDER BY x LIMIT 2;
+----
+stmt 0 err 1 -1 20 no such table: t5
+stmt 20 err 1 -1 97 no such table: t5
+stmt 97 err 1 -1 138 no such table: t5
+==== limit-5.4
+
+    SELECT * FROM t5 ORDER BY x DESC, y DESC LIMIT 2;
+----
+stmt 0 err 1 -1 54 no such table: t5
+==== limit-5.5
+
+    DELETE FROM t5;
+    INSERT INTO t5 SELECT a.x*100+b.x, a.y*100+b.y FROM t1 AS a, t1 AS b
+                   ORDER BY 1, 2 LIMIT 1000;
+    SELECT count(*), sum(x), sum(y), min(x), max(x), min(y), max(y) FROM t5;
+----
+stmt 0 err 1 -1 20 no such table: t5
+stmt 20 err 1 -1 138 no such table: t5
+stmt 138 err 1 -1 215 no such table: t5
+==== limit-6.1
+
+    BEGIN;
+    CREATE TABLE t6(a);
+    INSERT INTO t6 VALUES(1);
+    INSERT INTO t6 VALUES(2);
+    INSERT INTO t6 SELECT a+2 FROM t6;
+    COMMIT;
+    SELECT * FROM t6;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 35 err 1 -1 65 no such table: t6
+stmt 65 err 1 -1 95 no such table: t6
+stmt 95 err 1 -1 134 no such table: t6
+stmt 134 ok
+stmt 146 err 1 -1 168 no such table: t6
+==== limit-6.2
+
+    SELECT * FROM t6 LIMIT -1 OFFSET -1;
+----
+stmt 0 err 1 -1 41 no such table: t6
+==== limit-6.3
+
+    SELECT * FROM t6 LIMIT 2 OFFSET -123;
+----
+stmt 0 err 1 -1 42 no such table: t6
+==== limit-6.4
+
+    SELECT * FROM t6 LIMIT -432 OFFSET 2;
+----
+stmt 0 err 1 -1 42 no such table: t6
+==== limit-6.5
+
+    SELECT * FROM t6 LIMIT -1
+----
+stmt 0 err 1 -1 31 no such table: t6
+==== limit-6.6
+
+    SELECT * FROM t6 LIMIT -1 OFFSET 1
+----
+stmt 0 err 1 -1 40 no such table: t6
+==== limit-6.7
+
+    SELECT * FROM t6 LIMIT 0
+----
+stmt 0 err 1 -1 30 no such table: t6
+==== limit-6.8
+
+    SELECT * FROM t6 LIMIT 0 OFFSET 1
+----
+stmt 0 err 1 -1 39 no such table: t6
+==== limit-7.1.1
+
+    SELECT x FROM t2 LIMIT 5 UNION ALL SELECT a FROM t6;
+----
+stmt 0 err 1 -1 57 LIMIT clause should come after UNION ALL not before
+==== limit-7.1.2
+
+    SELECT x FROM t2 LIMIT 5 UNION SELECT a FROM t6;
+----
+stmt 0 err 1 -1 53 LIMIT clause should come after UNION not before
+==== limit-7.1.3
+
+    SELECT x FROM t2 LIMIT 5 EXCEPT SELECT a FROM t6 LIMIT 3;
+----
+stmt 0 err 1 -1 62 LIMIT clause should come after EXCEPT not before
+==== limit-7.1.4
+
+    SELECT x FROM t2 LIMIT 0,5 INTERSECT SELECT a FROM t6;
+----
+stmt 0 err 1 -1 59 LIMIT clause should come after INTERSECT not before
+==== limit-7.2
+
+    SELECT x FROM t2 UNION ALL SELECT a FROM t6 LIMIT 5;
+----
+stmt 0 err 1 -1 57 no such table: t6
+==== limit-7.3
+
+    SELECT x FROM t2 UNION ALL SELECT a FROM t6 LIMIT 3 OFFSET 1;
+----
+stmt 0 err 1 -1 66 no such table: t6
+==== limit-7.4
+
+    SELECT x FROM t2 UNION ALL SELECT a FROM t6 ORDER BY 1 LIMIT 3 OFFSET 1;
+----
+stmt 0 err 1 -1 77 no such table: t6
+==== limit-7.5
+
+    SELECT x FROM t2 UNION SELECT x+2 FROM t2 LIMIT 2 OFFSET 1;
+----
+stmt 0 err 1 -1 64 no such table: t2
+==== limit-7.6
+
+    SELECT x FROM t2 UNION SELECT x+2 FROM t2 ORDER BY 1 DESC LIMIT 2 OFFSET 1;
+----
+stmt 0 err 1 -1 80 no such table: t2
+==== limit-7.7
+
+    SELECT a+9 FROM t6 EXCEPT SELECT y FROM t2 LIMIT 2;
+----
+stmt 0 err 1 -1 56 no such table: t2
+==== limit-7.8
+
+    SELECT a+9 FROM t6 EXCEPT SELECT y FROM t2 ORDER BY 1 DESC LIMIT 2;
+----
+stmt 0 err 1 -1 72 no such table: t2
+==== limit-7.9
+
+    SELECT a+26 FROM t6 INTERSECT SELECT x FROM t2 LIMIT 1;
+----
+stmt 0 err 1 -1 60 no such table: t2
+==== limit-7.10
+
+    SELECT a+27 FROM t6 INTERSECT SELECT x FROM t2 LIMIT 1;
+----
+stmt 0 err 1 -1 60 no such table: t2
+==== limit-7.11
+
+    SELECT a+27 FROM t6 INTERSECT SELECT x FROM t2 LIMIT 1 OFFSET 1;
+----
+stmt 0 err 1 -1 69 no such table: t2
+==== limit-7.12
+
+    SELECT a+27 FROM t6 INTERSECT SELECT x FROM t2 
+       ORDER BY 1 DESC LIMIT 1 OFFSET 1;
+----
+stmt 0 err 1 -1 93 no such table: t2
+==== limit-8.1
+
+    SELECT DISTINCT cast(round(x/100) as integer) FROM t3 LIMIT 5;
+----
+stmt 0 err 1 -1 67 no such table: t3
+==== limit-8.2
+
+    SELECT DISTINCT cast(round(x/100) as integer) FROM t3 LIMIT 5 OFFSET 5;
+----
+stmt 0 err 1 -1 76 no such table: t3
+==== limit-8.3
+
+    SELECT DISTINCT cast(round(x/100) as integer) FROM t3 LIMIT 5 OFFSET 25;
+----
+stmt 0 err 1 -1 77 no such table: t3
+==== limit-9.1
+
+      SELECT * FROM (SELECT * FROM t6 LIMIT 3);
+----
+stmt 0 err 1 -1 48 no such table: t6
+==== limit-9.2.1
+
+    CREATE TABLE t7 AS SELECT * FROM t6;
+----
+stmt 0 err 1 -1 41 no such table: t6
+==== limit-9.2.2
+
+      SELECT * FROM (SELECT * FROM t7 LIMIT 3);
+----
+stmt 0 err 1 -1 48 no such table: t7
+==== limit-9.3
+
+        SELECT * FROM (SELECT * FROM t6 LIMIT 3)
+        UNION
+        SELECT * FROM (SELECT * FROM t7 LIMIT 3)
+        ORDER BY 1
+----
+stmt 0 err 1 -1 132 no such table: t7
+==== limit-9.4
+
+        SELECT * FROM (SELECT * FROM t6 LIMIT 3)
+        UNION
+        SELECT * FROM (SELECT * FROM t7 LIMIT 3)
+        ORDER BY 1
+        LIMIT 2
+----
+stmt 0 err 1 -1 148 no such table: t7
+==== limit-9.5
+
+      SELECT * FROM t6 LIMIT 3
+      UNION
+      SELECT * FROM t7 LIMIT 3
+----
+stmt 0 err 1 -1 75 LIMIT clause should come after UNION not before
+==== limit-12.1
+
+     SELECT * FROM t1 LIMIT replace(1)
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== limit-12.2
+
+     SELECT * FROM t1 LIMIT 5 OFFSET replace(1)
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== limit-12.3
+
+     SELECT * FROM t1 LIMIT x
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== limit-12.4
+
+     SELECT * FROM t1 LIMIT 1 OFFSET x
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== limit-14.1
+
+  SELECT 123 LIMIT 1 OFFSET 0
+----
+stmt 0 ok
+==== limit-14.2
+
+  SELECT 123 LIMIT 1 OFFSET 1
+----
+stmt 0 ok
+==== limit-14.3
+
+  SELECT 123 LIMIT 0 OFFSET 0
+----
+stmt 0 ok
+==== limit-14.4
+
+  SELECT 123 LIMIT 0 OFFSET 1
+----
+stmt 0 ok
+==== limit-14.6
+
+  SELECT 123 LIMIT -1 OFFSET 0
+----
+stmt 0 ok
+==== limit-14.7
+
+  SELECT 123 LIMIT -1 OFFSET 1
+----
+stmt 0 ok
+==== limit-15.1
+
+  CREATE TABLE t1(a PRIMARY KEY, b TEXT);
+  CREATE TABLE t4(c PRIMARY KEY, d);
+  CREATE TABLE t5(e PRIMARY KEY, f);
+  CREATE TABLE t6(g, h);
+  CREATE TABLE t3_a(k, v);
+  CREATE TABLE t3_b(k, v);
+  CREATE VIEW t3 AS SELECT * FROM t3_a UNION ALL SELECT * FROM t3_b;
+  INSERT INTO t5(e,f) VALUES(500000,'orange');
+  INSERT INTO t4(c,d) VALUES(300000,'blue'),(400,'green'),(8000,'grey');
+  INSERT INTO t1(a,b) VALUES(300000,'purple');
+  INSERT INTO t3_a VALUES(300000,'yellow'),(500,'pink'),(8000,'red');
+  INSERT INTO t6 default values;
+  SELECT (
+      SELECT 100000 FROM
+          (SELECT 200000 FROM t6 WHERE a = ( SELECT 300000 FROM t3 WHERE a ) ),
+          (SELECT 400000 FROM t5 WHERE e=500000),
+          (SELECT 600000 FROM t4 WHERE c=a)
+  ) FROM t1;
+----
+stmt 0 ok
+stmt 42 ok
+stmt 79 ok
+stmt 116 ok
+stmt 141 ok
+stmt 168 ok
+stmt 195 ok
+stmt 264 err 1 -1 311 no such table: t5
+stmt 311 err 1 -1 384 no such table: t4
+stmt 384 err 1 -1 431 no such table: t1
+stmt 431 err 1 -1 501 no such table: t3_a
+stmt 501 err 1 -1 534 no such table: t6
+stmt 534 err 1 -1 757 no such table: t1

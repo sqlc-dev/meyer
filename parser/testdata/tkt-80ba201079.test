@@ -1,0 +1,58 @@
+==== 301
+
+  CREATE TABLE t1(a, b, c);
+  CREATE INDEX i1 ON t1(a);
+  CREATE INDEX i2 ON t1(b);
+  CREATE TABLE t2(d, e);
+
+  INSERT INTO t1 VALUES('A', 'B', 'C');
+  INSERT INTO t2 VALUES('D', 'E');
+----
+stmt 0 ok
+stmt 28 err 1 -1 56 no such table: main.t1
+stmt 56 err 1 -1 84 no such table: main.t1
+stmt 84 ok
+stmt 109 err 1 -1 150 no such table: t1
+stmt 150 err 1 -1 185 no such table: t2
+==== 302
+
+  SELECT * FROM t1, t2 WHERE
+    (a='A' AND d='E') OR
+    (b='B' AND c IN ('C', 'D', 'E'))
+----
+stmt 0 err 1 -1 92 no such table: t1
+==== 303
+
+  SELECT * FROM t1, t2 WHERE
+    (a='A' AND d='E') OR
+    (b='B' AND c IN (SELECT c FROM t1))
+----
+stmt 0 err 1 -1 95 no such table: t1
+==== 304
+
+    SELECT * FROM t1, t2 WHERE
+      (a='A' AND d='E') OR
+      (b='B' AND c IN (SELECT 'B' UNION SELECT 'C' UNION SELECT 'D'))
+----
+stmt 0 err 1 -1 129 no such table: t1
+==== 305
+
+  SELECT * FROM t1, t2 WHERE
+    (b='B' AND c IN ('C', 'D', 'E')) OR
+    (a='A' AND d='E')
+----
+stmt 0 err 1 -1 92 no such table: t1
+==== 306
+
+  SELECT * FROM t1, t2 WHERE
+    (b='B' AND c IN (SELECT c FROM t1)) OR
+    (a='A' AND d='E')
+----
+stmt 0 err 1 -1 95 no such table: t1
+==== 307
+
+    SELECT * FROM t1, t2 WHERE
+      (b='B' AND c IN (SELECT 'B' UNION SELECT 'C' UNION SELECT 'D')) OR
+      (a='A' AND d='E')
+----
+stmt 0 err 1 -1 129 no such table: t1

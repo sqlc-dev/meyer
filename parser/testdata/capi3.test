@@ -1,0 +1,97 @@
+==== capi3-11.1
+
+    BEGIN;
+    CREATE TABLE t1(a, b);
+    INSERT INTO t1 VALUES(1, 'int');
+    INSERT INTO t1 VALUES(2, 'notatype');
+----
+stmt 0 ok
+stmt 11 ok
+stmt 38 err 1 -1 75 no such table: t1
+stmt 75 err 1 -1 117 no such table: t1
+==== capi3-11.3.1
+
+    COMMIT;
+----
+stmt 0 ok
+==== capi3-11.6
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== capi3-11.8
+
+    CREATE TABLE t2(a);
+    INSERT INTO t2 VALUES(1);
+    INSERT INTO t2 VALUES(2);
+    BEGIN;
+    INSERT INTO t2 VALUES(3);
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t2
+stmt 54 err 1 -1 84 no such table: t2
+stmt 84 ok
+stmt 95 err 1 -1 125 no such table: t2
+==== capi3-11.9.2
+
+    ROLLBACK;
+----
+stmt 0 ok
+==== capi3-11.14
+
+    SELECT a FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== capi3-11.15
+
+    ROLLBACK;
+----
+stmt 0 ok
+==== capi3-11.16
+
+    SELECT a FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== capi3-11.17
+
+    BEGIN;
+----
+stmt 0 ok
+==== capi3-11.20
+
+    BEGIN;
+    COMMIT;
+----
+stmt 0 ok
+stmt 11 ok
+==== capi3-12.2
+
+    INSERT INTO t1 VALUES(3, NULL);
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== capi3-12.3
+
+    INSERT INTO t2 VALUES(4);
+----
+stmt 0 err 1 -1 30 no such table: t2
+==== capi3-12.4
+
+    BEGIN;
+    INSERT INTO t1 VALUES(4, NULL);
+----
+stmt 0 ok
+stmt 11 err 1 -1 47 no such table: t1
+==== capi3-12.8
+
+    COMMIT;
+    SELECT a FROM t1;
+----
+stmt 0 ok
+stmt 12 err 1 -1 34 no such table: t1
+==== 20.1
+
+  CREATE TABLE t4(x);
+  INSERT INTO t4 VALUES('abcdefghij');
+----
+stmt 0 ok
+stmt 22 err 1 -1 61 no such table: t4

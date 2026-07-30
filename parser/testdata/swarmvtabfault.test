@@ -1,0 +1,15 @@
+==== 1.0
+
+  ATTACH 'test.db1' AS aux;
+  CREATE TABLE aux.t1(a INTEGER PRIMARY KEY, b);
+  INSERT INTO aux.t1 VALUES(1, NULL);
+  INSERT INTO aux.t1 VALUES(2, NULL);
+  INSERT INTO aux.t1 VALUES(9, NULL);
+  DETACH aux;
+----
+stmt 0 ok
+stmt 28 err 1 44 51 unknown database aux
+stmt 77 err 1 -1 115 no such table: aux.t1
+stmt 115 err 1 -1 153 no such table: aux.t1
+stmt 153 err 1 -1 191 no such table: aux.t1
+stmt 191 ok

@@ -1,0 +1,28 @@
+==== tkt-d11f09d36e.2
+
+    BEGIN;
+      UPDATE t1 set x = x+10000;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 -1 44 no such table: t1
+stmt 44 ok
+==== tkt-d11f09d36e.3
+ PRAGMA integrity_check
+----
+stmt 0 ok
+==== tkt-d11f09d36e.4
+
+    SAVEPOINT tr;
+      UPDATE t1 set x = x+10000;
+    ROLLBACK TO tr;
+    RELEASE tr;
+----
+stmt 0 ok
+stmt 18 err 1 -1 51 no such table: t1
+stmt 51 ok
+stmt 71 ok
+==== tkt-d11f09d36e.5
+ PRAGMA integrity_check
+----
+stmt 0 ok

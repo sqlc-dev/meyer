@@ -1,0 +1,134 @@
+==== joinA-generated
+
+    SELECT a,b,c,d,t2.e,f,t3.e
+      FROM t1
+           INNER JOIN t2 USING(c,d)
+           INNER JOIN t3 USING(a,b,f)
+           INNER JOIN t4 USING(a,c,d,f)
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 202 no such table: t1
+==== joinA-generated.dup1
+
+    SELECT a,b,c,d,t2.e,f,t3.e
+      FROM t1
+           LEFT JOIN t2 USING(c,d)
+           LEFT JOIN t3 USING(a,b,f)
+           LEFT JOIN t4 USING(a,c,d,f)
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinA-generated.dup2
+
+    SELECT a,b,c,d,t2.e,f,t3.e
+      FROM t1
+           LEFT JOIN t2 USING(c,d)
+           RIGHT JOIN t3 USING(a,b,f)
+           LEFT JOIN t4 USING(a,c,d,f)
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinA-generated.dup3
+
+    SELECT a,b,c,d,t2.e,f,t3.e
+      FROM t1
+           RIGHT JOIN t2 USING(c,d)
+           LEFT JOIN t3 USING(a,b,f)
+           RIGHT JOIN t4 USING(a,c,d,f)
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 201 no such table: t1
+==== joinA-generated.dup4
+
+    SELECT a,b,c,d,t2.e,f,t3.e
+      FROM t1
+           FULL JOIN t2 USING(c,d)
+           LEFT JOIN t3 USING(a,b,f)
+           RIGHT JOIN t4 USING(a,c,d,f)
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinA-generated.dup5
+
+    SELECT a,b,c,d,t2.e,f,t3.e
+      FROM t1
+           RIGHT JOIN t2 USING(c,d)
+           FULL JOIN t3 USING(a,b,f)
+           RIGHT JOIN t4 USING(a,c,d,f)
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 201 no such table: t1
+==== joinA-generated.dup6
+
+    SELECT a,b,c,d,t2.e,f,t3.e
+      FROM t1
+           RIGHT JOIN t2 USING(c,d)
+           LEFT JOIN t3 USING(a,b,f)
+           FULL JOIN t4 USING(a,c,d,f)
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinA-generated.dup7
+
+    SELECT a,b,c,d,t2.e,f,t3.e
+      FROM t1
+           LEFT JOIN t2 USING(c,d)
+           RIGHT JOIN t3 USING(a,b,f)
+           FULL JOIN t4 USING(a,c,d,f)
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinA-generated.dup8
+
+    SELECT a,b,c,d,t2.e,f,t3.e
+      FROM t1
+           FULL JOIN t2 USING(c,d)
+           FULL JOIN t3 USING(a,b,f)
+           FULL JOIN t4 USING(a,c,d,f)
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinA-generated.dup9
+
+    SELECT a,b,c,d,t2.e,f,t3.e,t1.a
+      FROM t1
+           FULL JOIN t2 USING(c,d)
+           FULL JOIN t3 USING(a,b,f)
+           FULL JOIN t4 USING(a,c,d,f)
+     WHERE t1.a!=0
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 223 no such table: t1
+==== joinA-generated.dup10
+
+    SELECT a,b,c,d,t2.e,f,t3.e,t3.a
+      FROM t1
+           FULL JOIN t2 USING(c,d)
+           FULL JOIN t3 USING(a,b,f)
+           FULL JOIN t4 USING(a,c,d,f)
+     WHERE t3.a!=0
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 223 no such table: t1
+==== joinA-generated.dup11
+
+    SELECT a,b,c,d,t2.e,f,t3.e,t4.a
+      FROM t1
+           FULL JOIN t2 USING(c,d)
+           FULL JOIN t3 USING(a,b,f)
+           FULL JOIN t4 USING(a,c,d,f)
+     WHERE t4.a!=0
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 223 no such table: t1
+==== joinA-generated.dup12
+
+    SELECT a,b,c,d,t2.e,f,t3.e
+      FROM t1
+           FULL JOIN t2 USING(c,d)
+           FULL JOIN t3 USING(a,b,f)
+           FULL JOIN t4 USING(a,c,d,f)
+     WHERE t2.e!=0
+    ORDER BY 1 nulls first, 3 nulls first;
+----
+stmt 0 err 1 -1 218 no such table: t1

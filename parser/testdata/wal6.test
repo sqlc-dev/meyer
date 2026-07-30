@@ -1,0 +1,106 @@
+==== wal6-generated
+
+      CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+      INSERT INTO t1 VALUES(1,2);
+      SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 49 err 1 -1 83 no such table: t1
+stmt 83 err 1 -1 107 no such table: t1
+==== wal6-generated.dup1
+
+      SELECT * FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== 2.1
+
+  PRAGMA journal_mode = WAL;
+  CREATE TABLE t1(a PRIMARY KEY, b TEXT);
+  INSERT INTO t1 VALUES(1, 'one');
+  INSERT INTO t1 VALUES(2, 'two');
+  BEGIN;
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 71 err 1 -1 106 no such table: t1
+stmt 106 err 1 -1 141 no such table: t1
+stmt 141 ok
+stmt 150 err 1 -1 172 no such table: t1
+==== 2.3
+ 
+  INSERT INTO t1 VALUES('x', 'x')
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== 2.5
+
+  SELECT * FROM t1;
+  COMMIT;
+  INSERT INTO t1 VALUES('x', 'x')
+----
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 ok
+stmt 30 err 1 -1 65 no such table: t1
+==== wal6-generated.dup2
+ SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 25 no such table: t1
+==== wal6-generated.dup3
+ INSERT INTO t1 VALUES('y', 'y')
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== wal6-generated.dup4
+ SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 25 no such table: t1
+==== 2.6.1
+ DELETE FROM t1
+----
+stmt 0 err 1 -1 16 no such table: t1
+==== 2.6.3
+ DELETE FROM t1
+----
+stmt 0 err 1 -1 16 no such table: t1
+==== wal6-generated.dup5
+ BEGIN IMMEDIATE
+----
+stmt 0 ok
+==== wal6-generated.dup6
+ BEGIN IMMEDIATE
+----
+stmt 0 ok
+==== wal6-generated.dup7
+ COMMIT
+----
+stmt 0 ok
+==== 3.1
+ 
+  PRAGMA journal_mode = WAL;
+  CREATE TABLE ab(a PRIMARY KEY, b);
+----
+stmt 0 ok
+stmt 30 ok
+==== 4.1
+
+  PRAGMA page_size = 1024;
+  PRAGMA journal_mode = wal;
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(a, b);
+  PRAGMA wal_checkpoint = truncate;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 56 ok
+stmt 81 ok
+stmt 106 ok
+==== 5.1
+
+  PRAGMA journal_mode = wal;
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(3, 4);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 54 err 1 -1 85 no such table: t1
+stmt 85 err 1 -1 116 no such table: t1

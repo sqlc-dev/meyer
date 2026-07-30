@@ -1,0 +1,263 @@
+==== autoindex2-100
+
+  CREATE TABLE t1(
+    t1_id largeint,
+    did char(9),
+    ptime largeint,
+    exbyte char(4),
+    pe_id int,
+    field_id int,
+    mass float,
+    param10 float,
+    param11 float,
+    exmass float,
+    deviation float,
+    trange float,
+    vstatus int,
+    commit_status int,
+    formula char(329),
+    tier int DEFAULT 2,
+    ssid int DEFAULT 0,
+    last_operation largeint DEFAULT 0,
+    admin_uuid int DEFAULT 0,
+    previous_value float,
+    job_id largeint,
+    last_t1 largeint DEFAULT 0,
+    data_t1 int,
+    previous_date largeint DEFAULT 0,
+    flg8 int DEFAULT 1,
+    failed_fields char(100)
+  );
+  CREATE INDEX t1x0 on t1 (t1_id);
+  CREATE INDEX t1x1 on t1 (ptime, vstatus);
+  CREATE INDEX t1x2 on t1 (did, ssid, ptime, vstatus, exbyte, t1_id);
+  CREATE INDEX t1x3 on t1 (job_id);
+  
+  CREATE TABLE t2(
+    did char(9),
+    client_did char(30),
+    description char(49),
+    uid int,
+    tzid int,
+    privilege int,
+    param2 int,
+    type char(30),
+    subtype char(32),
+    dparam1 char(7) DEFAULT '',
+    param5 char(3) DEFAULT '',
+    notional float DEFAULT 0.000000,
+    create_time largeint,
+    sample_time largeint DEFAULT 0,
+    param6 largeint,
+    frequency int,
+    expiration largeint,
+    uw_status int,
+    next_sample largeint,
+    last_sample largeint,
+    reserve1 char(29) DEFAULT '',
+    reserve2 char(29) DEFAULT '',
+    reserve3 char(29) DEFAULT '',
+    bxcdr char(19) DEFAULT 'XY',
+    ssid int DEFAULT 1,
+    last_t1_id largeint,
+    reserve4 char(29) DEFAULT '',
+    reserve5 char(29) DEFAULT '',
+    param12 int DEFAULT 0,
+    long_did char(100) DEFAULT '',
+    gr_code int DEFAULT 0,
+    drx char(100) DEFAULT '',
+    parent_id char(9) DEFAULT '',
+    param13 int DEFAULT 0,
+    position float DEFAULT 1.000000,
+    client_did3 char(100) DEFAULT '',
+    client_did4 char(100) DEFAULT '',
+    dlib_id char(9) DEFAULT ''
+  );
+  CREATE INDEX t2x0 on t2 (did);
+  CREATE INDEX t2x1 on t2 (client_did);
+  CREATE INDEX t2x2 on t2 (long_did);
+  CREATE INDEX t2x3 on t2 (uid);
+  CREATE INDEX t2x4 on t2 (param2);
+  CREATE INDEX t2x5 on t2 (type);
+  CREATE INDEX t2x6 on t2 (subtype);
+  CREATE INDEX t2x7 on t2 (last_sample);
+  CREATE INDEX t2x8 on t2 (param6);
+  CREATE INDEX t2x9 on t2 (frequency);
+  CREATE INDEX t2x10 on t2 (privilege);
+  CREATE INDEX t2x11 on t2 (sample_time);
+  CREATE INDEX t2x12 on t2 (notional);
+  CREATE INDEX t2x13 on t2 (tzid);
+  CREATE INDEX t2x14 on t2 (gr_code);
+  CREATE INDEX t2x15 on t2 (parent_id);
+  
+  CREATE TABLE t3(
+    uid int,
+    param3 int,
+    uuid int,
+    acc_id int,
+    cust_num int,
+    numerix_id int,
+    pfy char(29),
+    param4 char(29),
+    param15 int DEFAULT 0,
+    flg7 int DEFAULT 0,
+    param21 int DEFAULT 0,
+    bxcdr char(2) DEFAULT 'PC',
+    c31 int DEFAULT 0,
+    c33 int DEFAULT 0,
+    c35 int DEFAULT 0,
+    c37 int,
+    mgr_uuid int,
+    back_up_uuid int,
+    priv_mars int DEFAULT 0,
+    is_qc int DEFAULT 0,
+    c41 int DEFAULT 0,
+    deleted int DEFAULT 0,
+    c47 int DEFAULT 1
+  );
+  CREATE INDEX t3x0 on t3 (uid);
+  CREATE INDEX t3x1 on t3 (param3);
+  CREATE INDEX t3x2 on t3 (uuid);
+  CREATE INDEX t3x3 on t3 (acc_id);
+  CREATE INDEX t3x4 on t3 (param4);
+  CREATE INDEX t3x5 on t3 (pfy);
+  CREATE INDEX t3x6 on t3 (is_qc);
+  SELECT count(*) FROM sqlite_master;
+----
+stmt 0 ok
+stmt 611 err 1 -1 646 no such table: main.t1
+stmt 646 err 1 -1 690 no such table: main.t1
+stmt 690 err 1 -1 760 no such table: main.t1
+stmt 760 err 1 -1 796 no such table: main.t1
+stmt 796 ok
+stmt 1868 err 1 -1 1901 no such table: main.t2
+stmt 1901 err 1 -1 1941 no such table: main.t2
+stmt 1941 err 1 -1 1979 no such table: main.t2
+stmt 1979 err 1 -1 2012 no such table: main.t2
+stmt 2012 err 1 -1 2048 no such table: main.t2
+stmt 2048 err 1 -1 2082 no such table: main.t2
+stmt 2082 err 1 -1 2119 no such table: main.t2
+stmt 2119 err 1 -1 2160 no such table: main.t2
+stmt 2160 err 1 -1 2196 no such table: main.t2
+stmt 2196 err 1 -1 2235 no such table: main.t2
+stmt 2235 err 1 -1 2275 no such table: main.t2
+stmt 2275 err 1 -1 2317 no such table: main.t2
+stmt 2317 err 1 -1 2356 no such table: main.t2
+stmt 2356 err 1 -1 2391 no such table: main.t2
+stmt 2391 err 1 -1 2429 no such table: main.t2
+stmt 2429 err 1 -1 2469 no such table: main.t2
+stmt 2469 ok
+stmt 2990 err 1 -1 3023 no such table: main.t3
+stmt 3023 err 1 -1 3059 no such table: main.t3
+stmt 3059 err 1 -1 3093 no such table: main.t3
+stmt 3093 err 1 -1 3129 no such table: main.t3
+stmt 3129 err 1 -1 3165 no such table: main.t3
+stmt 3165 err 1 -1 3198 no such table: main.t3
+stmt 3198 err 1 -1 3233 no such table: main.t3
+stmt 3233 ok
+==== autoindex2-110
+
+  ANALYZE sqlite_master;
+  INSERT INTO sqlite_stat1 VALUES('t1','t1x3','10747267 260');
+  INSERT INTO sqlite_stat1 VALUES('t1','t1x2','10747267 121 113 2 2 2 1');
+  INSERT INTO sqlite_stat1 VALUES('t1','t1x1','10747267 50 40');
+  INSERT INTO sqlite_stat1 VALUES('t1','t1x0','10747267 1');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x15','39667 253');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x14','39667 19834');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x13','39667 13223');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x12','39667 7');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x11','39667 17');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x10','39667 19834');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x9','39667 7934');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x8','39667 11');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x7','39667 5');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x6','39667 242');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x5','39667 1984');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x4','39667 4408');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x3','39667 81');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x2','39667 551');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x1','39667 2');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2x0','39667 1');
+  INSERT INTO sqlite_stat1 VALUES('t3','t3x6','569 285');
+  INSERT INTO sqlite_stat1 VALUES('t3','t3x5','569 2');
+  INSERT INTO sqlite_stat1 VALUES('t3','t3x4','569 2');
+  INSERT INTO sqlite_stat1 VALUES('t3','t3x3','569 5');
+  INSERT INTO sqlite_stat1 VALUES('t3','t3x2','569 3');
+  INSERT INTO sqlite_stat1 VALUES('t3','t3x1','569 6');
+  INSERT INTO sqlite_stat1 VALUES('t3','t3x0','569 1');
+  ANALYZE sqlite_master;
+----
+stmt 0 ok
+stmt 25 err 1 -1 88 no such table: sqlite_stat1
+stmt 88 err 1 -1 163 no such table: sqlite_stat1
+stmt 163 err 1 -1 228 no such table: sqlite_stat1
+stmt 228 err 1 -1 289 no such table: sqlite_stat1
+stmt 289 err 1 -1 350 no such table: sqlite_stat1
+stmt 350 err 1 -1 413 no such table: sqlite_stat1
+stmt 413 err 1 -1 476 no such table: sqlite_stat1
+stmt 476 err 1 -1 535 no such table: sqlite_stat1
+stmt 535 err 1 -1 595 no such table: sqlite_stat1
+stmt 595 err 1 -1 658 no such table: sqlite_stat1
+stmt 658 err 1 -1 719 no such table: sqlite_stat1
+stmt 719 err 1 -1 778 no such table: sqlite_stat1
+stmt 778 err 1 -1 836 no such table: sqlite_stat1
+stmt 836 err 1 -1 896 no such table: sqlite_stat1
+stmt 896 err 1 -1 957 no such table: sqlite_stat1
+stmt 957 err 1 -1 1018 no such table: sqlite_stat1
+stmt 1018 err 1 -1 1077 no such table: sqlite_stat1
+stmt 1077 err 1 -1 1137 no such table: sqlite_stat1
+stmt 1137 err 1 -1 1195 no such table: sqlite_stat1
+stmt 1195 err 1 -1 1253 no such table: sqlite_stat1
+stmt 1253 err 1 -1 1311 no such table: sqlite_stat1
+stmt 1311 err 1 -1 1367 no such table: sqlite_stat1
+stmt 1367 err 1 -1 1423 no such table: sqlite_stat1
+stmt 1423 err 1 -1 1479 no such table: sqlite_stat1
+stmt 1479 err 1 -1 1535 no such table: sqlite_stat1
+stmt 1535 err 1 -1 1591 no such table: sqlite_stat1
+stmt 1591 err 1 -1 1647 no such table: sqlite_stat1
+stmt 1647 ok
+==== autoindex2-120
+
+  EXPLAIN QUERY PLAN
+  SELECT
+     t1_id,
+     t1.did,
+     param2,
+     param3,
+     t1.ptime,
+     t1.trange,
+     t1.exmass,
+     t1.mass,
+     t1.vstatus,
+     type,
+     subtype,
+     t1.deviation,
+     t1.formula,
+     dparam1,
+     reserve1,
+     reserve2,
+     param4,
+     t1.last_operation,
+     t1.admin_uuid,
+     t1.previous_value,
+     t1.job_id,
+     client_did, 
+     t1.last_t1,
+     t1.data_t1,
+     t1.previous_date,
+     param5,
+     param6,
+     mgr_uuid
+  FROM
+     t1,
+     t2,
+     t3
+  WHERE
+     t1.ptime > 1393520400
+     AND param3<>9001
+     AND t3.flg7 = 1
+     AND t1.did = t2.did
+     AND t2.uid = t3.uid
+  ORDER BY t1.ptime desc LIMIT 500;
+----
+stmt 0 err 1 -1 673 no such table: t1

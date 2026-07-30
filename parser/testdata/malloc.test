@@ -1,0 +1,29 @@
+==== 40.1
+
+  CREATE TABLE t1(a);
+  INSERT INTO t1 VALUES('fghij');
+  INSERT INTO t1 VALUES('pqrst');
+  INSERT INTO t1 VALUES('abcde');
+  INSERT INTO t1 VALUES('uvwxy');
+  INSERT INTO t1 VALUES('klmno');
+----
+stmt 0 ok
+stmt 22 err 1 -1 56 no such table: t1
+stmt 56 err 1 -1 90 no such table: t1
+stmt 90 err 1 -1 124 no such table: t1
+stmt 124 err 1 -1 158 no such table: t1
+stmt 158 err 1 -1 192 no such table: t1
+==== 40.2
+
+  SELECT * FROM t1 ORDER BY 1 COLLATE utf16bin;
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== 42.0
+
+  CREATE TABLE t1(x INTEGER PRIMARY KEY, y, z);
+  CREATE TABLE t2(a, b);
+  CREATE VIEW a002 AS SELECT *, sum(b) AS m FROM t2 GROUP BY a;
+----
+stmt 0 ok
+stmt 48 ok
+stmt 73 ok

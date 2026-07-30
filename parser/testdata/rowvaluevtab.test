@@ -1,0 +1,57 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c);
+  CREATE INDEX t1b ON t1(b);
+  INSERT INTO t1 VALUES('one', 1, 1);
+  INSERT INTO t1 VALUES('two', 1, 2);
+  INSERT INTO t1 VALUES('three', 1, 3);
+  INSERT INTO t1 VALUES('four', 2, 1);
+  INSERT INTO t1 VALUES('five', 2, 2);
+  INSERT INTO t1 VALUES('six', 2, 3);
+  INSERT INTO t1 VALUES('seven', 3, 1);
+  INSERT INTO t1 VALUES('eight', 3, 2);
+  INSERT INTO t1 VALUES('nine', 3, 3);
+
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<10000
+  ) INSERT INTO t1 SELECT NULL, NULL, NULL FROM s;
+  CREATE VIRTUAL TABLE e1 USING echo(t1);
+----
+stmt 0 ok
+stmt 28 err 1 -1 57 no such table: main.t1
+stmt 57 err 1 -1 95 no such table: t1
+stmt 95 err 1 -1 133 no such table: t1
+stmt 133 err 1 -1 173 no such table: t1
+stmt 173 err 1 -1 212 no such table: t1
+stmt 212 err 1 -1 251 no such table: t1
+stmt 251 err 1 -1 289 no such table: t1
+stmt 289 err 1 -1 329 no such table: t1
+stmt 329 err 1 -1 369 no such table: t1
+stmt 369 err 1 -1 408 no such table: t1
+stmt 408 err 1 -1 532 no such table: t1
+stmt 532 ok
+==== 1.1
+
+  SELECT a FROM e1 WHERE (b, c) = (2, 2)
+----
+stmt 0 err 1 -1 42 no such table: e1
+==== 1.2
+
+  SELECT a FROM e1 WHERE (b, c) > (2, 2)
+----
+stmt 0 err 1 -1 42 no such table: e1
+==== 1.3
+
+  SELECT a FROM e1 WHERE (b, c) >= (2, 2)
+----
+stmt 0 err 1 -1 43 no such table: e1
+==== 1.3.dup1
+
+  SELECT a FROM e1 WHERE (b, c) BETWEEN (1, 2) AND (2, 3)
+----
+stmt 0 err 1 -1 59 no such table: e1
+==== 1.4
+
+  SELECT a FROM e1 WHERE (b, c) IN ( VALUES(2, 2) )
+----
+stmt 0 err 1 -1 53 no such table: e1

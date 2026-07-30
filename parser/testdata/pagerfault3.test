@@ -1,0 +1,13 @@
+==== pagerfault3-pre1
+
+    PRAGMA auto_vacuum = 0;
+    PRAGMA page_size = 2048;
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(randomblob(1200));
+    PRAGMA page_count;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 57 ok
+stmt 81 err 1 -1 126 no such table: t1
+stmt 126 ok

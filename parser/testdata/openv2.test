@@ -1,0 +1,9 @@
+==== openv2-1.4
+
+    INSERT INTO t1 VALUES(123)
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== openv2-2.2
+CREATE TABLE t1(x)
+----
+stmt 0 ok

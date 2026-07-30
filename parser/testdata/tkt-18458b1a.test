@@ -1,0 +1,24 @@
+==== tkt-18458b1a-generated
+
+    CREATE TABLE t0(c0 COLLATE NOCASE);
+    INSERT INTO t0(c0) VALUES ('B');
+    CREATE VIEW v0(c0, c1) AS SELECT DISTINCT t0.c0, 'a' FROM t0;
+----
+stmt 0 ok
+stmt 40 err 1 -1 77 no such table: t0
+stmt 77 ok
+==== tkt-18458b1a-generated.dup1
+
+    SELECT count(*) FROM v0 WHERE c1 >= c0;
+----
+stmt 0 err 1 -1 44 no such table: v0
+==== tkt-18458b1a-generated.dup2
+
+    SELECT count(*) FROM v0 WHERE NOT NOT (c1 >= c0);
+----
+stmt 0 err 1 -1 54 no such table: v0
+==== tkt-18458b1a-generated.dup3
+
+    SELECT count(*) FROM v0 WHERE ((c1 >= c0) OR 0+0);
+----
+stmt 0 err 1 -1 55 no such table: v0

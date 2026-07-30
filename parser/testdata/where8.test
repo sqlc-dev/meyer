@@ -1,0 +1,305 @@
+==== where8-1.1
+
+    CREATE TABLE t1(a, b TEXT, c);
+    CREATE INDEX i1 ON t1(a);
+    CREATE INDEX i2 ON t1(b);
+
+    INSERT INTO t1 VALUES(1,  'one',   'I');
+    INSERT INTO t1 VALUES(2,  'two',   'II');
+    INSERT INTO t1 VALUES(3,  'three', 'III');
+    INSERT INTO t1 VALUES(4,  'four',  'IV');
+    INSERT INTO t1 VALUES(5,  'five',  'V');
+    INSERT INTO t1 VALUES(6,  'six',   'VI');
+    INSERT INTO t1 VALUES(7,  'seven', 'VII');
+    INSERT INTO t1 VALUES(8,  'eight', 'VIII');
+    INSERT INTO t1 VALUES(9,  'nine',  'IX');
+    INSERT INTO t1 VALUES(10, 'ten',   'X');
+----
+stmt 0 ok
+stmt 35 err 1 -1 65 no such table: main.t1
+stmt 65 err 1 -1 95 no such table: main.t1
+stmt 95 err 1 -1 141 no such table: t1
+stmt 141 err 1 -1 187 no such table: t1
+stmt 187 err 1 -1 234 no such table: t1
+stmt 234 err 1 -1 280 no such table: t1
+stmt 280 err 1 -1 325 no such table: t1
+stmt 325 err 1 -1 371 no such table: t1
+stmt 371 err 1 -1 418 no such table: t1
+stmt 418 err 1 -1 466 no such table: t1
+stmt 466 err 1 -1 512 no such table: t1
+stmt 512 err 1 -1 557 no such table: t1
+==== where8-2.1
+
+      CREATE VIRTUAL TABLE e1 USING echo(t1);
+      SELECT b FROM e1;
+----
+stmt 0 ok
+stmt 46 err 1 -1 70 no such table: e1
+==== where8-3.1
+
+    CREATE TABLE t2(d, e, f);
+    CREATE INDEX i3 ON t2(d);
+    CREATE INDEX i4 ON t2(e);
+
+    INSERT INTO t2 VALUES(1,  NULL,         'I');
+    INSERT INTO t2 VALUES(2,  'four',       'IV');
+    INSERT INTO t2 VALUES(3,  NULL,         'IX');
+    INSERT INTO t2 VALUES(4,  'sixteen',    'XVI');
+    INSERT INTO t2 VALUES(5,  NULL,         'XXV');
+    INSERT INTO t2 VALUES(6,  'thirtysix',  'XXXVI');
+    INSERT INTO t2 VALUES(7,  'fortynine',  'XLIX');
+    INSERT INTO t2 VALUES(8,  'sixtyeight', 'LXIV');
+    INSERT INTO t2 VALUES(9,  'eightyone',  'LXXXIX');
+    INSERT INTO t2 VALUES(10, NULL,         'C');
+----
+stmt 0 ok
+stmt 30 err 1 -1 60 no such table: main.t2
+stmt 60 err 1 -1 90 no such table: main.t2
+stmt 90 err 1 -1 141 no such table: t2
+stmt 141 err 1 -1 192 no such table: t2
+stmt 192 err 1 -1 243 no such table: t2
+stmt 243 err 1 -1 295 no such table: t2
+stmt 295 err 1 -1 347 no such table: t2
+stmt 347 err 1 -1 401 no such table: t2
+stmt 401 err 1 -1 454 no such table: t2
+stmt 454 err 1 -1 507 no such table: t2
+stmt 507 err 1 -1 562 no such table: t2
+stmt 562 err 1 -1 612 no such table: t2
+==== where8-4.1
+
+    BEGIN;
+    CREATE TABLE t3(a INTEGER, b REAL, c TEXT);
+    CREATE TABLE t4(f INTEGER, g REAL, h TEXT);
+    INSERT INTO t3 VALUES('hills', NULL, 1415926535);
+    INSERT INTO t3 VALUES('and', 'of', NULL);
+    INSERT INTO t3 VALUES('have', 'towering', 53594.08128);
+    INSERT INTO t3 VALUES(NULL, 45.64856692, 'Not');
+    INSERT INTO t3 VALUES('same', 5028841971, NULL);
+    INSERT INTO t3 VALUES('onlookers', 'in', 8214808651);
+    INSERT INTO t3 VALUES(346.0348610, 2643383279, NULL);
+    INSERT INTO t3 VALUES(1415926535, 'of', 'are');
+    INSERT INTO t3 VALUES(NULL, 0.4811174502, 'snapshots');
+    INSERT INTO t3 VALUES('over', 'the', 8628034825);
+    INSERT INTO t3 VALUES(8628034825, 66.59334461, 2847564.823);
+    INSERT INTO t3 VALUES('onlookers', 'same', 'and');
+    INSERT INTO t3 VALUES(NULL, 'light', 6939937510);
+    INSERT INTO t3 VALUES('from', 'their', 'viewed');
+    INSERT INTO t3 VALUES('from', 'Alpine', 'snapshots');
+    INSERT INTO t3 VALUES('from', 'sometimes', 'unalike');
+    INSERT INTO t3 VALUES(1339.360726, 'light', 'have');
+    INSERT INTO t3 VALUES(6939937510, 3282306647, 'other');
+    INSERT INTO t3 VALUES('paintings', 8628034825, 'all');
+    INSERT INTO t3 VALUES('paintings', NULL, 'same');
+    INSERT INTO t3 VALUES('Alpine', 378678316.5, 'unalike');
+    INSERT INTO t3 VALUES('Alpine', NULL, 'same');
+    INSERT INTO t3 VALUES(1339.360726, 2847564.823, 'over');
+    INSERT INTO t3 VALUES('villages', 'their', 'have');
+    INSERT INTO t3 VALUES('unalike', 'remarkably', 'in');
+    INSERT INTO t3 VALUES('and', 8979323846, 'and');
+    INSERT INTO t3 VALUES(NULL, 1415926535, 'an');
+    INSERT INTO t3 VALUES(271.2019091, 8628034825, 0.4811174502);
+    INSERT INTO t3 VALUES('all', 3421170679, 'the');
+    INSERT INTO t3 VALUES('Not', 'and', 1415926535);
+    INSERT INTO t3 VALUES('of', 'other', 'light');
+    INSERT INTO t3 VALUES(NULL, 'towering', 'Not');
+    INSERT INTO t3 VALUES(346.0348610, NULL, 'other');
+    INSERT INTO t3 VALUES('Not', 378678316.5, NULL);
+    INSERT INTO t3 VALUES('snapshots', 8628034825, 'of');
+    INSERT INTO t3 VALUES(3282306647, 271.2019091, 'and');
+    INSERT INTO t3 VALUES(50.58223172, 378678316.5, 5028841971);
+    INSERT INTO t3 VALUES(50.58223172, 2643383279, 'snapshots');
+    INSERT INTO t3 VALUES('writings', 8979323846, 8979323846);
+    INSERT INTO t3 VALUES('onlookers', 'his', 'in');
+    INSERT INTO t3 VALUES('unalike', 8628034825, 1339.360726);
+    INSERT INTO t3 VALUES('of', 'Alpine', 'and');
+    INSERT INTO t3 VALUES('onlookers', NULL, 'from');
+    INSERT INTO t3 VALUES('writings', 'it', 1339.360726);
+    INSERT INTO t3 VALUES('it', 'and', 'villages');
+    INSERT INTO t3 VALUES('an', 'the', 'villages');
+    INSERT INTO t3 VALUES(8214808651, 8214808651, 'same');
+    INSERT INTO t3 VALUES(346.0348610, 'light', 1415926535);
+    INSERT INTO t3 VALUES(NULL, 8979323846, 'and');
+    INSERT INTO t3 VALUES(NULL, 'same', 1339.360726);
+    INSERT INTO t4 VALUES('his', 'from', 'an');
+    INSERT INTO t4 VALUES('snapshots', 'or', NULL);
+    INSERT INTO t4 VALUES('Alpine', 'have', 'it');
+    INSERT INTO t4 VALUES('have', 'peak', 'remarkably');
+    INSERT INTO t4 VALUES('hills', NULL, 'Not');
+    INSERT INTO t4 VALUES('same', 'from', 2643383279);
+    INSERT INTO t4 VALUES('have', 'angle', 8628034825);
+    INSERT INTO t4 VALUES('sometimes', 'it', 2847564.823);
+    INSERT INTO t4 VALUES(0938446095, 'peak', 'of');
+    INSERT INTO t4 VALUES(8628034825, 'and', 'same');
+    INSERT INTO t4 VALUES('and', 271.2019091, 'their');
+    INSERT INTO t4 VALUES('the', 'of', 'remarkably');
+    INSERT INTO t4 VALUES('and', 3421170679, 1415926535);
+    INSERT INTO t4 VALUES('and', 'in', 'all');
+    INSERT INTO t4 VALUES(378678316.5, 0.4811174502, 'snapshots');
+    INSERT INTO t4 VALUES('it', 'are', 'have');
+    INSERT INTO t4 VALUES('angle', 'snapshots', 378678316.5);
+    INSERT INTO t4 VALUES('from', 1415926535, 8628034825);
+    INSERT INTO t4 VALUES('snapshots', 'angle', 'have');
+    INSERT INTO t4 VALUES(3421170679, 0938446095, 'Not');
+    INSERT INTO t4 VALUES('peak', NULL, 0.4811174502);
+    INSERT INTO t4 VALUES('same', 'have', 'Alpine');
+    INSERT INTO t4 VALUES(271.2019091, 66.59334461, 0938446095);
+    INSERT INTO t4 VALUES(8979323846, 'his', 'an');
+    INSERT INTO t4 VALUES(NULL, 'and', 3282306647);
+    INSERT INTO t4 VALUES('remarkably', NULL, 'Not');
+    INSERT INTO t4 VALUES('villages', 4543.266482, 'his');
+    INSERT INTO t4 VALUES(2643383279, 'paintings', 'onlookers');
+    INSERT INTO t4 VALUES(1339.360726, 'of', 'the');
+    INSERT INTO t4 VALUES('peak', 'other', 'peak');
+    INSERT INTO t4 VALUES('it', 'or', 8979323846);
+    INSERT INTO t4 VALUES('onlookers', 'Not', 'towering');
+    INSERT INTO t4 VALUES(NULL, 'peak', 'Not');
+    INSERT INTO t4 VALUES('of', 'have', 6939937510);
+    INSERT INTO t4 VALUES('light', 'hills', 0.4811174502);
+    INSERT INTO t4 VALUES(5028841971, 'Not', 'it');
+    INSERT INTO t4 VALUES('and', 'Not', NULL);
+    INSERT INTO t4 VALUES(346.0348610, 'villages', NULL);
+    INSERT INTO t4 VALUES(8979323846, NULL, 6939937510);
+    INSERT INTO t4 VALUES('an', 'light', 'peak');
+    INSERT INTO t4 VALUES(5028841971, 6939937510, 'light');
+    INSERT INTO t4 VALUES('sometimes', 'peak', 'peak');
+    INSERT INTO t4 VALUES(378678316.5, 5028841971, 'an');
+    INSERT INTO t4 VALUES(378678316.5, 'his', 'Alpine');
+    INSERT INTO t4 VALUES('from', 'of', 'all');
+    INSERT INTO t4 VALUES(0938446095, 'same', NULL);
+    INSERT INTO t4 VALUES(0938446095, 'Alpine', NULL);
+    INSERT INTO t4 VALUES('his', 'of', 378678316.5);
+    INSERT INTO t4 VALUES(271.2019091, 'viewed', 3282306647);
+    INSERT INTO t4 VALUES('hills', 'all', 'peak');
+    CREATE TABLE t5(s);
+    INSERT INTO t5 VALUES('tab-t5');
+    CREATE TABLE t6(t);
+    INSERT INTO t6 VALUES(123456);
+    COMMIT;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 59 ok
+stmt 107 err 1 -1 161 no such table: t3
+stmt 161 err 1 -1 207 no such table: t3
+stmt 207 err 1 -1 267 no such table: t3
+stmt 267 err 1 -1 320 no such table: t3
+stmt 320 err 1 -1 373 no such table: t3
+stmt 373 err 1 -1 431 no such table: t3
+stmt 431 err 1 -1 489 no such table: t3
+stmt 489 err 1 -1 541 no such table: t3
+stmt 541 err 1 -1 601 no such table: t3
+stmt 601 err 1 -1 655 no such table: t3
+stmt 655 err 1 -1 720 no such table: t3
+stmt 720 err 1 -1 775 no such table: t3
+stmt 775 err 1 -1 829 no such table: t3
+stmt 829 err 1 -1 883 no such table: t3
+stmt 883 err 1 -1 941 no such table: t3
+stmt 941 err 1 -1 1000 no such table: t3
+stmt 1000 err 1 -1 1057 no such table: t3
+stmt 1057 err 1 -1 1117 no such table: t3
+stmt 1117 err 1 -1 1176 no such table: t3
+stmt 1176 err 1 -1 1230 no such table: t3
+stmt 1230 err 1 -1 1291 no such table: t3
+stmt 1291 err 1 -1 1342 no such table: t3
+stmt 1342 err 1 -1 1403 no such table: t3
+stmt 1403 err 1 -1 1459 no such table: t3
+stmt 1459 err 1 -1 1517 no such table: t3
+stmt 1517 err 1 -1 1570 no such table: t3
+stmt 1570 err 1 -1 1621 no such table: t3
+stmt 1621 err 1 -1 1687 no such table: t3
+stmt 1687 err 1 -1 1740 no such table: t3
+stmt 1740 err 1 -1 1793 no such table: t3
+stmt 1793 err 1 -1 1844 no such table: t3
+stmt 1844 err 1 -1 1896 no such table: t3
+stmt 1896 err 1 -1 1951 no such table: t3
+stmt 1951 err 1 -1 2004 no such table: t3
+stmt 2004 err 1 -1 2062 no such table: t3
+stmt 2062 err 1 -1 2121 no such table: t3
+stmt 2121 err 1 -1 2186 no such table: t3
+stmt 2186 err 1 -1 2251 no such table: t3
+stmt 2251 err 1 -1 2314 no such table: t3
+stmt 2314 err 1 -1 2367 no such table: t3
+stmt 2367 err 1 -1 2430 no such table: t3
+stmt 2430 err 1 -1 2480 no such table: t3
+stmt 2480 err 1 -1 2534 no such table: t3
+stmt 2534 err 1 -1 2592 no such table: t3
+stmt 2592 err 1 -1 2644 no such table: t3
+stmt 2644 err 1 -1 2696 no such table: t3
+stmt 2696 err 1 -1 2755 no such table: t3
+stmt 2755 err 1 -1 2816 no such table: t3
+stmt 2816 err 1 -1 2868 no such table: t3
+stmt 2868 err 1 -1 2922 no such table: t3
+stmt 2922 err 1 -1 2970 no such table: t4
+stmt 2970 err 1 -1 3022 no such table: t4
+stmt 3022 err 1 -1 3073 no such table: t4
+stmt 3073 err 1 -1 3130 no such table: t4
+stmt 3130 err 1 -1 3179 no such table: t4
+stmt 3179 err 1 -1 3234 no such table: t4
+stmt 3234 err 1 -1 3290 no such table: t4
+stmt 3290 err 1 -1 3349 no such table: t4
+stmt 3349 err 1 -1 3402 no such table: t4
+stmt 3402 err 1 -1 3456 no such table: t4
+stmt 3456 err 1 -1 3512 no such table: t4
+stmt 3512 err 1 -1 3566 no such table: t4
+stmt 3566 err 1 -1 3624 no such table: t4
+stmt 3624 err 1 -1 3671 no such table: t4
+stmt 3671 err 1 -1 3738 no such table: t4
+stmt 3738 err 1 -1 3786 no such table: t4
+stmt 3786 err 1 -1 3848 no such table: t4
+stmt 3848 err 1 -1 3907 no such table: t4
+stmt 3907 err 1 -1 3964 no such table: t4
+stmt 3964 err 1 -1 4022 no such table: t4
+stmt 4022 err 1 -1 4077 no such table: t4
+stmt 4077 err 1 -1 4130 no such table: t4
+stmt 4130 err 1 -1 4195 no such table: t4
+stmt 4195 err 1 -1 4247 no such table: t4
+stmt 4247 err 1 -1 4299 no such table: t4
+stmt 4299 err 1 -1 4353 no such table: t4
+stmt 4353 err 1 -1 4412 no such table: t4
+stmt 4412 err 1 -1 4477 no such table: t4
+stmt 4477 err 1 -1 4530 no such table: t4
+stmt 4530 err 1 -1 4582 no such table: t4
+stmt 4582 err 1 -1 4633 no such table: t4
+stmt 4633 err 1 -1 4692 no such table: t4
+stmt 4692 err 1 -1 4740 no such table: t4
+stmt 4740 err 1 -1 4793 no such table: t4
+stmt 4793 err 1 -1 4852 no such table: t4
+stmt 4852 err 1 -1 4904 no such table: t4
+stmt 4904 err 1 -1 4951 no such table: t4
+stmt 4951 err 1 -1 5009 no such table: t4
+stmt 5009 err 1 -1 5066 no such table: t4
+stmt 5066 err 1 -1 5116 no such table: t4
+stmt 5116 err 1 -1 5176 no such table: t4
+stmt 5176 err 1 -1 5232 no such table: t4
+stmt 5232 err 1 -1 5290 no such table: t4
+stmt 5290 err 1 -1 5347 no such table: t4
+stmt 5347 err 1 -1 5395 no such table: t4
+stmt 5395 err 1 -1 5448 no such table: t4
+stmt 5448 err 1 -1 5503 no such table: t4
+stmt 5503 err 1 -1 5556 no such table: t4
+stmt 5556 err 1 -1 5618 no such table: t4
+stmt 5618 err 1 -1 5669 no such table: t4
+stmt 5669 ok
+stmt 5693 err 1 -1 5730 no such table: t5
+stmt 5730 ok
+stmt 5754 err 1 -1 5789 no such table: t6
+stmt 5789 ok
+==== where8-5.2
+
+    SELECT * FROM tA WHERE
+      a=1 AND b=2 AND c=3 AND d=4 AND e=5 AND f=6 AND g=7 AND h=8 AND
+      i=1 AND j=2 AND k=3 AND l=4 AND m=5 AND
+      (p = 1 OR p = 2 OR p = 3) AND n=6 AND o=7
+----
+stmt 0 err 1 -1 192 no such table: tA
+==== where8-6.1
+
+  CREATE TABLE t600(a PRIMARY KEY, b) WITHOUT rowid;
+  CREATE INDEX t600b ON t600(b);
+  INSERT INTO t600 VALUES('state','screen'),('exact','dolphin'),('green','mercury');
+  SELECT a, b, '|' FROM t600 WHERE a=='state' OR b='mercury' ORDER BY +a;
+----
+stmt 0 ok
+stmt 53 err 1 -1 86 no such table: main.t600
+stmt 86 err 1 -1 171 no such table: t600
+stmt 171 err 1 -1 245 no such table: t600

@@ -1,0 +1,44 @@
+==== trace3-1.0
+
+    CREATE TABLE t1(a,b);
+    INSERT INTO t1 VALUES(1,NULL);
+    INSERT INTO t1 VALUES(2,-1);
+    INSERT INTO t1 VALUES(3,0);
+    INSERT INTO t1 VALUES(4,1);
+    INSERT INTO t1 VALUES(5,-2147483648);
+    INSERT INTO t1 VALUES(6,2147483647);
+    INSERT INTO t1 VALUES(7,-9223372036854775808);
+    INSERT INTO t1 VALUES(8,9223372036854775807);
+    INSERT INTO t1 VALUES(9,-1.0);
+    INSERT INTO t1 VALUES(10,0.0);
+    INSERT INTO t1 VALUES(11,1.0);
+    INSERT INTO t1 VALUES(12,'');
+    INSERT INTO t1 VALUES(13,'1');
+    INSERT INTO t1 VALUES(14,'one');
+    INSERT INTO t1 VALUES(15,x'abcd0123');
+    INSERT INTO t1 VALUES(16,x'4567cdef');
+----
+stmt 0 ok
+stmt 26 err 1 -1 61 no such table: t1
+stmt 61 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 126 no such table: t1
+stmt 126 err 1 -1 158 no such table: t1
+stmt 158 err 1 -1 200 no such table: t1
+stmt 200 err 1 -1 241 no such table: t1
+stmt 241 err 1 -1 292 no such table: t1
+stmt 292 err 1 -1 342 no such table: t1
+stmt 342 err 1 -1 377 no such table: t1
+stmt 377 err 1 -1 412 no such table: t1
+stmt 412 err 1 -1 447 no such table: t1
+stmt 447 err 1 -1 481 no such table: t1
+stmt 481 err 1 -1 516 no such table: t1
+stmt 516 err 1 -1 553 no such table: t1
+stmt 553 err 1 -1 596 no such table: t1
+stmt 596 err 1 -1 639 no such table: t1
+==== 13.0
+
+  CREATE TABLE T1(a, b);
+  INSERT INTO t1 VALUES(1, 2), (3, 4);
+----
+stmt 0 ok
+stmt 25 err 1 -1 64 no such table: t1

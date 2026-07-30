@@ -1,0 +1,43 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING fts3(a, b);
+  INSERT INTO t1 VALUES('one two', 'one');
+  INSERT INTO t1 VALUES('one two', 'three');
+  INSERT INTO t1 VALUES('one two', 'two');
+----
+stmt 0 ok
+stmt 44 err 1 -1 87 no such table: t1
+stmt 87 err 1 -1 132 no such table: t1
+stmt 132 err 1 -1 175 no such table: t1
+==== 1.1
+
+  SELECT * FROM t1 WHERE t1 MATCH 'one' 
+  ORDER BY rank(matchinfo(t1), 1.0, 1.0) DESC, rowid
+----
+stmt 0 err 1 -1 95 no such table: t1
+==== 1.2
+
+  SELECT * FROM t1 WHERE t1 MATCH 'two' 
+  ORDER BY rank(matchinfo(t1), 1.0, 1.0) DESC, rowid
+----
+stmt 0 err 1 -1 95 no such table: t1
+==== 1.3
+
+  SELECT * FROM t1 ORDER BY rank(matchinfo(t1), 1.0, 1.0) DESC, rowid
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== 1.4
+
+  SELECT * FROM t1 ORDER BY rank(x'0000000000000000') DESC, rowid
+----
+stmt 0 err 1 -1 67 no such table: t1
+==== 1.5le
+
+    SELECT * FROM t1 ORDER BY rank(x'0100000001000000') DESC, rowid
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== 1.5be
+
+    SELECT * FROM t1 ORDER BY rank(x'0000000100000001') DESC, rowid
+----
+stmt 0 err 1 -1 69 no such table: t1

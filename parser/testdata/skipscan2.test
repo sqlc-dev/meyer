@@ -1,0 +1,227 @@
+==== skipscan2-1.1
+
+  CREATE TABLE people(
+    name TEXT PRIMARY KEY,
+    role TEXT NOT NULL,
+    height INT NOT NULL, -- in cm
+    CHECK( role IN ('student','teacher') )
+  );
+  CREATE INDEX people_idx1 ON people(role, height);
+----
+stmt 0 ok
+stmt 156 err 1 -1 208 no such table: main.people
+==== skipscan2-1.2
+
+  INSERT INTO people VALUES('Alice','student',156);
+  INSERT INTO people VALUES('Bob','student',161);
+  INSERT INTO people VALUES('Cindy','student',155);
+  INSERT INTO people VALUES('David','student',181);
+  INSERT INTO people VALUES('Emily','teacher',158);
+  INSERT INTO people VALUES('Fred','student',163);
+  INSERT INTO people VALUES('Ginny','student',169);
+  INSERT INTO people VALUES('Harold','student',172);
+  INSERT INTO people VALUES('Imma','student',179);
+  INSERT INTO people VALUES('Jack','student',181);
+  INSERT INTO people VALUES('Karen','student',163);
+  INSERT INTO people VALUES('Logan','student',177);
+  INSERT INTO people VALUES('Megan','teacher',159);
+  INSERT INTO people VALUES('Nathan','student',163);
+  INSERT INTO people VALUES('Olivia','student',161);
+  INSERT INTO people VALUES('Patrick','teacher',180);
+  INSERT INTO people VALUES('Quiana','student',182);
+  INSERT INTO people VALUES('Robert','student',159);
+  INSERT INTO people VALUES('Sally','student',166);
+  INSERT INTO people VALUES('Tom','student',171);
+  INSERT INTO people VALUES('Ursula','student',170);
+  INSERT INTO people VALUES('Vance','student',179);
+  INSERT INTO people VALUES('Willma','student',175);
+  INSERT INTO people VALUES('Xavier','teacher',185);
+  INSERT INTO people VALUES('Yvonne','student',149);
+  INSERT INTO people VALUES('Zach','student',170);
+----
+stmt 0 err 1 -1 52 no such table: people
+stmt 52 err 1 -1 102 no such table: people
+stmt 102 err 1 -1 154 no such table: people
+stmt 154 err 1 -1 206 no such table: people
+stmt 206 err 1 -1 258 no such table: people
+stmt 258 err 1 -1 309 no such table: people
+stmt 309 err 1 -1 361 no such table: people
+stmt 361 err 1 -1 414 no such table: people
+stmt 414 err 1 -1 465 no such table: people
+stmt 465 err 1 -1 516 no such table: people
+stmt 516 err 1 -1 568 no such table: people
+stmt 568 err 1 -1 620 no such table: people
+stmt 620 err 1 -1 672 no such table: people
+stmt 672 err 1 -1 725 no such table: people
+stmt 725 err 1 -1 778 no such table: people
+stmt 778 err 1 -1 832 no such table: people
+stmt 832 err 1 -1 885 no such table: people
+stmt 885 err 1 -1 938 no such table: people
+stmt 938 err 1 -1 990 no such table: people
+stmt 990 err 1 -1 1040 no such table: people
+stmt 1040 err 1 -1 1093 no such table: people
+stmt 1093 err 1 -1 1145 no such table: people
+stmt 1145 err 1 -1 1198 no such table: people
+stmt 1198 err 1 -1 1251 no such table: people
+stmt 1251 err 1 -1 1304 no such table: people
+stmt 1304 err 1 -1 1355 no such table: people
+==== skipscan2-1.3
+
+  SELECT name FROM people WHERE height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 60 no such table: people
+==== skipscan2-1.3eqp
+
+  EXPLAIN QUERY PLAN
+  SELECT name FROM people WHERE height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 81 no such table: people
+==== skipscan2-1.4
+
+  ANALYZE;
+  -- We do not have enough people above to actually force the use
+  -- of a skip-scan.  So make a manual adjustment to the stat1 table
+  -- to make it seem like there are many more.
+  UPDATE sqlite_stat1 SET stat='10000 5000 20' WHERE idx='people_idx1';
+  UPDATE sqlite_stat1 SET stat='10000 1' WHERE idx='sqlite_autoindex_people_1';
+  ANALYZE sqlite_master;
+----
+stmt 0 ok
+stmt 11 err 1 -1 265 no such table: sqlite_stat1
+stmt 265 err 1 -1 345 no such table: sqlite_stat1
+stmt 345 ok
+==== skipscan2-1.5
+
+  SELECT name FROM people WHERE height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 60 no such table: people
+==== skipscan2-1.5eqp
+
+  EXPLAIN QUERY PLAN
+  SELECT name FROM people WHERE height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 81 no such table: people
+==== skipscan2-1.6
+
+  SELECT name FROM people
+   WHERE role IN (SELECT DISTINCT role FROM people)
+     AND height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 115 no such table: people
+==== skipscan2-1.7
+
+  SELECT name FROM people WHERE role='teacher' AND height>=180
+  UNION ALL
+  SELECT name FROM people WHERE role='student' AND height>=180
+  ORDER BY 1;
+----
+stmt 0 err 1 -1 152 no such table: people
+==== skipscan2-1.8
+
+  INSERT INTO people VALUES('Angie','student',166);
+  INSERT INTO people VALUES('Brad','student',176);
+  INSERT INTO people VALUES('Claire','student',168);
+  INSERT INTO people VALUES('Donald','student',162);
+  INSERT INTO people VALUES('Elaine','student',177);
+  INSERT INTO people VALUES('Frazier','student',159);
+  INSERT INTO people VALUES('Grace','student',179);
+  INSERT INTO people VALUES('Horace','student',166);
+  ANALYZE;
+  SELECT stat FROM sqlite_stat1 WHERE idx='people_idx1';
+----
+stmt 0 err 1 -1 52 no such table: people
+stmt 52 err 1 -1 103 no such table: people
+stmt 103 err 1 -1 156 no such table: people
+stmt 156 err 1 -1 209 no such table: people
+stmt 209 err 1 -1 262 no such table: people
+stmt 262 err 1 -1 316 no such table: people
+stmt 316 err 1 -1 368 no such table: people
+stmt 368 err 1 -1 421 no such table: people
+stmt 421 ok
+stmt 432 err 1 -1 489 no such table: sqlite_stat1
+==== skipscan2-1.9
+
+  SELECT name FROM people WHERE height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 60 no such table: people
+==== skipscan2-1.9eqp
+
+  EXPLAIN QUERY PLAN
+  SELECT name FROM people WHERE height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 81 no such table: people
+==== skipscan2-1.10
+
+  INSERT INTO people VALUES('Ingrad','student',155);
+  INSERT INTO people VALUES('Jacob','student',179);
+  ANALYZE;
+  SELECT stat FROM sqlite_stat1 WHERE idx='people_idx1';
+----
+stmt 0 err 1 -1 53 no such table: people
+stmt 53 err 1 -1 105 no such table: people
+stmt 105 ok
+stmt 116 err 1 -1 173 no such table: sqlite_stat1
+==== skipscan2-1.11
+
+  SELECT name FROM people WHERE height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 60 no such table: people
+==== skipscan2-1.11eqp
+
+  EXPLAIN QUERY PLAN
+  SELECT name FROM people WHERE height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 81 no such table: people
+==== skipscan2-2.1
+
+  CREATE TABLE peoplew(
+    name TEXT PRIMARY KEY,
+    role TEXT NOT NULL,
+    height INT NOT NULL, -- in cm
+    CHECK( role IN ('student','teacher') )
+  ) WITHOUT ROWID;
+  CREATE INDEX peoplew_idx1 ON peoplew(role, height);
+  INSERT INTO peoplew(name,role,height)
+     SELECT name, role, height FROM  people;
+  SELECT name FROM peoplew WHERE height>=180 ORDER BY +name;
+----
+stmt 0 ok
+stmt 171 err 1 -1 225 no such table: main.peoplew
+stmt 225 err 1 -1 310 no such table: peoplew
+stmt 310 err 1 -1 371 no such table: peoplew
+==== skipscan2-2.2
+
+  SELECT name FROM peoplew
+   WHERE role IN (SELECT DISTINCT role FROM peoplew)
+     AND height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 117 no such table: peoplew
+==== skipscan2-2.2.dup1
+
+  SELECT name FROM peoplew WHERE role='teacher' AND height>=180
+  UNION ALL
+  SELECT name FROM peoplew WHERE role='student' AND height>=180
+  ORDER BY 1;
+----
+stmt 0 err 1 -1 154 no such table: peoplew
+==== skipscan2-2.4
+
+  ANALYZE;
+----
+stmt 0 ok
+==== skipscan2-2.5
+
+  SELECT name FROM peoplew WHERE height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 61 no such table: peoplew
+==== skipscan2-2.5eqp
+
+  EXPLAIN QUERY PLAN
+  SELECT name FROM peoplew WHERE height>=180 ORDER BY +name;
+----
+stmt 0 err 1 -1 82 no such table: peoplew
+==== skipscan2-3.1
+
+  CREATE TABLE t3(a, b, c, PRIMARY KEY(a, b)) WITHOUT ROWID;
+----
+stmt 0 ok

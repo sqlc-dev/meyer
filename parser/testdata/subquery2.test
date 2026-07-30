@@ -1,0 +1,231 @@
+==== subquery2-1.2
+
+    CREATE INDEX t1b ON t1(b);
+    SELECT a FROM t1
+     WHERE b IN (SELECT x+1 FROM (SELECT DISTINCT f/(a*a) AS x FROM t3));
+----
+stmt 0 err 1 -1 31 no such table: main.t1
+stmt 31 err 1 -1 126 no such table: t1
+==== subquery2-1.11
+
+    SELECT a FROM t1
+     WHERE +b=(SELECT x+1 FROM (SELECT DISTINCT f/(a*a) AS x FROM t3));
+----
+stmt 0 err 1 -1 93 no such table: t1
+==== subquery2-1.12
+
+    SELECT a FROM t1
+     WHERE b=(SELECT x+1 FROM (SELECT DISTINCT f/(a*a) AS x FROM t3));
+----
+stmt 0 err 1 -1 92 no such table: t1
+==== subquery2-1.21
+
+    SELECT a FROM t1
+     WHERE +b=(SELECT x+1 FROM 
+                 (SELECT DISTINCT f/d AS x FROM t2 JOIN t3 ON d*a=f))
+----
+stmt 0 err 1 -1 124 no such table: t1
+==== subquery2-1.22
+
+    SELECT a FROM t1
+     WHERE b=(SELECT x+1 FROM 
+                 (SELECT DISTINCT f/d AS x FROM t2 JOIN t3 ON d*a=f))
+----
+stmt 0 err 1 -1 123 no such table: t1
+==== 2.1
+
+  CREATE TABLE t4(a, b);
+  CREATE TABLE t5(a, b);
+  INSERT INTO t5 VALUES(3, 5);
+
+  INSERT INTO t4 VALUES(1, 1);
+  INSERT INTO t4 VALUES(2, 3);
+  INSERT INTO t4 VALUES(3, 6);
+  INSERT INTO t4 VALUES(4, 10);
+  INSERT INTO t4 VALUES(5, 15);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 81 no such table: t5
+stmt 81 err 1 -1 113 no such table: t4
+stmt 113 err 1 -1 144 no such table: t4
+stmt 144 err 1 -1 175 no such table: t4
+stmt 175 err 1 -1 207 no such table: t4
+stmt 207 err 1 -1 239 no such table: t4
+==== 2.2
+
+  SELECT * 
+  FROM (SELECT * FROM t4 ORDER BY a LIMIT -1 OFFSET 1) 
+  LIMIT (SELECT a FROM t5)
+----
+stmt 0 err 1 -1 96 no such table: t4
+==== 3.0
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1 (id INTEGER PRIMARY KEY, data TEXT);
+  INSERT INTO t1(id,data) VALUES(9,'nine-a');
+  INSERT INTO t1(id,data) VALUES(10,'ten-a');
+  INSERT INTO t1(id,data) VALUES(11,'eleven-a');
+  CREATE TABLE t2 (id INTEGER PRIMARY KEY, data TEXT);
+  INSERT INTO t2(id,data) VALUES(9,'nine-b');
+  INSERT INTO t2(id,data) VALUES(10,'ten-b');
+  INSERT INTO t2(id,data) VALUES(11,'eleven-b');
+  
+  SELECT id FROM (
+    SELECT id,data FROM (
+       SELECT * FROM t1 UNION ALL SELECT * FROM t2
+    )
+    WHERE id=10 ORDER BY data
+  );
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 109 err 1 -1 155 no such table: t1
+stmt 155 err 1 -1 201 no such table: t1
+stmt 201 err 1 -1 250 no such table: t1
+stmt 250 ok
+stmt 305 err 1 -1 351 no such table: t2
+stmt 351 err 1 -1 397 no such table: t2
+stmt 397 err 1 -1 446 no such table: t2
+stmt 446 err 1 -1 586 no such table: t2
+==== 3.1
+
+  SELECT data FROM (
+     SELECT 'dummy', data FROM (
+       SELECT data FROM t1 UNION ALL SELECT data FROM t1
+     ) ORDER BY data
+  );
+----
+stmt 0 err 1 -1 137 no such table: t1
+==== 3.2
+
+  DROP TABLE IF EXISTS t3;
+  DROP TABLE IF EXISTS t4;
+  CREATE TABLE t3(id INTEGER, data TEXT);
+  CREATE TABLE t4(id INTEGER, data TEXT);
+  INSERT INTO t3 VALUES(4, 'a'),(2,'c');
+  INSERT INTO t4 VALUES(3, 'b'),(1,'d');
+
+  SELECT data, id FROM (
+    SELECT id, data FROM (
+       SELECT * FROM t3 UNION ALL SELECT * FROM t4
+    ) ORDER BY data
+  );
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 96 ok
+stmt 138 err 1 -1 179 no such table: t3
+stmt 179 err 1 -1 220 no such table: t4
+stmt 220 err 1 -1 349 no such table: t4
+==== 4.0
+
+  CREATE TABLE t6(x);
+----
+stmt 0 ok
+==== 5.0
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES('ALFKI');
+  INSERT INTO t1 VALUES('ANATR');
+
+  CREATE TABLE t2(y, z);
+  CREATE INDEX t2y ON t2 (y);
+  INSERT INTO t2 VALUES('ANATR', '1997-08-08 00:00:00');
+  INSERT INTO t2 VALUES('ALFKI', '1997-08-25 00:00:00');
+----
+stmt 0 ok
+stmt 22 err 1 -1 56 no such table: t1
+stmt 56 err 1 -1 90 no such table: t1
+stmt 90 ok
+stmt 116 err 1 -1 146 no such table: main.t2
+stmt 146 err 1 -1 203 no such table: t2
+stmt 203 err 1 -1 260 no such table: t2
+==== 5.1
+
+  SELECT ( SELECT y FROM t2 WHERE x = y ORDER BY y, z) FROM t1;
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== 6.0
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(1234);
+----
+stmt 0 ok
+stmt 22 err 1 -1 53 no such table: t1
+==== 6.1
+
+  SELECT DISTINCT 'string' FROM t1 LIMIT 1 OFFSET 5;
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== 6.2
+
+  SELECT (
+      SELECT 'string' FROM t1 LIMIT 1 OFFSET 5
+  );
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== 6.3
+
+  SELECT (
+      SELECT DISTINCT 'string' FROM t1 LIMIT 1 OFFSET 5
+  );
+----
+stmt 0 err 1 -1 72 no such table: t1
+==== 6.4
+
+  SELECT (
+      SELECT DISTINCT 'string' FROM t1 ORDER BY 1 LIMIT 1 OFFSET 5
+  );
+----
+stmt 0 err 1 -1 83 no such table: t1
+==== 6.5
+
+  SELECT (
+      SELECT 'string' FROM t1 ORDER BY 1 LIMIT 1 OFFSET 5
+  );
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== 6.6
+
+  SELECT (SELECT DISTINCT x, x FROM t1 LIMIT 1 OFFSET 5)==(1234, 1234)
+----
+stmt 0 err 1 -1 72 no such table: t1
+==== 7.0
+
+  CREATE TABLE t1(x);
+  CREATE INDEX i1 ON t1(x);
+  INSERT INTO t1 VALUES(1234);
+----
+stmt 0 ok
+stmt 22 err 1 -1 50 no such table: main.t1
+stmt 50 err 1 -1 81 no such table: t1
+==== 7.1
+
+  SELECT (
+    SELECT DISTINCT 'string' FROM t1 ORDER BY x LIMIT 1 OFFSET 5
+  );
+----
+stmt 0 err 1 -1 81 no such table: t1
+==== 7.2
+
+  DROP INDEX i1;
+  CREATE UNIQUE INDEX i1 ON t1(x);
+----
+stmt 0 err 1 -1 17 no such index: i1
+stmt 17 err 1 -1 52 no such table: main.t1
+==== 7.3
+
+  SELECT (
+    SELECT DISTINCT x FROM t1 ORDER BY 1 LIMIT 1 OFFSET 5
+  );
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== 7.4
+
+  SELECT (SELECT DISTINCT x FROM t1 ORDER BY +x LIMIT 1 OFFSET 0);
+----
+stmt 0 err 1 -1 67 no such table: t1

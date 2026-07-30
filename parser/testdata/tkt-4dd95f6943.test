@@ -1,0 +1,65 @@
+==== 1.0
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES (3), (4), (2), (1), (5), (6);
+----
+stmt 0 ok
+stmt 22 err 1 -1 76 no such table: t1
+==== tkt-4dd95f6943-generated
+ DROP INDEX IF EXISTS i1;
+----
+stmt 0 ok
+==== tkt-4dd95f6943-generated.dup1
+
+    SELECT x FROM t1 WHERE x IN(2, 4, 5) ORDER BY x ASC;
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== tkt-4dd95f6943-generated.dup2
+
+    SELECT x FROM t1 WHERE x IN(2, 4, 5) ORDER BY x DESC;
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 2.0
+
+  CREATE TABLE t2(x, y);
+  INSERT INTO t2 VALUES (5, 3), (5, 4), (5, 2), (5, 1), (5, 5), (5, 6);
+  INSERT INTO t2 VALUES (1, 3), (1, 4), (1, 2), (1, 1), (1, 5), (1, 6);
+  INSERT INTO t2 VALUES (3, 3), (3, 4), (3, 2), (3, 1), (3, 5), (3, 6);
+  INSERT INTO t2 VALUES (2, 3), (2, 4), (2, 2), (2, 1), (2, 5), (2, 6);
+  INSERT INTO t2 VALUES (4, 3), (4, 4), (4, 2), (4, 1), (4, 5), (4, 6);
+  INSERT INTO t2 VALUES (6, 3), (6, 4), (6, 2), (6, 1), (6, 5), (6, 6);
+
+  CREATE TABLE t3(a, b);
+  INSERT INTO t3 VALUES (2, 2), (4, 4), (5, 5);
+  CREATE UNIQUE INDEX t3i1 ON t3(a ASC);
+  CREATE UNIQUE INDEX t3i2 ON t3(b DESC);
+----
+stmt 0 ok
+stmt 25 err 1 -1 97 no such table: t2
+stmt 97 err 1 -1 169 no such table: t2
+stmt 169 err 1 -1 241 no such table: t2
+stmt 241 err 1 -1 313 no such table: t2
+stmt 313 err 1 -1 385 no such table: t2
+stmt 385 err 1 -1 457 no such table: t2
+stmt 457 ok
+stmt 483 err 1 -1 531 no such table: t3
+stmt 531 err 1 -1 572 no such table: main.t3
+stmt 572 err 1 -1 614 no such table: main.t3
+==== tkt-4dd95f6943-generated.dup3
+ DROP INDEX IF EXISTS i1;
+----
+stmt 0 ok
+==== 3.0
+
+  CREATE TABLE t7(x);
+  INSERT INTO t7 VALUES (1), (2), (3);
+  CREATE INDEX i7 ON t7(x);
+
+  CREATE TABLE t8(y);
+  INSERT INTO t8 VALUES (1), (2), (3);
+----
+stmt 0 ok
+stmt 22 err 1 -1 61 no such table: t7
+stmt 61 err 1 -1 89 no such table: main.t7
+stmt 89 ok
+stmt 112 err 1 -1 151 no such table: t8

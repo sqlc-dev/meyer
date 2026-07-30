@@ -1,0 +1,38 @@
+==== descidx2-2.1
+
+    INSERT INTO t1 VALUES(1,1);
+    INSERT INTO t1 VALUES(2,2);
+    INSERT INTO t1 SELECT a+2, a+2 FROM t1;
+    INSERT INTO t1 SELECT a+4, a+4 FROM t1;
+    SELECT b FROM t1 WHERE a>3 AND a<7;
+----
+stmt 0 err 1 -1 32 no such table: t1
+stmt 32 err 1 -1 64 no such table: t1
+stmt 64 err 1 -1 108 no such table: t1
+stmt 108 err 1 -1 152 no such table: t1
+stmt 152 err 1 -1 192 no such table: t1
+==== descidx2-2.2
+
+    SELECT a FROM t1 WHERE b>3 AND b<7;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== descidx2-2.3
+
+    SELECT b FROM t1 WHERE a>=3 AND a<7;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== descidx2-2.4
+
+    SELECT b FROM t1 WHERE a>3 AND a<=7;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== descidx2-2.5
+
+    SELECT b FROM t1 WHERE a>=3 AND a<=7;
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== descidx2-2.6
+
+    SELECT a FROM t1 WHERE b>=3 AND b<=7;
+----
+stmt 0 err 1 -1 42 no such table: t1

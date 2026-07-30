@@ -1,0 +1,21 @@
+==== 1.1
+
+  CREATE TABLE t1(a INT, b INT, c INT);
+  CREATE INDEX i1 ON t1(a, b);
+----
+stmt 0 ok
+stmt 40 err 1 -1 71 no such table: main.t1
+==== skipscan5-generated
+
+    CREATE TABLE t2(a TEXT, b TEXT, c TEXT COLLATE test_collate, d TEXT);
+    CREATE INDEX i2 ON t2(a, b, c);
+----
+stmt 0 err 1 -1 65 no such collation sequence: test_collate
+stmt 74 err 1 -1 110 no such table: main.t2
+==== 3.1
+
+  CREATE TABLE t3(a, b, c);
+  CREATE INDEX i3 ON t3(a, b);
+----
+stmt 0 ok
+stmt 28 err 1 -1 59 no such table: main.t3

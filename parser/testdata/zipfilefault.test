@@ -1,0 +1,19 @@
+==== 2.0
+
+  CREATE VIRTUAL TABLE setup USING zipfile('test.zip');
+  INSERT INTO setup(name, data) VALUES('a.txt', '1234567890');
+----
+stmt 0 ok
+stmt 56 err 1 -1 119 no such table: setup
+==== 3.0
+
+  CREATE VIRTUAL TABLE setup USING zipfile('test.zip');
+  INSERT INTO setup(name, data) VALUES('a.txt', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+----
+stmt 0 ok
+stmt 56 err 1 -1 137 no such table: setup
+==== 5.0
+
+  CREATE VIRTUAL TABLE setup USING zipfile('test.zip')
+----
+stmt 0 ok

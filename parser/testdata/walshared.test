@@ -1,0 +1,28 @@
+==== walshared-1.0
+
+    PRAGMA cache_size = 10;
+    PRAGMA journal_mode = WAL;
+    CREATE TABLE t1(a PRIMARY KEY, b UNIQUE);
+    INSERT INTO t1 VALUES(randomblob(100), randomblob(200));
+----
+stmt 0 ok
+stmt 28 ok
+stmt 59 ok
+stmt 105 err 1 -1 166 no such table: t1
+==== walshared-1.1
+
+    BEGIN;
+      INSERT INTO t1 VALUES(randomblob(100), randomblob(200));
+      INSERT INTO t1 SELECT randomblob(100), randomblob(200) FROM t1;
+      INSERT INTO t1 SELECT randomblob(100), randomblob(200) FROM t1;
+      INSERT INTO t1 SELECT randomblob(100), randomblob(200) FROM t1;
+----
+stmt 0 ok
+stmt 11 err 1 -1 74 no such table: t1
+stmt 74 err 1 -1 144 no such table: t1
+stmt 144 err 1 -1 214 no such table: t1
+stmt 214 err 1 -1 284 no such table: t1
+==== walshared-1.2
+ PRAGMA wal_checkpoint
+----
+stmt 0 ok

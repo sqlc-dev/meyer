@@ -1,0 +1,105 @@
+==== 1.0
+
+  CREATE TABLE t0(a INTEGER PRIMARY KEY, b TEXT);
+  WITH s(i) AS ( SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<400) 
+  INSERT INTO t0 SELECT i, hex(randomblob(50)) FROM s;
+
+  CREATE TABLE dir(f, t, imin, imax);
+----
+stmt 0 ok
+stmt 50 err 1 -1 173 no such table: t0
+stmt 173 ok
+==== 1.2
+ 
+  DROP TABLE s1;
+----
+stmt 0 err 1 -1 18 no such table: s1
+==== 1.3
+
+  CREATE VIRTUAL TABLE temp.s1 USING swarmvtab('SELECT * FROM dir');
+  SELECT count(*) FROM s1 WHERE rowid<50;
+----
+stmt 0 ok
+stmt 69 err 1 -1 111 no such table: s1
+==== 1.5.1.(5-seconds-or-so)
+
+  SELECT count(*) FROM s1 a, s1 b WHERE b.rowid<=200;
+----
+stmt 0 err 1 -1 54 no such table: s1
+==== 1.5.2
+
+  SELECT count(*) FROM s1 a, s1 b, s1 c 
+  WHERE a.rowid=b.rowid AND b.rowid=c.rowid;
+----
+stmt 0 err 1 -1 86 no such table: s1
+==== 2.1
+
+  SELECT * FROM s1 WHERE rowid BETWEEN 1 AND 100;
+----
+stmt 0 err 1 -1 50 no such table: s1
+==== 2.2
+
+  SELECT * FROM s1 WHERE rowid BETWEEN 101 AND 200;
+----
+stmt 0 err 1 -1 52 no such table: s1
+==== 2.3
+
+  SELECT * FROM s1 WHERE rowid BETWEEN 201 AND 300;
+----
+stmt 0 err 1 -1 52 no such table: s1
+==== 2.4
+
+  CREATE VIRTUAL TABLE temp.x1 USING swarmvtab('SELECT * FROMdir');
+----
+stmt 0 ok
+==== 2.5
+
+  CREATE VIRTUAL TABLE temp.x1 USING swarmvtab('SELECT * FROMdir', 'fetchdb');
+----
+stmt 0 ok
+==== 3.1
+
+  CREATE VIRTUAL TABLE temp.xyz USING swarmvtab(
+    'VALUES
+        (''test.db1'', ''t1'', 1, 10),
+        (''test.db2'', ''t1'', 11, 20)
+    ', 'fetch_db_no_such_function'
+  );
+----
+stmt 0 ok
+==== 3.2
+
+  CREATE VIRTUAL TABLE temp.xyz USING swarmvtab(
+    'VALUES
+        (''test.db1'', ''t1'', 1, 10),
+        (''test.db2'', ''t1'', 11, 20)
+    ', 'fetch_db'
+  );
+----
+stmt 0 ok
+==== 3.3.1
+
+  ATTACH 'test.db1' AS aux;
+  CREATE TABLE aux.t1(a INTEGER PRIMARY KEY, b);
+  INSERT INTO aux.t1 VALUES(1, NULL);
+  INSERT INTO aux.t1 VALUES(2, NULL);
+  INSERT INTO aux.t1 VALUES(9, NULL);
+  DETACH aux;
+  CREATE VIRTUAL TABLE temp.xyz USING swarmvtab(
+    'VALUES
+        (''test.db1'', ''t1'', 1, 10),
+        (''test.db2'', ''t1'', 11, 20)
+    ', 'fetch_db'
+  );
+----
+stmt 0 ok
+stmt 28 err 1 44 51 unknown database aux
+stmt 77 err 1 -1 115 no such table: aux.t1
+stmt 115 err 1 -1 153 no such table: aux.t1
+stmt 153 err 1 -1 191 no such table: aux.t1
+stmt 191 ok
+stmt 205 ok
+==== 3.3.2
+ SELECT * FROM xyz
+----
+stmt 0 err 1 -1 19 no such table: xyz

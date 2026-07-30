@@ -1,0 +1,28 @@
+==== crash-1.7
+
+    SELECT * FROM abc;
+----
+stmt 0 err 1 -1 23 no such table: abc
+==== crash-1.9
+
+    SELECT * FROM abc;
+----
+stmt 0 err 1 -1 23 no such table: abc
+==== crash-1.11
+
+    SELECT * FROM abc;
+----
+stmt 0 err 1 -1 23 no such table: abc
+==== crash-5.1
+
+    CREATE TABLE abc(a, b, c);                          -- Root page 3
+    INSERT INTO abc VALUES(randstr(1500,1500), 0, 0);   -- Overflow page 4
+    INSERT INTO abc SELECT * FROM abc;
+    INSERT INTO abc SELECT * FROM abc;
+    INSERT INTO abc SELECT * FROM abc;
+----
+stmt 0 ok
+stmt 31 err 1 -1 125 no such table: abc
+stmt 125 err 1 -1 185 no such table: abc
+stmt 185 err 1 -1 224 no such table: abc
+stmt 224 err 1 -1 263 no such table: abc

@@ -1,0 +1,54 @@
+==== vtabA-1.1
+ CREATE TABLE t1(a, b HIDDEN VARCHAR, c INTEGER)
+----
+stmt 0 ok
+==== vtabA-1.2
+ CREATE VIRTUAL TABLE t1e USING echo(t1)
+----
+stmt 0 ok
+==== vtabA-1.3
+ PRAGMA table_info(t1e)
+----
+stmt 0 ok
+==== vtabA-1.4
+
+    INSERT INTO t1e VALUES('value a', 'value c');
+----
+stmt 0 err 1 -1 50 no such table: t1e
+==== vtabA-1.5
+
+    SELECT a, b, c FROM t1e;
+----
+stmt 0 err 1 -1 29 no such table: t1e
+==== vtabA-1.6
+
+    SELECT * FROM t1e;
+----
+stmt 0 err 1 -1 23 no such table: t1e
+==== vtabA-1.7
+
+  DELETE FROM t1e;
+  INSERT INTO t1e SELECT 'abc','def';
+----
+stmt 0 err 1 -1 19 no such table: t1e
+stmt 19 err 1 -1 57 no such table: t1e
+==== vtabA-1.8
+
+  INSERT INTO t1e VALUES('ghi','jkl'),('mno','pqr'),('stu','vwx');
+----
+stmt 0 err 1 -1 67 no such table: t1e
+==== vtabA-1.9
+
+  SELECT a,b,c, '|' FROM t1e ORDER BY 1;
+----
+stmt 0 err 1 -1 41 no such table: t1e
+==== vtabA-1.20
+
+    INSERT INTO t1e SELECT * FROM t1e;
+----
+stmt 0 err 1 -1 39 no such table: t1e
+==== vtabA-1.21
+
+    SELECT * FROM t1e ORDER BY 1;
+----
+stmt 0 err 1 -1 34 no such table: t1e

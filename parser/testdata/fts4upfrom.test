@@ -1,0 +1,51 @@
+==== fts4upfrom-generated
+
+    INSERT INTO ft(a, b, c) VALUES('a', NULL, 'apple');
+    INSERT INTO ft(a, b, c) VALUES('b', NULL, 'banana');
+    INSERT INTO ft(a, b, c) VALUES('c', NULL, 'cherry');
+    INSERT INTO ft(a, b, c) VALUES('d', NULL, 'damson plum');
+----
+stmt 0 err 1 -1 56 no such table: ft
+stmt 56 err 1 -1 113 no such table: ft
+stmt 113 err 1 -1 170 no such table: ft
+stmt 170 err 1 -1 232 no such table: ft
+==== fts4upfrom-generated.dup1
+
+    SELECT a, b, c FROM ft ORDER BY rowid;
+----
+stmt 0 err 1 -1 43 no such table: ft
+==== fts4upfrom-generated.dup2
+
+    UPDATE ft SET b=o.c FROM ft AS o WHERE (ft.a == char(unicode(o.a)+1))
+----
+stmt 0 err 1 -1 75 no such table: ft
+==== fts4upfrom-generated.dup3
+
+    SELECT a, b, c FROM ft ORDER BY rowid;
+----
+stmt 0 err 1 -1 43 no such table: ft
+==== fts4upfrom-generated.dup4
+
+    UPDATE ft SET c=v FROM changes WHERE a=k;
+----
+stmt 0 err 1 -1 46 no such table: ft
+==== fts4upfrom-generated.dup5
+
+    create view changes(k, v) AS 
+      VALUES( 'd', 'dewberry' ) UNION ALL
+      VALUES( 'c', 'clementine' ) UNION ALL
+      VALUES( 'b', 'blueberry' ) UNION ALL
+      VALUES( 'a', 'apricot' ) 
+    ;
+----
+stmt 0 ok
+==== fts4upfrom-generated.dup6
+
+    UPDATE ft SET c=v FROM changes WHERE a=k;
+----
+stmt 0 err 1 -1 46 no such table: ft
+==== fts4upfrom-generated.dup7
+
+    SELECT rowid, a, b, c FROM ft ORDER BY rowid;
+----
+stmt 0 err 1 -1 50 no such table: ft

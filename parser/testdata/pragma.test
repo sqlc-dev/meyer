@@ -1,0 +1,1014 @@
+==== pragma-1.1
+
+    PRAGMA cache_size;
+    PRAGMA default_cache_size;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 54 ok
+==== pragma-1.4
+
+    PRAGMA synchronous=OFF;
+    PRAGMA cache_size;
+    PRAGMA default_cache_size;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 51 ok
+stmt 82 ok
+==== pragma-1.5
+
+    PRAGMA cache_size=-4321;
+    PRAGMA cache_size;
+    PRAGMA default_cache_size;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 52 ok
+stmt 83 ok
+==== pragma-1.6
+
+    PRAGMA synchronous=ON;
+    PRAGMA cache_size;
+    PRAGMA default_cache_size;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 50 ok
+stmt 81 ok
+==== pragma-1.8
+
+    PRAGMA default_cache_size=-123;
+    PRAGMA cache_size;
+    PRAGMA default_cache_size;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 36 ok
+stmt 59 ok
+stmt 90 ok
+==== pragma-1.9.2
+
+      VACUUM;
+      PRAGMA cache_size;
+      PRAGMA default_cache_size;
+      PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 14 ok
+stmt 39 ok
+stmt 72 ok
+==== pragma-1.10
+
+    PRAGMA synchronous=NORMAL;
+    PRAGMA cache_size;
+    PRAGMA default_cache_size;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 31 ok
+stmt 54 ok
+stmt 85 ok
+==== pragma-1.11.1
+
+    PRAGMA synchronous=EXTRA;
+    PRAGMA cache_size;
+    PRAGMA default_cache_size;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 53 ok
+stmt 84 ok
+==== pragma-1.11.2
+
+    PRAGMA synchronous=FULL;
+    PRAGMA cache_size;
+    PRAGMA default_cache_size;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 52 ok
+stmt 83 ok
+==== pragma-1.13
+
+    PRAGMA synchronous=0;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 26 ok
+==== pragma-1.14
+
+    PRAGMA synchronous=2;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 26 ok
+==== pragma-1.14.1
+
+    PRAGMA synchronous=4;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 26 ok
+==== pragma-1.14.2
+
+    PRAGMA synchronous=3;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 26 ok
+==== pragma-1.14.3
+
+    PRAGMA synchronous=8;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 26 ok
+==== pragma-1.14.4
+
+    PRAGMA synchronous=10;
+    PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 27 ok
+==== 1.15.1
+
+  PRAGMA default_cache_size = 0;
+----
+stmt 0 ok
+==== 1.15.2
+
+  PRAGMA default_cache_size;
+----
+stmt 0 ok
+==== 1.15.3
+
+  PRAGMA default_cache_size = -500;
+----
+stmt 0 ok
+==== 1.15.4
+
+  PRAGMA default_cache_size;
+----
+stmt 0 ok
+==== 1.15.3.dup1
+
+  PRAGMA default_cache_size = 500;
+----
+stmt 0 ok
+==== 1.15.4.dup1
+
+  PRAGMA default_cache_size;
+----
+stmt 0 ok
+==== 1.15.4.dup2
+
+  PRAGMA default_cache_size;
+----
+stmt 0 ok
+==== pragma-1.15
+
+      PRAGMA vdbe_listing=YES;
+      PRAGMA vdbe_listing;
+----
+stmt 0 ok
+stmt 31 ok
+==== pragma-1.16
+
+      PRAGMA vdbe_listing=NO;
+      PRAGMA vdbe_listing;
+----
+stmt 0 ok
+stmt 30 ok
+==== pragma-1.17
+
+    PRAGMA parser_trace=ON;
+    PRAGMA parser_trace=OFF;
+----
+stmt 0 ok
+stmt 28 ok
+==== pragma-1.18
+
+    PRAGMA bogus = -1234;  -- Parsing of negative values
+----
+stmt 0 ok
+==== pragma-2.2
+
+      pragma aux.synchronous;
+----
+stmt 0 err 1 14 30 unknown database aux
+==== pragma-2.3
+
+      pragma aux.synchronous = OFF;
+      pragma aux.synchronous;
+      pragma synchronous;
+----
+stmt 0 err 1 14 36 unknown database aux
+stmt 36 err 1 50 66 unknown database aux
+stmt 66 ok
+==== pragma-2.4
+
+      pragma aux.synchronous = ON;
+      pragma synchronous;
+      pragma aux.synchronous;
+----
+stmt 0 err 1 14 35 unknown database aux
+stmt 35 ok
+stmt 61 err 1 75 91 unknown database aux
+==== pragma-3.3
+PRAGMA integrity_check=1
+----
+stmt 0 ok
+==== pragma-3.4
+
+        ATTACH DATABASE 'test.db' AS t2;
+        PRAGMA integrity_check
+----
+stmt 0 ok
+stmt 41 ok
+==== pragma-3.5
+
+        PRAGMA integrity_check=4
+----
+stmt 0 ok
+==== pragma-3.5.2
+
+      PRAGMA integrity_check='4'
+----
+stmt 0 err 1 -1 34 no such table: 4
+==== pragma-3.6
+
+      PRAGMA integrity_check=xyz
+----
+stmt 0 err 1 -1 34 no such table: xyz
+==== pragma-3.6b
+
+      PRAGMA integrity_check=t2
+----
+stmt 0 err 1 -1 33 no such table: t2
+==== pragma-3.6c
+
+      PRAGMA integrity_check=sqlite_schema
+----
+stmt 0 ok
+==== pragma-3.7
+
+        PRAGMA integrity_check=0
+----
+stmt 0 ok
+==== pragma-3.8.1
+PRAGMA quick_check
+----
+stmt 0 ok
+==== pragma-3.8.2
+PRAGMA QUICK_CHECK
+----
+stmt 0 ok
+==== pragma-3.9a
+
+        ATTACH 'testerr.db' AS t2;
+        PRAGMA integrity_check
+----
+stmt 0 ok
+stmt 35 ok
+==== pragma-3.9b
+
+      PRAGMA t2.integrity_check=t2;
+----
+stmt 0 err 1 14 36 unknown database t2
+==== pragma-3.9c
+
+      PRAGMA t2.integrity_check=sqlite_schema;
+----
+stmt 0 err 1 14 47 unknown database t2
+==== pragma-3.10
+
+        PRAGMA integrity_check=1
+----
+stmt 0 ok
+==== pragma-3.11
+
+        PRAGMA integrity_check=5
+----
+stmt 0 ok
+==== pragma-3.12
+
+        PRAGMA integrity_check=4
+----
+stmt 0 ok
+==== pragma-3.13
+
+        PRAGMA integrity_check=3
+----
+stmt 0 ok
+==== pragma-3.14
+
+        PRAGMA integrity_check(2)
+----
+stmt 0 ok
+==== pragma-3.15
+
+        ATTACH 'testerr.db' AS t3;
+        PRAGMA integrity_check
+----
+stmt 0 ok
+stmt 35 ok
+==== pragma-3.16
+
+        PRAGMA integrity_check(10)
+----
+stmt 0 ok
+==== pragma-3.17
+
+        PRAGMA integrity_check=8
+----
+stmt 0 ok
+==== pragma-3.18
+
+        PRAGMA integrity_check=4
+----
+stmt 0 ok
+==== pragma-3.20
+
+      CREATE TABLE t1(a,b);
+      CREATE INDEX t1a ON t1(a);
+      INSERT INTO t1 VALUES(1,1),(2,2),(3,3),(2,4),(NULL,5),(NULL,6);
+      PRAGMA writable_schema=ON;
+      UPDATE sqlite_master SET sql='CREATE UNIQUE INDEX t1a ON t1(a)'
+        WHERE name='t1a';
+      UPDATE sqlite_master SET sql='CREATE TABLE t1(a NOT NULL,b)'
+        WHERE name='t1';
+      PRAGMA writable_schema=OFF;
+      ALTER TABLE t1 RENAME TO t1x;
+      PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 28 err 1 -1 61 no such table: main.t1
+stmt 61 err 1 -1 131 no such table: t1
+stmt 131 ok
+stmt 164 ok
+stmt 260 ok
+stmt 352 ok
+stmt 386 err 1 -1 422 no such table: t1
+stmt 422 ok
+==== pragma-3.21
+
+    PRAGMA integrity_check(3);
+----
+stmt 0 ok
+==== pragma-3.22
+
+    PRAGMA integrity_check(2);
+----
+stmt 0 ok
+==== pragma-3.23
+
+    PRAGMA integrity_check(1);
+----
+stmt 0 ok
+==== pragma-3.24
+
+    DROP TABLE IF EXISTS t1;
+    CREATE TABLE t1(a);
+    INSERT INTO t1 VALUES (1);
+    ALTER TABLE t1 ADD COLUMN b NOT NULL DEFAULT 0.25;
+    SELECT * FROM t1;
+    PRAGMA integrity_check(t1);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 53 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 120 no such table: t1
+stmt 139 err 1 -1 161 no such table: t1
+stmt 161 err 1 -1 193 no such table: t1
+==== pragma-3.25
+
+    ALTER TABLE t1 ADD COLUMN c CHECK (1);
+    SELECT * FROM t1;
+    PRAGMA integrity_check(t1);
+----
+stmt 0 err 1 -1 38 no such table: t1
+stmt 43 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 97 no such table: t1
+==== pragma-3.40
+
+  CREATE TABLE t1(
+    a INTEGER PRIMARY KEY,
+    b TEXT COLLATE nocase,
+    c INT COLLATE nocase,
+    d TEXT
+  );
+  INSERT INTO t1(a,b,c,d) VALUES
+    (1, 'one','one','one'),
+    (2, 'two','two','two'),
+    (3, 'three','three','three'),
+    (4, 'four','four','four'),
+    (5, 'five','five','five');
+  CREATE INDEX t1bcd ON t1(b,c,d);
+  CREATE TABLE t2(
+    a INTEGER PRIMARY KEY,
+    b TEXT COLLATE nocase,
+    c INT COLLATE nocase,
+    d TEXT
+  );
+  INSERT INTO t2(a,b,c,d) VALUES
+    (1, 'one','one','one'),
+    (2, 'two','two','TWO'),
+    (3, 'three','THREE','three'),
+    (4, 'FOUR','four','four'),
+    (5, 'FIVE','FIVE','five');
+  CREATE INDEX t2bcd ON t2(b,c,d);
+  CREATE TEMP TABLE saved_schema AS SELECT name, rootpage FROM sqlite_schema;
+  PRAGMA writable_schema=ON;
+  UPDATE sqlite_schema
+     SET rootpage=(SELECT rootpage FROM saved_schema WHERE name='t2bcd')
+   WHERE name='t1bcd';
+  UPDATE sqlite_schema
+     SET rootpage=(SELECT rootpage FROM saved_schema WHERE name='t1bcd')
+   WHERE name='t2bcd';
+  PRAGMA Writable_schema=RESET;
+----
+stmt 0 ok
+stmt 115 err 1 -1 300 no such table: t1
+stmt 300 err 1 -1 335 no such table: main.t1
+stmt 335 ok
+stmt 450 err 1 -1 635 no such table: t2
+stmt 635 err 1 -1 670 no such table: main.t2
+stmt 670 ok
+stmt 748 ok
+stmt 777 err 1 -1 896 no such table: saved_schema
+stmt 896 err 1 -1 1015 no such table: saved_schema
+stmt 1015 ok
+==== pragma-3.41
+
+    SELECT integrity_check AS x FROM pragma_integrity_check ORDER BY 1;
+----
+stmt 0 ok
+==== pragma-4.1
+
+    ATTACH 'test2.db' AS aux;
+    pragma aux.cache_size;
+    pragma aux.default_cache_size;
+----
+stmt 0 ok
+stmt 30 err 1 42 57 unknown database aux
+stmt 57 err 1 69 92 unknown database aux
+==== pragma-4.2
+
+    pragma aux.cache_size = 50;
+    pragma aux.cache_size;
+    pragma aux.default_cache_size;
+----
+stmt 0 err 1 12 32 unknown database aux
+stmt 32 err 1 44 59 unknown database aux
+stmt 59 err 1 71 94 unknown database aux
+==== pragma-4.3
+
+    pragma aux.default_cache_size = 456;
+    pragma aux.cache_size;
+    pragma aux.default_cache_size;
+----
+stmt 0 err 1 12 41 unknown database aux
+stmt 41 err 1 53 68 unknown database aux
+stmt 68 err 1 80 103 unknown database aux
+==== pragma-4.4
+
+    pragma cache_size;
+    pragma default_cache_size;
+----
+stmt 0 ok
+stmt 23 ok
+==== pragma-4.5
+
+    DETACH aux;
+    ATTACH 'test3.db' AS aux;
+    pragma aux.cache_size;
+    pragma aux.default_cache_size;
+----
+stmt 0 ok
+stmt 16 ok
+stmt 46 err 1 58 73 unknown database aux
+stmt 73 err 1 85 108 unknown database aux
+==== pragma-4.6
+
+    DETACH aux;
+    ATTACH 'test2.db' AS aux;
+    pragma aux.cache_size;
+    pragma aux.default_cache_size;
+----
+stmt 0 ok
+stmt 16 ok
+stmt 46 err 1 58 73 unknown database aux
+stmt 73 err 1 85 108 unknown database aux
+==== pragma-5.0
+
+    pragma synchronous;
+----
+stmt 0 ok
+==== pragma-5.1
+
+    BEGIN;
+    pragma synchronous = OFF;
+----
+stmt 0 ok
+stmt 11 ok
+==== pragma-5.2
+
+    pragma synchronous;
+----
+stmt 0 ok
+==== pragma-6.2.1
+
+    pragma table_info;
+----
+stmt 0 ok
+==== pragma-6.2.2
+
+    CREATE TABLE t5(
+      a TEXT DEFAULT CURRENT_TIMESTAMP, 
+      b DEFAULT (5+3),
+      c TEXT,
+      d INTEGER DEFAULT NULL,
+      e TEXT DEFAULT '',
+      UNIQUE(b,c,d),
+      PRIMARY KEY(e,b,c)
+    );
+    PRAGMA table_info(t5);
+----
+stmt 0 ok
+stmt 207 ok
+==== pragma-6.2.3
+
+    CREATE TABLE t2_3(a,b INTEGER PRIMARY KEY,c);
+    pragma table_info(t2_3)
+----
+stmt 0 ok
+stmt 50 ok
+==== pragma-6.3.1
+
+      CREATE TABLE t3(a int references t2(b), b UNIQUE);
+      pragma foreign_key_list(t3);
+----
+stmt 0 ok
+stmt 57 ok
+==== pragma-6.3.2
+
+      pragma foreign_key_list;
+----
+stmt 0 ok
+==== pragma-6.3.3
+
+      pragma foreign_key_list(t3_bogus);
+----
+stmt 0 ok
+==== pragma-6.3.4
+
+      pragma foreign_key_list(t5);
+----
+stmt 0 ok
+==== pragma-6.5.1c
+
+  CREATE INDEX t3i2 ON t3(b,a);
+  PRAGMA index_info='t3i2';
+  DROP INDEX t3i2;
+----
+stmt 0 err 1 -1 32 no such table: main.t3
+stmt 32 ok
+stmt 60 err 1 -1 79 no such index: t3i2
+==== pragma-6.5.2
+
+    pragma index_info(t3i1_bogus);
+----
+stmt 0 ok
+==== pragma-6.6.1
+
+      CREATE TABLE trial(col_main);
+      CREATE TEMP TABLE trial(col_temp);
+----
+stmt 0 ok
+stmt 36 ok
+==== pragma-6.6.2
+
+      PRAGMA table_info(trial);
+----
+stmt 0 ok
+==== pragma-6.6.3
+
+      PRAGMA temp.table_info(trial);
+----
+stmt 0 ok
+==== pragma-6.6.4
+
+      PRAGMA main.table_info(trial);
+----
+stmt 0 ok
+==== pragma-6.8
+
+    CREATE TABLE t68(a,b,c,PRIMARY KEY(a,b,a,c));
+    PRAGMA table_info(t68);
+----
+stmt 0 ok
+stmt 50 ok
+==== pragma-7.1.2
+
+    pragma index_list(t3_bogus);
+----
+stmt 0 ok
+==== pragma-8.1.1
+
+    PRAGMA schema_version = 105;
+----
+stmt 0 ok
+==== pragma-8.1.3
+
+  PRAGMA schema_version = 106;
+  PRAGMA schema_version;
+----
+stmt 0 ok
+stmt 31 ok
+==== pragma-8.1.4
+
+  PRAGMA schema_version = 106;
+  PRAGMA schema_version;
+----
+stmt 0 ok
+stmt 31 ok
+==== pragma-8.1.5
+
+    CREATE TABLE t4(a, b, c);
+    INSERT INTO t4 VALUES(1, 2, 3);
+    SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 30 err 1 -1 66 no such table: t4
+stmt 66 err 1 -1 88 no such table: t4
+==== pragma-8.1.6
+
+    PRAGMA schema_version;
+----
+stmt 0 ok
+==== pragma-8.1.8
+
+    PRAGMA schema_version = 108;
+----
+stmt 0 ok
+==== pragma-8.1.11
+
+      ATTACH 'test2.db' AS aux;
+      CREATE TABLE aux.t1(a, b, c);
+      PRAGMA aux.schema_version = 205;
+----
+stmt 0 ok
+stmt 32 err 1 52 59 unknown database aux
+stmt 68 err 1 82 107 unknown database aux
+==== pragma-8.1.12
+
+      PRAGMA aux.schema_version;
+----
+stmt 0 err 1 14 33 unknown database aux
+==== pragma-8.1.13
+
+    PRAGMA schema_version;
+----
+stmt 0 ok
+==== pragma-8.1.15
+
+      PRAGMA aux.schema_version = 206;
+----
+stmt 0 err 1 14 39 unknown database aux
+==== pragma-8.2.2
+
+    PRAGMA user_version = 2;
+----
+stmt 0 ok
+==== pragma-8.2.4.1
+
+    PRAGMA schema_version;
+----
+stmt 0 ok
+==== pragma-8.2.4.2
+
+      VACUUM;
+      PRAGMA user_version;
+----
+stmt 0 ok
+stmt 14 ok
+==== pragma-8.2.4.3
+
+      PRAGMA schema_version;
+----
+stmt 0 ok
+==== pragma-8.2.5
+
+      PRAGMA aux.user_version;
+----
+stmt 0 err 1 14 31 unknown database aux
+==== pragma-8.2.6
+
+      PRAGMA aux.user_version = 3;
+----
+stmt 0 err 1 14 35 unknown database aux
+==== pragma-8.2.7
+
+      PRAGMA aux.user_version;
+----
+stmt 0 err 1 14 31 unknown database aux
+==== pragma-8.2.8
+
+      PRAGMA main.user_version;
+----
+stmt 0 ok
+==== pragma-8.2.9
+
+      BEGIN;
+      PRAGMA aux.user_version = 10;
+      PRAGMA user_version = 11;
+----
+stmt 0 ok
+stmt 13 err 1 27 49 unknown database aux
+stmt 49 ok
+==== pragma-8.2.10
+
+      PRAGMA aux.user_version;
+----
+stmt 0 err 1 14 31 unknown database aux
+==== pragma-8.2.11
+
+      PRAGMA main.user_version;
+----
+stmt 0 ok
+==== pragma-8.2.12
+
+      ROLLBACK;
+      PRAGMA aux.user_version;
+----
+stmt 0 ok
+stmt 16 err 1 30 47 unknown database aux
+==== pragma-8.2.13
+
+      PRAGMA main.user_version;
+----
+stmt 0 ok
+==== pragma-8.2.14
+
+    PRAGMA user_version = -450;
+----
+stmt 0 ok
+==== pragma-8.2.15
+
+    PRAGMA user_version;
+----
+stmt 0 ok
+==== pragma-8.3.1
+
+    PRAGMA application_id;
+----
+stmt 0 ok
+==== pragma-8.3.2
+PRAGMA Application_ID(12345); PRAGMA application_id;
+----
+stmt 0 ok
+stmt 29 ok
+==== pragma-9.4
+
+    PRAGMA temp_store_directory;
+----
+stmt 0 ok
+==== pragma-9.6
+ 
+      PRAGMA temp_store_directory;
+----
+stmt 0 ok
+==== pragma-9.7
+ 
+      PRAGMA temp_store_directory='/NON/EXISTENT/PATH/FOOBAR';
+----
+stmt 0 err 1 -1 64 not a writable directory
+==== pragma-9.8
+ 
+      PRAGMA temp_store_directory='';
+----
+stmt 0 ok
+==== pragma-9.9
+ 
+          PRAGMA temp_store_directory;
+          PRAGMA temp_store=FILE;
+          CREATE TEMP TABLE temp_store_directory_test(a integer);
+          INSERT INTO temp_store_directory_test values (2);
+          SELECT * FROM temp_store_directory_test;
+----
+stmt 0 ok
+stmt 40 ok
+stmt 74 ok
+stmt 140 err 1 -1 200 no such table: temp_store_directory_test
+stmt 200 err 1 -1 251 no such table: temp_store_directory_test
+==== pragma-9.11
+
+    PRAGMA temp_store = 0;
+    PRAGMA temp_store;
+----
+stmt 0 ok
+stmt 27 ok
+==== pragma-9.12
+
+    PRAGMA temp_store = 1;
+    PRAGMA temp_store;
+----
+stmt 0 ok
+stmt 27 ok
+==== pragma-9.13
+
+    PRAGMA temp_store = 2;
+    PRAGMA temp_store;
+----
+stmt 0 ok
+stmt 27 ok
+==== pragma-9.14
+
+    PRAGMA temp_store = 3;
+    PRAGMA temp_store;
+----
+stmt 0 ok
+stmt 27 ok
+==== pragma-9.15
+
+    BEGIN EXCLUSIVE;
+    CREATE TEMP TABLE temp_table(t);
+    INSERT INTO temp_table VALUES('valuable data');
+    PRAGMA temp_store = 1;
+----
+stmt 0 ok
+stmt 21 ok
+stmt 58 err 1 -1 110 no such table: temp_table
+stmt 110 ok
+==== pragma-9.16
+
+    SELECT * FROM temp_table;
+    COMMIT;
+----
+stmt 0 err 1 -1 30 no such table: temp_table
+stmt 30 ok
+==== pragma-9.17
+
+    INSERT INTO temp_table VALUES('valuable data II');
+    SELECT * FROM temp_table;
+----
+stmt 0 err 1 -1 55 no such table: temp_table
+stmt 55 err 1 -1 85 no such table: temp_table
+==== pragma-10.1
+
+    INSERT INTO t1 VALUES(randstr(10,10));
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== pragma-10.2
+
+    UPDATE t1 SET a = randstr(10,10);
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== pragma-10.3
+
+    DELETE FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== pragma-14.2
+ 
+      CREATE TABLE abc(a, b, c);
+      PRAGMA page_count;
+      PRAGMA main.page_count;
+      PRAGMA temp.page_count;
+----
+stmt 0 ok
+stmt 34 ok
+stmt 59 ok
+stmt 89 ok
+==== pragma-14.2uc
+pragma PAGE_COUNT
+----
+stmt 0 ok
+==== pragma-14.3
+ 
+      BEGIN;
+      CREATE TABLE def(a, b, c);
+      PRAGMA page_count;
+----
+stmt 0 ok
+stmt 14 ok
+stmt 47 ok
+==== pragma-14.3uc
+pragma PAGE_COUNT
+----
+stmt 0 ok
+==== pragma-14.5
+
+      ROLLBACK;
+      PRAGMA page_count;
+----
+stmt 0 ok
+stmt 16 ok
+==== pragma-14.6uc
+pragma AUX.PAGE_COUNT
+----
+stmt 0 err 1 7 22 unknown database AUX
+==== pragma-15.1
+
+      PRAGMA cache_size=59;
+      PRAGMA cache_size;
+----
+stmt 0 ok
+stmt 28 ok
+==== pragma-16.8.1
+
+      PRAGMA lock_proxy_file="yetanotherproxy";
+      PRAGMA lock_proxy_file;
+----
+stmt 0 ok
+stmt 48 ok
+==== pragma-16.8.2
+
+      create table mine(x);
+----
+stmt 0 ok
+==== pragma-19.1
+PRAGMA error
+----
+stmt 0 ok
+==== pragma-19.2
+PRAGMA error='This is the error message'
+----
+stmt 0 ok
+==== pragma-19.3
+PRAGMA error='7 This is the error message'
+----
+stmt 0 ok
+==== pragma-19.4
+PRAGMA error=7
+----
+stmt 0 ok
+==== pragma-20.1
+PRAGMA data_store_directory
+----
+stmt 0 ok
+==== pragma-20.3
+PRAGMA data_store_directory
+----
+stmt 0 ok
+==== pragma-20.8
+PRAGMA data_store_directory
+----
+stmt 0 ok
+==== 22.3.2
+ PRAGMA main.integrity_check;
+----
+stmt 0 ok
+==== 22.3.3
+ PRAGMA aux.integrity_check;
+----
+stmt 0 err 1 8 28 unknown database aux
+==== 22.4.2
+ PRAGMA main.integrity_check;
+----
+stmt 0 ok
+==== 22.4.3
+ PRAGMA aux.integrity_check;
+----
+stmt 0 err 1 8 28 unknown database aux
+==== 24.0
+
+    PRAGMA page_size = 1024;
+    CREATE TABLE t1(a, b, c);
+    CREATE INDEX i1 ON t1(b);
+    INSERT INTO t1 VALUES('a', 'b', 'c');
+    PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 59 err 1 -1 89 no such table: main.t1
+stmt 89 err 1 -1 131 no such table: t1
+stmt 131 ok
+==== 24.1
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== 24.2
+
+    PRAGMA integrity_check;
+----
+stmt 0 ok
+==== 25.0
+
+  CREATE TABLE t1(a INT, b AS (a*2) NOT NULL);
+  CREATE TEMP TABLE t2(a PRIMARY KEY, b, c UNIQUE) WITHOUT ROWID;
+  CREATE UNIQUE INDEX t2x ON t2(c,b);
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 47 ok
+stmt 113 err 1 -1 151 no such table: main.t2
+stmt 151 ok

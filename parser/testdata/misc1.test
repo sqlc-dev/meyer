@@ -1,0 +1,518 @@
+==== misc1-1.2
+SELECT x0, x10, x25, x50, x75 FROM manycol
+----
+stmt 0 err 1 -1 43 no such table: manycol
+==== misc1-1.3.2
+SELECT x50 FROM manycol ORDER BY x80
+----
+stmt 0 err 1 -1 37 no such table: manycol
+==== misc1-1.4
+SELECT x75 FROM manycol WHERE x50=350
+----
+stmt 0 err 1 -1 38 no such table: manycol
+==== misc1-1.5
+SELECT x50 FROM manycol WHERE x99=599
+----
+stmt 0 err 1 -1 38 no such table: manycol
+==== misc1-1.7
+SELECT count(*) FROM manycol
+----
+stmt 0 err 1 -1 29 no such table: manycol
+==== misc1-2.2
+SELECT sum(one), two, four FROM agger
+           GROUP BY two, four ORDER BY sum(one) desc
+----
+stmt 0 err 1 -1 91 no such table: agger
+==== misc1-2.3
+SELECT sum((one)), (two), (four) FROM agger
+           GROUP BY (two), (four) ORDER BY sum(one) desc
+----
+stmt 0 err 1 -1 101 no such table: agger
+==== misc1-4.1
+
+    BEGIN;
+    CREATE TABLE t2(a);
+    INSERT INTO t2 VALUES('This is a long string to use up a lot of disk -');
+    UPDATE t2 SET a=a||a||a||a;
+    INSERT INTO t2 SELECT '1 - ' || a FROM t2;
+    INSERT INTO t2 SELECT '2 - ' || a FROM t2;
+    INSERT INTO t2 SELECT '3 - ' || a FROM t2;
+    INSERT INTO t2 SELECT '4 - ' || a FROM t2;
+    INSERT INTO t2 SELECT '5 - ' || a FROM t2;
+    INSERT INTO t2 SELECT '6 - ' || a FROM t2;
+    COMMIT;
+    SELECT count(*) FROM t2;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 35 err 1 -1 113 no such table: t2
+stmt 113 err 1 -1 145 no such table: t2
+stmt 145 err 1 -1 192 no such table: t2
+stmt 192 err 1 -1 239 no such table: t2
+stmt 239 err 1 -1 286 no such table: t2
+stmt 286 err 1 -1 333 no such table: t2
+stmt 333 err 1 -1 380 no such table: t2
+stmt 380 err 1 -1 427 no such table: t2
+stmt 427 ok
+stmt 439 err 1 -1 468 no such table: t2
+==== misc1-5.1
+
+    CREATE TABLE t3(a,b);
+    INSERT INTO t3 VALUES(1,2);
+    INSERT INTO t3 VALUES(3,4);
+    UPDATE t3 SET a=0 WHEREwww b=2;
+----
+stmt 0 ok
+stmt 26 err 1 -1 58 no such table: t3
+stmt 58 err 1 -1 90 no such table: t3
+stmt 90 err 1 113 121 near "WHEREwww": syntax error
+==== misc1-5.2
+
+    SELECT * FROM t3 ORDER BY a;
+----
+stmt 0 err 1 -1 33 no such table: t3
+==== misc1-6.1
+
+    CREATE TABLE t4(
+      abort, asc, begin, cluster, conflict, copy, delimiters, desc, end,
+      explain, fail, ignore, key, offset, pragma, replace, temp,
+      vacuum, view
+    );
+----
+stmt 0 ok
+==== misc1-6.2
+
+    INSERT INTO t4
+       VALUES(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19);
+----
+stmt 0 err 1 -1 83 no such table: t4
+==== misc1-6.3
+
+    SELECT * FROM t4
+----
+stmt 0 err 1 -1 22 no such table: t4
+==== misc1-6.4
+
+    SELECT abort+asc,max(key,pragma,temp) FROM t4
+----
+stmt 0 err 1 -1 51 no such table: t4
+==== misc1-7.1
+
+    CREATE TABLE error1(
+      a TYPE PRIMARY KEY,
+      b TYPE PRIMARY KEY
+    );
+----
+stmt 0 err 1 -1 82 table "error1" has more than one primary key
+==== misc1-7.2
+
+    CREATE TABLE error1(
+      a INTEGER PRIMARY KEY,
+      b TYPE PRIMARY KEY
+    );
+----
+stmt 0 err 1 -1 85 table "error1" has more than one primary key
+==== misc1-7.3
+
+    CREATE TABLE t5(a,b,c,PRIMARY KEY(a,b));
+    INSERT INTO t5 VALUES(1,2,3);
+    SELECT * FROM t5 ORDER BY a;
+----
+stmt 0 ok
+stmt 45 err 1 -1 79 no such table: t5
+stmt 79 err 1 -1 112 no such table: t5
+==== misc1-7.4
+
+    INSERT INTO t5 VALUES(1,2,4);
+----
+stmt 0 err 1 -1 34 no such table: t5
+==== misc1-7.5
+
+    INSERT INTO t5 VALUES(0,2,4);
+----
+stmt 0 err 1 -1 34 no such table: t5
+==== misc1-7.6
+
+    SELECT * FROM t5 ORDER BY a;
+----
+stmt 0 err 1 -1 33 no such table: t5
+==== misc1-8.1
+
+    SELECT *;
+----
+stmt 0 err 1 -1 14 no tables specified
+==== misc1-8.2
+
+    SELECT t1.*;
+----
+stmt 0 err 1 -1 17 no such table: t1
+==== misc1-9.1
+
+    CREATE TABLE t1(a unique not null, b unique not null);
+    INSERT INTO t1 VALUES('a',1234567890123456789);
+    INSERT INTO t1 VALUES('b',1234567891123456789);
+    INSERT INTO t1 VALUES('c',1234567892123456789);
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 59 err 1 -1 111 no such table: t1
+stmt 111 err 1 -1 163 no such table: t1
+stmt 163 err 1 -1 215 no such table: t1
+stmt 215 err 1 -1 237 no such table: t1
+==== misc1-10.0
+SELECT count(*) FROM manycol
+----
+stmt 0 err 1 -1 29 no such table: manycol
+==== misc1-10.4
+SELECT count(*) FROM manycol
+----
+stmt 0 err 1 -1 29 no such table: manycol
+==== misc1-10.6
+SELECT x1 FROM manycol WHERE x0=100
+----
+stmt 0 err 1 -1 36 no such table: manycol
+==== misc1-10.8
+SELECT x1 FROM manycol WHERE x0=100
+----
+stmt 0 err 1 -1 36 no such table: manycol
+==== misc1-10.10
+SELECT x1 FROM manycol WHERE x0=100
+----
+stmt 0 err 1 -1 36 no such table: manycol
+==== misc1-12.1
+SELECT '0'=='0.0'
+----
+stmt 0 ok
+==== misc1-12.2
+SELECT '0'==0.0
+----
+stmt 0 ok
+==== misc1-12.3
+SELECT '12345678901234567890'=='12345678901234567891'
+----
+stmt 0 ok
+==== misc1-12.4
+
+    CREATE TABLE t6(a INT UNIQUE, b TEXT UNIQUE);
+    INSERT INTO t6 VALUES('0','0.0');
+    SELECT * FROM t6;
+----
+stmt 0 ok
+stmt 50 err 1 -1 88 no such table: t6
+stmt 88 err 1 -1 110 no such table: t6
+==== misc1-12.5
+
+      INSERT OR IGNORE INTO t6 VALUES(0.0,'x');
+      SELECT * FROM t6;
+----
+stmt 0 err 1 -1 48 no such table: t6
+stmt 48 err 1 -1 72 no such table: t6
+==== misc1-12.6
+
+      INSERT OR IGNORE INTO t6 VALUES('y',0);
+      SELECT * FROM t6;
+----
+stmt 0 err 1 -1 46 no such table: t6
+stmt 46 err 1 -1 70 no such table: t6
+==== misc1-12.7
+
+    CREATE TABLE t7(x INTEGER, y TEXT, z);
+    INSERT INTO t7 VALUES(0,0,1);
+    INSERT INTO t7 VALUES(0.0,0,2);
+    INSERT INTO t7 VALUES(0,0.0,3);
+    INSERT INTO t7 VALUES(0.0,0.0,4);
+    SELECT DISTINCT x, y FROM t7 ORDER BY z;
+----
+stmt 0 ok
+stmt 43 err 1 -1 77 no such table: t7
+stmt 77 err 1 -1 113 no such table: t7
+stmt 113 err 1 -1 149 no such table: t7
+stmt 149 err 1 -1 187 no such table: t7
+stmt 187 err 1 -1 232 no such table: t7
+==== misc1-12.8
+
+    SELECT min(z), max(z), count(z) FROM t7 GROUP BY x ORDER BY 1;
+----
+stmt 0 err 1 -1 67 no such table: t7
+==== misc1-12.9
+
+    SELECT min(z), max(z), count(z) FROM t7 GROUP BY y ORDER BY 1;
+----
+stmt 0 err 1 -1 67 no such table: t7
+==== misc1-12.11
+
+    CREATE TABLE t8(x TEXT COLLATE numeric, y INTEGER COLLATE text, z);
+    INSERT INTO t8 VALUES(0,0,1);
+    INSERT INTO t8 VALUES(0.0,0,2);
+    INSERT INTO t8 VALUES(0,0.0,3);
+    INSERT INTO t8 VALUES(0.0,0.0,4);
+    SELECT DISTINCT x, y FROM t8 ORDER BY z;
+----
+stmt 0 err 1 -1 44 no such collation sequence: numeric
+stmt 72 err 1 -1 106 no such table: t8
+stmt 106 err 1 -1 142 no such table: t8
+stmt 142 err 1 -1 178 no such table: t8
+stmt 178 err 1 -1 216 no such table: t8
+stmt 216 err 1 -1 261 no such table: t8
+==== misc1-12.12
+
+    SELECT min(z), max(z), count(z) FROM t8 GROUP BY x ORDER BY 1;
+----
+stmt 0 err 1 -1 67 no such table: t8
+==== misc1-12.13
+
+    SELECT min(z), max(z), count(z) FROM t8 GROUP BY y ORDER BY 1;
+----
+stmt 0 err 1 -1 67 no such table: t8
+==== misc1-13.1
+
+       CREATE TABLE t9(x,y);
+       INSERT INTO t9 VALUES('one',1);
+       INSERT INTO t9 VALUES('two',2);
+       INSERT INTO t9 VALUES('three',3);
+       INSERT INTO t9 VALUES('four',4);
+       INSERT INTO t9 VALUES('five',5);
+       INSERT INTO t9 VALUES('six',6);
+       INSERT INTO t9 VALUES('seven',7);
+       INSERT INTO t9 VALUES('eight',8);
+       INSERT INTO t9 VALUES('nine',9);
+       INSERT INTO t9 VALUES('ten',10);
+       INSERT INTO t9 VALUES('eleven',11);
+       SELECT y FROM t9
+       WHERE x=(SELECT x FROM t9 WHERE y=1)
+          OR x=(SELECT x FROM t9 WHERE y=2)
+          OR x=(SELECT x FROM t9 WHERE y=3)
+          OR x=(SELECT x FROM t9 WHERE y=4)
+          OR x=(SELECT x FROM t9 WHERE y=5)
+          OR x=(SELECT x FROM t9 WHERE y=6)
+          OR x=(SELECT x FROM t9 WHERE y=7)
+          OR x=(SELECT x FROM t9 WHERE y=8)
+          OR x=(SELECT x FROM t9 WHERE y=9)
+          OR x=(SELECT x FROM t9 WHERE y=10)
+          OR x=(SELECT x FROM t9 WHERE y=11)
+          OR x=(SELECT x FROM t9 WHERE y=12)
+          OR x=(SELECT x FROM t9 WHERE y=13)
+          OR x=(SELECT x FROM t9 WHERE y=14)
+       ;
+----
+stmt 0 ok
+stmt 29 err 1 -1 68 no such table: t9
+stmt 68 err 1 -1 107 no such table: t9
+stmt 107 err 1 -1 148 no such table: t9
+stmt 148 err 1 -1 188 no such table: t9
+stmt 188 err 1 -1 228 no such table: t9
+stmt 228 err 1 -1 267 no such table: t9
+stmt 267 err 1 -1 308 no such table: t9
+stmt 308 err 1 -1 349 no such table: t9
+stmt 349 err 1 -1 389 no such table: t9
+stmt 389 err 1 -1 429 no such table: t9
+stmt 429 err 1 -1 472 no such table: t9
+stmt 472 err 1 -1 1126 no such table: t9
+==== misc1-15.1.1
+
+    CREATE TABLE t10 AS SELECT c1;
+----
+stmt 0 err 1 32 35 no such column: c1
+==== misc1-15.1.2
+
+    CREATE TABLE t10 AS SELECT t9.c1;
+----
+stmt 0 err 1 32 38 no such column: t9.c1
+==== misc1-15.1.3
+
+    CREATE TABLE t10 AS SELECT main.t9.c1;
+----
+stmt 0 err 1 32 43 no such column: main.t9.c1
+==== misc1-16.2
+
+    CREATE TABLE test(a integer, primary key(a));
+----
+stmt 0 ok
+==== misc1-16.3
+
+    CREATE TABLE test2(a text primary key, b text, primary key(a,b));
+----
+stmt 0 err 1 -1 69 table "test2" has more than one primary key
+==== misc1-16.4
+
+    INSERT INTO test VALUES(1);
+    SELECT rowid, a FROM test;
+----
+stmt 0 err 1 -1 32 no such table: test
+stmt 32 err 1 -1 63 no such table: test
+==== misc1-16.5
+
+    INSERT INTO test VALUES(5);
+    SELECT rowid, a FROM test;
+----
+stmt 0 err 1 -1 32 no such table: test
+stmt 32 err 1 -1 63 no such table: test
+==== misc1-16.6
+
+    INSERT INTO test VALUES(NULL);
+    SELECT rowid, a FROM test;
+----
+stmt 0 err 1 -1 35 no such table: test
+stmt 35 err 1 -1 66 no such table: test
+==== misc1-17.1
+
+    BEGIN;
+    CREATE TABLE RealTable(TestID INTEGER PRIMARY KEY, TestString TEXT);
+    CREATE TEMP TABLE TempTable(TestID INTEGER PRIMARY KEY, TestString TEXT);
+    CREATE TEMP TRIGGER trigTest_1 AFTER UPDATE ON TempTable BEGIN
+      INSERT INTO RealTable(TestString) 
+         SELECT new.TestString FROM TempTable LIMIT 1;
+    END;
+    INSERT INTO TempTable(TestString) VALUES ('1');
+    INSERT INTO TempTable(TestString) VALUES ('2');
+    UPDATE TempTable SET TestString = TestString + 1 WHERE TestID=1 OR TestId=2;
+    COMMIT;
+    SELECT TestString FROM RealTable ORDER BY 1;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 84 ok
+stmt 162 err 1 -1 229 no such table: TempTable
+stmt 334 err 1 -1 386 no such table: TempTable
+stmt 386 err 1 -1 438 no such table: TempTable
+stmt 438 err 1 -1 519 no such table: TempTable
+stmt 519 ok
+stmt 531 err 1 -1 580 no such table: RealTable
+==== misc1-19.1
+
+  CREATE TABLE t19 AS SELECT 1, 2 AS '', 3;
+  SELECT * FROM t19;
+----
+stmt 0 ok
+stmt 44 err 1 -1 65 no such table: t19
+==== misc1-19.2
+
+  CREATE TABLE t19b AS SELECT 4 AS '', 5 AS '',  6 AS '';
+  SELECT * FROM t19b;
+----
+stmt 0 ok
+stmt 58 err 1 -1 80 no such table: t19b
+==== misc1-19.3
+
+  CREATE TABLE t19c(x TEXT);
+  CREATE TABLE t19d AS SELECT * FROM t19c UNION ALL SELECT 1234;
+  SELECT x, typeof(x) FROM t19d;
+----
+stmt 0 ok
+stmt 29 err 1 -1 94 no such table: t19c
+stmt 94 err 1 -1 127 no such table: t19d
+==== misc1-20.1
+
+  CREATE TABLE t0(x INTEGER DEFAULT(0==0) NOT NULL);
+  REPLACE INTO t0(x) VALUES('');
+  SELECT rowid, quote(x) FROM t0;
+----
+stmt 0 ok
+stmt 53 err 1 -1 86 no such table: t0
+stmt 86 err 1 -1 120 no such table: t0
+==== misc1-21.1
+
+  select''like''like''like#0;
+----
+stmt 0 err 1 -1 30 near "#0": syntax error
+==== misc1-21.2
+
+  VALUES(0,0x0MATCH#0;
+----
+stmt 0 err 1 12 12 unrecognized token: "0x0MATCH"
+==== misc1-22.1
+
+  SELECT ''+3 FROM (SELECT ''+5);
+----
+stmt 0 ok
+==== misc1-23.1
+
+  CREATE TABLE t1(x);
+  PRAGMA writable_schema=ON;
+  UPDATE sqlite_master SET sql='CREATE table t(d CHECK(T(#0)';
+  BEGIN;
+  CREATE TABLE t2(y);
+  ROLLBACK;
+  DROP TABLE IF EXISTS t3;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 51 ok
+stmt 114 ok
+stmt 123 ok
+stmt 145 ok
+stmt 157 ok
+==== misc1-23.2
+
+  CREATE TABLE t1(x UNIQUE);
+  PRAGMA writable_schema=ON;
+  UPDATE sqlite_master SET sql='CREATE TABLE IF not EXISTS t(c)';
+  BEGIN;
+  CREATE TABLE t2(x);
+  ROLLBACK;
+  DROP TABLE F;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 58 ok
+stmt 124 ok
+stmt 133 ok
+stmt 155 ok
+stmt 167 err 1 -1 183 no such table: F
+==== misc1-23.3
+
+  CREATE TABLE t1(x UNIQUE);
+  PRAGMA writable_schema=ON;
+  UPDATE sqlite_master SET sql='CREATE table y(a TEXT, a TEXT)';
+  BEGIN;
+  CREATE TABLE t2(y);
+  ROLLBACK;
+  DROP TABLE IF EXISTS t;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 58 ok
+stmt 123 ok
+stmt 132 ok
+stmt 154 ok
+stmt 166 ok
+==== misc1-26.0
+
+  DROP TABLE IF EXISTS abc;
+  CREATE TABLE abc(a, b, c);
+  SELECT randomblob(min(max(coalesce(EXISTS (SELECT 1 FROM ( SELECT (SELECT 2147483647) NOT IN (SELECT 2147483649 UNION ALL SELECT DISTINCT -1) IN (SELECT 2147483649), 'fault', (SELECT ALL -1 INTERSECT SELECT 'experiments') IN (SELECT ALL 56.1 ORDER BY 'experiments' DESC) FROM (SELECT DISTINCT 2147483648, 'hardware' UNION ALL SELECT -2147483648, 'experiments' ORDER BY 2147483648 LIMIT 1 OFFSET 123456789.1234567899) GROUP BY (SELECT ALL 0 INTERSECT SELECT 'in') IN (SELECT DISTINCT 'experiments' ORDER BY zeroblob(1000) LIMIT 56.1 OFFSET -456) HAVING EXISTS (SELECT 'fault' EXCEPT    SELECT DISTINCT 56.1) UNION SELECT 'The', 'The', 2147483649 UNION ALL SELECT DISTINCT 'hardware', 'first', 'experiments' ORDER BY 'hardware' LIMIT 123456789.1234567899 OFFSET -2147483647)) NOT IN (SELECT (SELECT DISTINCT (SELECT 'The') FROM abc ORDER BY EXISTS (SELECT -1 INTERSECT SELECT ALL NULL) ASC) IN (SELECT DISTINCT EXISTS (SELECT ALL 123456789.1234567899 ORDER BY 1 ASC, NULL DESC) FROM sqlite_master INTERSECT SELECT 456)), (SELECT ALL 'injection' UNION ALL SELECT ALL (SELECT DISTINCT 'first' UNION     SELECT DISTINCT 'The') FROM (SELECT 456, 'in', 2147483649))),1), 500)), 'first', EXISTS (SELECT DISTINCT 456 FROM abc ORDER BY 'experiments' DESC) FROM abc;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 57 err 1 -1 1315 no such table: abc
+==== misc1-27.0
+
+  CREATE TABLE dup1(a,b,c);
+  INSERT INTO dup1(a,b,c,a,b,c) VALUES(1,2,3,4,5,6);
+  SELECT a,b,c FROM dup1;
+----
+stmt 0 ok
+stmt 28 err 1 -1 81 no such table: dup1
+stmt 81 err 1 -1 107 no such table: dup1
+==== misc1-27.1
+
+  UPDATE dup1 SET a=7, b=8, c=9, a=10, b=11, c=12;
+  SELECT a,b,c FROM dup1;
+----
+stmt 0 err 1 -1 51 no such table: dup1
+stmt 51 err 1 -1 77 no such table: dup1
+==== misc1-28.0
+
+  CREATE TABLE t1(x);
+  CREATE UNIQUE INDEX t1x ON t1(x) WHERE x=1;
+  INSERT OR ABORT INTO t1 DEFAULT VALUES;
+  UPDATE OR REPLACE t1 SET x = 1;
+  PRAGMA integrity_check;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 22 err 1 -1 68 no such table: main.t1
+stmt 68 err 1 -1 110 no such table: t1
+stmt 110 err 1 -1 144 no such table: t1
+stmt 144 ok
+stmt 170 err 1 -1 190 no such table: t1

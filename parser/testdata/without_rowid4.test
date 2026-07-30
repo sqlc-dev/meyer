@@ -1,0 +1,344 @@
+==== without_rowid4-generated
+
+  
+        CREATE TABLE other_tbl(a, b);
+        INSERT INTO other_tbl VALUES(1, 2);
+        INSERT INTO other_tbl VALUES(3, 4);
+        -- INSERT INTO tbl SELECT * FROM other_tbl;
+        INSERT INTO tbl VALUES(5, 6);
+        DROP TABLE other_tbl;
+  
+        SELECT * FROM rlog;
+----
+stmt 0 ok
+stmt 41 err 1 -1 85 no such table: other_tbl
+stmt 85 err 1 -1 129 no such table: other_tbl
+stmt 129 err 1 -1 219 no such table: tbl
+stmt 219 err 1 -1 249 no such table: other_tbl
+stmt 249 err 1 -1 280 no such table: rlog
+==== without_rowid4-3.1
+
+    UPDATE tbl SET b = 1, c = 10; -- 2
+    UPDATE tbl SET b = 10; -- 0
+    UPDATE tbl SET d = 4 WHERE a = 0; --1
+    UPDATE tbl SET a = 4, b = 10; --0
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 34 no such table: tbl
+stmt 34 err 1 -1 66 no such table: tbl
+stmt 66 err 1 -1 109 no such table: tbl
+stmt 109 err 1 -1 147 no such table: tbl
+stmt 147 err 1 -1 174 no such table: log
+==== without_rowid4-3.2
+ 
+
+    INSERT INTO tbl VALUES(0, 0, 0, 0);     -- 1 (ifcapable subquery)
+    SELECT * FROM log;
+    UPDATE log SET a = 0;
+
+    INSERT INTO tbl VALUES(0, 0, 0, 0);     -- 0
+    SELECT * FROM log;
+    UPDATE log SET a = 0;
+
+    INSERT INTO tbl VALUES(200, 0, 0, 0);     -- 1
+    SELECT * FROM log;
+    UPDATE log SET a = 0;
+----
+stmt 0 err 1 -1 42 no such table: tbl
+stmt 42 err 1 -1 95 no such table: log
+stmt 95 err 1 -1 121 no such table: log
+stmt 121 err 1 -1 162 no such table: tbl
+stmt 162 err 1 -1 194 no such table: log
+stmt 194 err 1 -1 220 no such table: log
+stmt 220 err 1 -1 263 no such table: tbl
+stmt 263 err 1 -1 295 no such table: log
+stmt 295 err 1 -1 321 no such table: log
+==== without_rowid4-4.1
+
+    INSERT INTO tblA values(1, 2);
+    SELECT * FROM tblA;
+    SELECT * FROM tblB;
+    SELECT * FROM tblC;
+----
+stmt 0 err 1 -1 35 no such table: tblA
+stmt 35 err 1 -1 59 no such table: tblA
+stmt 59 err 1 -1 83 no such table: tblB
+stmt 83 err 1 -1 107 no such table: tblC
+==== without_rowid4-4.2
+
+    INSERT INTO tbl VALUES (1, 2, 3);
+    select * from tbl;
+----
+stmt 0 err 1 -1 38 no such table: tbl
+stmt 38 err 1 -1 61 no such table: tbl
+==== without_rowid4-6.1a
+
+      BEGIN;
+      INSERT INTO tbl values (1, 2, 3);
+      SELECT * from tbl;
+----
+stmt 0 ok
+stmt 13 err 1 -1 53 no such table: tbl
+stmt 53 err 1 -1 78 no such table: tbl
+==== without_rowid4-6.1b
+
+      INSERT OR ABORT INTO tbl values (2, 2, 3);
+----
+stmt 0 err 1 -1 49 no such table: tbl
+==== without_rowid4-6.1c
+
+      SELECT * from tbl;
+----
+stmt 0 err 1 -1 25 no such table: tbl
+==== without_rowid4-6.1d
+
+      INSERT OR FAIL INTO tbl values (2, 2, 3);
+----
+stmt 0 err 1 -1 48 no such table: tbl
+==== without_rowid4-6.1e
+
+      SELECT * from tbl;
+----
+stmt 0 err 1 -1 25 no such table: tbl
+==== without_rowid4-6.1f
+
+      INSERT OR REPLACE INTO tbl values (2, 2, 3);
+      SELECT * from tbl;
+----
+stmt 0 err 1 -1 51 no such table: tbl
+stmt 51 err 1 -1 76 no such table: tbl
+==== without_rowid4-6.1g
+
+      INSERT OR ROLLBACK INTO tbl values (3, 2, 3);
+----
+stmt 0 err 1 -1 52 no such table: tbl
+==== without_rowid4-6.1h
+
+      SELECT * from tbl;
+----
+stmt 0 err 1 -1 25 no such table: tbl
+==== without_rowid4-6.2a
+
+      BEGIN;
+      UPDATE tbl SET a = 1 WHERE a = 4;
+      SELECT * from tbl;
+----
+stmt 0 ok
+stmt 13 err 1 -1 53 no such table: tbl
+stmt 53 err 1 -1 78 no such table: tbl
+==== without_rowid4-6.2b
+
+      UPDATE OR ABORT tbl SET a = 4 WHERE a = 1;
+----
+stmt 0 err 1 -1 49 no such table: tbl
+==== without_rowid4-6.2c
+
+      SELECT * from tbl;
+----
+stmt 0 err 1 -1 25 no such table: tbl
+==== without_rowid4-6.2d
+
+      UPDATE OR FAIL tbl SET a = 4 WHERE a = 1;
+----
+stmt 0 err 1 -1 48 no such table: tbl
+==== without_rowid4-6.2e
+
+      SELECT * from tbl;
+----
+stmt 0 err 1 -1 25 no such table: tbl
+==== without_rowid4-6.2f.1
+
+      UPDATE OR REPLACE tbl SET a = 1 WHERE a = 4;
+      SELECT * from tbl;
+----
+stmt 0 err 1 -1 51 no such table: tbl
+stmt 51 err 1 -1 76 no such table: tbl
+==== without_rowid4-6.2f.2
+
+      INSERT INTO tbl VALUES (2, 3, 4);
+      SELECT * FROM tbl;
+----
+stmt 0 err 1 -1 40 no such table: tbl
+stmt 40 err 1 -1 65 no such table: tbl
+==== without_rowid4-6.2g
+
+      UPDATE OR ROLLBACK tbl SET a = 4 WHERE a = 1;
+----
+stmt 0 err 1 -1 52 no such table: tbl
+==== without_rowid4-6.2h
+
+      SELECT * from tbl;
+----
+stmt 0 err 1 -1 25 no such table: tbl
+==== without_rowid4-7.1
+
+  CREATE TABLE ab(a, b, PRIMARY KEY(a,b)) WITHOUT rowid;
+  CREATE TABLE cd(c, d, PRIMARY KEY(c,d)) WITHOUT rowid;
+  INSERT INTO ab VALUES (1, 2);
+  INSERT INTO ab VALUES (0, 0);
+  INSERT INTO cd VALUES (3, 4);
+
+  CREATE TABLE tlog(ii INTEGER PRIMARY KEY, 
+      olda, oldb, oldc, oldd, newa, newb, newc, newd);
+
+  CREATE VIEW abcd AS SELECT a, b, c, d FROM ab, cd;
+
+  CREATE TRIGGER before_update INSTEAD OF UPDATE ON abcd BEGIN
+    INSERT INTO tlog VALUES(NULL, 
+	old.a, old.b, old.c, old.d, new.a, new.b, new.c, new.d);
+  END;
+  CREATE TRIGGER after_update INSTEAD OF UPDATE ON abcd BEGIN
+    INSERT INTO tlog VALUES(NULL, 
+	old.a, old.b, old.c, old.d, new.a, new.b, new.c, new.d);
+  END;
+
+  CREATE TRIGGER before_delete INSTEAD OF DELETE ON abcd BEGIN
+    INSERT INTO tlog VALUES(NULL, 
+	old.a, old.b, old.c, old.d, 0, 0, 0, 0);
+  END;
+  CREATE TRIGGER after_delete INSTEAD OF DELETE ON abcd BEGIN
+    INSERT INTO tlog VALUES(NULL, 
+	old.a, old.b, old.c, old.d, 0, 0, 0, 0);
+  END;
+
+  CREATE TRIGGER before_insert INSTEAD OF INSERT ON abcd BEGIN
+    INSERT INTO tlog VALUES(NULL, 
+	0, 0, 0, 0, new.a, new.b, new.c, new.d);
+  END;
+   CREATE TRIGGER after_insert INSTEAD OF INSERT ON abcd BEGIN
+    INSERT INTO tlog VALUES(NULL, 
+	0, 0, 0, 0, new.a, new.b, new.c, new.d);
+   END;
+----
+stmt 0 ok
+stmt 57 ok
+stmt 114 err 1 -1 146 no such table: ab
+stmt 146 err 1 -1 178 no such table: ab
+stmt 178 err 1 -1 210 no such table: cd
+stmt 210 ok
+stmt 311 ok
+stmt 365 err 1 -1 429 no such table: main.abcd
+stmt 529 err 1 -1 591 no such table: main.abcd
+stmt 691 err 1 -1 755 no such table: main.abcd
+stmt 839 err 1 -1 901 no such table: main.abcd
+stmt 985 err 1 -1 1049 no such table: main.abcd
+stmt 1133 err 1 -1 1196 no such table: main.abcd
+==== without_rowid4-7.2
+
+    UPDATE abcd SET a = 100, b = 5*5 WHERE a = 1;
+    DELETE FROM abcd WHERE a = 1;
+    INSERT INTO abcd VALUES(10, 20, 30, 40);
+    SELECT * FROM tlog;
+----
+stmt 0 err 1 -1 50 no such table: abcd
+stmt 50 err 1 -1 84 no such table: abcd
+stmt 84 err 1 -1 129 no such table: abcd
+stmt 129 err 1 -1 153 no such table: tlog
+==== without_rowid4-7.3
+
+    DELETE FROM tlog;
+    INSERT INTO abcd VALUES(10, 20, 30, 40);
+    UPDATE abcd SET a = 100, b = 5*5 WHERE a = 1;
+    DELETE FROM abcd WHERE a = 1;
+    SELECT * FROM tlog;
+----
+stmt 0 err 1 -1 22 no such table: tlog
+stmt 22 err 1 -1 67 no such table: abcd
+stmt 67 err 1 -1 117 no such table: abcd
+stmt 117 err 1 -1 151 no such table: abcd
+stmt 151 err 1 -1 175 no such table: tlog
+==== without_rowid4-7.4
+
+    DELETE FROM tlog;
+    DELETE FROM abcd WHERE a = 1;
+    INSERT INTO abcd VALUES(10, 20, 30, 40);
+    UPDATE abcd SET a = 100, b = 5*5 WHERE a = 1;
+    SELECT * FROM tlog;
+----
+stmt 0 err 1 -1 22 no such table: tlog
+stmt 22 err 1 -1 56 no such table: abcd
+stmt 56 err 1 -1 101 no such table: abcd
+stmt 101 err 1 -1 151 no such table: abcd
+stmt 151 err 1 -1 175 no such table: tlog
+==== without_rowid4-8.1
+
+    CREATE TABLE t1(a,b,c, PRIMARY KEY(a,b,c)) WITHOUT rowid;
+    INSERT INTO t1 VALUES(1,2,3);
+    CREATE VIEW v1 AS
+      SELECT a+b AS x, b+c AS y, a+c AS z FROM t1;
+    SELECT * FROM v1;
+----
+stmt 0 ok
+stmt 62 err 1 -1 96 no such table: t1
+stmt 96 ok
+stmt 169 err 1 -1 191 no such table: v1
+==== without_rowid4-8.2
+
+    CREATE TABLE v1log(a,b,c,d,e,f);
+    CREATE TRIGGER r1 INSTEAD OF DELETE ON v1 BEGIN
+      INSERT INTO v1log VALUES(OLD.x,NULL,OLD.y,NULL,OLD.z,NULL);
+    END;
+    DELETE FROM v1 WHERE x=1;
+    SELECT * FROM v1log;
+----
+stmt 0 ok
+stmt 37 err 1 -1 89 no such table: main.v1
+stmt 164 err 1 -1 194 no such table: v1
+stmt 194 err 1 -1 219 no such table: v1log
+==== without_rowid4-8.3
+
+    DELETE FROM v1 WHERE x=3;
+    SELECT * FROM v1log;
+----
+stmt 0 err 1 -1 30 no such table: v1
+stmt 30 err 1 -1 55 no such table: v1log
+==== without_rowid4-8.4
+
+    INSERT INTO t1 VALUES(4,5,6);
+    DELETE FROM v1log;
+    DELETE FROM v1 WHERE y=11;
+    SELECT * FROM v1log;
+----
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 err 1 -1 57 no such table: v1log
+stmt 57 err 1 -1 88 no such table: v1
+stmt 88 err 1 -1 113 no such table: v1log
+==== without_rowid4-8.5
+
+    CREATE TRIGGER r2 INSTEAD OF INSERT ON v1 BEGIN
+      INSERT INTO v1log VALUES(NULL,NEW.x,NULL,NEW.y,NULL,NEW.z);
+    END;
+    DELETE FROM v1log;
+    INSERT INTO v1 VALUES(1,2,3);
+    SELECT * FROM v1log;
+----
+stmt 0 err 1 -1 52 no such table: main.v1
+stmt 127 err 1 -1 150 no such table: v1log
+stmt 150 err 1 -1 184 no such table: v1
+stmt 184 err 1 -1 209 no such table: v1log
+==== without_rowid4-8.6
+
+    CREATE TRIGGER r3 INSTEAD OF UPDATE ON v1 BEGIN
+      INSERT INTO v1log VALUES(OLD.x,NEW.x,OLD.y,NEW.y,OLD.z,NEW.z);
+    END;
+    DELETE FROM v1log;
+    UPDATE v1 SET x=x+100, y=y+200, z=z+300;
+    SELECT * FROM v1log;
+----
+stmt 0 err 1 -1 52 no such table: main.v1
+stmt 130 err 1 -1 153 no such table: v1log
+stmt 153 err 1 -1 198 no such table: v1
+stmt 198 err 1 -1 223 no such table: v1log
+==== without_rowid4-9.1
+
+    CREATE TABLE t3(a TEXT, b TEXT);
+    CREATE VIEW v3 AS SELECT t3.a FROM t3;
+    CREATE TRIGGER trig1 INSTEAD OF DELETE ON v3 BEGIN
+      SELECT 1;
+    END;
+    DELETE FROM v3 WHERE a = 1;
+----
+stmt 0 ok
+stmt 37 ok
+stmt 80 err 1 -1 135 no such table: main.v3
+stmt 160 err 1 -1 192 no such table: v3

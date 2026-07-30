@@ -1,0 +1,32 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t0 USING fts3(x);
+  SELECT rowid FROM t0 WHERE x MATCH '';
+----
+stmt 0 ok
+stmt 41 err 1 -1 82 no such table: t0
+==== 1.1
+
+  SELECT rowid FROM t0 WHERE x MATCH '""';
+----
+stmt 0 err 1 -1 43 no such table: t0
+==== 1.2
+
+  SELECT rowid FROM t0 WHERE x MATCH '"" ""';
+----
+stmt 0 err 1 -1 46 no such table: t0
+==== 1.3
+
+  SELECT rowid FROM t0 WHERE x MATCH '"" OR ""';
+----
+stmt 0 err 1 -1 49 no such table: t0
+==== 1.4
+
+  SELECT rowid FROM t0 WHERE x MATCH '"" NOT ""';
+----
+stmt 0 err 1 -1 50 no such table: t0
+==== 1.5
+
+  SELECT rowid FROM t0 WHERE x MATCH '""""';
+----
+stmt 0 err 1 -1 45 no such table: t0

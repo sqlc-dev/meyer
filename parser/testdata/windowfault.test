@@ -1,0 +1,58 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c, d);
+  INSERT INTO t1 VALUES(1, 2, 3, 4);
+  INSERT INTO t1 VALUES(5, 6, 7, 8);
+  INSERT INTO t1 VALUES(9, 10, 11, 12);
+----
+stmt 0 ok
+stmt 31 err 1 -1 68 no such table: t1
+stmt 68 err 1 -1 105 no such table: t1
+stmt 105 err 1 -1 145 no such table: t1
+==== 10.0
+
+  CREATE TABLE t1(a, b, c, d);
+  CREATE TABLE t2(a, b, c, d);
+----
+stmt 0 ok
+stmt 31 ok
+==== 11.0
+
+  DROP TABLE IF EXISTS t0;
+  CREATE TABLE t0(c0 INTEGER UNIQUE);
+  INSERT INTO t0 VALUES(0);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 65 err 1 -1 93 no such table: t0
+==== 12.0
+
+  CREATE TABLE t1(a, b, c);
+----
+stmt 0 ok
+==== 13.0
+
+  CREATE TABLE t1(id INTEGER PRIMARY KEY, a, b);
+  INSERT INTO t1 VALUES(1, '1', 'a');
+  INSERT INTO t1 VALUES(2, '22', 'b');
+  INSERT INTO t1 VALUES(3, '333', 'c');
+  INSERT INTO t1 VALUES(4, '4444', 'dddd');
+  INSERT INTO t1 VALUES(5, '55555', 'e');
+  INSERT INTO t1 VALUES(6, '666666', 'f');
+  INSERT INTO t1 VALUES(7, '7777777', 'gggggggggg');
+----
+stmt 0 ok
+stmt 49 err 1 -1 87 no such table: t1
+stmt 87 err 1 -1 126 no such table: t1
+stmt 126 err 1 -1 166 no such table: t1
+stmt 166 err 1 -1 210 no such table: t1
+stmt 210 err 1 -1 252 no such table: t1
+stmt 252 err 1 -1 295 no such table: t1
+stmt 295 err 1 -1 348 no such table: t1
+==== 13.1
+
+  SELECT group_concat(a, b) OVER (
+    ORDER BY id RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING
+  ) FROM t1
+----
+stmt 0 err 1 -1 106 no such table: t1

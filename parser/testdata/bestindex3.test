@@ -1,0 +1,55 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING tcl("vtab_cmd 0");
+----
+stmt 0 ok
+==== 1.5
+
+  CREATE TABLE ttt(a, b, c);
+
+  INSERT INTO ttt VALUES(1, 'two',   'three');
+  INSERT INTO ttt VALUES(2, 'one',   'two');
+  INSERT INTO ttt VALUES(3, 'three', 'one');
+  INSERT INTO ttt VALUES(4, 'y',     'one');
+  INSERT INTO ttt VALUES(5, 'x',     'two');
+  INSERT INTO ttt VALUES(6, 'y',     'three');
+----
+stmt 0 ok
+stmt 29 err 1 -1 77 no such table: ttt
+stmt 77 err 1 -1 122 no such table: ttt
+stmt 122 err 1 -1 167 no such table: ttt
+stmt 167 err 1 -1 212 no such table: ttt
+stmt 212 err 1 -1 257 no such table: ttt
+stmt 257 err 1 -1 304 no such table: ttt
+==== bestindex3-generated
+ 
+    SELECT rowid FROM t1 WHERE c LIKE 'o%'
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== bestindex3-generated.dup1
+ 
+    SELECT rowid FROM t1 WHERE c LIKE 'o%' OR b='y'
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== bestindex3-generated.dup2
+ 
+    SELECT rowid FROM t1 WHERE c = 'three' OR c LIKE 'o%'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== 2.1
+
+    CREATE TABLE t2(x TEXT COLLATE nocase, y TEXT);
+    CREATE INDEX t2x ON t2(x COLLATE nocase);
+    CREATE INDEX t2y ON t2(y);
+----
+stmt 0 ok
+stmt 52 err 1 -1 98 no such table: main.t2
+stmt 98 err 1 -1 129 no such table: main.t2
+==== 3.1
+ CREATE VIRTUAL TABLE t3 USING tcl('vvv_command')
+----
+stmt 0 ok
+==== 3.2
+ CREATE VIRTUAL TABLE t4 USING tcl('yyy_command')
+----
+stmt 0 ok

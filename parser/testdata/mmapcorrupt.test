@@ -1,0 +1,27 @@
+==== 1.0
+
+  PRAGMA page_size = 16384;
+  CREATE TABLE tn1(a PRIMARY KEY) WITHOUT ROWID;
+  CREATE TABLE t0(a PRIMARY KEY) WITHOUT ROWID;
+  CREATE TABLE t1(a PRIMARY KEY) WITHOUT ROWID;
+  INSERT INTO t1 VALUES('B');
+----
+stmt 0 ok
+stmt 28 ok
+stmt 77 ok
+stmt 125 ok
+stmt 173 err 1 -1 203 no such table: t1
+==== 2.1
+
+  PRAGMA mmap_size = 1000000;
+  SELECT sql FROM sqlite_schema LIMIT 1;
+  SELECT * FROM t0;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 71 err 1 -1 91 no such table: t0
+==== 2.2
+
+  INSERT INTO t0 SELECT * FROM t1;
+----
+stmt 0 err 1 -1 35 no such table: t0

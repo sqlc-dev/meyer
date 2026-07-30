@@ -1,0 +1,18 @@
+==== corrupt4-1.2
+PRAGMA freelist_count
+----
+stmt 0 ok
+==== 2.0
+
+  PRAGMA page_size = 512;
+  CREATE TABLE t1(a, b, c);
+----
+stmt 0 ok
+stmt 26 ok
+==== 2.2
+
+    PRAGMA writable_schema = 1;
+    SELECT * FROM sqlite_schema;
+----
+stmt 0 ok
+stmt 32 ok

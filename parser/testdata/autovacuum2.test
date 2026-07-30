@@ -1,0 +1,65 @@
+==== autovacuum2-1.0
+
+  PRAGMA page_size=1024;
+  PRAGMA auto_vacuum=FULL;
+  CREATE TABLE t1(x);
+  VACUUM;
+  INSERT INTO t1(x) VALUES(zeroblob(10000));
+  PRAGMA page_count;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 52 ok
+stmt 74 ok
+stmt 84 err 1 -1 129 no such table: t1
+stmt 129 ok
+==== autovacuum2-1.1
+
+  BEGIN;
+  DELETE FROM t1;
+  PRAGMA freelist_count;
+  PRAGMA page_count;
+----
+stmt 0 ok
+stmt 9 err 1 -1 27 no such table: t1
+stmt 27 ok
+stmt 52 ok
+==== autovacuum2-1.2
+
+  COMMIT;
+----
+stmt 0 ok
+==== autovacuum2-1.4
+
+  PRAGMA freelist_count;
+  PRAGMA page_count;
+----
+stmt 0 ok
+stmt 25 ok
+==== autovacuum2-1.5
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== autovacuum2-1.10
+
+  CREATE TABLE t2(x);
+  PRAGMA freelist_count;
+----
+stmt 0 ok
+stmt 22 ok
+==== autovacuum2-1.20
+
+  BEGIN;
+  INSERT INTO t1(x) VALUES(zeroblob(10000));
+  DELETE FROM t1;
+  PRAGMA freelist_count;
+  COMMIT;
+  PRAGMA freelist_count;
+----
+stmt 0 ok
+stmt 9 err 1 -1 54 no such table: t1
+stmt 54 err 1 -1 72 no such table: t1
+stmt 72 ok
+stmt 97 ok
+stmt 107 ok

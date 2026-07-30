@@ -1,0 +1,131 @@
+==== fts3atoken-1.1
+
+    CREATE VIRTUAL TABLE t1 USING fts3(content, tokenize blah);
+----
+stmt 0 ok
+==== fts3atoken-1.2
+
+    SELECT fts3_tokenizer('blah', fts3_tokenizer('simple')) IS NULL;
+----
+stmt 0 err 1 12 69 no such function: fts3_tokenizer
+==== fts3atoken-1.3
+
+    SELECT fts3_tokenizer('blah') == fts3_tokenizer('simple');
+----
+stmt 0 err 1 38 63 no such function: fts3_tokenizer
+==== fts3atoken-1.4
+
+    CREATE VIRTUAL TABLE t1 USING fts3(content, tokenize blah);
+----
+stmt 0 ok
+==== fts3atoken-1.5
+
+    INSERT INTO t1(content) VALUES('There was movement at the station');
+    INSERT INTO t1(content) VALUES('For the word has passed around');
+    INSERT INTO t1(content) VALUES('That the colt from ol regret had got');
+    SELECT content FROM t1 WHERE content MATCH 'movement'
+----
+stmt 0 err 1 -1 73 no such table: t1
+stmt 73 err 1 -1 143 no such table: t1
+stmt 143 err 1 -1 219 no such table: t1
+stmt 219 err 1 -1 278 no such table: t1
+==== 1.6
+
+  SELECT fts3_tokenizer('blah', fts3_tokenizer('simple')) IS NULL;
+----
+stmt 0 err 1 10 67 no such function: fts3_tokenizer
+==== fts3atoken-1.10
+
+  CREATE VIEW v110(x) AS
+      SELECT fts3_tokenizer('tok110', fts3_tokenizer('simple')) IS NULL;
+----
+stmt 0 ok
+==== fts3atoken-1.11
+
+  SELECT * FROM v110;
+----
+stmt 0 err 1 -1 22 no such table: v110
+==== fts3atoken-1.12
+
+  CREATE TABLE t110(a,b);
+  CREATE TRIGGER r110 AFTER INSERT ON t110 BEGIN
+      SELECT fts3_tokenizer('tok110', fts3_tokenizer('simple')) IS NULL;
+  END;
+----
+stmt 0 ok
+stmt 26 err 1 -1 75 no such table: main.t110
+==== fts3atoken-1.13
+
+  INSERT INTO t110(a,b) VALUES(1,2);
+----
+stmt 0 err 1 -1 37 no such table: t110
+==== fts3atoken-1.14
+
+  SELECT * FROM t110;
+----
+stmt 0 err 1 -1 22 no such table: t110
+==== fts3atoken-2.1
+
+    SELECT fts3_tokenizer('nosuchtokenizer');
+----
+stmt 0 err 1 12 46 no such function: fts3_tokenizer
+==== fts3atoken-3.1
+
+    SELECT fts3_tokenizer_test('simple', 'I don''t see how');
+----
+stmt 0 err 1 12 62 no such function: fts3_tokenizer_test
+==== fts3atoken-3.2
+
+    SELECT fts3_tokenizer_test('porter', 'I don''t see how');
+----
+stmt 0 err 1 12 62 no such function: fts3_tokenizer_test
+==== fts3atoken-3.3
+
+      SELECT fts3_tokenizer_test('icu', 'I don''t see how');
+----
+stmt 0 err 1 14 61 no such function: fts3_tokenizer_test
+==== 5.1
+
+    CREATE VIRTUAL TABLE x1 USING fts3(name,TOKENIZE icu en_US);
+    insert into x1 (name) values (NULL);
+    insert into x1 (name) values (NULL);
+    delete from x1;
+----
+stmt 0 ok
+stmt 65 err 1 -1 106 no such table: x1
+stmt 106 err 1 -1 147 no such table: x1
+stmt 147 err 1 -1 167 no such table: x1
+==== fts3atoken-internal
+ SELECT fts3_tokenizer_internal_test()
+----
+stmt 0 err 1 8 39 no such function: fts3_tokenizer_internal_test
+==== 6.1.1
+
+  CREATE VIRTUAL TABLE t3 USING fts4(tokenize="");
+----
+stmt 0 ok
+==== 6.1.2
+
+  CREATE VIRTUAL TABLE t3 USING fts4(tokenize=);
+----
+stmt 0 ok
+==== 6.1.3
+
+  CREATE VIRTUAL TABLE t3 USING fts4(tokenize="   ");
+----
+stmt 0 ok
+==== 6.2.1
+
+  SELECT fts3_tokenizer(NULL);
+----
+stmt 0 err 1 10 31 no such function: fts3_tokenizer
+==== 6.2.2
+
+  SELECT fts3_tokenizer(NULL, X'1234567812345678');
+----
+stmt 0 err 1 10 52 no such function: fts3_tokenizer
+==== 6.2.3
+
+  SELECT fts3_tokenizer(NULL, X'12345678');
+----
+stmt 0 err 1 10 44 no such function: fts3_tokenizer

@@ -1,0 +1,7 @@
+==== 1.1
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, 2);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t1

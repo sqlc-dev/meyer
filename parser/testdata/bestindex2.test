@@ -1,0 +1,14 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING tcl("vtab_cmd t1 {a b}");
+  CREATE VIRTUAL TABLE t2 USING tcl("vtab_cmd t2 {c d}");
+  CREATE VIRTUAL TABLE t3 USING tcl("vtab_cmd t3 {e f}");
+----
+stmt 0 ok
+stmt 58 ok
+stmt 116 ok
+==== 1.7.1
+
+  CREATE TABLE x1(a, b);
+----
+stmt 0 ok

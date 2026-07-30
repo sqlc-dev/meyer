@@ -1,0 +1,1160 @@
+==== func-0.1
+
+     CREATE TABLE t2(a);
+     INSERT INTO t2 VALUES(1);
+     INSERT INTO t2 VALUES(NULL);
+     INSERT INTO t2 VALUES(345);
+     INSERT INTO t2 VALUES(NULL);
+     INSERT INTO t2 VALUES(67890);
+     SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t2
+stmt 56 err 1 -1 90 no such table: t2
+stmt 90 err 1 -1 123 no such table: t2
+stmt 123 err 1 -1 157 no such table: t2
+stmt 157 err 1 -1 192 no such table: t2
+stmt 192 err 1 -1 215 no such table: t2
+==== func-1.0
+SELECT length(t1) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 40 no such table: tbl1
+==== func-1.0b
+
+  SELECT octet_length(t1) FROM tbl1 ORDER BY t1;
+----
+stmt 0 err 1 -1 49 no such table: tbl1
+==== func-1.3
+SELECT length(t1), count(*) FROM tbl1 GROUP BY length(t1)
+           ORDER BY length(t1)
+----
+stmt 0 err 1 -1 89 no such table: tbl1
+==== func-1.4
+SELECT coalesce(length(a),-1) FROM t2
+----
+stmt 0 err 1 -1 38 no such table: t2
+==== func-1.5
+
+  SELECT octet_length(12345);
+----
+stmt 0 ok
+==== func-1.6
+
+  SELECT octet_length(NULL);
+----
+stmt 0 ok
+==== func-1.7
+
+  SELECT octet_length(7.5);
+----
+stmt 0 ok
+==== func-1.8
+
+  SELECT octet_length(x'30313233');
+----
+stmt 0 ok
+==== func-1.9
+
+  WITH c(x) AS (VALUES(char(350,351,352,353,354)))
+  SELECT length(x), octet_length(x) FROM c;
+----
+stmt 0 ok
+==== func-2.0
+SELECT substr(t1,1,2) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 44 no such table: tbl1
+==== func-2.1
+SELECT substr(t1,2,1) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 44 no such table: tbl1
+==== func-2.2
+SELECT substr(t1,3,3) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 44 no such table: tbl1
+==== func-2.3
+SELECT substr(t1,-1,1) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 45 no such table: tbl1
+==== func-2.4
+SELECT substr(t1,-1,2) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 45 no such table: tbl1
+==== func-2.5
+SELECT substr(t1,-2,1) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 45 no such table: tbl1
+==== func-2.6
+SELECT substr(t1,-2,2) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 45 no such table: tbl1
+==== func-2.7
+SELECT substr(t1,-4,2) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 45 no such table: tbl1
+==== func-2.8
+SELECT t1 FROM tbl1 ORDER BY substr(t1,2,20)
+----
+stmt 0 err 1 -1 45 no such table: tbl1
+==== func-2.9
+SELECT substr(a,1,1) FROM t2
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== func-2.10
+SELECT substr(a,2,2) FROM t2
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== func-2.11
+SELECT substr('abcdefg',0x100000001,2)
+----
+stmt 0 ok
+==== func-2.12
+SELECT substr('abcdefg',1,0x100000002)
+----
+stmt 0 ok
+==== func-2.13
+SELECT quote(substr(x'313233343536373839',0x7ffffffffffffffe,5))
+----
+stmt 0 ok
+==== func-3.1
+SELECT length(t1) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 40 no such table: tbl1
+==== func-3.2
+SELECT substr(t1,1,2) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 44 no such table: tbl1
+==== func-3.3
+SELECT substr(t1,1,3) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 44 no such table: tbl1
+==== func-3.4
+SELECT substr(t1,2,2) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 44 no such table: tbl1
+==== func-3.5
+SELECT substr(t1,2,3) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 44 no such table: tbl1
+==== func-3.6
+SELECT substr(t1,3,2) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 44 no such table: tbl1
+==== func-3.7
+SELECT substr(t1,4,2) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 44 no such table: tbl1
+==== func-3.8
+SELECT substr(t1,-1,1) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 45 no such table: tbl1
+==== func-3.9
+SELECT substr(t1,-3,2) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 45 no such table: tbl1
+==== func-3.10
+SELECT substr(t1,-4,3) FROM tbl1 ORDER BY t1
+----
+stmt 0 err 1 -1 45 no such table: tbl1
+==== func-4.2
+SELECT abs() FROM t1
+----
+stmt 0 err 1 -1 21 no such table: t1
+==== func-4.3
+SELECT abs(b) FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== func-4.4
+SELECT abs(c) FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== func-4.3.dup1
+SELECT abs(b) FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== func-4.4.dup1
+SELECT abs(c) FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== func-4.4.1
+SELECT abs(a) FROM t2
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== func-4.4.2
+SELECT abs(t1) FROM tbl1
+----
+stmt 0 err 1 -1 25 no such table: tbl1
+==== func-4.5
+SELECT round(a,b,c) FROM t1
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== func-4.6
+SELECT round(b,2) FROM t1 ORDER BY b
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== func-4.7
+SELECT round(b,0) FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== func-4.8
+SELECT round(c) FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== func-4.9
+SELECT round(c,a) FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== func-4.10
+SELECT 'x' || round(c,a) || 'y' FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== func-4.11
+SELECT round() FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== func-4.12
+SELECT coalesce(round(a,2),'nil') FROM t2
+----
+stmt 0 err 1 -1 42 no such table: t2
+==== func-4.13
+SELECT round(t1,2) FROM tbl1
+----
+stmt 0 err 1 -1 29 no such table: tbl1
+==== func-4.14
+SELECT typeof(round(5.1,1));
+----
+stmt 0 ok
+==== func-4.15
+SELECT typeof(round(5.1));
+----
+stmt 0 ok
+==== func-4.16
+SELECT round(b,2.0) FROM t1 ORDER BY b
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== func-4.20
+SELECT round(40223.4999999999);
+----
+stmt 0 ok
+==== func-4.21
+SELECT round(40224.4999999999);
+----
+stmt 0 ok
+==== func-4.22
+SELECT round(40225.4999999999);
+----
+stmt 0 ok
+==== func-4.29
+SELECT round(1234567890.5);
+----
+stmt 0 ok
+==== func-4.30
+SELECT round(12345678901.5);
+----
+stmt 0 ok
+==== func-4.31
+SELECT round(123456789012.5);
+----
+stmt 0 ok
+==== func-4.32
+SELECT round(1234567890123.5);
+----
+stmt 0 ok
+==== func-4.33
+SELECT round(12345678901234.5);
+----
+stmt 0 ok
+==== func-4.34
+SELECT round(1234567890123.35,1);
+----
+stmt 0 ok
+==== func-4.35
+SELECT round(1234567890123.445,2);
+----
+stmt 0 ok
+==== func-4.36
+SELECT round(99999999999994.5);
+----
+stmt 0 ok
+==== func-4.37
+SELECT round(9999999999999.55,1);
+----
+stmt 0 ok
+==== func-4.38
+SELECT round(9999999999999.556,2);
+----
+stmt 0 ok
+==== func-4.40
+
+    SELECT round(123.456 , 4294967297);
+----
+stmt 0 ok
+==== func-5.1
+SELECT upper(t1) FROM tbl1
+----
+stmt 0 err 1 -1 27 no such table: tbl1
+==== func-5.2
+SELECT lower(upper(t1)) FROM tbl1
+----
+stmt 0 err 1 -1 34 no such table: tbl1
+==== func-5.3
+SELECT upper(a), lower(a) FROM t2
+----
+stmt 0 err 1 -1 34 no such table: t2
+==== func-5.4
+SELECT upper(a,5) FROM t2
+----
+stmt 0 err 1 -1 26 no such table: t2
+==== func-5.5
+SELECT upper(*) FROM t2
+----
+stmt 0 err 1 -1 24 no such table: t2
+==== func-6.1
+SELECT coalesce(a,'xyz') FROM t2
+----
+stmt 0 err 1 -1 33 no such table: t2
+==== func-6.2
+SELECT coalesce(upper(a),'nil') FROM t2
+----
+stmt 0 err 1 -1 40 no such table: t2
+==== func-6.3
+SELECT coalesce(nullif(1,1),'nil')
+----
+stmt 0 ok
+==== func-6.4
+SELECT coalesce(nullif(1,2),'nil')
+----
+stmt 0 ok
+==== func-6.5
+SELECT coalesce(nullif(1,NULL),'nil')
+----
+stmt 0 ok
+==== func-7.1
+SELECT last_insert_rowid()
+----
+stmt 0 ok
+==== func-8.2
+
+    SELECT max('z+'||a||'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP') FROM t2;
+----
+stmt 0 err 1 -1 79 no such table: t2
+==== func-8.3
+
+      CREATE TEMP TABLE t3 AS SELECT a FROM t2 ORDER BY a DESC;
+      SELECT min('z+'||a||'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP') FROM t3;
+----
+stmt 0 err 1 -1 64 no such table: t2
+stmt 64 err 1 -1 145 no such table: t3
+==== func-8.3.dup1
+
+      CREATE TABLE t3 AS SELECT a FROM t2 ORDER BY a DESC;
+      SELECT min('z+'||a||'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP') FROM t3;
+----
+stmt 0 err 1 -1 59 no such table: t2
+stmt 59 err 1 -1 140 no such table: t3
+==== func-8.4
+
+    SELECT max('z+'||a||'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP') FROM t3;
+----
+stmt 0 err 1 -1 79 no such table: t3
+==== func-8.5
+
+      SELECT sum(x) FROM (SELECT '9223372036' || '854775807' AS x
+                          UNION ALL SELECT -9223372036854775807)
+----
+stmt 0 ok
+==== func-8.6
+
+      SELECT typeof(sum(x)) FROM (SELECT '9223372036' || '854775807' AS x
+                          UNION ALL SELECT -9223372036854775807)
+----
+stmt 0 ok
+==== func-8.7
+
+      SELECT typeof(sum(x)) FROM (SELECT '9223372036' || '854775808' AS x
+                          UNION ALL SELECT -9223372036854775807)
+----
+stmt 0 ok
+==== func-8.8
+
+      SELECT sum(x)>0.0 FROM (SELECT '9223372036' || '854775808' AS x
+                          UNION ALL SELECT -9223372036850000000)
+----
+stmt 0 ok
+==== func-8.8.dup1
+
+      SELECT sum(x)>0 FROM (SELECT '9223372036' || '854775808' AS x
+                          UNION ALL SELECT -9223372036850000000)
+----
+stmt 0 ok
+==== func-9.1
+
+    SELECT random() is not null;
+----
+stmt 0 ok
+==== func-9.2
+
+    SELECT typeof(random());
+----
+stmt 0 ok
+==== func-9.3
+
+    SELECT randomblob(32) is not null;
+----
+stmt 0 ok
+==== func-9.4
+
+    SELECT typeof(randomblob(32));
+----
+stmt 0 ok
+==== func-9.5
+
+    SELECT length(randomblob(32)), length(randomblob(-5)),
+           length(randomblob(2000))
+----
+stmt 0 ok
+==== func-9.10
+SELECT hex(x'00112233445566778899aAbBcCdDeEfF')
+----
+stmt 0 ok
+==== func-9.11-utf16le
+SELECT hex(replace('abcdefg','ef','12'))
+----
+stmt 0 ok
+==== func-9.12-utf16le
+SELECT hex(replace('abcdefg','','12'))
+----
+stmt 0 ok
+==== func-9.13-utf16le
+SELECT hex(replace('aabcdefg','a','aaa'))
+----
+stmt 0 ok
+==== func-9.11-utf8
+SELECT hex(replace('abcdefg','ef','12'))
+----
+stmt 0 ok
+==== func-9.12-utf8
+SELECT hex(replace('abcdefg','','12'))
+----
+stmt 0 ok
+==== func-9.13-utf8
+SELECT hex(replace('aabcdefg','a','aaa'))
+----
+stmt 0 ok
+==== func-9.14
+
+  WITH RECURSIVE c(x) AS (
+     VALUES(1)
+     UNION ALL
+     SELECT x+1 FROM c WHERE x<1040
+  )
+  SELECT 
+    count(*),
+    sum(length(replace(printf('abc%.*cxyz',x,'m'),'m','nnnn'))-(6+x*4))
+  FROM c;
+----
+stmt 0 ok
+==== func-10.1
+
+    SELECT testfunc(NULL,NULL);
+----
+stmt 0 err 1 12 32 no such function: testfunc
+==== func-10.2
+
+    SELECT testfunc(
+     'string', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+     'int', 1234
+    );
+----
+stmt 0 err 1 12 116 no such function: testfunc
+==== func-10.3
+
+    SELECT testfunc(
+     'string', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+     'string', NULL
+    );
+----
+stmt 0 err 1 12 119 no such function: testfunc
+==== func-10.4
+
+      SELECT testfunc(
+       'string', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+       'double', 1.234
+      );
+----
+stmt 0 err 1 14 128 no such function: testfunc
+==== func-10.5
+
+      SELECT testfunc(
+       'string', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+       'int', 1234,
+       'string', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+       'string', NULL,
+       'string', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+       'double', 1.234,
+       'string', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+       'int', 1234,
+       'string', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+       'string', NULL,
+       'string', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+       'double', 1.234
+      );
+----
+stmt 0 err 1 14 603 no such function: testfunc
+==== func-11.1
+
+    SELECT sqlite_version(*);
+----
+stmt 0 ok
+==== func-12.1-utf8
+
+      SELECT test_destructor('hello world'), test_destructor_count();
+----
+stmt 0 err 1 14 70 no such function: test_destructor
+==== func-12.1-utf16
+
+          SELECT test_destructor16('hello world'), test_destructor_count();
+----
+stmt 0 err 1 18 76 no such function: test_destructor16
+==== func-12.2
+
+    SELECT test_destructor_count();
+----
+stmt 0 err 1 12 36 no such function: test_destructor_count
+==== func-12.3
+
+    SELECT test_destructor('hello')||' world'
+----
+stmt 0 err 1 12 47 no such function: test_destructor
+==== func-12.4
+
+    SELECT test_destructor_count();
+----
+stmt 0 err 1 12 36 no such function: test_destructor_count
+==== func-12.5
+
+    CREATE TABLE t4(x);
+    INSERT INTO t4 VALUES(test_destructor('hello'));
+    INSERT INTO t4 VALUES(test_destructor('world'));
+    SELECT min(test_destructor(x)), max(test_destructor(x)) FROM t4;
+----
+stmt 0 ok
+stmt 24 err 1 -1 77 no such table: t4
+stmt 77 err 1 -1 130 no such table: t4
+stmt 130 err 1 -1 199 no such table: t4
+==== func-12.6
+
+    SELECT test_destructor_count();
+----
+stmt 0 err 1 12 36 no such function: test_destructor_count
+==== func-12.7
+
+    DROP TABLE t4;
+----
+stmt 0 err 1 -1 19 no such table: t4
+==== func-13.1
+
+    SELECT test_auxdata('hello world');
+----
+stmt 0 err 1 12 40 no such function: test_auxdata
+==== func-13.2
+
+    CREATE TABLE t4(a, b);
+    INSERT INTO t4 VALUES('abc', 'def');
+    INSERT INTO t4 VALUES('ghi', 'jkl');
+----
+stmt 0 ok
+stmt 27 err 1 -1 68 no such table: t4
+stmt 68 err 1 -1 109 no such table: t4
+==== func-13.3
+
+    SELECT test_auxdata('hello world') FROM t4;
+----
+stmt 0 err 1 -1 48 no such table: t4
+==== func-13.4
+
+    SELECT test_auxdata('hello world', 123) FROM t4;
+----
+stmt 0 err 1 -1 53 no such table: t4
+==== func-13.5
+
+    SELECT test_auxdata('hello world', a) FROM t4;
+----
+stmt 0 err 1 -1 51 no such table: t4
+==== func-13.6
+
+    SELECT test_auxdata('hello'||'world', a) FROM t4;
+----
+stmt 0 err 1 -1 54 no such table: t4
+==== 13.8.1
+
+  SELECT test_auxdata('constant') FROM t4;
+----
+stmt 0 err 1 -1 43 no such table: t4
+==== 13.8.2
+
+  SELECT test_auxdata('constant') FROM t4;
+----
+stmt 0 err 1 -1 43 no such table: t4
+==== 13.8.3
+
+  SELECT test_auxdata('constant') FROM t4;
+----
+stmt 0 err 1 -1 43 no such table: t4
+==== func-15.1
+select test_error(NULL)
+----
+stmt 0 err 1 7 24 no such function: test_error
+==== func-15.2
+select test_error('this is the error message')
+----
+stmt 0 err 1 7 47 no such function: test_error
+==== func-15.3
+select test_error('this is the error message',12)
+----
+stmt 0 err 1 7 50 no such function: test_error
+==== func-16.2
+
+  SELECT quote(4.2e+859), quote(-7.8e+904);
+----
+stmt 0 ok
+==== func-18.1
+
+    CREATE TABLE t5(x);
+    INSERT INTO t5 VALUES(1);
+    INSERT INTO t5 VALUES(-99);
+    INSERT INTO t5 VALUES(10000);
+    SELECT sum(x) FROM t5;
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t5
+stmt 54 err 1 -1 86 no such table: t5
+stmt 86 err 1 -1 120 no such table: t5
+stmt 120 err 1 -1 147 no such table: t5
+==== func-18.2
+
+      INSERT INTO t5 VALUES(0.0);
+      SELECT sum(x) FROM t5;
+----
+stmt 0 err 1 -1 34 no such table: t5
+stmt 34 err 1 -1 63 no such table: t5
+==== func-18.3
+
+    DELETE FROM t5;
+    SELECT sum(x), total(x) FROM t5;
+----
+stmt 0 err 1 -1 20 no such table: t5
+stmt 20 err 1 -1 57 no such table: t5
+==== func-18.4
+
+    INSERT INTO t5 VALUES(NULL);
+    SELECT sum(x), total(x) FROM t5
+----
+stmt 0 err 1 -1 33 no such table: t5
+stmt 33 err 1 -1 70 no such table: t5
+==== func-18.5
+
+    INSERT INTO t5 VALUES(NULL);
+    SELECT sum(x), total(x) FROM t5
+----
+stmt 0 err 1 -1 33 no such table: t5
+stmt 33 err 1 -1 70 no such table: t5
+==== func-18.6
+
+    INSERT INTO t5 VALUES(123);
+    SELECT sum(x), total(x) FROM t5
+----
+stmt 0 err 1 -1 32 no such table: t5
+stmt 32 err 1 -1 69 no such table: t5
+==== func-18.10
+
+    CREATE TABLE t6(x INTEGER);
+    INSERT INTO t6 VALUES(1);
+    INSERT INTO t6 VALUES(1<<62);
+    SELECT sum(x) - ((1<<62)+1) from t6;
+----
+stmt 0 ok
+stmt 32 err 1 -1 62 no such table: t6
+stmt 62 err 1 -1 96 no such table: t6
+stmt 96 err 1 -1 137 no such table: t6
+==== func-18.11
+
+    SELECT typeof(sum(x)) FROM t6
+----
+stmt 0 err 1 -1 35 no such table: t6
+==== func-18.12
+
+    INSERT INTO t6 VALUES(1<<62);
+    SELECT sum(x) - ((1<<62)*2.0+1) from t6;
+----
+stmt 0 err 1 -1 34 no such table: t6
+stmt 34 err 1 -1 79 no such table: t6
+==== func-18.13
+
+    SELECT total(x) - ((1<<62)*2.0+1) FROM t6
+----
+stmt 0 err 1 -1 47 no such table: t6
+==== func-18.14
+
+      SELECT sum(-9223372036854775805);
+----
+stmt 0 ok
+==== func-18.15
+
+    SELECT sum(x) FROM 
+       (SELECT 9223372036854775807 AS x UNION ALL
+        SELECT 10 AS x);
+----
+stmt 0 ok
+==== func-18.16
+
+      SELECT sum(x) FROM 
+         (SELECT 9223372036854775807 AS x UNION ALL
+          SELECT -10 AS x);
+----
+stmt 0 ok
+==== func-18.17
+
+      SELECT sum(x) FROM 
+         (SELECT -9223372036854775807 AS x UNION ALL
+          SELECT 10 AS x);
+----
+stmt 0 ok
+==== func-18.18
+
+    SELECT sum(x) FROM 
+       (SELECT -9223372036854775807 AS x UNION ALL
+        SELECT -10 AS x);
+----
+stmt 0 ok
+==== func-18.19
+
+    SELECT sum(x) FROM (SELECT 9 AS x UNION ALL SELECT -10 AS x);
+----
+stmt 0 ok
+==== func-18.20
+
+    SELECT sum(x) FROM (SELECT -9 AS x UNION ALL SELECT 10 AS x);
+----
+stmt 0 ok
+==== func-18.21
+
+    SELECT sum(x) FROM (SELECT -10 AS x UNION ALL SELECT 9 AS x);
+----
+stmt 0 ok
+==== func-18.22
+
+    SELECT sum(x) FROM (SELECT 10 AS x UNION ALL SELECT -9 AS x);
+----
+stmt 0 ok
+==== func-18.31
+
+      SELECT abs(-9223372036854775807);
+----
+stmt 0 ok
+==== func-18.32
+
+    SELECT abs(-9223372036854775807-1);
+----
+stmt 0 ok
+==== func-19.1
+
+    SELECT match(a,b) FROM t1 WHERE 0;
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== func-19.2
+
+    SELECT 'abc' MATCH 'xyz';
+----
+stmt 0 ok
+==== func-19.3
+
+    SELECT 'abc' NOT MATCH 'xyz';
+----
+stmt 0 ok
+==== func-19.4
+
+    SELECT match(1,2,3);
+----
+stmt 0 err 1 12 25 wrong number of arguments to function match()
+==== func-21.1
+
+    SELECT replace(1,2);
+----
+stmt 0 err 1 12 25 wrong number of arguments to function replace()
+==== func-21.2
+
+    SELECT replace(1,2,3,4);
+----
+stmt 0 err 1 12 29 wrong number of arguments to function replace()
+==== func-21.3
+
+    SELECT typeof(replace('This is the main test string', NULL, 'ALT'));
+----
+stmt 0 ok
+==== func-21.4
+
+    SELECT typeof(replace(NULL, 'main', 'ALT'));
+----
+stmt 0 ok
+==== func-21.5
+
+    SELECT typeof(replace('This is the main test string', 'main', NULL));
+----
+stmt 0 ok
+==== func-21.6
+
+    SELECT replace('This is the main test string', 'main', 'ALT');
+----
+stmt 0 ok
+==== func-21.7
+
+    SELECT replace('This is the main test string', 'main', 'larger-main');
+----
+stmt 0 ok
+==== func-21.8
+
+    SELECT replace('aaaaaaa', 'a', '0123456789');
+----
+stmt 0 ok
+==== func-21.9
+
+  SELECT typeof(replace(1,'',0));
+----
+stmt 0 ok
+==== func-22.1
+SELECT trim(1,2,3)
+----
+stmt 0 err 1 7 19 wrong number of arguments to function trim()
+==== func-22.2
+SELECT ltrim(1,2,3)
+----
+stmt 0 err 1 7 20 wrong number of arguments to function ltrim()
+==== func-22.3
+SELECT rtrim(1,2,3)
+----
+stmt 0 err 1 7 20 wrong number of arguments to function rtrim()
+==== func-22.4
+SELECT trim('  hi  ');
+----
+stmt 0 ok
+==== func-22.5
+SELECT ltrim('  hi  ');
+----
+stmt 0 ok
+==== func-22.6
+SELECT rtrim('  hi  ');
+----
+stmt 0 ok
+==== func-22.7
+SELECT trim('  hi  ','xyz');
+----
+stmt 0 ok
+==== func-22.8
+SELECT ltrim('  hi  ','xyz');
+----
+stmt 0 ok
+==== func-22.9
+SELECT rtrim('  hi  ','xyz');
+----
+stmt 0 ok
+==== func-22.10
+SELECT trim('xyxzy  hi  zzzy','xyz');
+----
+stmt 0 ok
+==== func-22.11
+SELECT ltrim('xyxzy  hi  zzzy','xyz');
+----
+stmt 0 ok
+==== func-22.12
+SELECT rtrim('xyxzy  hi  zzzy','xyz');
+----
+stmt 0 ok
+==== func-22.13
+SELECT trim('  hi  ','');
+----
+stmt 0 ok
+==== func-22.14
+SELECT hex(trim(x'c280e1bfbff48fbfbf6869',x'6162e1bfbfc280'))
+----
+stmt 0 ok
+==== func-22.15
+SELECT hex(trim(x'6869c280e1bfbff48fbfbf61',
+                             x'6162e1bfbfc280f48fbfbf'))
+----
+stmt 0 ok
+==== func-22.16
+SELECT hex(trim(x'ceb1ceb2ceb3',x'ceb1'));
+----
+stmt 0 ok
+==== func-22.20
+SELECT typeof(trim(NULL));
+----
+stmt 0 ok
+==== func-22.21
+SELECT typeof(trim(NULL,'xyz'));
+----
+stmt 0 ok
+==== func-22.22
+SELECT typeof(trim('hello',NULL));
+----
+stmt 0 ok
+==== func-22.23
+
+  SELECT trim('xyzzy',x'c0808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080');
+----
+stmt 0 ok
+==== func-24.1
+
+    SELECT group_concat(t1), string_agg(t1,',') FROM tbl1
+----
+stmt 0 err 1 -1 59 no such table: tbl1
+==== func-24.2
+
+    SELECT group_concat(t1,' '), string_agg(t1,' ') FROM tbl1
+----
+stmt 0 err 1 -1 63 no such table: tbl1
+==== func-24.3
+
+    SELECT group_concat(t1,' ' || rowid || ' ') FROM tbl1
+----
+stmt 0 err 1 -1 59 no such table: tbl1
+==== func-24.4
+
+    SELECT group_concat(NULL,t1) FROM tbl1
+----
+stmt 0 err 1 -1 44 no such table: tbl1
+==== func-24.5
+
+    SELECT group_concat(t1,NULL), string_agg(t1,NULL) FROM tbl1
+----
+stmt 0 err 1 -1 65 no such table: tbl1
+==== func-24.6
+
+    SELECT 'BEGIN-'||group_concat(t1) FROM tbl1
+----
+stmt 0 err 1 -1 49 no such table: tbl1
+==== func-24.8
+
+    SELECT group_concat(CASE t1 WHEN 'this' THEN '' ELSE t1 END) FROM tbl1
+----
+stmt 0 err 1 -1 76 no such table: tbl1
+==== func-24.9
+
+    SELECT group_concat(CASE WHEN t1!='software' THEN '' ELSE t1 END) FROM tbl1
+----
+stmt 0 err 1 -1 81 no such table: tbl1
+==== func-24.10
+
+    SELECT group_concat(CASE t1 WHEN 'this' THEN null ELSE t1 END) FROM tbl1
+----
+stmt 0 err 1 -1 78 no such table: tbl1
+==== func-24.11
+
+   SELECT group_concat(CASE WHEN t1!='software' THEN null ELSE t1 END) FROM tbl1
+----
+stmt 0 err 1 -1 82 no such table: tbl1
+==== func-24.12
+
+    SELECT group_concat(CASE t1 WHEN 'this' THEN ''
+                          WHEN 'program' THEN null ELSE t1 END) FROM tbl1
+----
+stmt 0 err 1 -1 127 no such table: tbl1
+==== func-24.13
+
+    SELECT typeof(group_concat(x)) FROM (SELECT '' AS x);
+----
+stmt 0 ok
+==== func-24.14
+
+    SELECT typeof(group_concat(x,''))
+      FROM (SELECT '' AS x UNION ALL SELECT '');
+----
+stmt 0 ok
+==== func-25.1
+SELECT test_isolation(t1,t1) FROM tbl1
+----
+stmt 0 err 1 -1 39 no such table: tbl1
+==== func-27.1
+SELECT coalesce()
+----
+stmt 0 err 1 7 18 wrong number of arguments to function coalesce()
+==== func-27.2
+SELECT coalesce(1)
+----
+stmt 0 err 1 7 19 wrong number of arguments to function coalesce()
+==== func-27.3
+SELECT coalesce(1,2)
+----
+stmt 0 ok
+==== func-29.10
+
+  CREATE TABLE t29b(a,b,c,d,e,f,g,h,i);
+  INSERT INTO t29b 
+   VALUES(1, hex(randomblob(2000)), null, 0, 1, '', zeroblob(0),'x',x'01');
+  SELECT typeof(c), typeof(d), typeof(e), typeof(f),
+         typeof(g), typeof(h), typeof(i) FROM t29b;
+----
+stmt 0 ok
+stmt 40 err 1 -1 136 no such table: t29b
+stmt 136 err 1 -1 241 no such table: t29b
+==== func-29.11
+
+  SELECT length(f), length(g), length(h), length(i) FROM t29b;
+----
+stmt 0 err 1 -1 63 no such table: t29b
+==== func-29.12
+
+  SELECT quote(f), quote(g), quote(h), quote(i) FROM t29b;
+----
+stmt 0 err 1 -1 59 no such table: t29b
+==== func-30.4
+SELECT char(36,162,8364);
+----
+stmt 0 ok
+==== func-31.1
+ 
+  SELECT char(), length(char()), typeof(char())
+----
+stmt 0 ok
+==== func-32.100
+
+  SELECT test_frombind(1,2,3,4);
+----
+stmt 0 err 1 10 33 no such function: test_frombind
+==== func-32.110
+
+  SELECT test_frombind(1,2,?,4);
+----
+stmt 0 err 1 10 33 no such function: test_frombind
+==== func-32.120
+
+  SELECT test_frombind(1,(?),4,?+7);
+----
+stmt 0 err 1 10 37 no such function: test_frombind
+==== func-33.2
+
+  CREATE VIEW v33(y) AS SELECT testdirectonly(15);
+  SELECT * FROM v33;
+----
+stmt 0 ok
+stmt 51 err 1 -1 72 no such table: v33
+==== func-33.3
+
+  SELECT * FROM (SELECT testdirectonly(15)) AS v33;
+----
+stmt 0 err 1 25 52 no such function: testdirectonly
+==== func-33.4
+
+  WITH c(x) AS (SELECT testdirectonly(15))
+  SELECT * FROM c;
+----
+stmt 0 err 1 24 62 no such function: testdirectonly
+==== func-33.5
+
+  WITH c(x) AS (SELECT * FROM v33)
+  SELECT * FROM c;
+----
+stmt 0 err 1 -1 54 no such table: v33
+==== func-33.10
+
+  CREATE TABLE t33a(a,b);
+  CREATE TABLE t33b(x,y);
+  CREATE TRIGGER r1 AFTER INSERT ON t33a BEGIN
+    INSERT INTO t33b(x,y) VALUES(testdirectonly(new.a),new.b);
+  END;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 52 err 1 -1 99 no such table: main.t33a
+==== func-33.11
+
+  INSERT INTO t33a VALUES(1,2);
+----
+stmt 0 err 1 -1 32 no such table: t33a
+==== func-33.20
+
+  ALTER TABLE t33a RENAME COLUMN a TO aaa;
+  SELECT sql FROM sqlite_master WHERE name='r1';
+----
+stmt 0 err 1 -1 43 no such table: t33a
+stmt 43 ok
+==== func-34.10
+
+  CREATE TABLE t1(a INT CHECK(
+     datetime( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+              10,11,12,13,14,15,16,17,18,19,
+              20,21,22,23,24,25,26,27,28,29,
+              30,31,32,33,34,35,36,37,38,39,
+              40,41,42,43,44,45,46,47,48,a)
+   )
+  );
+  INSERT INTO t1(a) VALUES(1),(2);
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 265 err 1 -1 300 no such table: t1
+stmt 300 err 1 -1 320 no such table: t1
+==== func-35.100
+
+  CREATE TABLE t1(x);
+  SELECT coalesce(x, abs(-9223372036854775808)) FROM t1;
+----
+stmt 0 ok
+stmt 22 err 1 -1 79 no such table: t1
+==== func-35.110
+
+  SELECT coalesce(x, 'xyz' LIKE printf('%.1000000c','y')) FROM t1;
+----
+stmt 0 err 1 -1 67 no such table: t1
+==== func-35.200
+
+  CREATE TABLE t0(c0 CHECK(ABS(-9223372036854775808)));
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 56 ok
+==== func-36.100
+
+  SELECT 123 -> 456
+----
+stmt 0 ok
+==== func-36.110
+
+  SELECT 123 ->> 456
+----
+stmt 0 ok
+==== func-37.100
+
+  WITH c(x) AS (VALUES(9223372036854775807),(9223372036854775807),
+                      (123),(-9223372036854775807),(-9223372036854775807))
+  SELECT sum(x) FROM c;
+----
+stmt 0 ok
+==== func-37.110
+
+  WITH c(x) AS (VALUES(9223372036854775807),(1))
+  SELECT sum(x) FROM c;
+----
+stmt 0 ok
+==== func-37.120
+
+  WITH c(x) AS (VALUES(9223372036854775807),(10000),(-10010))
+  SELECT sum(x) FROM c;
+----
+stmt 0 ok
+==== func-38.100
+
+  WITH t1(x) AS (VALUES(9e+999)) SELECT sum(x), avg(x), total(x) FROM t1;
+  WITH t1(x) AS (VALUES(-9e+999)) SELECT sum(x), avg(x), total(x) FROM t1;
+----
+stmt 0 ok
+stmt 74 ok
+==== func-39.101
+
+  WITH RECURSIVE c(n) AS (VALUES(1) UNION ALL SELECT n+1 FROM c WHERE n<1)
+  SELECT sum(1.7976931348623157e308),
+         avg(1.7976931348623157e308),
+         total(1.7976931348623157e308)
+    FROM c;
+----
+stmt 0 ok

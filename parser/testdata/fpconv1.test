@@ -1,0 +1,60 @@
+==== fpconv1-1.0
+
+  SELECT 1.23 - 2.34;
+----
+stmt 0 ok
+==== fpconv1-1.1
+
+  SELECT 1.23 * 2.34;
+----
+stmt 0 ok
+==== fpconv1-1.2
+
+  SELECT 1.23 - 2.34;
+----
+stmt 0 ok
+==== fpconv1-1.3
+
+  SELECT 1.23 * 2.34;
+----
+stmt 0 ok
+==== fpconv1-2.0
+
+  WITH RECURSIVE
+       /* Number of random floating-point values to try.
+       ** On a circa 2021 Ryzen 5950X running Mint Linux, and
+       ** compiled with -O0 -DSQLITE_DEBUG, this test runs at
+       ** about 150000 cases per second  ------------------vvvvvvv */
+    c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<500_000),
+    fp(y) AS MATERIALIZED (
+       SELECT CAST( format('%+d.%019d0e%+03d',
+                           random()%10,abs(random()),random()%200) AS real)
+        FROM c
+    )
+  SELECT y FROM fp
+   WHERE -log10(abs(decimal_sub(dtostr(y,24),format('%!.24e',y))/y))<17.0;
+                     /* Number of digits of accuracy required -------^^^^ */
+----
+stmt 0 err 1 539 603 no such function: log10
+==== fpconv1-3.0
+
+  WITH RECURSIVE
+    c(x,s) AS MATERIALIZED (VALUES(1,random()&0xffefffffffffffff)
+               UNION ALL
+               SELECT x+1,random()&0xffefffffffffffff
+                 FROM c WHERE x<1_000_000),
+    fp(y,s) AS (
+       SELECT ieee754_from_int(s),s FROM c
+    ),
+    fp2(yt,y,s) AS (
+       SELECT y||'', y, s FROM fp
+    )
+  SELECT format('%#016x',s) aS 'orig-hex',
+         format('%#016x',ieee754_to_int(CAST(yt AS real))) AS 'full-roundtrip',
+         yt AS 'rendered-as',
+         decimal_exp(yt,30) AS 'text-decimal',
+         decimal_exp(ieee754_from_int(s),30) AS 'float-decimal'
+    FROM fp2
+   WHERE ieee754_to_int(CAST(yt AS real))<>s;
+----
+stmt 0 err 1 238 657 no such function: ieee754_from_int

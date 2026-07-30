@@ -1,0 +1,269 @@
+==== null-1.0
+
+    begin;
+    create table t1(a,b,c);
+    insert into t1 values(1,0,0);
+    insert into t1 values(2,0,1);
+    insert into t1 values(3,1,0);
+    insert into t1 values(4,1,1);
+    insert into t1 values(5,null,0);
+    insert into t1 values(6,null,1);
+    insert into t1 values(7,null,null);
+    commit;
+    select * from t1;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 39 err 1 -1 73 no such table: t1
+stmt 73 err 1 -1 107 no such table: t1
+stmt 107 err 1 -1 141 no such table: t1
+stmt 141 err 1 -1 175 no such table: t1
+stmt 175 err 1 -1 212 no such table: t1
+stmt 212 err 1 -1 249 no such table: t1
+stmt 249 err 1 -1 289 no such table: t1
+stmt 289 ok
+stmt 301 err 1 -1 323 no such table: t1
+==== null-1.1
+
+    select ifnull(a+b,99) from t1;
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== null-1.2
+
+    select ifnull(b*c,99) from t1;
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== null-2.1
+
+    select ifnull(case when b<>0 then 1 else 0 end, 99) from t1;
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== null-2.2
+
+    select ifnull(case when not b<>0 then 1 else 0 end, 99) from t1;
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== null-2.3
+
+    select ifnull(case when b<>0 and c<>0 then 1 else 0 end, 99) from t1;
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== null-2.4
+
+    select ifnull(case when not (b<>0 and c<>0) then 1 else 0 end, 99) from t1;
+----
+stmt 0 err 1 -1 80 no such table: t1
+==== null-2.5
+
+    select ifnull(case when b<>0 or c<>0 then 1 else 0 end, 99) from t1;
+----
+stmt 0 err 1 -1 73 no such table: t1
+==== null-2.6
+
+    select ifnull(case when not (b<>0 or c<>0) then 1 else 0 end, 99) from t1;
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== null-2.7
+
+    select ifnull(case b when c then 1 else 0 end, 99) from t1;
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== null-2.8
+
+    select ifnull(case c when b then 1 else 0 end, 99) from t1;
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== null-3.1
+
+    select count(*), count(b), count(c), sum(b), sum(c), 
+           avg(b), avg(c), min(b), max(b) from t1;
+----
+stmt 0 err 1 -1 109 no such table: t1
+==== null-3.2
+
+    SELECT sum(b), total(b) FROM t1 WHERE b<0
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== null-4.1
+
+    select a from t1 where b<10
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== null-4.2
+
+    select a from t1 where not b>10
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== null-4.3
+
+    select a from t1 where b<10 or c=1;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== null-4.4
+
+    select a from t1 where b<10 and c=1;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== null-4.5
+
+    select a from t1 where not (b<10 and c=1);
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== null-5.1
+
+    select distinct b from t1 order by b;
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== null-6.1
+
+      select b from t1 union select c from t1 order by b;
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== null-6.2
+
+      select b from t1 union select c from t1 order by 1;
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== null-6.3
+
+      select b from t1 union select c from t1 order by t1.b;
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== null-6.4
+
+      select b from t1 union select c from t1 order by main.t1.b;
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== null-6.5
+
+      select b from t1 union select c from t1 order by t1.a;
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== null-6.6
+
+      select b from t1 union select c from t1 order by main.t1.a;
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== null-7.1
+
+      create table t2(a, b unique on conflict ignore);
+      insert into t2 values(1,1);
+      insert into t2 values(2,null);
+      insert into t2 values(3,null);
+      insert into t2 values(4,1);
+      select a from t2;
+----
+stmt 0 ok
+stmt 55 err 1 -1 89 no such table: t2
+stmt 89 err 1 -1 126 no such table: t2
+stmt 126 err 1 -1 163 no such table: t2
+stmt 163 err 1 -1 197 no such table: t2
+stmt 197 err 1 -1 221 no such table: t2
+==== null-7.2
+
+      create table t3(a, b, c, unique(b,c) on conflict ignore);
+      insert into t3 values(1,1,1);
+      insert into t3 values(2,null,1);
+      insert into t3 values(3,null,1);
+      insert into t3 values(4,1,1);
+      select a from t3;
+----
+stmt 0 ok
+stmt 64 err 1 -1 100 no such table: t3
+stmt 100 err 1 -1 139 no such table: t3
+stmt 139 err 1 -1 178 no such table: t3
+stmt 178 err 1 -1 214 no such table: t3
+stmt 214 err 1 -1 238 no such table: t3
+==== null-8.1
+
+    CREATE TABLE t4(x,y);
+    INSERT INTO t4 VALUES(1,11);
+    INSERT INTO t4 VALUES(2,NULL);
+    SELECT x FROM t4 WHERE y=NULL;
+----
+stmt 0 ok
+stmt 26 err 1 -1 59 no such table: t4
+stmt 59 err 1 -1 94 no such table: t4
+stmt 94 err 1 -1 129 no such table: t4
+==== null-8.2
+
+      SELECT x FROM t4 WHERE y IN (33,NULL);
+----
+stmt 0 err 1 -1 45 no such table: t4
+==== null-8.3
+
+    SELECT x FROM t4 WHERE y<33 ORDER BY x;
+----
+stmt 0 err 1 -1 44 no such table: t4
+==== null-8.4
+
+    SELECT x FROM t4 WHERE y>6 ORDER BY x;
+----
+stmt 0 err 1 -1 43 no such table: t4
+==== null-8.5
+
+    SELECT x FROM t4 WHERE y!=33 ORDER BY x;
+----
+stmt 0 err 1 -1 45 no such table: t4
+==== null-8.11
+
+    CREATE INDEX t4i1 ON t4(y);
+    SELECT x FROM t4 WHERE y=NULL;
+----
+stmt 0 err 1 -1 32 no such table: main.t4
+stmt 32 err 1 -1 67 no such table: t4
+==== null-8.12
+
+      SELECT x FROM t4 WHERE y IN (33,NULL);
+----
+stmt 0 err 1 -1 45 no such table: t4
+==== null-8.13
+
+    SELECT x FROM t4 WHERE y<33 ORDER BY x;
+----
+stmt 0 err 1 -1 44 no such table: t4
+==== null-8.14
+
+    SELECT x FROM t4 WHERE y>6 ORDER BY x;
+----
+stmt 0 err 1 -1 43 no such table: t4
+==== null-8.15
+
+    SELECT x FROM t4 WHERE y!=33 ORDER BY x;
+----
+stmt 0 err 1 -1 45 no such table: t4
+==== null-9.1
+
+  CREATE TABLE t5(a, b, c);
+  CREATE UNIQUE INDEX t5ab ON t5(a, b);
+
+  INSERT INTO t5 VALUES(1, NULL, 'one');
+  INSERT INTO t5 VALUES(1, NULL, 'i');
+  INSERT INTO t5 VALUES(NULL, 'x', 'two');
+  INSERT INTO t5 VALUES(NULL, 'x', 'ii');
+----
+stmt 0 ok
+stmt 28 err 1 -1 68 no such table: main.t5
+stmt 68 err 1 -1 110 no such table: t5
+stmt 110 err 1 -1 149 no such table: t5
+stmt 149 err 1 -1 192 no such table: t5
+stmt 192 err 1 -1 234 no such table: t5
+==== null-9.2
+
+  SELECT * FROM t5 WHERE a = 1 AND b IS NULL;
+----
+stmt 0 err 1 -1 46 no such table: t5
+==== null-9.3
+
+  SELECT * FROM t5 WHERE a IS NULL AND b = 'x';
+----
+stmt 0 err 1 -1 48 no such table: t5
+==== null-10.1
+
+  CREATE TABLE t0(c0 PRIMARY KEY DESC);
+  INSERT INTO t0(c0) VALUES (0);
+  SELECT * FROM t0 WHERE t0.c0 > NULL;
+----
+stmt 0 ok
+stmt 40 err 1 -1 73 no such table: t0
+stmt 73 err 1 -1 112 no such table: t0

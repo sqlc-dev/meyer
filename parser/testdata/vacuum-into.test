@@ -1,0 +1,102 @@
+==== vacuum-into-100
+
+  CREATE TABLE t1(
+    a INTEGER PRIMARY KEY,
+    b ANY,
+    c INT AS (b+1),                          --- See "2024-04-09" block
+    CHECK( typeof(b)!='integer' OR b>a-5 )   --- comment below
+  );
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<100)
+  INSERT INTO t1(a,b) SELECT x, randomblob(600) FROM c;
+  CREATE INDEX t1b ON t1(b);
+  DELETE FROM t1 WHERE a%2;
+  SELECT count(*), sum(a), sum(length(b)) FROM t1;
+----
+stmt 0 ok
+stmt 197 err 1 -1 330 no such table: t1
+stmt 330 err 1 -1 359 no such table: main.t1
+stmt 359 err 1 -1 387 no such table: t1
+stmt 387 err 1 -1 438 no such table: t1
+==== vacuum-into-110
+
+  VACUUM main INTO 'out.db';
+----
+stmt 0 ok
+==== vacuum-into-130
+
+  VACUUM INTO 'out.db';
+----
+stmt 0 ok
+==== vacuum-into-140
+
+  VACUUM INTO 'out2.db';
+----
+stmt 0 ok
+==== vacuum-into-150
+
+  VACUUM INTO 'out2.db';
+----
+stmt 0 ok
+==== vacuum-into-200
+
+  VACUUM main INTO ':memory:';
+----
+stmt 0 ok
+==== vacuum-into-300
+
+  CREATE TABLE t2(name TEXT);
+  INSERT INTO t2 VALUES(':memory:');
+  VACUUM main INTO (SELECT name FROM t2);
+----
+stmt 0 ok
+stmt 30 err 1 -1 67 no such table: t2
+stmt 67 err 1 -1 109 no such table: t2
+==== vacuum-into-310
+
+  VACUUM INTO null;
+----
+stmt 0 ok
+==== vacuum-into-320
+
+  VACUUM INTO x;
+----
+stmt 0 err 1 15 17 no such column: x
+==== vacuum-into-330
+
+  VACUUM INTO t1.nosuchcol;
+----
+stmt 0 err 1 15 28 no such column: t1.nosuchcol
+==== vacuum-into-340
+
+  VACUUM INTO main.t1.nosuchcol;
+----
+stmt 0 err 1 15 33 no such column: main.t1.nosuchcol
+==== vacuum-into-420
+
+  VACUUM INTO target2()
+----
+stmt 0 err 1 15 25 no such function: target2
+==== vacuum-into-500
+
+  VACUUM INTO 'test.db2';
+----
+stmt 0 ok
+==== vacuum-into-610
+
+    PRAGMA page_size;
+----
+stmt 0 ok
+==== vacuum-into-620
+
+    PRAGMA page_size=1024;
+    VACUUM INTO 'test.db2';
+----
+stmt 0 ok
+stmt 27 ok
+==== vacuum-into-700
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, 2);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t1

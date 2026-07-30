@@ -1,0 +1,24 @@
+==== 3.1.2
+
+  UPDATE t3 SET k = 'xyz' WHERE i=1;
+  SELECT * FROM t3 WHERE i=1;
+----
+stmt 0 err 1 -1 37 no such table: t3
+stmt 37 err 1 -1 67 no such table: t3
+==== 3.1.4
+
+  SELECT * FROM t3 WHERE i=1;
+----
+stmt 0 err 1 -1 30 no such table: t3
+==== 3.2.2
+
+  UPDATE t3 SET j = 'xyz' WHERE i=2;
+  SELECT * FROM t3 WHERE i=2;
+----
+stmt 0 err 1 -1 37 no such table: t3
+stmt 37 err 1 -1 67 no such table: t3
+==== 3.2.4
+
+  SELECT * FROM t3 WHERE i=2;
+----
+stmt 0 err 1 -1 30 no such table: t3

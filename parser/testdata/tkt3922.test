@@ -1,0 +1,36 @@
+==== tkt3922.1
+
+      CREATE TABLE t1(a NUMBER);
+      INSERT INTO t1 VALUES('-9223372036854775808');
+      SELECT a, typeof(a) FROM t1;
+----
+stmt 0 ok
+stmt 33 err 1 -1 86 no such table: t1
+stmt 86 err 1 -1 121 no such table: t1
+==== tkt3922.1.dup1
+
+      CREATE TABLE t1(a NUMBER);
+      INSERT INTO t1 VALUES('-1');
+      SELECT a, typeof(a) FROM t1;
+----
+stmt 0 ok
+stmt 33 err 1 -1 68 no such table: t1
+stmt 68 err 1 -1 103 no such table: t1
+==== tkt3922.5
+
+      DELETE FROM t1;
+      INSERT INTO t1 VALUES('9223372036854775807');
+      SELECT a, typeof(a) FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+stmt 22 err 1 -1 74 no such table: t1
+stmt 74 err 1 -1 109 no such table: t1
+==== tkt3922.5.dup1
+
+      DELETE FROM t1;
+      INSERT INTO t1 VALUES('1');
+      SELECT a, typeof(a) FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+stmt 22 err 1 -1 56 no such table: t1
+stmt 56 err 1 -1 91 no such table: t1

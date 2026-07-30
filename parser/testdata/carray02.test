@@ -1,0 +1,24 @@
+==== 3.0.0
+
+  SELECT * FROM carray
+----
+stmt 0 err 1 -1 24 no such table: carray
+==== 3.0.1
+
+  SELECT * FROM carray('0xFFFF', 5)
+----
+stmt 0 err 1 -1 37 no such table: carray
+==== 3.0.2
+
+  SELECT * FROM carray('0xFFFF')
+----
+stmt 0 err 1 -1 34 no such table: carray
+==== 3.0.3
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES('0xFFFF');
+  SELECT * FROM t1, carray WHERE carray.pointer = t1.x;
+----
+stmt 0 ok
+stmt 22 err 1 -1 57 no such table: t1
+stmt 57 err 1 -1 113 no such table: t1

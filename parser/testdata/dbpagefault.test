@@ -1,0 +1,37 @@
+==== 3.0
+
+  CREATE TABLE x1(z, b);
+  CREATE TRIGGER BEFORE INSERT ON x1 BEGIN
+    DELETE FROM sqlite_dbpage WHERE pgno=100;
+    UPDATE sqlite_dbpage SET data=null WHERE pgno=100;
+  END;
+----
+stmt 0 ok
+stmt 25 err 1 -1 68 no such table: main.x1
+==== 3.1
+
+  PRAGMA trusted_schema = 1;
+----
+stmt 0 ok
+==== 3.2
+
+  PRAGMA trusted_schema = 1;
+  INSERT INTO x1 DEFAULT VALUES;
+----
+stmt 0 ok
+stmt 29 err 1 -1 62 no such table: x1
+==== 4.0
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES('one');
+  CREATE TABLE t2(x);
+  INSERT INTO t2 VALUES('two');
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.x1(x);
+----
+stmt 0 ok
+stmt 22 err 1 -1 54 no such table: t1
+stmt 54 ok
+stmt 76 err 1 -1 108 no such table: t2
+stmt 108 ok
+stmt 136 err 1 152 159 unknown database aux

@@ -1,0 +1,729 @@
+==== rowid-1.1
+
+    CREATE TABLE t1(x int, y int);
+    INSERT INTO t1 VALUES(1,2);
+    INSERT INTO t1 VALUES(3,4);
+    SELECT x FROM t1 ORDER BY y;
+----
+stmt 0 ok
+stmt 35 err 1 -1 67 no such table: t1
+stmt 67 err 1 -1 99 no such table: t1
+stmt 99 err 1 -1 132 no such table: t1
+==== rowid-2.1
+
+    INSERT INTO t1(rowid,x,y) VALUES(1234,5,6);
+    SELECT rowid, * FROM t1;
+----
+stmt 0 err 1 -1 48 no such table: t1
+stmt 48 err 1 -1 77 no such table: t1
+==== rowid-2.2
+
+    UPDATE t1 SET rowid=12345 WHERE x==1;
+    SELECT rowid, * FROM t1
+----
+stmt 0 err 1 -1 42 no such table: t1
+stmt 42 err 1 -1 71 no such table: t1
+==== rowid-2.3
+
+    INSERT INTO t1(y,x,oid) VALUES(8,7,1235);
+    SELECT rowid, * FROM t1 WHERE rowid>1000;
+----
+stmt 0 err 1 -1 46 no such table: t1
+stmt 46 err 1 -1 92 no such table: t1
+==== rowid-2.4
+
+    UPDATE t1 SET oid=12346 WHERE x==1;
+    SELECT rowid, * FROM t1;
+----
+stmt 0 err 1 -1 40 no such table: t1
+stmt 40 err 1 -1 69 no such table: t1
+==== rowid-2.5
+
+    INSERT INTO t1(x,_rowid_,y) VALUES(9,1236,10);
+    SELECT rowid, * FROM t1 WHERE rowid>1000;
+----
+stmt 0 err 1 -1 51 no such table: t1
+stmt 51 err 1 -1 97 no such table: t1
+==== rowid-2.6
+
+    UPDATE t1 SET _rowid_=12347 WHERE x==1;
+    SELECT rowid, * FROM t1 WHERE rowid>1000;
+----
+stmt 0 err 1 -1 44 no such table: t1
+stmt 44 err 1 -1 90 no such table: t1
+==== rowid-3.1
+
+    CREATE TABLE t2(rowid int, x int, y int);
+    INSERT INTO t2 VALUES(0,2,3);
+    INSERT INTO t2 VALUES(4,5,6);
+    INSERT INTO t2 VALUES(7,8,9);
+    SELECT * FROM t2 ORDER BY x;
+----
+stmt 0 ok
+stmt 46 err 1 -1 80 no such table: t2
+stmt 80 err 1 -1 114 no such table: t2
+stmt 114 err 1 -1 148 no such table: t2
+stmt 148 err 1 -1 181 no such table: t2
+==== rowid-3.2
+SELECT * FROM t2 ORDER BY rowid
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== rowid-3.3
+SELECT rowid, x, y FROM t2 ORDER BY rowid
+----
+stmt 0 err 1 -1 42 no such table: t2
+==== rowid-4.2
+SELECT t2.y FROM t2, t1 WHERE t1.x==4 AND t1.rowid==t2.rowid
+----
+stmt 0 err 1 -1 61 no such table: t2
+==== rowid-4.2.1
+SELECT t2.y FROM t2, t1 WHERE t1.x==4 AND t1.oid==t2.rowid
+----
+stmt 0 err 1 -1 59 no such table: t2
+==== rowid-4.2.2
+SELECT t2.y FROM t2, t1 WHERE t1.x==4 AND t1._rowid_==t2.rowid
+----
+stmt 0 err 1 -1 63 no such table: t2
+==== rowid-4.2.3
+SELECT t2.y FROM t2, t1 WHERE t1.x==4 AND t2.rowid==t1.rowid
+----
+stmt 0 err 1 -1 61 no such table: t2
+==== rowid-4.2.4
+SELECT t2.y FROM t2, t1 WHERE t2.rowid==t1.oid AND t1.x==4
+----
+stmt 0 err 1 -1 59 no such table: t2
+==== rowid-4.2.5
+SELECT t2.y FROM t1, t2 WHERE t1.x==4 AND t1._rowid_==t2.rowid
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== rowid-4.2.6
+SELECT t2.y FROM t1, t2 WHERE t1.x==4 AND t2.rowid==t1.rowid
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== rowid-4.2.7
+SELECT t2.y FROM t1, t2 WHERE t2.rowid==t1.oid AND t1.x==4
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== rowid-4.3.1
+SELECT t2.y FROM t1, t2 WHERE t1.x==4 AND t1._rowid_==t2.rowid
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== rowid-4.3.2
+SELECT t2.y FROM t1, t2 WHERE t2.rowid==t1.oid AND 4==t1.x
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== rowid-4.4
+SELECT t2.y FROM t2, t1 WHERE t1.x==4 AND t1.rowid==t2.rowid
+----
+stmt 0 err 1 -1 61 no such table: t2
+==== rowid-4.4.1
+SELECT t2.y FROM t2, t1 WHERE t1.x==4 AND t1._rowid_==t2.rowid
+----
+stmt 0 err 1 -1 63 no such table: t2
+==== rowid-4.4.2
+SELECT t2.y FROM t2, t1 WHERE t2.rowid==t1.oid AND 4==t1.x
+----
+stmt 0 err 1 -1 59 no such table: t2
+==== rowid-4.6
+
+    SELECT t1.x FROM t1, t2
+    WHERE t2.y==256 AND t1.rowid==t2.rowid
+----
+stmt 0 err 1 -1 72 no such table: t1
+==== rowid-5.1.2
+SELECT max(x) FROM t1
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== rowid-6.1
+
+    SELECT x FROM t1
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== rowid-6.3
+
+    SELECT x FROM t1
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== rowid-7.0
+
+    DELETE FROM t1;
+    DROP TABLE t2;
+    DROP INDEX idxt1;
+    INSERT INTO t1 VALUES(1,2);
+    SELECT rowid, * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 39 no such table: t2
+stmt 39 err 1 -1 61 no such index: idxt1
+stmt 61 err 1 -1 93 no such table: t1
+stmt 93 err 1 -1 122 no such table: t1
+==== rowid-7.1
+
+    INSERT INTO t1 VALUES(99,100);
+    SELECT rowid,* FROM t1
+----
+stmt 0 err 1 -1 35 no such table: t1
+stmt 35 err 1 -1 63 no such table: t1
+==== rowid-7.2
+
+    CREATE TABLE t2(a INTEGER PRIMARY KEY, b);
+    INSERT INTO t2(b) VALUES(55);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 47 err 1 -1 81 no such table: t2
+stmt 81 err 1 -1 103 no such table: t2
+==== rowid-7.3
+
+    INSERT INTO t2(b) VALUES(66);
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 34 no such table: t2
+stmt 34 err 1 -1 56 no such table: t2
+==== rowid-7.4
+
+    INSERT INTO t2(a,b) VALUES(1000000,77);
+    INSERT INTO t2(b) VALUES(88);
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 44 no such table: t2
+stmt 44 err 1 -1 78 no such table: t2
+stmt 78 err 1 -1 100 no such table: t2
+==== rowid-7.5
+
+    INSERT INTO t2(a,b) VALUES(2147483647,99);
+    INSERT INTO t2(b) VALUES(11);
+    SELECT b FROM t2 ORDER BY b;
+----
+stmt 0 err 1 -1 47 no such table: t2
+stmt 47 err 1 -1 81 no such table: t2
+stmt 81 err 1 -1 114 no such table: t2
+==== rowid-7.6
+
+      SELECT b FROM t2 WHERE a NOT IN(1,2,1000000,1000001,2147483647);
+----
+stmt 0 err 1 -1 71 no such table: t2
+==== rowid-7.7
+
+      INSERT INTO t2(b) VALUES(22);
+      INSERT INTO t2(b) VALUES(33);
+      INSERT INTO t2(b) VALUES(44);
+      INSERT INTO t2(b) VALUES(55);
+      SELECT b FROM t2 WHERE a NOT IN(1,2,1000000,1000001,2147483647) 
+          ORDER BY b;
+----
+stmt 0 err 1 -1 36 no such table: t2
+stmt 36 err 1 -1 72 no such table: t2
+stmt 72 err 1 -1 108 no such table: t2
+stmt 108 err 1 -1 144 no such table: t2
+stmt 144 err 1 -1 237 no such table: t2
+==== rowid-7.8
+
+    DELETE FROM t2 WHERE a!=2;
+    INSERT INTO t2(b) VALUES(111);
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 31 no such table: t2
+stmt 31 err 1 -1 66 no such table: t2
+stmt 66 err 1 -1 88 no such table: t2
+==== rowid-8.1
+
+    CREATE TABLE t3(a integer primary key);
+    CREATE TABLE t4(x);
+    INSERT INTO t4 VALUES(1);
+    CREATE TRIGGER r3 AFTER INSERT on t3 FOR EACH ROW BEGIN
+      INSERT INTO t4 VALUES(NEW.a+10);
+    END;
+    SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 44 ok
+stmt 68 err 1 -1 98 no such table: t4
+stmt 98 err 1 -1 158 no such table: main.t3
+stmt 206 err 1 -1 228 no such table: t3
+==== rowid-8.2
+
+    SELECT rowid, * FROM t4;
+----
+stmt 0 err 1 -1 29 no such table: t4
+==== rowid-8.3
+
+    INSERT INTO t3 VALUES(123);
+    SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 32 no such table: t3
+stmt 32 ok
+==== rowid-8.4
+
+    SELECT * FROM t3;
+----
+stmt 0 err 1 -1 22 no such table: t3
+==== rowid-8.5
+
+    SELECT rowid, * FROM t4;
+----
+stmt 0 err 1 -1 29 no such table: t4
+==== rowid-8.6
+
+    INSERT INTO t3 VALUES(NULL);
+    SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 33 no such table: t3
+stmt 33 ok
+==== rowid-8.7
+
+    SELECT * FROM t3;
+----
+stmt 0 err 1 -1 22 no such table: t3
+==== rowid-8.8
+
+    SELECT rowid, * FROM t4;
+----
+stmt 0 err 1 -1 29 no such table: t4
+==== rowid-9.1
+
+    SELECT * FROM t3 WHERE a<123.5
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== rowid-9.2
+
+    SELECT * FROM t3 WHERE a<124.5
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== rowid-9.3
+
+    SELECT * FROM t3 WHERE a>123.5
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== rowid-9.4
+
+    SELECT * FROM t3 WHERE a>122.5
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== rowid-9.5
+
+    SELECT * FROM t3 WHERE a==123.5
+----
+stmt 0 err 1 -1 37 no such table: t3
+==== rowid-9.6
+
+    SELECT * FROM t3 WHERE a==123.000
+----
+stmt 0 err 1 -1 39 no such table: t3
+==== rowid-9.7
+
+    SELECT * FROM t3 WHERE a>100.5 AND a<200.5
+----
+stmt 0 err 1 -1 48 no such table: t3
+==== rowid-9.8
+
+    SELECT * FROM t3 WHERE a>'xyz';
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== rowid-9.9
+
+    SELECT * FROM t3 WHERE a<'xyz';
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== rowid-9.10
+
+    SELECT * FROM t3 WHERE a>=122.9 AND a<=123.1
+----
+stmt 0 err 1 -1 50 no such table: t3
+==== rowid-10.1
+
+    CREATE TABLE t5(a);
+    INSERT INTO t5 VALUES(1);
+    INSERT INTO t5 VALUES(2);
+    INSERT INTO t5 SELECT a+2 FROM t5;
+    INSERT INTO t5 SELECT a+4 FROM t5;
+    SELECT rowid, * FROM t5;
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t5
+stmt 54 err 1 -1 84 no such table: t5
+stmt 84 err 1 -1 123 no such table: t5
+stmt 123 err 1 -1 162 no such table: t5
+stmt 162 err 1 -1 191 no such table: t5
+==== rowid-10.2
+SELECT rowid, a FROM t5 WHERE rowid>=5.5
+----
+stmt 0 err 1 -1 41 no such table: t5
+==== rowid-10.3
+SELECT rowid, a FROM t5 WHERE rowid>=5.0
+----
+stmt 0 err 1 -1 41 no such table: t5
+==== rowid-10.4
+SELECT rowid, a FROM t5 WHERE rowid>5.5
+----
+stmt 0 err 1 -1 40 no such table: t5
+==== rowid-10.3.2
+SELECT rowid, a FROM t5 WHERE rowid>5.0
+----
+stmt 0 err 1 -1 40 no such table: t5
+==== rowid-10.5
+SELECT rowid, a FROM t5 WHERE 5.5<=rowid
+----
+stmt 0 err 1 -1 41 no such table: t5
+==== rowid-10.6
+SELECT rowid, a FROM t5 WHERE 5.5<rowid
+----
+stmt 0 err 1 -1 40 no such table: t5
+==== rowid-10.7
+SELECT rowid, a FROM t5 WHERE rowid<=5.5
+----
+stmt 0 err 1 -1 41 no such table: t5
+==== rowid-10.8
+SELECT rowid, a FROM t5 WHERE rowid<5.5
+----
+stmt 0 err 1 -1 40 no such table: t5
+==== rowid-10.9
+SELECT rowid, a FROM t5 WHERE 5.5>=rowid
+----
+stmt 0 err 1 -1 41 no such table: t5
+==== rowid-10.10
+SELECT rowid, a FROM t5 WHERE 5.5>rowid
+----
+stmt 0 err 1 -1 40 no such table: t5
+==== rowid-10.11
+SELECT rowid, a FROM t5 WHERE rowid>=5.5 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 61 no such table: t5
+==== rowid-10.11.2
+SELECT rowid, a FROM t5 WHERE rowid>=5.0 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 61 no such table: t5
+==== rowid-10.12
+SELECT rowid, a FROM t5 WHERE rowid>5.5 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 60 no such table: t5
+==== rowid-10.12.2
+SELECT rowid, a FROM t5 WHERE rowid>5.0 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 60 no such table: t5
+==== rowid-10.13
+SELECT rowid, a FROM t5 WHERE 5.5<=rowid ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 61 no such table: t5
+==== rowid-10.14
+SELECT rowid, a FROM t5 WHERE 5.5<rowid ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 60 no such table: t5
+==== rowid-10.15
+SELECT rowid, a FROM t5 WHERE rowid<=5.5 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 61 no such table: t5
+==== rowid-10.16
+SELECT rowid, a FROM t5 WHERE rowid<5.5 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 60 no such table: t5
+==== rowid-10.17
+SELECT rowid, a FROM t5 WHERE 5.5>=rowid ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 61 no such table: t5
+==== rowid-10.18
+SELECT rowid, a FROM t5 WHERE 5.5>rowid ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 60 no such table: t5
+==== rowid-10.30
+
+    CREATE TABLE t6(a);
+    INSERT INTO t6(rowid,a) SELECT -a,a FROM t5;
+    SELECT rowid, * FROM t6;
+----
+stmt 0 ok
+stmt 24 err 1 -1 73 no such table: t6
+stmt 73 err 1 -1 102 no such table: t6
+==== rowid-10.31.1
+SELECT rowid, a FROM t6 WHERE rowid>=-5.5
+----
+stmt 0 err 1 -1 42 no such table: t6
+==== rowid-10.31.2
+SELECT rowid, a FROM t6 WHERE rowid>=-5.0
+----
+stmt 0 err 1 -1 42 no such table: t6
+==== rowid-10.32.1
+SELECT rowid, a FROM t6 WHERE rowid>=-5.5 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 62 no such table: t6
+==== rowid-10.32.1.dup1
+SELECT rowid, a FROM t6 WHERE rowid>=-5.0 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 62 no such table: t6
+==== rowid-10.33
+SELECT rowid, a FROM t6 WHERE -5.5<=rowid
+----
+stmt 0 err 1 -1 42 no such table: t6
+==== rowid-10.34
+SELECT rowid, a FROM t6 WHERE -5.5<=rowid ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 62 no such table: t6
+==== rowid-10.35.1
+SELECT rowid, a FROM t6 WHERE rowid>-5.5
+----
+stmt 0 err 1 -1 41 no such table: t6
+==== rowid-10.35.2
+SELECT rowid, a FROM t6 WHERE rowid>-5.0
+----
+stmt 0 err 1 -1 41 no such table: t6
+==== rowid-10.36.1
+SELECT rowid, a FROM t6 WHERE rowid>-5.5 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 61 no such table: t6
+==== rowid-10.36.2
+SELECT rowid, a FROM t6 WHERE rowid>-5.0 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 61 no such table: t6
+==== rowid-10.37
+SELECT rowid, a FROM t6 WHERE -5.5<rowid
+----
+stmt 0 err 1 -1 41 no such table: t6
+==== rowid-10.38
+SELECT rowid, a FROM t6 WHERE -5.5<rowid ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 61 no such table: t6
+==== rowid-10.39
+SELECT rowid, a FROM t6 WHERE rowid<=-5.5
+----
+stmt 0 err 1 -1 42 no such table: t6
+==== rowid-10.40
+SELECT rowid, a FROM t6 WHERE rowid<=-5.5 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 62 no such table: t6
+==== rowid-10.41
+SELECT rowid, a FROM t6 WHERE -5.5>=rowid
+----
+stmt 0 err 1 -1 42 no such table: t6
+==== rowid-10.42
+SELECT rowid, a FROM t6 WHERE -5.5>=rowid ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 62 no such table: t6
+==== rowid-10.43
+SELECT rowid, a FROM t6 WHERE rowid<-5.5
+----
+stmt 0 err 1 -1 41 no such table: t6
+==== rowid-10.44
+SELECT rowid, a FROM t6 WHERE rowid<-5.5 ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 61 no such table: t6
+==== rowid-10.44.dup1
+SELECT rowid, a FROM t6 WHERE -5.5>rowid
+----
+stmt 0 err 1 -1 41 no such table: t6
+==== rowid-10.46
+SELECT rowid, a FROM t6 WHERE -5.5>rowid ORDER BY rowid DESC
+----
+stmt 0 err 1 -1 61 no such table: t6
+==== rowid-11.1
+SELECT rowid, a FROM t5 WHERE rowid>'abc'
+----
+stmt 0 err 1 -1 42 no such table: t5
+==== rowid-11.2
+SELECT rowid, a FROM t5 WHERE rowid>='abc'
+----
+stmt 0 err 1 -1 43 no such table: t5
+==== rowid-11.3
+SELECT rowid, a FROM t5 WHERE rowid<'abc'
+----
+stmt 0 err 1 -1 42 no such table: t5
+==== rowid-11.4
+SELECT rowid, a FROM t5 WHERE rowid<='abc'
+----
+stmt 0 err 1 -1 43 no such table: t5
+==== rowid-11.asc.1
+SELECT rowid, a FROM t5 WHERE rowid>'abc' ORDER BY 1 ASC
+----
+stmt 0 err 1 -1 57 no such table: t5
+==== rowid-11.asc.2
+SELECT rowid, a FROM t5 WHERE rowid>='abc' ORDER BY 1 ASC
+----
+stmt 0 err 1 -1 58 no such table: t5
+==== rowid-11.asc.3
+SELECT rowid, a FROM t5 WHERE rowid<'abc' ORDER BY 1 ASC
+----
+stmt 0 err 1 -1 57 no such table: t5
+==== rowid-11.asc.4
+SELECT rowid, a FROM t5 WHERE rowid<='abc' ORDER BY 1 ASC
+----
+stmt 0 err 1 -1 58 no such table: t5
+==== rowid-11.desc.1
+SELECT rowid, a FROM t5 WHERE rowid>'abc' ORDER BY 1 DESC
+----
+stmt 0 err 1 -1 58 no such table: t5
+==== rowid-11.desc.2
+SELECT rowid, a FROM t5 WHERE rowid>='abc' ORDER BY 1 DESC
+----
+stmt 0 err 1 -1 59 no such table: t5
+==== rowid-11.desc.3
+SELECT rowid, a FROM t5 WHERE rowid<'abc' ORDER BY 1 DESC
+----
+stmt 0 err 1 -1 58 no such table: t5
+==== rowid-11.desc.4
+SELECT rowid, a FROM t5 WHERE rowid<='abc' ORDER BY 1 DESC
+----
+stmt 0 err 1 -1 59 no such table: t5
+==== rowid-12.1
+
+    CREATE TABLE t7(x INTEGER PRIMARY KEY, y);
+    CREATE TABLE t7temp(a INTEGER PRIMARY KEY);
+    INSERT INTO t7 VALUES(9223372036854775807,'a');
+    SELECT y FROM t7;
+----
+stmt 0 ok
+stmt 47 ok
+stmt 95 err 1 -1 147 no such table: t7
+stmt 147 err 1 -1 169 no such table: t7
+==== rowid-13.1
+
+  CREATE TABLE t13(x);
+  INSERT INTO t13(rowid,x) VALUES(1234,5);
+  SELECT rowid, x, addrow(rowid+1000), '|' FROM t13 LIMIT 3;
+  SELECT last_insert_rowid();
+----
+stmt 0 ok
+stmt 23 err 1 -1 66 no such table: t13
+stmt 66 err 1 -1 127 no such table: t13
+stmt 127 ok
+==== rowid-14.0
+
+  CREATE TABLE t14(x INTEGER PRIMARY KEY);
+  INSERT INTO t14(x) VALUES (100);
+----
+stmt 0 ok
+stmt 43 err 1 -1 78 no such table: t14
+==== rowid-14.1
+
+  SELECT * FROM t14 WHERE x < 'a' ORDER BY rowid ASC;
+----
+stmt 0 err 1 -1 54 no such table: t14
+==== rowid-14.2
+
+  SELECT * FROM t14 WHERE x < 'a' ORDER BY rowid DESC;
+----
+stmt 0 err 1 -1 55 no such table: t14
+==== rowid-14.3
+
+  DELETE FROM t14;
+  SELECT * FROM t14 WHERE x < 'a' ORDER BY rowid ASC;
+----
+stmt 0 err 1 -1 19 no such table: t14
+stmt 19 err 1 -1 73 no such table: t14
+==== rowid-14.4
+
+  SELECT * FROM t14 WHERE x < 'a' ORDER BY rowid DESC;
+----
+stmt 0 err 1 -1 55 no such table: t14
+==== rowid-15.0
+
+  PRAGMA reverse_unordered_selects=true;
+  CREATE TABLE t1 (c0, c1);
+  CREATE TABLE t2 (c0 INT UNIQUE);
+  INSERT INTO t1(c0, c1) VALUES (0, 0), (0, NULL);
+  INSERT INTO t2(c0) VALUES (1);
+----
+stmt 0 ok
+stmt 41 ok
+stmt 69 ok
+stmt 104 err 1 -1 155 no such table: t1
+stmt 155 err 1 -1 188 no such table: t2
+==== rowid-15.1
+
+  SELECT t2.c0, t1.c1 FROM t1, t2 
+  WHERE (t2.rowid <= 'a') OR (t1.c0 <= t2.c0) LIMIT 100
+----
+stmt 0 err 1 -1 92 no such table: t1
+==== rowid-15.2
+
+  SELECT 1, NULL INTERSECT SELECT * FROM (
+      SELECT t2.c0, t1.c1 FROM t1, t2
+      WHERE ((t2.rowid <= 'a')) OR (t1.c0 <= t2.c0) ORDER BY 'a' DESC LIMIT 100
+  );
+----
+stmt 0 err 1 -1 166 no such table: t1
+==== 16.0
+
+  CREATE TABLE t1(x);
+  CREATE TABLE t2(y PRIMARY KEY) WITHOUT ROWID;
+  CREATE VIEW v1 AS SELECT x FROM t1;
+  CREATE TABLE t3(z);
+
+  INSERT INTO t1(rowid, x) VALUES(1, 1);
+  INSERT INTO t2(y) VALUES(2);
+  INSERT INTO t3(rowid, z) VALUES(3, 3);
+----
+stmt 0 ok
+stmt 22 ok
+stmt 70 ok
+stmt 108 ok
+stmt 130 err 1 -1 172 no such table: t1
+stmt 172 err 1 -1 203 no such table: t2
+stmt 203 err 1 -1 244 no such table: t3
+==== 16.1
+ SELECT rowid FROM t1, t2;
+----
+stmt 0 err 1 -1 26 no such table: t1
+==== 16.2
+ SELECT rowid FROM t1, v1;
+----
+stmt 0 err 1 -1 26 no such table: t1
+==== 16.3
+ SELECT rowid FROM t3, v1;
+----
+stmt 0 err 1 -1 26 no such table: t3
+==== 16.4
+ SELECT rowid FROM t3, (SELECT 123);
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== 16.5
+ SELECT rowid FROM t2, t1;
+----
+stmt 0 err 1 -1 26 no such table: t2
+==== 16.6
+ SELECT rowid FROM v1, t1;
+----
+stmt 0 err 1 -1 26 no such table: v1
+==== 16.7
+ SELECT rowid FROM v1, t3;
+----
+stmt 0 err 1 -1 26 no such table: v1
+==== 16.8
+ SELECT rowid FROM (SELECT 123), t3;
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== 16.1.dup1
+ SELECT rowid FROM t1, t2;
+----
+stmt 0 err 1 -1 26 no such table: t1
+==== 16.2.dup1
+ SELECT rowid FROM t1, v1;
+----
+stmt 0 err 1 -1 26 no such table: t1
+==== 16.3.dup1
+ SELECT rowid FROM t3, v1;
+----
+stmt 0 err 1 -1 26 no such table: t3
+==== 16.4.dup1
+ SELECT rowid FROM t3, (SELECT 123);
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== 16.5.dup1
+ SELECT rowid FROM t2, t1;
+----
+stmt 0 err 1 -1 26 no such table: t2
+==== 16.6.dup1
+ SELECT rowid FROM v1, t1;
+----
+stmt 0 err 1 -1 26 no such table: v1
+==== 16.7.dup1
+ SELECT rowid FROM v1, t3;
+----
+stmt 0 err 1 -1 26 no such table: v1
+==== 16.8.dup1
+ SELECT rowid FROM (SELECT 123), t3;
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== 16.9
+ 
+  SELECT rowid FROM t1, t3;
+----
+stmt 0 err 1 -1 29 no such table: t1

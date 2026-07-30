@@ -1,0 +1,365 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, 'f');
+  INSERT INTO t1 VALUES(2, 'e');
+  INSERT INTO t1 VALUES(3, 'd');
+  INSERT INTO t1 VALUES(4, 'c');
+  INSERT INTO t1 VALUES(5, 'b');
+  INSERT INTO t1 VALUES(6, 'a');
+
+  CREATE VIEW v1 AS SELECT a,b FROM t1;
+  CREATE TABLE log(op, a);
+
+  CREATE TRIGGER v1del INSTEAD OF DELETE ON v1 BEGIN
+    INSERT INTO log VALUES('delete', old.a);
+  END;
+
+  CREATE TRIGGER v1upd INSTEAD OF UPDATE ON v1 BEGIN
+    INSERT INTO log VALUES('update', old.a);
+  END;
+----
+stmt 0 ok
+stmt 25 err 1 -1 58 no such table: t1
+stmt 58 err 1 -1 91 no such table: t1
+stmt 91 err 1 -1 124 no such table: t1
+stmt 124 err 1 -1 157 no such table: t1
+stmt 157 err 1 -1 190 no such table: t1
+stmt 190 err 1 -1 223 no such table: t1
+stmt 223 ok
+stmt 264 ok
+stmt 291 err 1 -1 345 no such table: main.v1
+stmt 397 err 1 -1 451 no such table: main.v1
+==== 1.1
+
+  DELETE FROM v1 ORDER BY a LIMIT 3;
+  SELECT * FROM log; DELETE FROM log;
+----
+stmt 0 err 1 18 23 near "ORDER": syntax error
+stmt 37 err 1 -1 58 no such table: log
+stmt 58 err 1 -1 75 no such table: log
+==== 1.2
+
+  DELETE FROM v1 ORDER BY b LIMIT 3;
+  SELECT * FROM log; DELETE FROM log;
+----
+stmt 0 err 1 18 23 near "ORDER": syntax error
+stmt 37 err 1 -1 58 no such table: log
+stmt 58 err 1 -1 75 no such table: log
+==== 1.3
+
+  UPDATE v1 SET b = 555 ORDER BY a LIMIT 3;
+  SELECT * FROM log; DELETE FROM log;
+----
+stmt 0 err 1 25 30 near "ORDER": syntax error
+stmt 44 err 1 -1 65 no such table: log
+stmt 65 err 1 -1 82 no such table: log
+==== 1.4
+
+  UPDATE v1 SET b = 555 ORDER BY b LIMIT 3;
+  SELECT * FROM log; DELETE FROM log;
+----
+stmt 0 err 1 25 30 near "ORDER": syntax error
+stmt 44 err 1 -1 65 no such table: log
+stmt 65 err 1 -1 82 no such table: log
+==== 2.1.0
+
+  CREATE TABLE t2(a, b, c, PRIMARY KEY(a, b)) WITHOUT ROWID;
+  INSERT INTO t2 VALUES(1, 1, 'h');
+  INSERT INTO t2 VALUES(1, 2, 'g');
+  INSERT INTO t2 VALUES(2, 1, 'f');
+  INSERT INTO t2 VALUES(2, 2, 'e');
+  INSERT INTO t2 VALUES(3, 1, 'd');
+  INSERT INTO t2 VALUES(3, 2, 'c');
+  INSERT INTO t2 VALUES(4, 1, 'b');
+  INSERT INTO t2 VALUES(4, 2, 'a');
+----
+stmt 0 ok
+stmt 61 err 1 -1 97 no such table: t2
+stmt 97 err 1 -1 133 no such table: t2
+stmt 133 err 1 -1 169 no such table: t2
+stmt 169 err 1 -1 205 no such table: t2
+stmt 205 err 1 -1 241 no such table: t2
+stmt 241 err 1 -1 277 no such table: t2
+stmt 277 err 1 -1 313 no such table: t2
+stmt 313 err 1 -1 349 no such table: t2
+==== 2.1.1
+
+  BEGIN;
+    DELETE FROM t2 WHERE b=1 ORDER BY c LIMIT 2;
+    SELECT c FROM t2 ORDER BY 1;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 39 44 near "ORDER": syntax error
+stmt 58 err 1 -1 91 no such table: t2
+stmt 91 ok
+==== 2.1.2
+
+  BEGIN;
+    UPDATE t2 SET c=NULL ORDER BY a, b DESC LIMIT 3 OFFSET 1;
+    SELECT a, b, c FROM t2;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 35 40 near "ORDER": syntax error
+stmt 71 err 1 -1 99 no such table: t2
+stmt 99 ok
+==== 2.2.0
+
+  DROP TABLE t2;
+  CREATE TABLE t2(a INTEGER PRIMARY KEY, b, c) WITHOUT ROWID;
+  INSERT INTO t2 VALUES(1, 1, 'h');
+  INSERT INTO t2 VALUES(2, 2, 'g');
+  INSERT INTO t2 VALUES(3, 1, 'f');
+  INSERT INTO t2 VALUES(4, 2, 'e');
+  INSERT INTO t2 VALUES(5, 1, 'd');
+  INSERT INTO t2 VALUES(6, 2, 'c');
+  INSERT INTO t2 VALUES(7, 1, 'b');
+  INSERT INTO t2 VALUES(8, 2, 'a');
+----
+stmt 0 err 1 -1 17 no such table: t2
+stmt 17 ok
+stmt 79 err 1 -1 115 no such table: t2
+stmt 115 err 1 -1 151 no such table: t2
+stmt 151 err 1 -1 187 no such table: t2
+stmt 187 err 1 -1 223 no such table: t2
+stmt 223 err 1 -1 259 no such table: t2
+stmt 259 err 1 -1 295 no such table: t2
+stmt 295 err 1 -1 331 no such table: t2
+stmt 331 err 1 -1 367 no such table: t2
+==== 2.2.1
+
+  BEGIN;
+    DELETE FROM t2 WHERE b=1 ORDER BY c LIMIT 2;
+    SELECT c FROM t2 ORDER BY 1;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 39 44 near "ORDER": syntax error
+stmt 58 err 1 -1 91 no such table: t2
+stmt 91 ok
+==== 2.2.2
+
+  BEGIN;
+    UPDATE t2 SET c=NULL ORDER BY a DESC LIMIT 3 OFFSET 1;
+    SELECT a, b, c FROM t2;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 35 40 near "ORDER": syntax error
+stmt 68 err 1 -1 96 no such table: t2
+stmt 96 ok
+==== 3.0
+
+    CREATE VIRTUAL TABLE ft USING fts5(x);
+    INSERT INTO ft(rowid, x) VALUES(-45,   'a a');
+    INSERT INTO ft(rowid, x) VALUES(12,    'a b');
+    INSERT INTO ft(rowid, x) VALUES(444,   'a c');
+    INSERT INTO ft(rowid, x) VALUES(12300, 'a d');
+    INSERT INTO ft(rowid, x) VALUES(25400, 'a c');
+    INSERT INTO ft(rowid, x) VALUES(25401, 'a b');
+    INSERT INTO ft(rowid, x) VALUES(50000, 'a a');
+----
+stmt 0 ok
+stmt 43 err 1 -1 94 no such table: ft
+stmt 94 err 1 -1 145 no such table: ft
+stmt 145 err 1 -1 196 no such table: ft
+stmt 196 err 1 -1 247 no such table: ft
+stmt 247 err 1 -1 298 no such table: ft
+stmt 298 err 1 -1 349 no such table: ft
+stmt 349 err 1 -1 400 no such table: ft
+==== 3.1.1
+
+    BEGIN;
+      DELETE FROM ft ORDER BY rowid LIMIT 3;
+      SELECT x FROM ft;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 33 38 near "ORDER": syntax error
+stmt 56 err 1 -1 80 no such table: ft
+stmt 80 ok
+==== 3.1.2
+
+    BEGIN;
+      DELETE FROM ft WHERE ft MATCH 'a' ORDER BY rowid LIMIT 3;
+      SELECT x FROM ft;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 52 57 near "ORDER": syntax error
+stmt 75 err 1 -1 99 no such table: ft
+stmt 99 ok
+==== 3.1.3
+
+    BEGIN;
+      DELETE FROM ft WHERE ft MATCH 'b' ORDER BY rowid ASC LIMIT 1 OFFSET 1;
+      SELECT rowid FROM ft;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 52 57 near "ORDER": syntax error
+stmt 88 err 1 -1 116 no such table: ft
+stmt 116 ok
+==== 3.2.1
+
+    BEGIN;
+      UPDATE ft SET x='hello' ORDER BY rowid LIMIT 2 OFFSET 2;
+      SELECT x FROM ft;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 42 47 near "ORDER": syntax error
+stmt 74 err 1 -1 98 no such table: ft
+stmt 98 ok
+==== 3.2.2
+
+    BEGIN;
+      UPDATE ft SET x='hello' WHERE ft MATCH 'a' 
+          ORDER BY rowid DESC LIMIT 2 OFFSET 2;
+      SELECT x FROM ft;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 72 77 near "ORDER": syntax error
+stmt 109 err 1 -1 133 no such table: ft
+stmt 133 ok
+==== 4.0
+
+  CREATE TABLE x1(a INTEGER PRIMARY KEY, b, c, d);
+  CREATE INDEX x1bc ON x1(b, c);
+  INSERT INTO x1 VALUES(1,1,1,1);
+  INSERT INTO x1 VALUES(2,1,2,2);
+  INSERT INTO x1 VALUES(3,2,1,3);
+  INSERT INTO x1 VALUES(4,2,2,3);
+  INSERT INTO x1 VALUES(5,3,1,2);
+  INSERT INTO x1 VALUES(6,3,2,1);
+----
+stmt 0 ok
+stmt 51 err 1 -1 84 no such table: main.x1
+stmt 84 err 1 -1 118 no such table: x1
+stmt 118 err 1 -1 152 no such table: x1
+stmt 152 err 1 -1 186 no such table: x1
+stmt 186 err 1 -1 220 no such table: x1
+stmt 220 err 1 -1 254 no such table: x1
+stmt 254 err 1 -1 288 no such table: x1
+==== 4.1
+
+  BEGIN;
+    DELETE FROM x1 ORDER BY a LIMIT 2;
+    SELECT a FROM x1;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 29 34 near "ORDER": syntax error
+stmt 48 err 1 -1 70 no such table: x1
+stmt 70 ok
+==== 4.3
+
+  DELETE FROM x1 INDEXED BY x1bc WHERE b=3 LIMIT 1;
+  SELECT a FROM x1;
+----
+stmt 0 err 1 44 49 near "LIMIT": syntax error
+stmt 52 err 1 -1 72 no such table: x1
+==== 4.5
+
+  UPDATE x1 INDEXED BY x1bc SET d=5 WHERE b=2 LIMIT 1;
+  SELECT a, d FROM x1;
+----
+stmt 0 err 1 47 52 near "LIMIT": syntax error
+stmt 55 err 1 -1 78 no such table: x1
+==== 5.0
+
+  CREATE TABLE "x y"("a b" PRIMARY KEY, "c d") WITHOUT ROWID;
+  CREATE INDEX xycd ON "x y"("c d");
+
+  INSERT INTO "x y" VALUES('a', 'a');
+  INSERT INTO "x y" VALUES('b', 'b');
+  INSERT INTO "x y" VALUES('c', 'c');
+  INSERT INTO "x y" VALUES('d', 'd');
+  INSERT INTO "x y" VALUES('e', 'a');
+  INSERT INTO "x y" VALUES('f', 'b');
+  INSERT INTO "x y" VALUES('g', 'c');
+  INSERT INTO "x y" VALUES('h', 'd');
+----
+stmt 0 ok
+stmt 62 err 1 -1 99 no such table: main.x y
+stmt 99 err 1 -1 138 no such table: x y
+stmt 138 err 1 -1 176 no such table: x y
+stmt 176 err 1 -1 214 no such table: x y
+stmt 214 err 1 -1 252 no such table: x y
+stmt 252 err 1 -1 290 no such table: x y
+stmt 290 err 1 -1 328 no such table: x y
+stmt 328 err 1 -1 366 no such table: x y
+stmt 366 err 1 -1 404 no such table: x y
+==== 5.1
+
+  BEGIN;
+    DELETE FROM "x y" WHERE "c d"!='e' ORDER BY "c d" LIMIT 2 OFFSET 2;
+    SELECT * FROM "x y" ORDER BY 1;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 49 54 near "ORDER": syntax error
+stmt 81 err 1 -1 117 no such table: x y
+stmt 117 ok
+==== 5.2
+
+  BEGIN;
+    UPDATE "x y" SET "c d"='e' WHERE "c d"!='e' ORDER BY "c d" LIMIT 2 OFFSET 2;
+    SELECT * FROM "x y" ORDER BY 1;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 58 63 near "ORDER": syntax error
+stmt 90 err 1 -1 126 no such table: x y
+stmt 126 ok
+==== 5.3
+
+  CREATE VIEW "v w" AS SELECT * FROM "x y";
+  CREATE TRIGGER tr1 INSTEAD OF DELETE ON "v w" BEGIN
+    SELECT log(old."a b", old."c d");
+  END;
+  CREATE TRIGGER tr2 INSTEAD OF UPDATE ON "v w" BEGIN
+    SELECT log(new."a b", new."c d");
+  END;
+----
+stmt 0 ok
+stmt 44 err 1 -1 98 no such table: main.v w
+stmt 143 err 1 -1 197 no such table: main.v w
+==== 6.0
+
+  CREATE TABLE t2(x);  
+  INSERT INTO t2(x) VALUES(1),(2),(3),(5),(8),(13);
+----
+stmt 0 ok
+stmt 22 err 1 -1 76 no such table: t2
+==== 6.1
+
+  WITH t2 AS MATERIALIZED (VALUES(5))
+  DELETE FROM t2 ORDER BY rank()OVER() LIMIT 2;
+----
+stmt 0 err 1 56 61 near "ORDER": syntax error
+==== 6.2
+
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 20 no such table: t2
+==== 7.0
+
+  CREATE TABLE t1(a INT); INSERT INTO t1(a) VALUES(0);
+----
+stmt 0 ok
+stmt 26 err 1 -1 55 no such table: t1
+==== 7.1
+
+  WITH t1(b) AS (SELECT * FROM (SELECT * FROM (VALUES(2))))
+  UPDATE t1 SET a=3 LIMIT 1;
+----
+stmt 0 err 1 81 86 near "LIMIT": syntax error
+==== 7.2
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1

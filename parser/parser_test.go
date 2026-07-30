@@ -76,9 +76,8 @@ func runFile(t *testing.T, path string) {
 
 // runCase checks one corpus case against the oracle-derived expectation:
 // meyer must accept exactly when SQLite's parser accepted, and must produce
-// the identical message on rejection. (Error offsets are recorded in the
-// corpus but not asserted yet; they become part of this check once the
-// parser tracks positions.)
+// the identical message and byte offset on rejection. SQLite reports -1 from
+// sqlite3_error_offset for errors it cannot place, and those are not checked.
 func runCase(c testfile.Case) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -107,6 +106,10 @@ func runCase(c testfile.Case) error {
 	}
 	if pe.Message != exp.Message {
 		return fmt.Errorf("error message mismatch:\n  got:  %s\n  want: %s", pe.Message, exp.Message)
+	}
+	if exp.Offset >= 0 && pe.Offset != exp.Offset {
+		return fmt.Errorf("error offset mismatch for %s: got %d, want %d",
+			exp.Message, pe.Offset, exp.Offset)
 	}
 	return nil
 }

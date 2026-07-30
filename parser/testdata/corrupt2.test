@@ -1,0 +1,48 @@
+==== corrupt2-1.1
+
+    PRAGMA auto_vacuum=0;
+    PRAGMA page_size=1024;
+    CREATE TABLE abc(a, b, c);
+----
+stmt 0 ok
+stmt 26 ok
+stmt 53 ok
+==== corrupt2-13.3
+ DELETE FROM t1 WHERE rowid < 30;
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 14.0
+
+  PRAGMA auto_vacuum = 0;
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(randomblob(3500));
+  DELETE FROM t1;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 48 err 1 -1 91 no such table: t1
+stmt 91 err 1 -1 109 no such table: t1
+==== 14.1
+
+  PRAGMA integrity_check;
+  PRAGMA freelist_count;
+----
+stmt 0 ok
+stmt 26 ok
+==== 14.3
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== 14.4
+
+  INSERT INTO t1 VALUES(randomblob(2500));
+  PRAGMA freelist_count;
+----
+stmt 0 err 1 -1 43 no such table: t1
+stmt 43 ok
+==== 14.5
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok

@@ -1,0 +1,5 @@
+==== 2.0
+
+  CREATE TABLE t1(a);
+----
+stmt 0 ok

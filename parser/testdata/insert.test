@@ -1,0 +1,448 @@
+==== insert-3.1
+
+    DELETE FROM test2;
+    CREATE INDEX index9 ON test2(f1,f2);
+    CREATE INDEX indext ON test2(f4,f5);
+    SELECT * from test2;
+----
+stmt 0 err 1 -1 23 no such table: test2
+stmt 23 err 1 -1 64 no such table: main.test2
+stmt 64 err 1 -1 105 no such table: main.test2
+stmt 105 err 1 -1 130 no such table: test2
+==== insert-3.4
+SELECT * FROM test2 WHERE f1=22 AND f2=-4.44
+----
+stmt 0 err 1 -1 45 no such table: test2
+==== insert-4.1
+
+    CREATE TABLE t3(a,b,c);
+    INSERT INTO t3 VALUES(1+2+3,4,5);
+    SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 28 err 1 -1 66 no such table: t3
+stmt 66 err 1 -1 88 no such table: t3
+==== insert-4.3
+
+      INSERT INTO t3 VALUES((SELECT max(a) FROM t3)+1,t3.a,6);
+      SELECT * FROM t3 ORDER BY a;
+----
+stmt 0 err 1 -1 63 no such table: t3
+stmt 63 err 1 -1 98 no such table: t3
+==== insert-4.5
+
+    SELECT b,c FROM t3 WHERE a IS NULL;
+----
+stmt 0 err 1 -1 40 no such table: t3
+==== insert-4.6
+
+    INSERT INTO t3 VALUES(notafunc(2,3),2,3);
+----
+stmt 0 err 1 -1 46 no such table: t3
+==== insert-4.7
+
+    INSERT INTO t3 VALUES(min(1,2,3),max(1,2,3),99);
+    SELECT * FROM t3 WHERE c=99;
+----
+stmt 0 err 1 -1 53 no such table: t3
+stmt 53 err 1 -1 86 no such table: t3
+==== insert-5.1
+
+      CREATE TEMP TABLE t4(x);
+      INSERT INTO t4 VALUES(1);
+      SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 31 err 1 -1 63 no such table: t4
+stmt 63 err 1 -1 87 no such table: t4
+==== insert-5.2
+
+      INSERT INTO t4 SELECT x+1 FROM t4;
+      SELECT * FROM t4;
+----
+stmt 0 err 1 -1 41 no such table: t4
+stmt 41 err 1 -1 65 no such table: t4
+==== insert-6.1
+
+      CREATE TABLE t1(a INTEGER PRIMARY KEY, b UNIQUE);
+      INSERT INTO t1 VALUES(1,2);
+      INSERT INTO t1 VALUES(2,3);
+      SELECT b FROM t1 WHERE b=2;
+----
+stmt 0 ok
+stmt 56 err 1 -1 90 no such table: t1
+stmt 90 err 1 -1 124 no such table: t1
+stmt 124 err 1 -1 158 no such table: t1
+==== insert-6.2
+
+      REPLACE INTO t1 VALUES(1,4);
+      SELECT b FROM t1 WHERE b=2;
+----
+stmt 0 err 1 -1 35 no such table: t1
+stmt 35 err 1 -1 69 no such table: t1
+==== insert-6.3
+
+      UPDATE OR REPLACE t1 SET a=2 WHERE b=4;
+      SELECT * FROM t1 WHERE b=4;
+----
+stmt 0 err 1 -1 46 no such table: t1
+stmt 46 err 1 -1 80 no such table: t1
+==== insert-6.4
+
+      SELECT * FROM t1 WHERE b=3;
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== insert-6.6
+
+      DROP TABLE t1;
+----
+stmt 0 err 1 -1 21 no such table: t1
+==== insert-7.1
+
+    CREATE TABLE t1(a);
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(2);
+    CREATE INDEX i1 ON t1(a);
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t1
+stmt 54 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 114 no such table: main.t1
+==== insert-7.2
+
+    INSERT INTO t1 SELECT max(a) FROM t1;
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== insert-7.3
+
+    SELECT a FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== insert-8.1
+
+      INSERT INTO t3 SELECT * FROM (SELECT * FROM t3 UNION ALL SELECT 1,2,3)
+----
+stmt 0 err 1 -1 78 no such table: t3
+==== insert-9.1
+
+    CREATE TABLE t5(x);
+    INSERT INTO t5 VALUES(1);
+    INSERT INTO t5 VALUES(2);
+    INSERT INTO t5 VALUES(3);
+    INSERT INTO t5(rowid, x) SELECT nullif(x*2+10,14), x+100 FROM t5;
+    SELECT rowid, x FROM t5;
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t5
+stmt 54 err 1 -1 84 no such table: t5
+stmt 84 err 1 -1 114 no such table: t5
+stmt 114 err 1 -1 184 no such table: t5
+stmt 184 err 1 -1 213 no such table: t5
+==== insert-9.2
+
+    CREATE TABLE t6(x INTEGER PRIMARY KEY, y);
+    INSERT INTO t6 VALUES(1,1);
+    INSERT INTO t6 VALUES(2,2);
+    INSERT INTO t6 VALUES(3,3);
+    INSERT INTO t6 SELECT nullif(y*2+10,14), y+100 FROM t6;
+    SELECT x, y FROM t6;
+----
+stmt 0 ok
+stmt 47 err 1 -1 79 no such table: t6
+stmt 79 err 1 -1 111 no such table: t6
+stmt 111 err 1 -1 143 no such table: t6
+stmt 143 err 1 -1 203 no such table: t6
+stmt 203 err 1 -1 228 no such table: t6
+==== insert-10.1
+
+      CREATE TABLE t10(a,b,c);
+      INSERT INTO t10 VALUES(1,2,3), (4,5,6), (7,8,9);
+      SELECT * FROM t10;
+----
+stmt 0 ok
+stmt 31 err 1 -1 86 no such table: t10
+stmt 86 err 1 -1 111 no such table: t10
+==== insert-10.2
+
+      INSERT INTO t10 VALUES(11,12,13), (14,15), (16,17,28);
+----
+stmt 0 err 1 -1 49 all VALUES must have the same number of terms
+==== insert-11.1
+
+  CREATE TABLE t11a AS SELECT '123456789' AS x;
+  CREATE TABLE t11b (a INTEGER PRIMARY KEY, b, c);
+  INSERT INTO t11b SELECT x, x, x FROM t11a;
+  SELECT quote(a), quote(b), quote(c) FROM t11b;
+----
+stmt 0 ok
+stmt 48 ok
+stmt 99 err 1 -1 144 no such table: t11b
+stmt 144 err 1 -1 193 no such table: t11b
+==== insert-12.1
+
+  CREATE TABLE t12a(a,b,c,d,e,f,g);
+  INSERT INTO t12a VALUES(101,102,103,104,105,106,107);
+  CREATE TABLE t12b(x);
+  INSERT INTO t12b(x,rowid,x,x,x,x,x) SELECT * FROM t12a;
+  SELECT rowid, x FROM t12b;
+----
+stmt 0 ok
+stmt 36 err 1 -1 92 no such table: t12a
+stmt 92 ok
+stmt 116 err 1 -1 174 no such table: t12b
+stmt 174 err 1 -1 203 no such table: t12b
+==== insert-12.2
+
+  CREATE TABLE tab1( value INTEGER);
+  INSERT INTO tab1 (value, _rowid_) values( 11, 1);
+  INSERT INTO tab1 (value, _rowid_) SELECT 22,999;
+  SELECT * FROM tab1;
+----
+stmt 0 ok
+stmt 37 err 1 -1 89 no such table: tab1
+stmt 89 err 1 -1 140 no such table: tab1
+stmt 140 err 1 -1 162 no such table: tab1
+==== insert-12.3
+
+  CREATE TABLE t12c(a, b DEFAULT 'xyzzy', c);
+  INSERT INTO t12c(a, rowid, c) SELECT 'one', 999, 'two';
+  SELECT * FROM t12c;
+----
+stmt 0 ok
+stmt 46 err 1 -1 104 no such table: t12c
+stmt 104 err 1 -1 126 no such table: t12c
+==== insert-13.1
+
+  DROP TABLE IF EXISTS t13;
+  CREATE TABLE t13(a INTEGER PRIMARY KEY,b UNIQUE);
+  CREATE INDEX t13x1 ON t13(-b=b);
+  INSERT INTO t13 VALUES(1,5),(6,2);
+  REPLACE INTO t13 SELECT b,0 FROM t13;
+  SELECT * FROM t13 ORDER BY +b;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 80 err 1 -1 115 no such table: main.t13
+stmt 115 err 1 -1 152 no such table: t13
+stmt 152 err 1 -1 192 no such table: t13
+stmt 192 err 1 -1 225 no such table: t13
+==== insert-14.1
+
+  DROP TABLE IF EXISTS t14;
+  CREATE TABLE t14(x INTEGER PRIMARY KEY);
+  INSERT INTO t14 VALUES(CASE WHEN 1 THEN null END);
+  SELECT x FROM t14;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 71 err 1 -1 124 no such table: t14
+stmt 124 err 1 -1 145 no such table: t14
+==== insert-15.1
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b TEXT);
+  CREATE INDEX i1 ON t1(b);
+  CREATE TABLE t2(a, b);
+  INSERT INTO t2 VALUES(4, randomblob(31000));
+  INSERT INTO t2 VALUES(4, randomblob(32000));
+  INSERT INTO t2 VALUES(4, randomblob(33000));
+  REPLACE INTO t1 SELECT a, b FROM t2;
+  SELECT a, length(b) FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 104 err 1 -1 132 no such table: main.t1
+stmt 132 ok
+stmt 157 err 1 -1 204 no such table: t2
+stmt 204 err 1 -1 251 no such table: t2
+stmt 251 err 1 -1 298 no such table: t2
+stmt 298 err 1 -1 337 no such table: t1
+stmt 337 err 1 -1 368 no such table: t1
+==== insert-16.1
+
+  PRAGMA recursive_triggers = true;
+  CREATE TABLE t0(c0,c1);
+  CREATE UNIQUE INDEX i0 ON t0(c0);
+  INSERT INTO t0(c0,c1) VALUES(123,1);
+  CREATE TRIGGER tr0 AFTER DELETE ON t0
+  BEGIN
+    INSERT INTO t0 VALUES(123,2);
+  END;
+  REPLACE INTO t0(c0,c1) VALUES(123,3);
+----
+stmt 0 ok
+stmt 36 ok
+stmt 62 err 1 -1 98 no such table: main.t0
+stmt 98 err 1 -1 137 no such table: t0
+stmt 137 err 1 -1 185 no such table: main.t0
+stmt 226 err 1 -1 266 no such table: t0
+==== insert-16.2
+
+  SELECT * FROM t0;
+----
+stmt 0 err 1 -1 20 no such table: t0
+==== insert-16.4
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  CREATE INDEX t1b ON t1(b);
+  INSERT INTO t1 VALUES(1, 'one');
+  CREATE TRIGGER tr3 AFTER DELETE ON t1 BEGIN
+    INSERT INTO t1 VALUES(1, 'three');
+  END;
+  REPLACE INTO t1 VALUES(1, 'two');
+----
+stmt 0 ok
+stmt 45 err 1 -1 74 no such table: main.t1
+stmt 74 err 1 -1 109 no such table: t1
+stmt 109 err 1 -1 155 no such table: main.t1
+stmt 201 err 1 -1 237 no such table: t1
+==== insert-16.6
+
+  PRAGMA foreign_keys = 1;
+  CREATE TABLE p1(a, b UNIQUE);
+  CREATE TABLE c1(c, d REFERENCES p1(b) ON DELETE CASCADE);
+  CREATE TRIGGER tr6 AFTER DELETE ON c1 BEGIN
+    INSERT INTO p1 VALUES(4, 1);
+  END;
+  INSERT INTO p1 VALUES(1, 1);
+  INSERT INTO c1 VALUES(2, 1);
+  REPLACE INTO p1 VALUES(3, 1);2
+----
+stmt 0 ok
+stmt 27 ok
+stmt 59 ok
+stmt 119 err 1 -1 165 no such table: main.c1
+stmt 205 err 1 -1 236 no such table: p1
+stmt 236 err 1 -1 267 no such table: c1
+stmt 267 err 1 -1 299 no such table: p1
+stmt 299 err 1 299 300 near "2": syntax error
+==== insert-17.1
+
+  PRAGMA temp.recursive_triggers = true;
+  DROP TABLE IF EXISTS t0;
+  CREATE TABLE t0(aa, bb);
+  CREATE UNIQUE INDEX t0bb ON t0(bb);
+  CREATE TRIGGER "r17.1" BEFORE DELETE ON t0
+    BEGIN INSERT INTO t0(aa,bb) VALUES(99,1);
+  END;
+  INSERT INTO t0(aa,bb) VALUES(10,20);
+  REPLACE INTO t0(aa,bb) VALUES(30,20);
+----
+stmt 0 ok
+stmt 41 ok
+stmt 68 ok
+stmt 95 err 1 -1 133 no such table: main.t0
+stmt 133 err 1 -1 188 no such table: main.t0
+stmt 231 err 1 -1 270 no such table: t0
+stmt 270 err 1 -1 310 no such table: t0
+==== insert-17.3
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a, b UNIQUE, c UNIQUE);
+  INSERT INTO t1(a,b,c) VALUES(1,1,1),(2,2,2),(3,3,3),(4,4,4);
+  CREATE TRIGGER "r17.3" AFTER DELETE ON t1 WHEN OLD.c<>3 BEGIN
+    INSERT INTO t1(rowid,a,b,c) VALUES(100,100,100,3);
+  END;
+  REPLACE INTO t1(rowid,a,b,c) VALUES(200,1,2,3);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 69 err 1 -1 132 no such table: t1
+stmt 132 err 1 -1 196 no such table: main.t1
+stmt 258 err 1 -1 308 no such table: t1
+==== insert-17.5
+
+  CREATE TABLE t2(a INTEGER PRIMARY KEY, b);
+  CREATE UNIQUE INDEX t2b ON t2(b);
+  INSERT INTO t2(a,b) VALUES(1,1),(2,2),(3,3),(4,4);
+  CREATE TABLE fire(x);
+  CREATE TRIGGER t2r1 AFTER DELETE ON t2 BEGIN
+    INSERT INTO fire VALUES(old.a);
+  END;
+  UPDATE OR REPLACE t2 SET a=4, b=3 WHERE a=1;
+  SELECT *, 'x' FROM t2 ORDER BY a;
+----
+stmt 0 ok
+stmt 45 err 1 -1 81 no such table: main.t2
+stmt 81 err 1 -1 134 no such table: t2
+stmt 134 ok
+stmt 158 err 1 -1 205 no such table: main.t2
+stmt 248 err 1 -1 295 no such table: t2
+stmt 295 err 1 -1 331 no such table: t2
+==== insert-17.6
+
+  SELECT x FROM fire ORDER BY x;
+----
+stmt 0 err 1 -1 33 no such table: fire
+==== insert-17.7
+
+  DELETE FROM t2;
+  DELETE FROM fire;
+  INSERT INTO t2(a,b) VALUES(1,1),(2,2),(3,3),(4,4);
+  UPDATE OR REPLACE t2 SET a=1, b=3 WHERE a=1;
+  SELECT *, 'x' FROM t2 ORDER BY a;
+----
+stmt 0 err 1 -1 18 no such table: t2
+stmt 18 err 1 -1 38 no such table: fire
+stmt 38 err 1 -1 91 no such table: t2
+stmt 91 err 1 -1 138 no such table: t2
+stmt 138 err 1 -1 174 no such table: t2
+==== insert-17.8
+
+  SELECT x FROM fire ORDER BY x;
+----
+stmt 0 err 1 -1 33 no such table: fire
+==== insert-17.10
+
+  CREATE TABLE t3(a INTEGER PRIMARY KEY, b INT, c INT, d INT);
+  CREATE UNIQUE INDEX t3bpi ON t3(b) WHERE c<=d;
+  CREATE UNIQUE INDEX t3d ON t3(d);
+  INSERT INTO t3(a,b,c,d) VALUES(1,1,1,1),(2,1,3,2),(3,4,5,6);
+  CREATE TRIGGER t3r1 AFTER DELETE ON t3 BEGIN
+    SELECT 'hi';
+  END;
+  REPLACE INTO t3(a,b,c,d) VALUES(4,4,8,9);
+----
+stmt 0 ok
+stmt 63 err 1 -1 112 no such table: main.t3
+stmt 112 err 1 -1 148 no such table: main.t3
+stmt 148 err 1 -1 211 no such table: t3
+stmt 211 err 1 -1 258 no such table: main.t3
+stmt 282 err 1 -1 326 no such table: t3
+==== insert-17.11
+
+  SELECT *, 'x' FROM t3 ORDER BY a;
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== insert-17.12
+
+  REPLACE INTO t3(a,b,c,d) VALUES(5,1,11,2);
+  SELECT *, 'x' FROM t3 ORDER BY a;
+----
+stmt 0 err 1 -1 45 no such table: t3
+stmt 45 err 1 -1 81 no such table: t3
+==== insert-17.13
+
+  DELETE FROM t3;
+  INSERT INTO t3(a,b,c,d) VALUES(1,1,1,1),(2,1,3,2),(3,4,5,6);
+  DROP TRIGGER t3r1;
+  CREATE TRIGGER t3r1 AFTER DELETE ON t3 BEGIN
+    INSERT INTO t3(b,c,d) VALUES(old.b,old.c,old.d);
+  END;
+----
+stmt 0 err 1 -1 18 no such table: t3
+stmt 18 err 1 -1 81 no such table: t3
+stmt 81 err 1 -1 102 no such trigger: t3r1
+stmt 102 err 1 -1 149 no such table: main.t3
+==== insert-17.14
+
+  REPLACE INTO t3(a,b,c,d) VALUES(4,4,8,9);
+----
+stmt 0 err 1 -1 44 no such table: t3
+==== insert-17.15
+
+  REPLACE INTO t3(a,b,c,d) VALUES(5,1,11,2);
+----
+stmt 0 err 1 -1 45 no such table: t3

@@ -1,0 +1,52 @@
+==== analyze7-1.1
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE b=123;
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== analyze7-1.2
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE c=2;
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== analyze7-2.1
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE b=123;
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== analyze7-2.2
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE c=2;
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== analyze7-2.3
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE a=123 AND b=123
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== analyze7-3.1
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE b=123;
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== analyze7-3.2.1
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE c=?;
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== analyze7-3.2.2
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE c=2;
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== analyze7-3.2.3
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE c=2;
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== analyze7-3.3
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE a=123 AND b=123
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== analyze7-3.4
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE c=123 AND b=123
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== analyze7-3.5
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE a=123 AND c=123
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== analyze7-3.6
+EXPLAIN QUERY PLAN SELECT * FROM t1 WHERE c=123 AND d=123 AND b=123
+----
+stmt 0 err 1 -1 68 no such table: t1

@@ -1,0 +1,20 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING fts3(x);
+----
+stmt 0 ok
+==== 1.1
+
+  CREATE VIRTUAL TABLE t2 USING fts4(x);
+----
+stmt 0 ok
+==== 2.0
+
+  CREATE VIRTUAL TABLE t1 USING fts4(x);
+----
+stmt 0 ok
+==== 2.1
+
+  CREATE VIRTUAL TABLE t2 USING fts3(x);
+----
+stmt 0 ok

@@ -1,0 +1,7 @@
+==== 0.0
+
+  PRAGMA journal_mode = wal;
+  CREATE TABLE t1(x);
+----
+stmt 0 ok
+stmt 29 ok

@@ -1,0 +1,61 @@
+==== json106-generated
+
+    SELECT count(*)
+      FROM t1, json_tree(j0) AS rt
+     WHERE rt.type NOT IN ('object','array')
+       AND rt.atom IS NOT (j0 ->> rt.fullkey);
+----
+stmt 0 err 1 -1 147 no such table: t1
+==== json106-generated.dup1
+
+    SELECT count(*)
+      FROM t1, json_tree(j5) AS rt
+     WHERE rt.type NOT IN ('object','array')
+       AND rt.atom IS NOT (j0 ->> rt.fullkey);
+----
+stmt 0 err 1 -1 147 no such table: t1
+==== json106-generated.dup2
+
+    DELETE FROM kv;
+    INSERT INTO kv
+      SELECT rt.rowid, rt.fullkey, rt.atom
+        FROM t1, json_tree(j0) AS rt
+       WHERE rt.type NOT IN ('object','array');
+----
+stmt 0 err 1 -1 20 no such table: kv
+stmt 20 err 1 -1 167 no such table: kv
+==== json106-generated.dup3
+
+    SELECT count(*)
+      FROM t1, kv
+     WHERE key NOT LIKE '%]'
+       AND json_remove(j5,key)->>key IS NOT NULL
+----
+stmt 0 err 1 -1 117 no such table: t1
+==== json106-generated.dup4
+
+    SELECT count(*)
+      FROM t1, kv
+     WHERE key NOT LIKE '%]'
+       AND json_insert(json_remove(j5,key),key,val)->>key IS NOT val
+----
+stmt 0 err 1 -1 137 no such table: t1
+==== json106-generated.dup5
+
+    UPDATE t1 SET p=json_patch(j0,j5);
+    SELECT count(*)
+      FROM t1, kv
+     WHERE p->>key IS NOT val
+----
+stmt 0 err 1 -1 39 no such table: t1
+stmt 39 err 1 -1 108 no such table: t1
+==== json106-generated.dup6
+
+    SELECT j0 FROM t1 WHERE json(j0)!=json(json_pretty(j0));
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== json106-generated.dup7
+
+    SELECT j5 FROM t1 WHERE json(j5)!=json(json_pretty(j5));
+----
+stmt 0 err 1 -1 61 no such table: t1

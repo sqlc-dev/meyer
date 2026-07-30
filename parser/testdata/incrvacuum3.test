@@ -1,0 +1,12 @@
+==== incrvacuum3-generated
+PRAGMA integrity_check
+----
+stmt 0 ok
+==== incrvacuum3-generated.dup1
+ PRAGMA freelist_count
+----
+stmt 0 ok
+==== incrvacuum3-generated.dup2
+ SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 25 no such table: t1

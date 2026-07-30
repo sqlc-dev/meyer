@@ -1,0 +1,95 @@
+==== 1.1.0
+
+  CREATE VIRTUAL TABLE xx USING fts3(x);
+  INSERT INTO xx VALUES('A x x x B C x x');
+  INSERT INTO xx VALUES('A B C x B x x C');
+  INSERT INTO xx VALUES('A x x B C x x x');
+----
+stmt 0 ok
+stmt 41 err 1 -1 85 no such table: xx
+stmt 85 err 1 -1 129 no such table: xx
+stmt 129 err 1 -1 173 no such table: xx
+==== 1.1.1
+
+  SELECT oid,extract(offsets(xx), x) FROM xx WHERE xx MATCH 'a OR (b NEAR/1 c)';
+----
+stmt 0 err 1 -1 81 no such table: xx
+==== 1.2
+
+  DELETE FROM xx;
+  INSERT INTO xx VALUES('A x x x B C x x');
+  INSERT INTO xx VALUES('A x x C x x x C');
+  INSERT INTO xx VALUES('A x x B C x x x');
+----
+stmt 0 err 1 -1 18 no such table: xx
+stmt 18 err 1 -1 62 no such table: xx
+stmt 62 err 1 -1 106 no such table: xx
+stmt 106 err 1 -1 150 no such table: xx
+==== 1.2.1
+
+  SELECT oid,extract(offsets(xx), x) FROM xx WHERE xx MATCH 'a OR (b NEAR/1 c)';
+----
+stmt 0 err 1 -1 81 no such table: xx
+==== 1.3
+
+  DELETE FROM xx;
+  INSERT INTO xx(rowid, x) VALUES(1, 'A B C');
+  INSERT INTO xx(rowid, x) VALUES(2, 'A x');
+  INSERT INTO xx(rowid, x) VALUES(3, 'A B C');
+  INSERT INTO xx(rowid, x) VALUES(4, 'A B C x x x x x x x B');
+  INSERT INTO xx(rowid, x) VALUES(5, 'A x x x x x x x x x C');
+  INSERT INTO xx(rowid, x) VALUES(6, 'A x x x x x x x x x x x B');
+  INSERT INTO xx(rowid, x) VALUES(7, 'A B C');
+----
+stmt 0 err 1 -1 18 no such table: xx
+stmt 18 err 1 -1 65 no such table: xx
+stmt 65 err 1 -1 110 no such table: xx
+stmt 110 err 1 -1 157 no such table: xx
+stmt 157 err 1 -1 220 no such table: xx
+stmt 220 err 1 -1 283 no such table: xx
+stmt 283 err 1 -1 350 no such table: xx
+stmt 350 err 1 -1 397 no such table: xx
+==== 1.3.1
+
+  SELECT oid,extract(offsets(xx), x) FROM xx WHERE xx MATCH 'a OR (b NEAR/1 c)';
+----
+stmt 0 err 1 -1 81 no such table: xx
+==== 1.4
+
+  DELETE FROM xx;
+  INSERT INTO xx(rowid, x) VALUES(7, 'A B C');
+  INSERT INTO xx(rowid, x) VALUES(6, 'A x');
+  INSERT INTO xx(rowid, x) VALUES(5, 'A B C');
+  INSERT INTO xx(rowid, x) VALUES(4, 'A B C x x x x x x x B');
+  INSERT INTO xx(rowid, x) VALUES(3, 'A x x x x x x x x x C');
+  INSERT INTO xx(rowid, x) VALUES(2, 'A x x x x x x x x x x x B');
+  INSERT INTO xx(rowid, x) VALUES(1, 'A B C');
+----
+stmt 0 err 1 -1 18 no such table: xx
+stmt 18 err 1 -1 65 no such table: xx
+stmt 65 err 1 -1 110 no such table: xx
+stmt 110 err 1 -1 157 no such table: xx
+stmt 157 err 1 -1 220 no such table: xx
+stmt 220 err 1 -1 283 no such table: xx
+stmt 283 err 1 -1 350 no such table: xx
+stmt 350 err 1 -1 397 no such table: xx
+==== 1.4.1
+
+  SELECT oid,extract(offsets(xx), x) FROM xx WHERE xx MATCH 'a OR (b NEAR/1 c)'
+  ORDER BY docid DESC;
+----
+stmt 0 err 1 -1 103 no such table: xx
+==== 1.5.0
+
+  CREATE VIRTUAL TABLE x1 USING fts3(x);
+  INSERT INTO x1 VALUES('A A A');
+  INSERT INTO x1 VALUES('A A A');
+----
+stmt 0 ok
+stmt 41 err 1 -1 75 no such table: x1
+stmt 75 err 1 -1 109 no such table: x1
+==== 1.5.1
+
+  SELECT offsets(x1) FROM x1 WHERE x1 MATCH 'a OR b AND c NEAR d'
+----
+stmt 0 err 1 -1 67 no such table: x1

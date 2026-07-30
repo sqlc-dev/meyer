@@ -1,0 +1,31 @@
+==== vtabF-1.1
+
+    CREATE TABLE t1(a, b);
+    CREATE INDEX i1 ON t1(a);
+    CREATE INDEX i2 ON t1(b);
+    INSERT INTO t1 VALUES(10,110);
+    INSERT INTO t1 VALUES(11,111);
+    INSERT INTO t1 SELECT a+2, b+2 FROM t1;
+    INSERT INTO t1 SELECT null, b+4 FROM t1;
+    INSERT INTO t1 SELECT null, b+8 FROM t1;
+    INSERT INTO t1 SELECT null, b+16 FROM t1;
+    ANALYZE;
+    CREATE VIRTUAL TABLE tv1 USING echo(t1);
+    SELECT b FROM t1 WHERE a IS NOT NULL;
+----
+stmt 0 ok
+stmt 27 err 1 -1 57 no such table: main.t1
+stmt 57 err 1 -1 87 no such table: main.t1
+stmt 87 err 1 -1 122 no such table: t1
+stmt 122 err 1 -1 157 no such table: t1
+stmt 157 err 1 -1 201 no such table: t1
+stmt 201 err 1 -1 246 no such table: t1
+stmt 246 err 1 -1 291 no such table: t1
+stmt 291 err 1 -1 337 no such table: t1
+stmt 337 ok
+stmt 350 ok
+stmt 395 err 1 -1 437 no such table: t1
+==== vtabF-1.2
+SELECT b FROM tv1 WHERE a IS NOT NULL
+----
+stmt 0 err 1 -1 38 no such table: tv1

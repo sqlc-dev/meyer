@@ -22,9 +22,11 @@ https://sqlite.org/lang.html.
 ## The corpus
 
 Each `parser/testdata/<name>.test` holds cases extracted from SQLite's
-`test/<name>.test` TCL scripts. For every case, the raw oracle results (one
-line per statement: prepared OK, or the exact error message and offset) are
-stored; the harness derives the expectation from them:
+`test/<name>.test` TCL script; there is one for every script in the pinned
+source tree that yields at least one literal-SQL block. For every case, the
+raw oracle results (one line per statement: prepared OK, or the exact error
+message, offset and parse tail) are stored; the harness derives the
+expectation from them:
 
 - If any statement failed with a **syntax-family** message (`near "…":
   syntax error`, `unrecognized token: "…"`, `incomplete input`), meyer must
@@ -64,7 +66,7 @@ the fix is in `cmd/regenerate-parse` (or the classification in
 ## Regenerating the corpus
 
 ```sh
-go run ./cmd/regenerate-parse                  # the full starter set
+go run ./cmd/regenerate-parse                  # every script in the pinned tree
 go run ./cmd/regenerate-parse -files select1   # one file
 ```
 

@@ -1,0 +1,15 @@
+==== tkt-fa7bf5ec-1
+
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES ('a');
+    INSERT INTO t1 VALUES ('A');
+    INSERT INTO t1 VALUES ('A');
+    SELECT count(CASE WHEN x='a' THEN 1 END),
+           count(CASE WHEN x='A' THEN 1 END)
+      FROM t1;
+----
+stmt 0 ok
+stmt 24 err 1 -1 57 no such table: t1
+stmt 57 err 1 -1 90 no such table: t1
+stmt 90 err 1 -1 123 no such table: t1
+stmt 123 err 1 -1 229 no such table: t1

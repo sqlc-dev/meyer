@@ -1,0 +1,25 @@
+==== 1.0
+
+  PRAGMA page_size = 1024;
+  CREATE TABLE t1(a, b);
+  BEGIN;
+  WITH data(x,y) AS (
+    SELECT 1, zeroblob(10000)
+    UNION ALL
+    SELECT x+1, y FROM data WHERE x < 300000
+  )
+  INSERT INTO t1 SELECT * FROM data;
+  COMMIT;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 52 ok
+stmt 61 err 1 -1 213 no such table: t1
+stmt 213 ok
+==== 1.1
+
+  PRAGMA cache_size = 4194304;
+  CREATE INDEX i1 ON t1(a, b);
+----
+stmt 0 ok
+stmt 31 err 1 -1 62 no such table: main.t1

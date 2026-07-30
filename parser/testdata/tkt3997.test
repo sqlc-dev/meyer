@@ -1,0 +1,46 @@
+==== tkt3997-1.1
+
+    create table mytext(name BLOB);
+    INSERT INTO mytext VALUES('abc');
+    INSERT INTO mytext VALUES('acd');
+    INSERT INTO mytext VALUES('afe');
+----
+stmt 0 ok
+stmt 36 err 1 -1 74 no such table: mytext
+stmt 74 err 1 -1 112 no such table: mytext
+stmt 112 err 1 -1 150 no such table: mytext
+==== tkt3997-1.2
+ 
+    SELECT name 
+    FROM mytext 
+    ORDER BY name COLLATE reverse
+----
+stmt 0 err 1 -1 70 no such table: mytext
+==== tkt3997-1.3
+ 
+    SELECT name 
+    FROM (SELECT name FROM mytext)  
+    ORDER BY name COLLATE reverse
+----
+stmt 0 err 1 -1 90 no such table: mytext
+==== tkt3997-2.1
+ 
+    CREATE TABLE mytext2(name COLLATE reverse);
+    INSERT INTO mytext2 SELECT name FROM mytext;
+----
+stmt 0 err 1 -1 48 no such collation sequence: reverse
+stmt 49 err 1 -1 98 no such table: mytext2
+==== tkt3997-2.2
+ 
+    SELECT name 
+    FROM (SELECT name FROM mytext2)  
+    ORDER BY name
+----
+stmt 0 err 1 -1 75 no such table: mytext2
+==== tkt3997-2.3
+ 
+    SELECT name 
+    FROM (SELECT name FROM mytext2)
+    ORDER BY name COLLATE usual
+----
+stmt 0 err 1 -1 87 no such table: mytext2

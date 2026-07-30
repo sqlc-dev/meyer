@@ -1,0 +1,88 @@
+==== vtab2-1.1
+
+    CREATE VIRTUAL TABLE schema USING schema;
+    SELECT * FROM schema;
+----
+stmt 0 ok
+stmt 46 err 1 -1 72 no such table: schema
+==== vtab2-1.2
+
+    SELECT length(tablename) FROM schema GROUP by tablename;
+----
+stmt 0 err 1 -1 61 no such table: schema
+==== vtab2-1.3
+
+    SELECT tablename FROM schema GROUP by length(tablename);
+----
+stmt 0 err 1 -1 61 no such table: schema
+==== vtab2-1.4
+
+    SELECT length(tablename) FROM schema GROUP by length(tablename);
+----
+stmt 0 err 1 -1 69 no such table: schema
+==== vtab2-2.3
+
+    SELECT name, value FROM vars
+      WHERE name MATCH 'tcl_*' AND arrayname = '' 
+      ORDER BY name;
+----
+stmt 0 err 1 -1 105 no such table: vars
+==== vtab2-3.1
+
+    SELECT * FROM schema WHERE dflt_value IS NULL LIMIT 1
+----
+stmt 0 err 1 -1 59 no such table: schema
+==== vtab2-3.2
+
+    SELECT *, b.rowid
+      FROM schema a LEFT JOIN schema b ON a.dflt_value=b.dflt_value
+     WHERE a.rowid=1
+----
+stmt 0 err 1 -1 112 no such table: schema
+==== vtab2-3.3
+
+    SELECT *, b.rowid
+      FROM schema a LEFT JOIN schema b ON a.dflt_value IS b.dflt_value
+                                      AND a.dflt_value IS NOT NULL
+     WHERE a.rowid=1
+----
+stmt 0 err 1 -1 182 no such table: schema
+==== vtab2-4.1
+
+    BEGIN TRANSACTION;
+    CREATE TABLE t1(a INTEGER PRIMARY KEY, b, c, UNIQUE(b, c));
+    CREATE TABLE fkey(
+      to_tbl,
+      to_col
+    );
+    INSERT INTO "fkey" VALUES('t1',NULL);
+    COMMIT;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 87 ok
+stmt 144 err 1 -1 186 no such table: fkey
+stmt 186 ok
+==== vtab2-4.2
+ CREATE VIRTUAL TABLE v_col USING schema
+----
+stmt 0 ok
+==== vtab2-4.3
+ SELECT name FROM v_col WHERE tablename = 't1' AND pk
+----
+stmt 0 err 1 -1 54 no such table: v_col
+==== vtab2-4.4
+
+    UPDATE fkey 
+    SET to_col = (SELECT name FROM v_col WHERE tablename = 't1' AND pk);
+----
+stmt 0 err 1 -1 90 no such table: fkey
+==== vtab2-4.5
+ SELECT * FROM fkey
+----
+stmt 0 err 1 -1 20 no such table: fkey
+==== 5.1
+
+    PRAGMA encoding='UTF16';
+----
+stmt 0 ok

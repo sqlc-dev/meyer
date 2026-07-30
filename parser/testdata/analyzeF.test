@@ -1,0 +1,78 @@
+==== 1.0
+
+  CREATE TABLE t1(x INTEGER, y INTEGER);
+  WITH data(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM data
+  )
+  INSERT INTO t1 SELECT isqrt(i), isqrt(i) FROM data LIMIT 400;
+  CREATE INDEX t1x ON t1(x);
+  CREATE INDEX t1y ON t1(y);
+  ANALYZE;
+----
+stmt 0 ok
+stmt 41 err 1 -1 173 no such table: t1
+stmt 173 err 1 -1 202 no such table: main.t1
+stmt 202 err 1 -1 231 no such table: main.t1
+stmt 231 ok
+==== 2.1
+
+  SELECT * FROM t1 WHERE x = substr('145', 2, 1) AND y = func(1, 2, 3)
+----
+stmt 0 err 1 -1 72 no such table: t1
+==== 2.2
+
+  UPDATE t1 SET y=y+1 WHERE x = substr('145', 2, 1) AND y = func(1, 2, 3)
+----
+stmt 0 err 1 -1 75 no such table: t1
+==== 4.1
+
+  SELECT * FROM t1 WHERE x = error('error one') AND y = 4;
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== 4.2
+
+  SELECT * FROM t1 WHERE x = zeroblob(2200000000) AND y = 4;
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== 4.3
+
+  SELECT * FROM t1 WHERE x = dstr() AND y = 11;
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== 4.4
+
+  SELECT * FROM t1 WHERE x = test_zeroblob(1100000) AND y = 4;
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== 5.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b TEXT, c INT);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<10000)
+    INSERT INTO t1(a, c) SELECT x, x FROM c;
+  UPDATE t1 SET b=printf('x%02x',a/500) WHERE a>4000;
+  UPDATE t1 SET b='xyz' where a>=9998;
+  CREATE INDEX t1b ON t1(b);
+  ANALYZE;
+  SELECT count(*), b FROM t1 GROUP BY 2 ORDER BY 2;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 84 err 1 -1 208 no such table: t1
+stmt 208 err 1 -1 262 no such table: t1
+stmt 262 err 1 -1 301 no such table: t1
+stmt 301 err 1 -1 330 no such table: main.t1
+stmt 330 ok
+stmt 341 err 1 -1 393 no such table: t1
+==== 5.2
+
+  explain query plan
+  SELECT * FROM t1 WHERE b='xyz' AND b IS NOT NULL ORDER BY +a;
+  /*                  v---- Should be "=", not ">"  */
+----
+stmt 0 err 1 -1 85 no such table: t1
+==== 5.3
+
+  SELECT * FROM t1 WHERE b='xyz' AND b IS NOT NULL ORDER BY +a;
+----
+stmt 0 err 1 -1 64 no such table: t1

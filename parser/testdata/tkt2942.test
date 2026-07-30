@@ -1,0 +1,30 @@
+==== tkt2942.1
+
+    create table t1(num int);
+    insert into t1 values (2);
+    insert into t1 values (1);
+    insert into t1 values (3);
+    insert into t1 values (4);
+    SELECT group_concat(num) FROM (SELECT num FROM t1 ORDER BY num DESC);
+----
+stmt 0 ok
+stmt 30 err 1 -1 61 no such table: t1
+stmt 61 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 123 no such table: t1
+stmt 123 err 1 -1 154 no such table: t1
+stmt 154 err 1 -1 228 no such table: t1
+==== tkt2942.2
+
+    SELECT group_concat(num) FROM (SELECT num FROM t1 ORDER BY num);
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== tkt2942.3
+
+    SELECT group_concat(num) FROM (SELECT num FROM t1);
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== tkt2942.4
+
+    SELECT group_concat(num) FROM (SELECT num FROM t1 ORDER BY rowid DESC);
+----
+stmt 0 err 1 -1 76 no such table: t1

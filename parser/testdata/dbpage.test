@@ -1,0 +1,199 @@
+==== 110
+
+  SELECT pgno, quote(substr(data,1,5)) FROM sqlite_dbpage('main') ORDER BY pgno;
+----
+stmt 0 err 1 -1 81 no such table: sqlite_dbpage
+==== 120
+
+  SELECT pgno, quote(substr(data,1,5)) FROM sqlite_dbpage WHERE pgno=2;
+----
+stmt 0 err 1 -1 72 no such table: sqlite_dbpage
+==== 130
+
+  SELECT pgno, quote(substr(data,1,5)) FROM sqlite_dbpage WHERE pgno=4;
+----
+stmt 0 err 1 -1 72 no such table: sqlite_dbpage
+==== 140
+
+  SELECT pgno, quote(substr(data,1,5)) FROM sqlite_dbpage WHERE pgno=5;
+----
+stmt 0 err 1 -1 72 no such table: sqlite_dbpage
+==== 150
+
+  SELECT pgno, quote(substr(data,1,5)) FROM sqlite_dbpage WHERE pgno=0;
+----
+stmt 0 err 1 -1 72 no such table: sqlite_dbpage
+==== 160
+
+  ATTACH ':memory:' AS aux1;
+  PRAGMA aux1.page_size=4096;
+  CREATE TABLE aux1.t2(a,b,c);
+  INSERT INTO t2 VALUES(11,12,13);
+  SELECT pgno, quote(substr(data,1,5)) FROM sqlite_dbpage('aux1');
+----
+stmt 0 ok
+stmt 29 err 1 39 59 unknown database aux1
+stmt 59 err 1 75 83 unknown database aux1
+stmt 90 err 1 -1 125 no such table: t2
+stmt 125 err 1 -1 192 no such table: sqlite_dbpage
+==== 170
+
+  CREATE TABLE aux1.x3(x,y,z);
+  INSERT INTO x3(x,y,z) VALUES(1,'main',1),(2,'aux1',1);
+  SELECT pgno, schema, substr(data,1,6)
+    FROM sqlite_dbpage, x3
+   WHERE sqlite_dbpage.schema=x3.y AND sqlite_dbpage.pgno=x3.z
+   ORDER BY x3.x;
+----
+stmt 0 err 1 16 24 unknown database aux1
+stmt 31 err 1 -1 88 no such table: x3
+stmt 88 err 1 -1 236 no such table: sqlite_dbpage
+==== 200
+
+  CREATE TEMP TABLE saved_content(x);
+  INSERT INTO saved_content(x) SELECT data FROM sqlite_dbpage WHERE pgno=4;
+  UPDATE sqlite_dbpage SET data=zeroblob(4096) WHERE pgno=4;
+----
+stmt 0 ok
+stmt 38 err 1 -1 114 no such table: saved_content
+stmt 114 err 1 -1 175 no such table: sqlite_dbpage
+==== 210
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== 220
+
+  SELECT pgno, quote(substr(data,1,5)) FROM sqlite_dbpage('main') ORDER BY pgno;
+----
+stmt 0 err 1 -1 81 no such table: sqlite_dbpage
+==== 230
+
+  UPDATE sqlite_dbpage SET data=(SELECT x FROM saved_content) WHERE pgno=4;
+----
+stmt 0 err 1 -1 76 no such table: sqlite_dbpage
+==== 230.dup1
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== 240
+
+  DELETE FROM saved_content;
+  INSERT INTO saved_content(x) 
+     SELECT data FROM sqlite_dbpage WHERE schema='aux1' AND pgno=2;
+----
+stmt 0 err 1 -1 29 no such table: saved_content
+stmt 29 err 1 -1 129 no such table: saved_content
+==== 241
+
+  UPDATE sqlite_dbpage SET data=zeroblob(4096) WHERE pgno=2 AND schema='aux1';
+----
+stmt 0 err 1 -1 79 no such table: sqlite_dbpage
+==== 250
+
+  PRAGMA aux1.integrity_check;
+----
+stmt 0 err 1 10 31 unknown database aux1
+==== 260
+
+  UPDATE sqlite_dbpage SET data=(SELECT x FROM saved_content)
+   WHERE pgno=2 AND schema='aux1';
+----
+stmt 0 err 1 -1 97 no such table: sqlite_dbpage
+==== 270
+
+  PRAGMA aux1.integrity_check;
+----
+stmt 0 err 1 10 31 unknown database aux1
+==== 300
+
+  SELECT * FROM sqlite_temp_schema, sqlite_dbpage;
+----
+stmt 0 err 1 -1 51 no such table: sqlite_dbpage
+==== 400
+
+  ATTACH ':memory:' AS aux1;
+  BEGIN;
+    CREATE VIRTUAL TABLE aux1.t1 USING sqlite_dbpage;
+    INSERT INTO t1 VALUES(17, NULL);
+  COMMIT;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 38 err 1 64 92 unknown database aux1
+stmt 92 err 1 -1 129 no such table: t1
+stmt 129 ok
+==== 500
+
+  PRAGMA auto_vacuum=NONE;
+  CREATE TABLE x1(a);
+  INSERT INTO x1 VALUES( hex(randomblob(2000)) );
+  INSERT INTO x1 VALUES( hex(randomblob(2000)) );
+  INSERT INTO x1 VALUES( hex(randomblob(2000)) );
+  INSERT INTO x1 VALUES( hex(randomblob(2000)) );
+  PRAGMA page_count;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 49 err 1 -1 99 no such table: x1
+stmt 99 err 1 -1 149 no such table: x1
+stmt 149 err 1 -1 199 no such table: x1
+stmt 199 err 1 -1 249 no such table: x1
+stmt 249 ok
+==== 520
+
+  PRAGMA page_count;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 21 err 1 -1 41 no such table: t1
+==== 610
+
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE t1(x);
+  CREATE TABLE t2(y);
+  INSERT INTO t1 VALUES(1234);
+  CREATE TABLE aux.x1(z);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 50 ok
+stmt 72 err 1 -1 103 no such table: t1
+stmt 103 err 1 119 126 unknown database aux
+==== 640
+
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 20 no such table: t2
+==== 700
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES( hex(randomblob(1000)) );
+  INSERT INTO t1 VALUES( hex(randomblob(1000)) );
+  INSERT INTO t1 VALUES( hex(randomblob(1000)) );
+----
+stmt 0 ok
+stmt 22 err 1 -1 72 no such table: t1
+stmt 72 err 1 -1 122 no such table: t1
+stmt 122 err 1 -1 172 no such table: t1
+==== 720
+
+  PRAGMA integrity_check
+----
+stmt 0 ok
+==== 800
+
+  CREATE TABLE x1(x);
+----
+stmt 0 ok
+==== 810
+
+  SELECT pgno FROM sqlite_dbpage WHERE pgno=555
+----
+stmt 0 err 1 -1 49 no such table: sqlite_dbpage
+==== 820
+
+  SELECT pgno FROM sqlite_dbpage WHERE pgno=4294967297
+----
+stmt 0 err 1 -1 56 no such table: sqlite_dbpage

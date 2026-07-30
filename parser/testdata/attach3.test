@@ -1,0 +1,194 @@
+==== attach3-1.1
+
+    ATTACH 'test2.db' AS aux;
+----
+stmt 0 ok
+==== attach3-1.2
+
+    CREATE TABLE aux.t3(e, f);
+----
+stmt 0 err 1 18 25 unknown database aux
+==== attach3-1.3
+
+    SELECT * FROM sqlite_master WHERE name = 't3';
+----
+stmt 0 ok
+==== attach3-1.4
+
+    SELECT * FROM aux.sqlite_master WHERE name = 't3';
+----
+stmt 0 err 1 -1 55 no such table: aux.sqlite_master
+==== attach3-1.5
+
+    INSERT INTO t3 VALUES(1, 2);
+    SELECT * FROM t3;
+----
+stmt 0 err 1 -1 33 no such table: t3
+stmt 33 err 1 -1 55 no such table: t3
+==== attach3-2.1
+
+    CREATE INDEX aux.i1 on t3(e);
+----
+stmt 0 err 1 18 34 unknown database aux
+==== attach3-2.2
+
+    SELECT * FROM sqlite_master WHERE name = 'i1';
+----
+stmt 0 ok
+==== attach3-2.3
+
+    SELECT * FROM aux.sqlite_master WHERE name = 'i1';
+----
+stmt 0 err 1 -1 55 no such table: aux.sqlite_master
+==== attach3-3.1
+
+    DROP INDEX aux.i1;
+    SELECT * FROM aux.sqlite_master WHERE name = 'i1';
+----
+stmt 0 err 1 -1 23 no such index: aux.i1
+stmt 23 err 1 -1 78 no such table: aux.sqlite_master
+==== attach3-3.2
+
+    CREATE INDEX aux.i1 on t3(e);
+    SELECT * FROM aux.sqlite_master WHERE name = 'i1';
+----
+stmt 0 err 1 18 34 unknown database aux
+stmt 34 err 1 -1 89 no such table: aux.sqlite_master
+==== attach3-3.3
+
+    DROP INDEX i1;
+    SELECT * FROM aux.sqlite_master WHERE name = 'i1';
+----
+stmt 0 err 1 -1 19 no such index: i1
+stmt 19 err 1 -1 74 no such table: aux.sqlite_master
+==== attach3-4.1
+
+    DROP TABLE aux.t1;
+    SELECT name FROM aux.sqlite_master;
+----
+stmt 0 err 1 -1 23 no such table: aux.t1
+stmt 23 err 1 -1 63 no such table: aux.sqlite_master
+==== attach3-4.3
+
+    DROP TABLE t2;
+    SELECT name FROM aux.sqlite_master;
+----
+stmt 0 err 1 -1 19 no such table: t2
+stmt 19 err 1 -1 59 no such table: aux.sqlite_master
+==== attach3-5.1
+
+    CREATE VIEW aux.v1 AS SELECT * FROM t3;
+----
+stmt 0 err 1 17 44 unknown database aux
+==== attach3-5.2
+
+    SELECT * FROM aux.sqlite_master WHERE name = 'v1';
+----
+stmt 0 err 1 -1 55 no such table: aux.sqlite_master
+==== attach3-5.3
+
+    INSERT INTO aux.t3 VALUES('hello', 'world');
+    SELECT * FROM v1;
+----
+stmt 0 err 1 -1 49 no such table: aux.t3
+stmt 49 err 1 -1 71 no such table: v1
+==== attach3-6.1
+
+    DROP VIEW aux.v1;
+----
+stmt 0 err 1 -1 22 no such view: aux.v1
+==== attach3-6.2
+
+    SELECT * FROM aux.sqlite_master WHERE name = 'v1';
+----
+stmt 0 err 1 -1 55 no such table: aux.sqlite_master
+==== attach3-7.1
+
+    CREATE TRIGGER aux.tr1 AFTER INSERT ON t3 BEGIN
+      INSERT INTO t3 VALUES(new.e*2, new.f*2);
+    END;
+----
+stmt 0 err 1 20 52 unknown database aux
+==== attach3-7.2
+
+    DELETE FROM t3;
+    INSERT INTO t3 VALUES(10, 20);
+    SELECT * FROM t3;
+----
+stmt 0 err 1 -1 20 no such table: t3
+stmt 20 err 1 -1 55 no such table: t3
+stmt 55 err 1 -1 77 no such table: t3
+==== attach3-5.3.dup1
+
+    SELECT * FROM aux.sqlite_master WHERE name = 'tr1';
+----
+stmt 0 err 1 -1 56 no such table: aux.sqlite_master
+==== attach3-8.1
+
+    DROP TRIGGER aux.tr1;
+----
+stmt 0 err 1 -1 26 no such trigger: aux.tr1
+==== attach3-8.2
+
+    SELECT * FROM aux.sqlite_master WHERE name = 'tr1';
+----
+stmt 0 err 1 -1 56 no such table: aux.sqlite_master
+==== attach3-9.0
+
+      CREATE TABLE main.t4(a, b, c);
+      CREATE TABLE aux.t4(a, b, c);
+      CREATE TEMP TRIGGER tst_trigger BEFORE INSERT ON aux.t4 BEGIN 
+        SELECT 'hello world';
+      END;
+      SELECT count(*) FROM temp.sqlite_master;
+----
+stmt 0 ok
+stmt 37 err 1 57 64 unknown database aux
+stmt 73 err 1 -1 141 no such table: aux.t4
+stmt 183 ok
+==== attach3-9.1
+
+      DROP TABLE main.t4;
+      SELECT count(*) FROM sqlite_temp_master;
+----
+stmt 0 err 1 -1 26 no such table: main.t4
+stmt 26 ok
+==== attach3-9.2
+
+      DROP TABLE aux.t4;
+      SELECT count(*) FROM temp.sqlite_master;
+----
+stmt 0 err 1 -1 25 no such table: aux.t4
+stmt 25 ok
+==== attach3-10.0
+
+    INSERT INTO aux.sqlite_master VALUES(1, 2, 3, 4, 5);
+----
+stmt 0 err 1 -1 57 no such table: aux.sqlite_master
+==== attach3-11.0
+
+    ATTACH DATABASE '/nodir/nofile.x' AS notadb;
+----
+stmt 0 ok
+==== attach3-11.1
+
+    ATTACH DATABASE ':memory:' AS notadb;
+----
+stmt 0 ok
+==== attach3-11.2
+
+    DETACH DATABASE notadb;
+----
+stmt 0 ok
+==== attach3-12.11
+
+    DETACH NULL
+----
+stmt 0 ok
+==== attach3-12.12
+
+    ATTACH null AS null;
+    ATTACH '' AS '';
+----
+stmt 0 ok
+stmt 25 ok

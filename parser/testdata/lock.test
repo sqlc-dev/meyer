@@ -1,0 +1,58 @@
+==== lock-1.1
+SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
+----
+stmt 0 ok
+==== lock-1.9
+SELECT * FROM t1
+----
+stmt 0 err 1 -1 17 no such table: t1
+==== lock-1.20
+SELECT * FROM t2
+----
+stmt 0 err 1 -1 17 no such table: t2
+==== lock-5.1
+
+    SELECT * FROM t1
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== lock-5.3
+
+      CREATE TEMP TABLE t3(x);
+      SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 31 err 1 -1 55 no such table: t3
+==== lock-5.4
+
+      INSERT INTO t3 SELECT tx_exec('SELECT y FROM t2 LIMIT 1');
+----
+stmt 0 err 1 -1 65 no such table: t3
+==== lock-5.5
+
+      SELECT * FROM t3;
+----
+stmt 0 err 1 -1 24 no such table: t3
+==== lock-5.6
+
+      UPDATE t1 SET a=tx_exec('SELECT x FROM t2');
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== lock-5.7
+
+      SELECT * FROM t1;
+----
+stmt 0 err 1 -1 24 no such table: t1
+==== lock-5.8
+
+      UPDATE t3 SET x=tx_exec('SELECT x FROM t2');
+----
+stmt 0 err 1 -1 51 no such table: t3
+==== lock-5.9
+
+      SELECT * FROM t3;
+----
+stmt 0 err 1 -1 24 no such table: t3
+==== lock-7.2
+ PRAGMA lock_status
+----
+stmt 0 ok

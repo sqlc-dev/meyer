@@ -1,0 +1,27 @@
+==== tkt3718-1.1
+
+    CREATE TABLE t1(a PRIMARY KEY, b);
+    INSERT INTO t1 VALUES(1, 'one');
+    INSERT INTO t1 VALUES(2, 'two');
+    INSERT INTO t1 VALUES(3, 'three');
+    INSERT INTO t1 VALUES(4, 'four');
+    INSERT INTO t1 VALUES(5, 'five');
+    CREATE TABLE t2(a PRIMARY KEY, b);
+----
+stmt 0 ok
+stmt 39 err 1 -1 76 no such table: t1
+stmt 76 err 1 -1 113 no such table: t1
+stmt 113 err 1 -1 152 no such table: t1
+stmt 152 err 1 -1 190 no such table: t1
+stmt 190 err 1 -1 228 no such table: t1
+stmt 228 ok
+==== tkt3718-1.4
+pragma count_changes=0
+----
+stmt 0 ok
+==== tkt3718-generated
+
+      SELECT 
+        (SELECT sum(a) FROM t2)==(SELECT sum(a*5-10) FROM t2 WHERE (a%5)==0)
+----
+stmt 0 err 1 -1 92 no such table: t2

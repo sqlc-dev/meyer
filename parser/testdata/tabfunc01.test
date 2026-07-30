@@ -1,0 +1,804 @@
+==== tabfunc01-1.1
+
+  SELECT *, '|' FROM generate_series WHERE start=1 AND stop=9 AND step=2;
+----
+stmt 0 err 1 -1 74 no such table: generate_series
+==== tabfunc01-1.1b
+
+  PRAGMA table_xinfo(generate_series);
+----
+stmt 0 ok
+==== tabfunc01-1.2
+
+  SELECT *, '|' FROM generate_series(0) LIMIT 5;
+----
+stmt 0 err 1 -1 49 no such table: generate_series
+==== tabfunc01-1.2b
+
+  SELECT *, '|' FROM generate_series LIMIT 5;
+----
+stmt 0 err 1 -1 46 no such table: generate_series
+==== tabfunc01-1.2c
+
+  SELECT *, '|' FROM generate_series(value) LIMIT 5;
+----
+stmt 0 err 1 -1 53 no such table: generate_series
+==== tabfunc01-1.3
+
+  CREATE VIRTUAL TABLE t1 USING generate_series;
+----
+stmt 0 ok
+==== tabfunc01-1.4
+
+  SELECT * FROM generate_series(1,9,2);
+----
+stmt 0 err 1 -1 40 no such table: generate_series
+==== tabfunc01-1.5
+
+  SELECT * FROM generate_series(1,9);
+----
+stmt 0 err 1 -1 38 no such table: generate_series
+==== tabfunc01-1.6
+
+  SELECT * FROM generate_series(1,10) WHERE step=3;
+----
+stmt 0 err 1 -1 52 no such table: generate_series
+==== tabfunc01-1.7
+
+  SELECT * FROM generate_series(1,9,2,11);
+----
+stmt 0 err 1 -1 43 no such table: generate_series
+==== tabfunc01-1.8
+
+  SELECT * FROM generate_series(0,32,5) ORDER BY rowid DESC;
+----
+stmt 0 err 1 -1 61 no such table: generate_series
+==== tabfunc01-1.9
+
+  SELECT rowid, * FROM generate_series(0,32,5) ORDER BY value DESC;
+----
+stmt 0 err 1 -1 68 no such table: generate_series
+==== tabfunc01-1.10
+
+  SELECT rowid, * FROM generate_series(0,32,5) ORDER BY +value DESC;
+----
+stmt 0 err 1 -1 69 no such table: generate_series
+==== tabfunc01-1.20
+
+  CREATE VIEW v1(a,b) AS VALUES(1,2),(3,4);
+  SELECT * FROM v1;
+----
+stmt 0 ok
+stmt 44 err 1 -1 64 no such table: v1
+==== tabfunc01-1.21.1
+
+  SELECT * FROM v1(55);
+----
+stmt 0 err 1 -1 24 no such table: v1
+==== tabfunc01-1.21.2
+
+  SELECT * FROM v1();
+----
+stmt 0 err 1 -1 22 no such table: v1
+==== tabfunc01-1.22
+
+  CREATE VIEW v2(x) AS SELECT value FROM generate_series(1,5);
+  SELECT * FROM v2;
+----
+stmt 0 ok
+stmt 63 err 1 -1 83 no such table: v2
+==== tabfunc01-1.23.1
+
+  SELECT * FROM v2(55);
+----
+stmt 0 err 1 -1 24 no such table: v2
+==== tabfunc01-1.23.2
+
+  SELECT * FROM v2();
+----
+stmt 0 err 1 -1 22 no such table: v2
+==== tabfunc01-1.24
+
+  CREATE TABLE t0(x);
+  INSERT INTO t0(x) VALUES(123),(456),(789);
+  SELECT * FROM t0 ORDER BY x;
+----
+stmt 0 ok
+stmt 22 err 1 -1 67 no such table: t0
+stmt 67 err 1 -1 98 no such table: t0
+==== tabfunc01-1.25
+
+  SELECT * FROM t0(55) ORDER BY x;
+----
+stmt 0 err 1 -1 35 no such table: t0
+==== tabfunc01-1.26
+
+  WITH w0 AS (SELECT * FROM t0)
+  INSERT INTO t0(x) SELECT * FROM w0()
+----
+stmt 0 err 1 -1 72 no such table: t0
+==== tabfunc01-2.1
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1(x) VALUES(2),(3);
+  SELECT *, '|' FROM t1, generate_series(1,x) ORDER BY 1, 2
+----
+stmt 0 ok
+stmt 22 err 1 -1 57 no such table: t1
+stmt 57 err 1 -1 118 no such table: t1
+==== tabfunc01-2.2
+
+  SELECT *, '|' FROM (SELECT x FROM t1) AS y, generate_series(1,y.x)
+  ORDER BY 1, 2;
+----
+stmt 0 err 1 -1 86 no such table: t1
+==== tabfunc01-2.50
+
+  SELECT * FROM generate_series(0) LIMIT 5;
+----
+stmt 0 err 1 -1 44 no such table: generate_series
+==== tabfunc01-3.1
+
+  SELECT DISTINCT value FROM generate_series(1,x), t1 ORDER BY 1;
+----
+stmt 0 err 1 -1 66 no such table: generate_series
+==== tabfunc01-4.1
+
+  SELECT * FROM main.generate_series(1,4)
+----
+stmt 0 err 1 -1 43 no such table: main.generate_series
+==== tabfunc01-4.2
+
+  SELECT * FROM temp.generate_series(1,4)
+----
+stmt 0 err 1 -1 43 no such table: temp.generate_series
+==== tabfunc01-4.3
+
+  ATTACH ':memory:' AS aux1;
+  CREATE TABLE aux1.t1(a,b,c);
+  SELECT * FROM aux1.generate_series(1,4)
+----
+stmt 0 ok
+stmt 29 err 1 45 53 unknown database aux1
+stmt 60 err 1 -1 103 no such table: aux1.generate_series
+==== tabfunc01-4.4
+
+  SELECT * FROM (generate_series(1,5,2)) AS x LIMIT 10;
+----
+stmt 0 err 1 -1 56 no such table: generate_series
+==== tabfunc01-5.1
+
+  SELECT value
+    FROM generate_series(60,73,6)
+   WHERE value=66;
+----
+stmt 0 err 1 -1 68 no such table: generate_series
+==== tabfunc01-5.2
+
+  SELECT value
+    FROM generate_series(73,60,-6)
+   WHERE value=67;
+----
+stmt 0 err 1 -1 69 no such table: generate_series
+==== tabfunc01-6.1
+
+  SELECT value FROM generate_series(1,10) WHERE value<5.5;
+----
+stmt 0 err 1 -1 59 no such table: generate_series
+==== tabfunc01-6.2
+
+  SELECT value FROM generate_series(1,10) WHERE value<5.0;
+----
+stmt 0 err 1 -1 59 no such table: generate_series
+==== tabfunc01-6.3
+
+  SELECT value FROM generate_series(1,10) WHERE value<=5.5;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-6.4
+
+  SELECT value FROM generate_series(1,10) WHERE value<=5.0;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-6.5
+
+  SELECT value FROM generate_series(1,10) WHERE value>5.5;
+----
+stmt 0 err 1 -1 59 no such table: generate_series
+==== tabfunc01-6.6
+
+  SELECT value FROM generate_series(1,10) WHERE value>5.0;
+----
+stmt 0 err 1 -1 59 no such table: generate_series
+==== tabfunc01-6.7
+
+  SELECT value FROM generate_series(1,10) WHERE value>=5.5;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-6.8
+
+  SELECT value FROM generate_series(1,10) WHERE value>=5.0;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-6.9
+
+  SELECT value FROM generate_series(10,1,-1) WHERE value<5.5;
+----
+stmt 0 err 1 -1 62 no such table: generate_series
+==== tabfunc01-6.10
+
+  SELECT value FROM generate_series(10,1,-1) WHERE value<5.0;
+----
+stmt 0 err 1 -1 62 no such table: generate_series
+==== tabfunc01-6.11
+
+  SELECT value FROM generate_series(10,1,-1) WHERE value<=5.5;
+----
+stmt 0 err 1 -1 63 no such table: generate_series
+==== tabfunc01-6.12
+
+  SELECT value FROM generate_series(10,1,-1) WHERE value<=5.0;
+----
+stmt 0 err 1 -1 63 no such table: generate_series
+==== tabfunc01-6.13
+
+  SELECT value FROM generate_series(10,1,-1) WHERE value>5.5;
+----
+stmt 0 err 1 -1 62 no such table: generate_series
+==== tabfunc01-6.14
+
+  SELECT value FROM generate_series(10,1,-1) WHERE value>5.0;
+----
+stmt 0 err 1 -1 62 no such table: generate_series
+==== tabfunc01-6.15
+
+  SELECT value FROM generate_series(10,1,-1) WHERE value>=5.5;
+----
+stmt 0 err 1 -1 63 no such table: generate_series
+==== tabfunc01-6.16
+
+  SELECT value FROM generate_series(10,1,-1) WHERE value>=5.0;
+----
+stmt 0 err 1 -1 63 no such table: generate_series
+==== tabfunc01-6.17
+
+  SELECT value FROM generate_series(1,10) WHERE value==5.5;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-6.18
+
+  SELECT value FROM generate_series(1,10) WHERE value==5.0;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-500
+
+  SELECT * FROM generate_series WHERE start IN (1,7) AND stop=20 AND step=10
+  ORDER BY +1;
+----
+stmt 0 err 1 -1 92 no such table: generate_series
+==== tabfunc01-600
+
+  CREATE TABLE t600(a INTEGER PRIMARY KEY, b TEXT);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<100)
+    INSERT INTO t600(a,b) SELECT x, printf('(%03d)',x) FROM c;
+  SELECT b FROM t600 WHERE a IN generate_series(2,52,10);
+----
+stmt 0 ok
+stmt 52 err 1 -1 192 no such table: t600
+stmt 192 err 1 -1 250 no such table: t600
+==== tabfunc01-800
+
+      ALTER TABLE generate_series ADD COLUMN col2;
+----
+stmt 0 err 1 -1 51 no such table: generate_series
+==== tabfunc01-810
+
+      ALTER TABLE generate_series RENAME TO flubber;
+----
+stmt 0 err 1 -1 53 no such table: generate_series
+==== tabfunc01-820
+
+      ALTER TABLE generate_series RENAME  start TO flubber;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-830
+
+      ALTER TABLE generate_series DROP COLUMN start;
+----
+stmt 0 err 1 -1 53 no such table: generate_series
+==== tabfunc01-900
+
+      ALTER TABLE pragma_compile_options ADD COLUMN col2;
+----
+stmt 0 err 1 -1 58 virtual tables may not be altered
+==== tabfunc01-910
+
+      ALTER TABLE pragma_compile_options RENAME TO flubber;
+----
+stmt 0 err 1 -1 60 table pragma_compile_options may not be altered
+==== tabfunc01-920
+
+      ALTER TABLE pragma_compile_options RENAME  start TO flubber;
+----
+stmt 0 err 1 -1 67 table pragma_compile_options may not be altered
+==== tabfunc01-930
+
+      ALTER TABLE pragma_compile_options DROP COLUMN start;
+----
+stmt 0 err 1 -1 60 table pragma_compile_options may not be altered
+==== tabfunc01-900.dup1
+
+  SELECT * FROM (
+    SELECT * FROM generate_series(1,10)
+    UNION ALL
+    SELECT * FROM generate_series(101,104)
+  ) LIMIT 10 OFFSET 5;
+----
+stmt 0 err 1 -1 138 no such table: generate_series
+==== tabfunc01-910.dup1
+
+  SELECT * FROM (
+    SELECT * FROM generate_series(1,10)
+    UNION ALL
+    SELECT * FROM generate_series(101,104)
+  ) LIMIT -1 OFFSET 5;
+----
+stmt 0 err 1 -1 138 no such table: generate_series
+==== tabfunc01-920.dup1
+
+  SELECT * FROM (
+    SELECT * FROM generate_series(1,10)
+    UNION ALL
+    SELECT * FROM generate_series(101,104)
+  ) LIMIT -1 OFFSET 0;
+----
+stmt 0 err 1 -1 138 no such table: generate_series
+==== tabfunc01-930.dup1
+
+  SELECT * FROM generate_series(9223372036854775807,
+                                -9223372036854775808,
+                                -9223372036854775808);
+----
+stmt 0 err 1 -1 162 no such table: generate_series
+==== tabfunc01-931
+
+  SELECT * FROM generate_series(9223372036854775807,
+                                -9223372036854775808,
+                                -9223372036854775808)
+   LIMIT 100 OFFSET 1;
+----
+stmt 0 err 1 -1 184 no such table: generate_series
+==== tabfunc01-932
+
+  SELECT * FROM generate_series(9223372036854775807,
+                                -9223372036854775808,
+                                -9223372036854775808)
+   LIMIT 100 OFFSET 2;
+----
+stmt 0 err 1 -1 184 no such table: generate_series
+==== tabfunc01-933
+
+  SELECT * FROM generate_series(9223372036854775807,
+                                -9223372036854775808,
+                                -9223372036854775808)
+   LIMIT 100 OFFSET 9223372036854775807;
+----
+stmt 0 err 1 -1 202 no such table: generate_series
+==== tabfunc01-940
+
+  SELECT * FROM generate_series(1,11,2);
+----
+stmt 0 err 1 -1 41 no such table: generate_series
+==== tabfunc01-941
+
+  SELECT * FROM generate_series(1,11,2) LIMIT 100 OFFSET 4;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-942
+
+  SELECT * FROM generate_series(1,11,2) LIMIT 100 OFFSET 5;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-943
+
+  SELECT * FROM generate_series(1,11,2) LIMIT 100 OFFSET 6;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-944
+
+  SELECT * FROM generate_series(1,11,2) LIMIT 100 OFFSET 7;
+----
+stmt 0 err 1 -1 60 no such table: generate_series
+==== tabfunc01-945
+
+  SELECT * FROM generate_series(1,11,2) LIMIT 100 OFFSET 9223372036854775807;
+----
+stmt 0 err 1 -1 78 no such table: generate_series
+==== tabfunc01-950
+
+  SELECT * FROM generate_series(1,11,1) LIMIT 100 OFFSET 10;
+----
+stmt 0 err 1 -1 61 no such table: generate_series
+==== tabfunc01-951
+
+  SELECT * FROM generate_series(1,11,2) LIMIT 100 OFFSET 9223372036854775807;
+----
+stmt 0 err 1 -1 78 no such table: generate_series
+==== tabfunc01-952
+
+  SELECT * FROM generate_series(11,1,-1) LIMIT 100 OFFSET 10;
+----
+stmt 0 err 1 -1 62 no such table: generate_series
+==== tabfunc01-953
+
+  SELECT * FROM generate_series(11,1,-1) LIMIT 100 OFFSET 9223372036854775807;
+----
+stmt 0 err 1 -1 79 no such table: generate_series
+==== tabfunc01-954
+
+  SELECT * FROM generate_series(1,11,1) LIMIT 3 OFFSET 3;
+----
+stmt 0 err 1 -1 58 no such table: generate_series
+==== 1100
+
+  select 1 as c_0
+    from        
+    generate_series(1, 1) as ref_3
+    where (ref_3.value) in (select 1);
+----
+stmt 0 err 1 -1 109 no such table: generate_series
+==== 1200
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(value INT);
+  INSERT INTO t1 VALUES (1),(2),(3);
+  SELECT t1.value, t2.value
+    FROM t1 RIGHT JOIN generate_series(1,3,1) AS t2 USING(value);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 57 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 188 no such table: t1
+==== 1300
+
+  SELECT value
+    FROM generate_series(-9223372036854775808, 9223372036854775807, 2)
+   WHERE value BETWEEN 1 AND 5;
+----
+stmt 0 err 1 -1 118 no such table: generate_series
+==== 1301
+
+  SELECT value
+    FROM generate_series(-9223372036854775808, 9223372036854775807, 2)
+   WHERE value BETWEEN 0 AND 6;
+----
+stmt 0 err 1 -1 118 no such table: generate_series
+==== 1302
+
+  SELECT value
+    FROM generate_series(-9223372036854775808, 9223372036854775807, 2)
+   WHERE value BETWEEN 0.5 AND 6.25;
+----
+stmt 0 err 1 -1 123 no such table: generate_series
+==== 1303
+
+  SELECT value
+    FROM generate_series(-9223372036854775808, 9223372036854775807, 2)
+   WHERE value BETWEEN 9223372036854775803 AND 9223372036854775807
+----
+stmt 0 err 1 -1 154 no such table: generate_series
+==== 1304
+
+  SELECT value
+    FROM generate_series(-9223372036854775808, 9223372036854775807, 2)
+   WHERE value BETWEEN 9223372036854775803 AND 9223372036854775807
+   ORDER BY value DESC;
+----
+stmt 0 err 1 -1 177 no such table: generate_series
+==== 1310
+
+  SELECT value FROM generate_series(0) LIMIT 5;
+----
+stmt 0 err 1 -1 48 no such table: generate_series
+==== 1311
+
+  SELECT value FROM generate_series(5) LIMIT 5;
+----
+stmt 0 err 1 -1 48 no such table: generate_series
+==== 1312
+
+  SELECT value FROM generate_series(0) WHERE stop=6;
+----
+stmt 0 err 1 -1 53 no such table: generate_series
+==== 1313
+
+  SELECT value FROM generate_series(1,10) WHERE step IS NULL;
+----
+stmt 0 err 1 -1 62 no such table: generate_series
+==== 1314
+
+  SELECT value FROM generate_series(0xfffffffd);
+----
+stmt 0 err 1 -1 49 no such table: generate_series
+==== 1315
+
+  SELECT value FROM generate_series(4,3,1);
+----
+stmt 0 err 1 -1 44 no such table: generate_series
+==== 1316
+
+  SELECT value FROM generate_series(3,4,-1);
+----
+stmt 0 err 1 -1 45 no such table: generate_series
+==== 1320
+
+  SELECT value FROM generate_series(-9223372036854775808,+9223372036854775807)
+   WHERE value=9.2234e18;
+----
+stmt 0 err 1 -1 105 no such table: generate_series
+==== 1321
+
+  SELECT value FROM generate_series(-9223372036854775808,+9223372036854775807)
+   WHERE value=-9.2234e18;
+----
+stmt 0 err 1 -1 106 no such table: generate_series
+==== 1322
+
+  SELECT value FROM generate_series(-9223372036854775808,+9223372036854775807)
+   WHERE value>9223372036854775807;
+----
+stmt 0 err 1 -1 115 no such table: generate_series
+==== 1323
+
+  SELECT value FROM generate_series(-9223372036854775808,+9223372036854775807)
+   WHERE value>9223372036854775806;
+----
+stmt 0 err 1 -1 115 no such table: generate_series
+==== 1324
+
+  SELECT value FROM generate_series(-9223372036854775808,+9223372036854775807)
+   WHERE value>=9223372036854775807;
+----
+stmt 0 err 1 -1 116 no such table: generate_series
+==== 1330
+
+  SELECT value FROM generate_series(-9223372036854775808,+9223372036854775807)
+   WHERE value<-9223372036854775808;
+----
+stmt 0 err 1 -1 116 no such table: generate_series
+==== 1331
+
+  SELECT value FROM generate_series(-9223372036854775808,+9223372036854775807)
+   WHERE value<=-9223372036854775808;
+----
+stmt 0 err 1 -1 117 no such table: generate_series
+==== 1332
+
+  SELECT value FROM generate_series(-9223372036854775808,+9223372036854775807)
+   WHERE value<-9223372036854775807;
+----
+stmt 0 err 1 -1 116 no such table: generate_series
+==== 1333
+
+  SELECT value FROM generate_series(-9223372036854775808,+9223372036854775807)
+   WHERE value BETWEEN 4 AND 1;
+----
+stmt 0 err 1 -1 111 no such table: generate_series
+==== 1340
+
+  SELECT value FROM generate_series(100,0,-10)
+   WHERE value BETWEEN 33 AND 66;
+----
+stmt 0 err 1 -1 81 no such table: generate_series
+==== 1341
+
+  SELECT value FROM generate_series(100,0,-10)
+   WHERE value BETWEEN 33 AND 60;
+----
+stmt 0 err 1 -1 81 no such table: generate_series
+==== 1342
+
+  SELECT value FROM generate_series(100,0,-10)
+   WHERE value BETWEEN 33 AND 59;
+----
+stmt 0 err 1 -1 81 no such table: generate_series
+==== 1343
+
+  SELECT value
+    FROM generate_series(-9223372036854760000,-9223372036854775808,-10000);
+----
+stmt 0 err 1 -1 91 no such table: generate_series
+==== 1344
+
+  SELECT value
+    FROM generate_series(-9223372036854760000,-9223372036854775808,-10000)
+   WHERE value < -9223372036854770001;
+----
+stmt 0 err 1 -1 129 no such table: generate_series
+==== 1345
+
+  SELECT value
+    FROM generate_series(9223372036854760000,9223372036854775807,10000);
+----
+stmt 0 err 1 -1 88 no such table: generate_series
+==== 1346
+
+  SELECT value
+    FROM generate_series(9223372036854760000,9223372036854775807,10000)
+   WHERE value > 9223372036854770001;
+----
+stmt 0 err 1 -1 125 no such table: generate_series
+==== 1350
+
+  SELECT value FROM generate_series(100,0,-10)
+   WHERE value BETWEEN 33 AND 38;
+----
+stmt 0 err 1 -1 81 no such table: generate_series
+==== 1351
+
+  SELECT value FROM generate_series(0,100,+10)
+   WHERE value BETWEEN 33 AND 38;
+----
+stmt 0 err 1 -1 81 no such table: generate_series
+==== 1360
+
+  SELECT * FROM generate_series(0,-9223372036854775808,-9223372036854775808);
+----
+stmt 0 err 1 -1 78 no such table: generate_series
+==== 1361
+
+  SELECT * FROM generate_series(0,-9223372036854775808,-9223372036854775808)
+  LIMIT 1 OFFSET 0;
+----
+stmt 0 err 1 -1 97 no such table: generate_series
+==== 1362
+
+  SELECT * FROM generate_series(0,-9223372036854775808,-9223372036854775808)
+   ORDER BY value ASC;
+----
+stmt 0 err 1 -1 100 no such table: generate_series
+==== 1363
+
+  SELECT * FROM generate_series(0,-9223372036854775808,-9223372036854775808)
+   ORDER BY value ASC LIMIT 10 OFFSET 1;
+----
+stmt 0 err 1 -1 118 no such table: generate_series
+==== 1364
+
+  SELECT * FROM generate_series(0,-9223372036854775808,-9223372036854775808)
+   ORDER BY value ASC LIMIT 10 OFFSET 40000000;
+----
+stmt 0 err 1 -1 125 no such table: generate_series
+==== 1370
+
+  SELECT * FROM generate_series(0,0,0);
+----
+stmt 0 err 1 -1 40 no such table: generate_series
+==== 1400
+
+  CREATE TABLE t1(x);
+  CREATE TABLE t2(y);
+----
+stmt 0 ok
+stmt 22 ok
+==== 1410
+
+  SELECT x, y, value
+  FROM (t1 RIGHT JOIN generate_series(t2.y,5) AS value) JOIN t2;
+----
+stmt 0 err 1 -1 86 no such table: t1
+==== 1420
+
+  SELECT x, y, value 
+  FROM t2 JOIN (t1 RIGHT JOIN generate_series(t2.y,5) AS value)
+----
+stmt 0 err 1 -1 87 no such table: t2
+==== 1500
+
+  SELECT value FROM generate_series(1) WHERE value>1e19 LIMIT 3;
+----
+stmt 0 err 1 -1 65 no such table: generate_series
+==== 1501
+
+  SELECT value FROM generate_series(1) WHERE value>=1e19 LIMIT 3;
+----
+stmt 0 err 1 -1 66 no such table: generate_series
+==== 1502
+
+  SELECT value FROM generate_series(1) WHERE value<-1e19 LIMIT 3;
+----
+stmt 0 err 1 -1 66 no such table: generate_series
+==== 1503
+
+  SELECT value FROM generate_series(1) WHERE value<=-1e19 LIMIT 3;
+----
+stmt 0 err 1 -1 67 no such table: generate_series
+==== 1504
+
+  SELECT value FROM generate_series(1,9223372036854775807)
+   WHERE value>=9223372036854775807.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 109 no such table: generate_series
+==== 1505
+
+  SELECT value FROM generate_series(1,9223372036854775807)
+   WHERE value>9223372036854775807.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 108 no such table: generate_series
+==== 1506
+
+  SELECT 9223372036854774784 = 9223372036854775000.0;
+----
+stmt 0 ok
+==== 1507
+
+  SELECT value FROM generate_series(1,9223372036854775807)
+   WHERE value>=9223372036854775000.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 109 no such table: generate_series
+==== 1508
+
+  SELECT value FROM generate_series(1,9223372036854775807)
+   WHERE value>9223372036854775000.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 108 no such table: generate_series
+==== 1510
+
+  SELECT value FROM generate_series(-9223372036854775808,1)
+   WHERE value>=-9223372036854775000.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 111 no such table: generate_series
+==== 1511
+
+  SELECT value FROM generate_series(-9223372036854775808,1)
+   WHERE value>-9223372036854775000.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 110 no such table: generate_series
+==== 1520
+
+  SELECT value FROM generate_series(9223372036854774784)
+   WHERE value<=9223372036854775000.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 107 no such table: generate_series
+==== 1521
+
+  SELECT value FROM generate_series(9223372036854774784)
+   WHERE value<9223372036854775000.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 106 no such table: generate_series
+==== 1522
+
+  SELECT value FROM generate_series(9223372036854775805,9223372036854775807)
+   WHERE value<=9223372036854775807.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 127 no such table: generate_series
+==== 1522ck
+
+  SELECT value FROM generate_series(9223372036854775805,9223372036854775807)
+   WHERE +value<=9223372036854775807.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 128 no such table: generate_series
+==== 1523
+
+  SELECT value FROM generate_series(9223372036854775805,9223372036854775807)
+   WHERE value<9223372036854775807.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 126 no such table: generate_series
+==== 1523ck
+
+  SELECT value FROM generate_series(9223372036854775805,9223372036854775807)
+   WHERE +value<9223372036854775807.0
+   LIMIT 3;
+----
+stmt 0 err 1 -1 127 no such table: generate_series

@@ -1,0 +1,55 @@
+==== func9-100
+
+  SELECT concat('abc',123,null,'xyz');
+----
+stmt 0 ok
+==== func9-110
+
+  SELECT typeof(concat(null));
+----
+stmt 0 ok
+==== func9-120
+
+  SELECT concat();
+----
+stmt 0 err 1 10 19 wrong number of arguments to function concat()
+==== func9-130
+
+  SELECT concat_ws(',',1,2,3,4,5,6,7,8,NULL,9,10,11,12);
+----
+stmt 0 ok
+==== func9-131
+
+  SELECT concat_ws(',',1,2,3,4,'',6,7,8,NULL,9,10,11,12);
+----
+stmt 0 ok
+==== func9-132
+
+  SELECT concat_ws(',','',2,3,4,'',6,7,8,NULL,9,10,11,12);
+----
+stmt 0 ok
+==== func9-133
+
+  SELECT concat_ws(',',NULL,'',3,4,'',6,7,8,NULL,9,10,11,12);
+----
+stmt 0 ok
+==== func9-134
+
+  SELECT concat_ws(',',NULL,NULL,NULL,'',3,4,'',6,7,8,NULL,9,10,11,12);
+----
+stmt 0 ok
+==== func9-140
+
+  SELECT concat_ws(NULL,1,2,3,4,5,6,7,8,NULL,9,10,11,12);
+----
+stmt 0 ok
+==== func9-150
+
+  SELECT concat_ws();
+----
+stmt 0 err 1 10 22 wrong number of arguments to function concat_ws()
+==== func9-160
+
+  SELECT concat_ws(',');
+----
+stmt 0 err 1 10 25 wrong number of arguments to function concat_ws()

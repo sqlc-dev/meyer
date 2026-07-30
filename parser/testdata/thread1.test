@@ -1,0 +1,27 @@
+==== thread1-1.1
+
+    CREATE TABLE t1(a,b);
+    INSERT INTO t1 VALUES(1,'abcdefgh');
+    INSERT INTO t1 SELECT a+1, b||b FROM t1;
+    INSERT INTO t1 SELECT a+2, b||b FROM t1;
+    INSERT INTO t1 SELECT a+4, b||b FROM t1;
+    SELECT count(*), max(length(b)) FROM t1;
+----
+stmt 0 ok
+stmt 26 err 1 -1 67 no such table: t1
+stmt 67 err 1 -1 112 no such table: t1
+stmt 112 err 1 -1 157 no such table: t1
+stmt 157 err 1 -1 202 no such table: t1
+stmt 202 err 1 -1 247 no such table: t1
+==== thread1-2.4
+SELECT * FROM t2
+----
+stmt 0 err 1 -1 17 no such table: t2
+==== thread1-2.7
+SELECT * FROM t2
+----
+stmt 0 err 1 -1 17 no such table: t2
+==== thread1-2.11
+SELECT * FROM t2
+----
+stmt 0 err 1 -1 17 no such table: t2

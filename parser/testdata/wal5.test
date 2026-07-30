@@ -1,0 +1,24 @@
+==== wal5-generated
+
+        CREATE TABLE t1(a, b);
+        INSERT INTO t1 VALUES(1, 2);
+        CREATE TABLE aux.t2(a, b);
+        INSERT INTO t2 VALUES(1, 2);
+        INSERT INTO t2 VALUES(3, 4);
+----
+stmt 0 ok
+stmt 31 err 1 -1 68 no such table: t1
+stmt 68 err 1 90 97 unknown database aux
+stmt 103 err 1 -1 140 no such table: t2
+stmt 140 err 1 -1 177 no such table: t2
+==== wal5-generated.dup1
+
+        CREATE TABLE t1(a, b);
+        INSERT INTO t1 VALUES(1, 2);
+        CREATE TABLE aux.t2(a, b);
+        INSERT INTO t2 VALUES(1, 2);
+----
+stmt 0 ok
+stmt 31 err 1 -1 68 no such table: t1
+stmt 68 err 1 90 97 unknown database aux
+stmt 103 err 1 -1 140 no such table: t2

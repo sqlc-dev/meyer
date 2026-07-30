@@ -1,0 +1,7 @@
+==== pager2-generated
+ 
+        SELECT COALESCE(max(i), 0) FROM t1;
+        PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 45 no such table: t1
+stmt 45 ok

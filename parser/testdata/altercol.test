@@ -1,0 +1,879 @@
+==== altercol-generated
+
+    INSERT INTO t1 VALUES(1, 2, 3);
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== altercol-generated.dup1
+
+    ALTER TABLE t1 RENAME COLUMN b TO d;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== altercol-generated.dup2
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== altercol-generated.dup3
+
+    SELECT sql FROM sqlite_master WHERE tbl_name='t1' AND sql!=''
+----
+stmt 0 ok
+==== 2.0
+
+  CREATE TABLE t3(a, b, c, d, e, f, g, h, i, j, k, l, m, FOREIGN KEY (b, c, d, e, f, g, h, i, j, k, l, m) REFERENCES t4);
+----
+stmt 0 ok
+==== 2.2
+
+  ALTER TABLE t3 RENAME b TO biglongname;
+  SELECT sql FROM sqlite_master WHERE name='t3';
+----
+stmt 0 err 1 -1 42 no such table: t3
+stmt 42 ok
+==== 3.0
+
+  CREATE TABLE t4(x, y, z);
+  CREATE TRIGGER ttt AFTER INSERT ON t4 WHEN new.y<0 BEGIN
+    SELECT x, y, z FROM t4;
+    DELETE FROM t4 WHERE y=32;
+    UPDATE t4 SET x=y+1, y=0 WHERE y=32;
+    INSERT INTO t4(x, y, z) SELECT 4, 5, 6 WHERE 0;
+  END;
+  INSERT INTO t4 VALUES(3, 2, 1);
+----
+stmt 0 ok
+stmt 28 err 1 -1 87 no such table: main.t4
+stmt 246 err 1 -1 280 no such table: t4
+==== 3.1
+
+  ALTER TABLE t4 RENAME y TO abc;
+  SELECT sql FROM sqlite_master WHERE name='t4';
+----
+stmt 0 err 1 -1 34 no such table: t4
+stmt 34 ok
+==== 3.2
+
+  SELECT * FROM t4;
+----
+stmt 0 err 1 -1 20 no such table: t4
+==== 3.3
+ INSERT INTO t4 VALUES(6, 5, 4);
+----
+stmt 0 err 1 -1 32 no such table: t4
+==== 3.4
+ SELECT sql FROM sqlite_master WHERE type='trigger'
+----
+stmt 0 ok
+==== 4.0
+
+  CREATE TABLE c1(a, b, FOREIGN KEY (a, b) REFERENCES p1(c, d));
+  CREATE TABLE p1(c, d, PRIMARY KEY(c, d));
+  PRAGMA foreign_keys = 1;
+  INSERT INTO p1 VALUES(1, 2);
+  INSERT INTO p1 VALUES(3, 4);
+----
+stmt 0 ok
+stmt 65 ok
+stmt 109 ok
+stmt 136 err 1 -1 167 no such table: p1
+stmt 167 err 1 -1 198 no such table: p1
+==== 4.1
+
+  ALTER TABLE p1 RENAME d TO "silly name";
+  SELECT sql FROM sqlite_master WHERE name IN ('c1', 'p1');
+----
+stmt 0 err 1 -1 43 no such table: p1
+stmt 43 ok
+==== 4.2
+ INSERT INTO c1 VALUES(1, 2);
+----
+stmt 0 err 1 -1 29 no such table: c1
+==== 4.3
+
+  CREATE TABLE c2(a, b, FOREIGN KEY (a, b) REFERENCES p1);
+----
+stmt 0 ok
+==== 4.4
+
+  ALTER TABLE p1 RENAME "silly name" TO reasonable;
+  SELECT sql FROM sqlite_master WHERE name IN ('c1', 'c2', 'p1');
+----
+stmt 0 err 1 -1 52 no such table: p1
+stmt 52 ok
+==== 5.0
+
+  CREATE TABLE t5(a, b, c);
+  CREATE INDEX t5a ON t5(a);
+  INSERT INTO t5 VALUES(1, 2, 3), (4, 5, 6);
+  ANALYZE;
+----
+stmt 0 ok
+stmt 28 err 1 -1 57 no such table: main.t5
+stmt 57 err 1 -1 102 no such table: t5
+stmt 102 ok
+==== 5.1
+
+  ALTER TABLE t5 RENAME b TO big;
+  SELECT big FROM t5;
+----
+stmt 0 err 1 -1 34 no such table: t5
+stmt 34 err 1 -1 56 no such table: t5
+==== 6.1
+
+  ALTER TABLE sqlite_stat1 RENAME tbl TO thetable;
+----
+stmt 0 err 1 -1 51 no such table: sqlite_stat1
+==== 6.0
+
+  CREATE TABLE blob(
+    rid INTEGER PRIMARY KEY,
+    rcvid INTEGER,
+    size INTEGER,
+    uuid TEXT UNIQUE NOT NULL,
+    content BLOB,
+    CHECK( length(uuid)>=40 AND rid>0 )
+  );
+----
+stmt 0 ok
+==== 6.1.dup1
+
+  ALTER TABLE "blob" RENAME COLUMN "rid" TO "a1";
+----
+stmt 0 err 1 -1 50 no such table: blob
+==== 6.3
+
+  SELECT "where" FROM blob;
+----
+stmt 0 err 1 -1 28 no such table: blob
+==== 7.0
+
+  CREATE TABLE c(x);
+  INSERT INTO c VALUES(0);
+  CREATE TABLE t6("col a", "col b", "col c");
+  CREATE TRIGGER zzz AFTER UPDATE OF "col a", "col c" ON t6 BEGIN
+    UPDATE c SET x=x+1;
+  END;
+----
+stmt 0 ok
+stmt 21 err 1 -1 48 no such table: c
+stmt 48 ok
+stmt 94 err 1 -1 160 no such table: main.t6
+==== 7.1.1
+
+  INSERT INTO t6 VALUES(0, 0, 0);
+  UPDATE t6 SET "col c" = 1;
+  SELECT * FROM c;
+----
+stmt 0 err 1 -1 34 no such table: t6
+stmt 34 err 1 -1 63 no such table: t6
+stmt 63 err 1 -1 82 no such table: c
+==== 7.1.2
+
+  ALTER TABLE t6 RENAME "col c" TO "col 3";
+----
+stmt 0 err 1 -1 44 no such table: t6
+==== 7.1.3
+
+  UPDATE t6 SET "col 3" = 0;
+  SELECT * FROM c;
+----
+stmt 0 err 1 -1 29 no such table: t6
+stmt 29 err 1 -1 48 no such table: c
+==== 8.0
+
+  CREATE TABLE a1(x INTEGER, y TEXT, z BLOB, PRIMARY KEY(x));
+  CREATE TABLE a2(a, b, c);
+  CREATE VIEW v1 AS SELECT x, y, z FROM a1;
+----
+stmt 0 ok
+stmt 62 ok
+stmt 90 ok
+==== 8.1
+
+  ALTER TABLE a1 RENAME y TO yyy;
+  SELECT sql FROM sqlite_master WHERE type='view';
+----
+stmt 0 err 1 -1 34 no such table: a1
+stmt 34 ok
+==== 8.2.1
+
+  DROP VIEW v1;
+  CREATE VIEW v2 AS SELECT x, x+x, a, a+a FROM a1, a2;
+----
+stmt 0 err 1 -1 16 no such view: v1
+stmt 16 ok
+==== 8.2.2
+
+  ALTER TABLE a1 RENAME x TO xxx;
+----
+stmt 0 err 1 -1 34 no such table: a1
+==== 8.2.3
+
+  SELECT sql FROM sqlite_master WHERE type='view';
+----
+stmt 0 ok
+==== 8.3.1
+
+  DROP TABLE a2;
+  DROP VIEW v2;
+  CREATE TABLE a2(a INTEGER PRIMARY KEY, b, c);
+  CREATE VIEW v2 AS SELECT xxx, xxx+xxx, a, a+a FROM a1, a2;
+----
+stmt 0 err 1 -1 17 no such table: a2
+stmt 17 err 1 -1 33 no such view: v2
+stmt 33 ok
+stmt 81 ok
+==== 8.3.2
+
+  ALTER TABLE a1 RENAME xxx TO x;
+----
+stmt 0 err 1 -1 34 no such table: a1
+==== 8.3.3
+
+  SELECT sql FROM sqlite_master WHERE type='view';
+----
+stmt 0 ok
+==== 8.4.0
+
+  CREATE TABLE b1(a, b, c);
+  CREATE TABLE b2(x, y, z);
+----
+stmt 0 ok
+stmt 28 ok
+==== 8.4.1
+
+  CREATE VIEW vvv AS SELECT c+c || coalesce(c, c) FROM b1, b2 WHERE x=c GROUP BY c HAVING c>0;
+  ALTER TABLE b1 RENAME c TO "a;b";
+  SELECT sql FROM sqlite_master WHERE name='vvv';
+----
+stmt 0 ok
+stmt 95 err 1 -1 131 no such table: b1
+stmt 131 ok
+==== 8.4.2
+
+  CREATE VIEW www AS SELECT b FROM b1 UNION ALL SELECT y FROM b2;
+  ALTER TABLE b1 RENAME b TO bbb;
+  SELECT sql FROM sqlite_master WHERE name='www';
+----
+stmt 0 ok
+stmt 66 err 1 -1 100 no such table: b1
+stmt 100 ok
+==== 8.4.3
+
+  CREATE VIEW xxx AS SELECT a FROM b1 UNION SELECT x FROM b2 ORDER BY 1 COLLATE nocase;
+----
+stmt 0 ok
+==== 8.4.4
+
+  ALTER TABLE b2 RENAME x TO hello;
+  SELECT sql FROM sqlite_master WHERE name='xxx';
+----
+stmt 0 err 1 -1 36 no such table: b2
+stmt 36 ok
+==== 8.4.5
+
+  CREATE VIEW zzz AS SELECT george, ringo FROM b1;
+  ALTER TABLE b1 RENAME a TO aaa;
+----
+stmt 0 ok
+stmt 51 err 1 -1 85 no such table: b1
+==== 8.5
+
+  DROP VIEW zzz;
+  CREATE TABLE t5(a TEXT, b INT);
+  INSERT INTO t5(a,b) VALUES('aaa',7),('bbb',3),('ccc',4);
+  CREATE VIEW vt5(x) AS SELECT group_concat(a ORDER BY b) FROM t5;
+  SELECT x FROM vt5;
+----
+stmt 0 err 1 -1 17 no such view: zzz
+stmt 17 ok
+stmt 51 err 1 -1 110 no such table: t5
+stmt 110 ok
+stmt 177 err 1 -1 198 no such table: vt5
+==== 8.5.1
+
+  ALTER TABLE t5 RENAME COLUMN b TO bbb;
+  SELECT sql FROM sqlite_schema WHERE name='vt5';
+----
+stmt 0 err 1 -1 41 no such table: t5
+stmt 41 ok
+==== 8.5.2
+
+  SELECT x FROM vt5;
+----
+stmt 0 err 1 -1 21 no such table: vt5
+==== altercol-generated.dup4
+
+      SELECT sql FROM sqlite_master WHERE sql!='' ORDER BY 1
+----
+stmt 0 ok
+==== altercol-generated.dup5
+
+      SELECT sql FROM sqlite_master ORDER BY 1
+----
+stmt 0 ok
+==== 11.0
+
+    CREATE TABLE x1(a, b, c);
+    CREATE VIRTUAL TABLE e1 USING echo(x1);
+----
+stmt 0 ok
+stmt 30 ok
+==== 11.1
+
+    ALTER TABLE x1 RENAME b TO bbb;
+    SELECT sql FROM sqlite_master;
+----
+stmt 0 err 1 -1 36 no such table: x1
+stmt 36 ok
+==== 11.2
+
+    CREATE VIEW v1 AS SELECT e1.*, x1.c FROM e1, x1;
+----
+stmt 0 ok
+==== 11.3
+
+    ALTER TABLE x1 RENAME c TO ccc;
+----
+stmt 0 err 1 -1 36 no such table: x1
+==== 12.1.1
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX t1a ON t1(a);
+  INSERT INTO t1 VALUES(1, 1), (2, 2), (3, 4);
+  ANALYZE;
+----
+stmt 0 ok
+stmt 25 err 1 -1 54 no such table: main.t1
+stmt 54 err 1 -1 101 no such table: t1
+stmt 101 ok
+==== 12.1.2
+
+  ALTER TABLE sqlite_stat1 RENAME idx TO theindex;
+----
+stmt 0 err 1 -1 51 no such table: sqlite_stat1
+==== 12.1.3
+
+  SELECT sql FROM sqlite_master WHERE tbl_name = 'sqlite_stat1'
+----
+stmt 0 ok
+==== 12.2.1
+
+  CREATE VIEW v1 AS SELECT * FROM t1;
+  CREATE VIEW v2(c, d) AS SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 38 ok
+==== 12.2.2
+
+  ALTER TABLE v1 RENAME a TO z;
+----
+stmt 0 err 1 -1 32 no such table: v1
+==== 12.2.3
+
+  ALTER TABLE v2 RENAME c TO y;
+----
+stmt 0 err 1 -1 32 no such table: v2
+==== 12.3.1
+
+    CREATE VIRTUAL TABLE ft USING fts5(a, b, c);
+----
+stmt 0 ok
+==== 12.3.2
+
+    ALTER TABLE ft RENAME a TO z;
+----
+stmt 0 err 1 -1 34 no such table: ft
+==== 12.4.1
+
+  CREATE TABLE t2(x, y, z);
+----
+stmt 0 ok
+==== 12.4.2
+
+  ALTER TABLE t2 RENAME COLUMN a TO b;
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== 12.5.1
+
+  ALTER TABLE t3 RENAME COLUMN a TO b;
+----
+stmt 0 err 1 -1 39 no such table: t3
+==== 13.1.1
+
+  CREATE TABLE x1(i INTEGER, t TEXT UNIQUE);
+  CREATE TRIGGER tr1 AFTER INSERT ON x1 BEGIN
+    SELECT * FROM nosuchtable;
+  END;
+----
+stmt 0 ok
+stmt 45 err 1 -1 91 no such table: main.x1
+==== 13.1.2
+
+  ALTER TABLE x1 RENAME COLUMN t TO ttt;
+----
+stmt 0 err 1 -1 41 no such table: x1
+==== 13.1.3
+
+  DROP TRIGGER tr1;
+  CREATE INDEX x1i ON x1(i);
+  SELECT sql FROM sqlite_master WHERE name='x1i';
+----
+stmt 0 err 1 -1 20 no such trigger: tr1
+stmt 20 err 1 -1 49 no such table: main.x1
+stmt 49 ok
+==== 13.1.4
+
+  PRAGMA writable_schema = ON;
+  UPDATE sqlite_master SET sql = 'CREATE INDEX x1i ON x1(j)' WHERE name='x1i';
+  PRAGMA writable_schema = OFF;
+----
+stmt 0 ok
+stmt 31 ok
+stmt 110 ok
+==== 13.1.5
+
+  ALTER TABLE x1 RENAME COLUMN t TO ttt;
+----
+stmt 0 err 1 -1 41 no such table: x1
+==== 13.1.6
+
+  PRAGMA writable_schema = ON;
+  UPDATE sqlite_master SET sql = '' WHERE name='x1i';
+  PRAGMA writable_schema = OFF;
+----
+stmt 0 ok
+stmt 31 ok
+stmt 85 ok
+==== 13.1.7
+
+  ALTER TABLE x1 RENAME COLUMN t TO ttt;
+----
+stmt 0 err 1 -1 41 no such table: x1
+==== 13.1.8
+
+  PRAGMA writable_schema = ON;
+  DELETE FROM sqlite_master WHERE name = 'x1i';
+  PRAGMA writable_schema = OFF;
+----
+stmt 0 ok
+stmt 31 ok
+stmt 79 ok
+==== 13.2.0
+
+  CREATE TABLE data(x UNIQUE, y, z);
+----
+stmt 0 ok
+==== altercol-generated.dup6
+
+    ALTER TABLE x1 RENAME COLUMN t TO ttt;
+----
+stmt 0 err 1 -1 43 no such table: x1
+==== 14.1
+
+  CREATE TABLE ddd(sql, type, object, db, tbl, icol, znew, bquote);
+  INSERT INTO ddd VALUES(
+      'CREATE TABLE x1(i INTEGER, t TEXT)',
+      'table', 'x1', 'main', 'x1', -1, 'zzz', 0
+  ), (
+      'CREATE TABLE x1(i INTEGER, t TEXT)',
+      'table', 'x1', 'main', 'x1', 2, 'zzz', 0
+  ), (
+      'CREATE TABLE x1(i INTEGER, t TEXT)',
+      'table', 'x1', 'main', 'notable', 0, 'zzz', 0
+  ), (
+      'CREATE TABLE x1(i INTEGER, t TEXT)',
+      'table', 'x1', 'main', 'ddd', -1, 'zzz', 0
+  );
+----
+stmt 0 ok
+stmt 68 err 1 -1 492 no such table: ddd
+==== 14.2
+
+  SELECT 
+  sqlite_rename_column(sql, type, object, db, tbl, icol, znew, bquote, 0)
+  FROM ddd;
+----
+stmt 0 err 1 -1 96 no such table: ddd
+==== 14.3
+
+  SELECT sqlite_rename_column(0,0,0,0,0,0,0,0,0);
+----
+stmt 0 err 1 10 50 no such function: sqlite_rename_column
+==== 15.0
+
+  CREATE TABLE xxx(a, b, c);
+  SELECT a AS d FROM xxx WHERE d=0;
+----
+stmt 0 ok
+stmt 29 err 1 -1 65 no such table: xxx
+==== 15.1
+
+  CREATE VIEW vvv AS SELECT a AS d FROM xxx WHERE d=0;
+  ALTER TABLE xxx RENAME a TO xyz;
+----
+stmt 0 ok
+stmt 55 err 1 -1 90 no such table: xxx
+==== 15.2
+
+  SELECT sql FROM sqlite_master WHERE type='view';
+----
+stmt 0 ok
+==== 16.1.0
+
+  CREATE TABLE t1(a,b,c);
+  CREATE TABLE t2(d,e,f);
+  INSERT INTO t1 VALUES(1,2,3);
+  INSERT INTO t2 VALUES(4,5,6);
+  CREATE VIEW v4 AS SELECT a, d FROM t1, t2;
+  SELECT * FROM v4;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 52 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 116 no such table: t2
+stmt 116 ok
+stmt 161 err 1 -1 181 no such table: v4
+==== 16.1.1
+
+  ALTER TABLE t2 RENAME d TO a;
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== 16.1.2
+
+  SELECT * FROM v4;
+----
+stmt 0 err 1 -1 20 no such table: v4
+==== 16.1.3
+
+  CREATE UNIQUE INDEX t2d ON t2(d);
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t2 VALUES(new.a, new.b, new.c)
+      ON CONFLICT(d) DO UPDATE SET f = excluded.f;
+  END;
+----
+stmt 0 err 1 -1 36 no such table: main.t2
+stmt 36 err 1 -1 82 no such table: main.t1
+==== 16.1.4
+
+  INSERT INTO t1 VALUES(4, 8, 456);
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 56 no such table: t2
+==== 16.1.5
+
+  ALTER TABLE t2 RENAME COLUMN f TO "big f";
+  INSERT INTO t1 VALUES(4, 0, 20456);
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 45 no such table: t2
+stmt 45 err 1 -1 83 no such table: t1
+stmt 83 err 1 -1 103 no such table: t2
+==== 16.1.6
+
+  ALTER TABLE t1 RENAME COLUMN c TO "big c";
+  INSERT INTO t1 VALUES(4, 0, 0);
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 45 no such table: t1
+stmt 45 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 99 no such table: t2
+==== 16.2.1
+
+  CREATE VIEW temp.v5 AS SELECT "big c" FROM t1; 
+  SELECT * FROM v5;
+----
+stmt 0 ok
+stmt 49 err 1 -1 70 no such table: v5
+==== 16.2.2
+
+  ALTER TABLE t1 RENAME COLUMN "big c" TO reallybigc;
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== 16.2.3
+
+  SELECT * FROM v5;
+----
+stmt 0 err 1 -1 20 no such table: v5
+==== 17.0
+
+  CREATE TABLE u7(x, y, z);
+  CREATE TRIGGER u7t AFTER INSERT ON u7 BEGIN
+    INSERT INTO u8 VALUES(new.x, new.y, new.z);
+  END;
+----
+stmt 0 ok
+stmt 28 err 1 -1 74 no such table: main.u7
+==== 17.1
+
+  ALTER TABLE u7 RENAME x TO xxx;
+----
+stmt 0 err 1 -1 34 no such table: u7
+==== 17.2
+
+  CREATE TEMP TABLE uu7(x, y, z);
+  CREATE TRIGGER uu7t AFTER INSERT ON uu7 BEGIN
+    INSERT INTO u8 VALUES(new.x, new.y, new.z);
+  END;
+----
+stmt 0 ok
+stmt 34 err 1 -1 82 no such table: main.uu7
+==== 17.3
+
+  ALTER TABLE uu7 RENAME x TO xxx;
+----
+stmt 0 err 1 -1 35 no such table: uu7
+==== 18.0
+
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE t1(a);
+  CREATE TABLE aux.log(v);
+  CREATE TEMP TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO log VALUES(new.a);
+  END;
+  INSERT INTO t1 VALUES(111);
+  SELECT v FROM log;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 50 err 1 66 74 unknown database aux
+stmt 77 err 1 -1 128 no such table: t1
+stmt 170 err 1 -1 200 no such table: t1
+stmt 200 err 1 -1 221 no such table: log
+==== 18.1
+
+  ALTER TABLE t1 RENAME a TO b;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== 19.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(c, d);
+  CREATE VIEW v2(e) AS SELECT coalesce(t2.c,t1.a) FROM t1, t2 WHERE t1.b=t2.d;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 ok
+==== 19.1
+
+  ALTER TABLE t1 RENAME a TO f;
+  SELECT sql FROM sqlite_master WHERE name = 'v2';
+----
+stmt 0 err 1 -1 32 no such table: t1
+stmt 32 ok
+==== 20.100
+
+  CREATE TABLE t1(aaa,b,c,UNIQUE(aaA),PRIMARY KEY(aAa),UNIQUE(aAA));
+  ALTER TABLE t1 RENAME aaa TO bbb;
+  SELECT sql FROM sqlite_master WHERE name='t1';
+----
+stmt 0 ok
+stmt 69 err 1 -1 105 no such table: t1
+stmt 105 ok
+==== 20.105
+
+  DROP TABLE t1;
+  CREATE TABLE t1(aaa,b,c,UNIQUE(aaA),PRIMARY KEY(aAa),UNIQUE(aAA))WITHOUT ROWID;
+  ALTER TABLE t1 RENAME aaa TO bbb;
+  SELECT sql FROM sqlite_master WHERE name='t1';
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 99 err 1 -1 135 no such table: t1
+stmt 135 ok
+==== 20.110
+
+  DROP TABLE t1;
+  CREATE TABLE t1(aa UNIQUE,bb UNIQUE,cc UNIQUE,UNIQUE(aA),PRIMARY KEY(bB),UNIQUE(cC));
+  ALTER TABLE t1 RENAME aa TO xx;
+  ALTER TABLE t1 RENAME bb TO yy;
+  ALTER TABLE t1 RENAME cc TO zz;
+  SELECT sql FROM sqlite_master WHERE name='t1';
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 105 err 1 -1 139 no such table: t1
+stmt 139 err 1 -1 173 no such table: t1
+stmt 173 err 1 -1 207 no such table: t1
+stmt 207 ok
+==== 21.0
+
+  CREATE TABLE t1(a, b, c NOT NULL);
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 WHEN new.c IS NOT NULL BEGIN
+    SELECT c NOT NULL FROM t1;
+  END;
+----
+stmt 0 ok
+stmt 37 err 1 -1 106 no such table: main.t1
+==== 21.1
+
+  ALTER TABLE t1 RENAME c TO d;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== 21.2
+
+  SELECT sql FROM sqlite_schema WHERE name IS 'tr1'
+----
+stmt 0 ok
+==== 22.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(c, othername, extra AS (c + 1));
+  ALTER TABLE t1 RENAME a to othername;
+  SELECT sql FROM sqlite_schema;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 76 err 1 -1 116 no such table: t1
+stmt 116 ok
+==== 22.0.dup1
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX x1 on t1("c"=b);
+  INSERT INTO t1 VALUES('a', 'a');
+  INSERT INTO t1 VALUES('b', 'b');
+  INSERT INTO t1 VALUES('c', 'c');
+  ALTER TABLE t1 RENAME COLUMN a TO "c";
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 25 err 1 -1 57 no such table: main.t1
+stmt 57 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 127 no such table: t1
+stmt 127 err 1 -1 162 no such table: t1
+stmt 162 err 1 -1 203 no such table: t1
+stmt 203 ok
+==== 23.0
+
+  CREATE TABLE t1('a'"b",c);
+  CREATE INDEX i1 ON t1('a');
+  INSERT INTO t1 VALUES(1,2), (3,4);
+  ALTER TABLE t1 RENAME COLUMN a TO x;
+  PRAGMA integrity_check;
+  SELECT sql FROM sqlite_schema WHERE name='t1';
+----
+stmt 0 ok
+stmt 29 err 1 -1 59 no such table: main.t1
+stmt 59 err 1 -1 96 no such table: t1
+stmt 96 err 1 -1 135 no such table: t1
+stmt 135 ok
+stmt 161 ok
+==== 23.0.dup1
+
+  CREATE TABLE t1(a INT, b REAL, c TEXT, d BLOB, e ANY);
+  CREATE INDEX t1abx ON t1(a, b, a+b) WHERE c IS NOT NULL;
+  CREATE VIEW t2 AS SELECT a+10, b*5.0, xyz FROM t1; -- unknown column "xyz"
+  CREATE TABLE schema_copy(name TEXT, sql TEXT);
+  INSERT INTO schema_copy(name,sql) SELECT name, sql FROM sqlite_schema WHERE sql IS NOT NULL;
+----
+stmt 0 ok
+stmt 57 err 1 -1 116 no such table: main.t1
+stmt 116 ok
+stmt 169 ok
+stmt 242 err 1 -1 337 no such table: schema_copy
+==== 23.1
+
+  ALTER TABLE t1 RENAME COLUMN e TO eeee;
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== 23.2
+
+  SELECT name, sql FROM sqlite_master
+    EXCEPT SELECT name, sql FROM schema_copy;
+----
+stmt 0 err 1 -1 84 no such table: schema_copy
+==== 23.3
+
+  BEGIN;
+  PRAGMA writable_schema=ON;
+  ALTER TABLE t1 RENAME COLUMN e TO eeee;
+  PRAGMA writable_schema=OFF;
+  SELECT name FROM sqlite_master
+     WHERE (name, sql) NOT IN (SELECT name, sql FROM schema_copy);
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 38 err 1 -1 80 no such table: t1
+stmt 80 ok
+stmt 110 err 1 -1 210 no such table: schema_copy
+stmt 210 ok
+==== 23.10
+
+  DROP VIEW t2;
+  CREATE TRIGGER r3 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t3(x,y) VALUES(new.a, new.b);
+    INSERT INTO t4(p) VALUES(new.c);    -- no such table "t4"
+  END;
+  DELETE FROM schema_copy;
+  INSERT INTO schema_copy(name,sql) SELECT name, sql FROM sqlite_schema WHERE sql IS NOT NULL;
+----
+stmt 0 err 1 -1 16 no such view: t2
+stmt 16 err 1 -1 61 no such table: main.t1
+stmt 176 err 1 -1 203 no such table: schema_copy
+stmt 203 err 1 -1 298 no such table: schema_copy
+==== 23.11
+
+  ALTER TABLE t1 RENAME COLUMN e TO eeee;
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== 23.12
+
+  SELECT name, sql FROM sqlite_master
+    EXCEPT SELECT name, sql FROM schema_copy;
+----
+stmt 0 err 1 -1 84 no such table: schema_copy
+==== 23.13
+
+  BEGIN;
+  PRAGMA writable_schema=ON;
+  ALTER TABLE t1 RENAME COLUMN e TO eeee;
+  PRAGMA writable_schema=OFF;
+  SELECT name FROM sqlite_master
+     WHERE (name, sql) NOT IN (SELECT name, sql FROM schema_copy);
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 38 err 1 -1 80 no such table: t1
+stmt 80 ok
+stmt 110 err 1 -1 210 no such table: schema_copy
+stmt 210 ok
+==== 23.20
+
+  CREATE TABLE t4(id INTEGER PRIMARY KEY, c1 INT, c2 INT);
+  CREATE VIEW t4v1 AS SELECT id, c1, c99 FROM t4;
+  DELETE FROM schema_copy;
+  INSERT INTO schema_copy SELECT name, sql FROM sqlite_schema;
+  BEGIN;
+  PRAGMA writable_schema=ON;
+  ALTER TABLE t4 RENAME to t4new;
+  SELECT name FROM sqlite_schema WHERE (name,sql) NOT IN (SELECT * FROM schema_copy);
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 59 ok
+stmt 109 err 1 -1 136 no such table: schema_copy
+stmt 136 err 1 -1 199 no such table: schema_copy
+stmt 199 ok
+stmt 208 ok
+stmt 237 err 1 -1 271 no such table: t4
+stmt 271 err 1 -1 357 no such table: schema_copy
+stmt 357 ok
+==== 24.0
+
+  CREATE TABLE t1(a PRIMARY KEY, b);
+  CREATE TABLE t2(a, b, c);
+  INSERT INTO t2 VALUES(1, 1, 1);
+----
+stmt 0 ok
+stmt 37 ok
+stmt 65 err 1 -1 99 no such table: t2
+==== 24.1
+
+  PRAGMA foreign_keys = 1;
+  ALTER TABLE t2 ADD COLUMN d REFERENCES t1 DEFAULT 123;
+----
+stmt 0 ok
+stmt 27 err 1 -1 68 no such table: t2

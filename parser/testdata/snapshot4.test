@@ -1,0 +1,23 @@
+==== 1.0
+
+  PRAGMA cache_size = 10;
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, randomblob(400));
+  PRAGMA journal_mode = wal;
+  WITH s(i) AS (
+    SELECT 2 UNION ALL SELECT i+1 FROM s WHERE i<100
+  ) 
+  INSERT INTO t1 SELECT i, randomblob(400) FROM s;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 51 err 1 -1 96 no such table: t1
+stmt 96 ok
+stmt 125 err 1 -1 251 no such table: t1
+==== 1.1
+
+    BEGIN;
+      SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 11 err 1 -1 42 no such table: t1

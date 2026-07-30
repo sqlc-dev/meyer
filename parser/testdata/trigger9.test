@@ -1,0 +1,263 @@
+==== trigger9-1.1
+
+    PRAGMA page_size = 1024;
+    CREATE TABLE t1(x, y, z);
+    INSERT INTO t1 VALUES('1', randstr(10000,10000), '2');
+    INSERT INTO t1 VALUES('2', randstr(10000,10000), '4');
+    INSERT INTO t1 VALUES('3', randstr(10000,10000), '6');
+    CREATE TABLE t2(x);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 59 err 1 -1 118 no such table: t1
+stmt 118 err 1 -1 177 no such table: t1
+stmt 177 err 1 -1 236 no such table: t1
+stmt 236 ok
+==== trigger9-1.2.1
+
+    BEGIN;
+      CREATE TRIGGER trig1 BEFORE DELETE ON t1 BEGIN
+        INSERT INTO t2 VALUES(old.rowid);
+      END;
+      DELETE FROM t1;
+      SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 64 no such table: main.t1
+stmt 117 err 1 -1 139 no such table: t1
+stmt 139 err 1 -1 163 no such table: t2
+==== trigger9-1.2.4
+ ROLLBACK
+----
+stmt 0 ok
+==== trigger9-1.3.1
+
+    BEGIN;
+      CREATE TRIGGER trig1 BEFORE DELETE ON t1 BEGIN
+        INSERT INTO t2 VALUES(old.x);
+      END;
+      DELETE FROM t1;
+      SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 64 no such table: main.t1
+stmt 113 err 1 -1 135 no such table: t1
+stmt 135 err 1 -1 159 no such table: t2
+==== trigger9-1.3.3
+ ROLLBACK
+----
+stmt 0 ok
+==== trigger9-1.4.1
+
+    BEGIN;
+      CREATE TRIGGER trig1 BEFORE DELETE ON t1 WHEN old.x='1' BEGIN
+        INSERT INTO t2 VALUES(old.rowid);
+      END;
+      DELETE FROM t1;
+      SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 79 no such table: main.t1
+stmt 132 err 1 -1 154 no such table: t1
+stmt 154 err 1 -1 178 no such table: t2
+==== trigger9-1.4.3
+ ROLLBACK
+----
+stmt 0 ok
+==== trigger9-1.5.1
+
+    BEGIN;
+      CREATE TRIGGER trig1 BEFORE UPDATE ON t1 BEGIN
+        INSERT INTO t2 VALUES(old.rowid);
+      END;
+      UPDATE t1 SET y = '';
+      SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 64 no such table: main.t1
+stmt 117 err 1 -1 145 no such table: t1
+stmt 145 err 1 -1 169 no such table: t2
+==== trigger9-1.5.3
+ ROLLBACK
+----
+stmt 0 ok
+==== trigger9-1.6.1
+
+    BEGIN;
+      CREATE TRIGGER trig1 BEFORE UPDATE ON t1 BEGIN
+        INSERT INTO t2 VALUES(old.x);
+      END;
+      UPDATE t1 SET y = '';
+      SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 64 no such table: main.t1
+stmt 113 err 1 -1 141 no such table: t1
+stmt 141 err 1 -1 165 no such table: t2
+==== trigger9-1.6.3
+ ROLLBACK
+----
+stmt 0 ok
+==== trigger9-1.7.1
+
+    BEGIN;
+      CREATE TRIGGER trig1 BEFORE UPDATE ON t1 WHEN old.x>='2' BEGIN
+        INSERT INTO t2 VALUES(old.x);
+      END;
+      UPDATE t1 SET y = '';
+      SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 80 no such table: main.t1
+stmt 129 err 1 -1 157 no such table: t1
+stmt 157 err 1 -1 181 no such table: t2
+==== trigger9-1.7.3
+ ROLLBACK
+----
+stmt 0 ok
+==== trigger9-3.1
+
+    CREATE TABLE t3(a, b);
+    INSERT INTO t3 VALUES(1, 'one');
+    INSERT INTO t3 VALUES(2, 'two');
+    INSERT INTO t3 VALUES(3, 'three');
+----
+stmt 0 ok
+stmt 27 err 1 -1 64 no such table: t3
+stmt 64 err 1 -1 101 no such table: t3
+stmt 101 err 1 -1 140 no such table: t3
+==== trigger9-3.2
+
+    BEGIN;
+      CREATE VIEW v1 AS SELECT * FROM t3;
+      CREATE TRIGGER trig1 INSTEAD OF UPDATE ON v1 BEGIN
+        INSERT INTO t2 VALUES(old.a);
+      END;
+      UPDATE v1 SET b = 'hello';
+      SELECT * FROM t2;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 53 err 1 -1 110 no such table: main.v1
+stmt 159 err 1 -1 192 no such table: v1
+stmt 192 err 1 -1 216 no such table: t2
+stmt 216 ok
+==== trigger9-3.4
+
+    BEGIN;
+      INSERT INTO t3 VALUES(3, 'three');
+      INSERT INTO t3 VALUES(3, 'four');
+      CREATE VIEW v1 AS SELECT DISTINCT a, b FROM t3;
+      CREATE TRIGGER trig1 INSTEAD OF UPDATE ON v1 BEGIN
+        INSERT INTO t2 VALUES(old.a);
+      END;
+      UPDATE v1 SET b = 'hello';
+      SELECT * FROM t2;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 -1 52 no such table: t3
+stmt 52 err 1 -1 92 no such table: t3
+stmt 92 ok
+stmt 146 err 1 -1 203 no such table: main.v1
+stmt 252 err 1 -1 285 no such table: v1
+stmt 285 err 1 -1 309 no such table: t2
+stmt 309 ok
+==== trigger9-3.5
+
+      BEGIN;
+        INSERT INTO t3 VALUES(1, 'uno');
+        CREATE VIEW v1 AS SELECT a, b FROM t3 EXCEPT SELECT 1, 'one';
+        CREATE TRIGGER trig1 INSTEAD OF UPDATE ON v1 BEGIN
+          INSERT INTO t2 VALUES(old.a);
+        END;
+        UPDATE v1 SET b = 'hello';
+        SELECT * FROM t2;
+      ROLLBACK;
+----
+stmt 0 ok
+stmt 13 err 1 -1 54 no such table: t3
+stmt 54 ok
+stmt 124 err 1 -1 183 no such table: main.v1
+stmt 236 err 1 -1 271 no such table: v1
+stmt 271 err 1 -1 297 no such table: t2
+stmt 297 ok
+==== trigger9-3.6
+
+      BEGIN;
+        INSERT INTO t3 VALUES(1, 'zero');
+        CREATE VIEW v1 AS 
+          SELECT sum(a) AS a, max(b) AS b FROM t3 GROUP BY t3.a HAVING b>'two';
+        CREATE TRIGGER trig1 INSTEAD OF UPDATE ON v1 BEGIN
+          INSERT INTO t2 VALUES(old.a);
+        END;
+        UPDATE v1 SET b = 'hello';
+        SELECT * FROM t2;
+      ROLLBACK;
+----
+stmt 0 ok
+stmt 13 err 1 -1 55 no such table: t3
+stmt 55 ok
+stmt 162 err 1 -1 221 no such table: main.v1
+stmt 274 err 1 -1 309 no such table: v1
+stmt 309 err 1 -1 335 no such table: t2
+stmt 335 ok
+==== 4.1
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE log(x);
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(3, 4);
+  CREATE VIEW v1 AS SELECT a, b FROM t1;
+
+  CREATE TRIGGER tr1 INSTEAD OF DELETE ON v1 BEGIN
+    INSERT INTO log VALUES('delete');
+  END;
+
+  CREATE TRIGGER tr2 INSTEAD OF UPDATE ON v1 BEGIN
+    INSERT INTO log VALUES('update');
+  END;
+
+  CREATE TRIGGER tr3 INSTEAD OF INSERT ON v1 BEGIN
+    INSERT INTO log VALUES('insert');
+  END;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 48 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 110 no such table: t1
+stmt 110 ok
+stmt 151 err 1 -1 203 no such table: main.v1
+stmt 248 err 1 -1 300 no such table: main.v1
+stmt 345 err 1 -1 397 no such table: main.v1
+==== 4.2
+
+    DELETE FROM v1 WHERE rowid=1;
+----
+stmt 0 err 1 -1 34 no such table: v1
+==== 4.3
+
+    UPDATE v1 SET a=b WHERE rowid=2;
+----
+stmt 0 err 1 -1 37 no such table: v1
+==== 4.2a
+
+    DELETE FROM log;
+----
+stmt 0 err 1 -1 21 no such table: log
+==== 4.2.dup1
+
+    DELETE FROM v1 WHERE rowid=1;
+----
+stmt 0 err 1 -1 34 no such table: v1
+==== 4.3.dup1
+
+    UPDATE v1 SET a=b WHERE rowid=2;
+----
+stmt 0 err 1 -1 37 no such table: v1
+==== 4.3b
+
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 23 no such table: log

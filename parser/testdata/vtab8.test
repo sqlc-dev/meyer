@@ -1,0 +1,58 @@
+==== vtab1.2244-1
+
+    CREATE TABLE t2244(a, b);
+    CREATE VIRTUAL TABLE t2244e USING echo(t2244);
+    INSERT INTO t2244 VALUES('AA', 'BB');
+    INSERT INTO t2244 VALUES('CC', 'DD');
+    SELECT rowid, * FROM t2244e;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 81 err 1 -1 123 no such table: t2244
+stmt 123 err 1 -1 165 no such table: t2244
+stmt 165 err 1 -1 198 no such table: t2244e
+==== vtab1.2244-2
+
+    SELECT * FROM t2244e WHERE rowid = 10;
+----
+stmt 0 err 1 -1 43 no such table: t2244e
+==== vtab1.2244-3
+
+    UPDATE t2244e SET a = 'hello world' WHERE 0;
+    SELECT rowid, * FROM t2244e;
+----
+stmt 0 err 1 -1 49 no such table: t2244e
+stmt 49 err 1 -1 82 no such table: t2244e
+==== vtab1-2250-2
+
+    CREATE TABLE t2250(a, b);
+    INSERT INTO t2250 VALUES(10, 20);
+    CREATE VIRTUAL TABLE t2250e USING echo(t2250);
+    select max(rowid) from t2250;
+    select max(rowid) from t2250e;
+----
+stmt 0 ok
+stmt 30 err 1 -1 68 no such table: t2250
+stmt 68 ok
+stmt 119 err 1 -1 153 no such table: t2250
+stmt 153 err 1 -1 188 no such table: t2250e
+==== vtab1.2260-1
+
+    CREATE TABLE t2260a_real(a, b);
+    CREATE TABLE t2260b_real(a, b);
+
+    CREATE INDEX i2260 ON t2260a_real(a);
+    CREATE INDEX i2260x ON t2260b_real(a);
+
+    CREATE VIRTUAL TABLE t2260a USING echo(t2260a_real);
+    CREATE VIRTUAL TABLE t2260b USING echo(t2260b_real);
+
+    SELECT * FROM t2260a, t2260b WHERE t2260a.a = t2260b.a AND t2260a.a > 101;
+----
+stmt 0 ok
+stmt 36 ok
+stmt 72 err 1 -1 115 no such table: main.t2260a_real
+stmt 115 err 1 -1 158 no such table: main.t2260b_real
+stmt 158 ok
+stmt 216 ok
+stmt 273 err 1 -1 353 no such table: t2260a

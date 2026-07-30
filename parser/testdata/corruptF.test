@@ -1,0 +1,14 @@
+==== 1.6
+ 
+  CREATE TABLE t4(x);
+  SELECT * FROM sqlite_master;
+----
+stmt 0 ok
+stmt 23 ok
+==== 2.6
+ 
+  CREATE TABLE t4(x);
+  SELECT * FROM sqlite_master;
+----
+stmt 0 ok
+stmt 23 ok

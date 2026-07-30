@@ -1,0 +1,17 @@
+==== aggerror-1.2
+
+    INSERT INTO t1 VALUES(40);
+    SELECT x_count(*) FROM t1;
+----
+stmt 0 err 1 -1 31 no such table: t1
+stmt 31 err 1 -1 62 no such table: t1
+==== aggerror-1.3
+
+    SELECT x_count(a) FROM t1;
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== aggerror-1.5
+
+    SELECT x_count(*) FROM t1
+----
+stmt 0 err 1 -1 31 no such table: t1

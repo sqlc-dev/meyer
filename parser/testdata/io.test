@@ -1,0 +1,60 @@
+==== io-2.1
+ DELETE FROM abc; VACUUM;
+----
+stmt 0 err 1 -1 17 no such table: abc
+stmt 17 ok
+==== io-2.6.4
+ SELECT * FROM abc
+----
+stmt 0 err 1 -1 19 no such table: abc
+==== io-2.7.3
+ SELECT * FROM abc UNION ALL SELECT * FROM abc2
+----
+stmt 0 err 1 -1 48 no such table: abc2
+==== io-2.7.6
+ SELECT * FROM abc UNION ALL SELECT * FROM abc2
+----
+stmt 0 err 1 -1 48 no such table: abc2
+==== io-2.8.2
+ SELECT * FROM abc
+----
+stmt 0 err 1 -1 19 no such table: abc
+==== io-2.8.3
+
+    ROLLBACK;
+    SELECT * FROM abc;
+----
+stmt 0 ok
+stmt 14 err 1 -1 37 no such table: abc
+==== io-2.9.3
+ COMMIT
+----
+stmt 0 ok
+==== io-2.10.3
+ ROLLBACK
+----
+stmt 0 ok
+==== io-2.11.0
+ 
+    PRAGMA locking_mode = exclusive;
+    PRAGMA locking_mode;
+----
+stmt 0 ok
+stmt 38 ok
+==== io-4.3.2
+
+      PRAGMA synchronous = full;
+      PRAGMA cache_size = 10;
+      PRAGMA synchronous;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 63 ok
+==== io-generated
+ PRAGMA integrity_check
+----
+stmt 0 ok
+==== io-generated.dup1
+ PRAGMA integrity_check
+----
+stmt 0 ok

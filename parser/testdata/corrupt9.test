@@ -1,0 +1,21 @@
+==== corrupt9-2.2
+
+    CREATE INDEX i2 ON t2(b,a);
+    REINDEX;
+----
+stmt 0 err 1 -1 32 no such table: main.t2
+stmt 32 ok
+==== corrupt9-3.2
+
+    CREATE INDEX i2 ON t2(b,a);
+    REINDEX;
+----
+stmt 0 err 1 -1 32 no such table: main.t2
+stmt 32 ok
+==== corrupt9-4.2
+
+    CREATE INDEX i2 ON t2(b,a);
+    REINDEX;
+----
+stmt 0 err 1 -1 32 no such table: main.t2
+stmt 32 ok

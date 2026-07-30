@@ -1,0 +1,234 @@
+==== 4.1.1
+
+  CREATE TABLE t1(a, b, c);
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.t2(d, e, f);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 56 err 1 72 79 unknown database aux
+==== 4.1.2
+ PRAGMA table_info = t1
+----
+stmt 0 ok
+==== 4.1.3
+ PRAGMA table_info = t2
+----
+stmt 0 ok
+==== 4.1.5a
+ 
+    PRAGMA table_info(t1)
+----
+stmt 0 ok
+==== 4.1.5
+ 
+  PRAGMA table_info(t1)
+----
+stmt 0 ok
+==== 4.1.6
+ PRAGMA table_info(t2)
+----
+stmt 0 ok
+==== 4.2.1
+
+  CREATE TABLE t1(a, b, c);
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.t2(d, e, f);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 56 err 1 72 79 unknown database aux
+==== 4.2.2
+ SELECT * FROM pragma_table_info('t1')
+----
+stmt 0 ok
+==== 4.2.3
+ SELECT * FROM pragma_table_info('t2')
+----
+stmt 0 ok
+==== 4.2.5
+ SELECT * FROM pragma_table_info('t1')
+----
+stmt 0 ok
+==== 4.2.6
+ SELECT * FROM pragma_table_info('t2')
+----
+stmt 0 ok
+==== 4.3.1
+
+  CREATE TABLE t1(a, b, c);
+  CREATE INDEX i1 ON t1(b);
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.t2(d, e, f);
+  CREATE INDEX aux.i2 ON t2(e);
+----
+stmt 0 ok
+stmt 28 err 1 -1 56 no such table: main.t1
+stmt 56 ok
+stmt 84 err 1 100 107 unknown database aux
+stmt 116 err 1 132 148 unknown database aux
+==== 4.3.2
+ SELECT * FROM pragma_index_info('i1')
+----
+stmt 0 ok
+==== 4.3.3
+ SELECT * FROM pragma_index_info('i2')
+----
+stmt 0 ok
+==== 4.3.5
+ SELECT * FROM pragma_index_info('i1')
+----
+stmt 0 ok
+==== 4.3.6
+ SELECT * FROM pragma_index_info('i2')
+----
+stmt 0 ok
+==== 4.4.0
+
+  CREATE INDEX main.i1 ON t1(b, c);
+  CREATE INDEX aux.i2 ON t2(e, f);
+----
+stmt 0 err 1 -1 36 no such table: main.t1
+stmt 36 err 1 52 71 unknown database aux
+==== 4.4.1
+ SELECT * FROM pragma_index_list('t1')
+----
+stmt 0 ok
+==== 4.4.2
+ SELECT * FROM pragma_index_list('t2')
+----
+stmt 0 ok
+==== 4.4.5
+ SELECT * FROM pragma_index_list('t1')
+----
+stmt 0 ok
+==== 4.4.6
+ SELECT * FROM pragma_index_list('t2')
+----
+stmt 0 ok
+==== 4.5.0
+
+  CREATE UNIQUE INDEX main.i1 ON t1(a);
+  CREATE UNIQUE INDEX aux.i2 ON t2(d);
+  CREATE TABLE main.c1 (a, b, c REFERENCES t1(a));
+  CREATE TABLE aux.c2 (d, e, r REFERENCES t2(d));
+----
+stmt 0 err 1 -1 40 no such table: main.t1
+stmt 40 err 1 63 79 unknown database aux
+stmt 79 ok
+stmt 130 err 1 146 154 unknown database aux
+==== 4.5.1
+ SELECT * FROM pragma_foreign_key_list('c1')
+----
+stmt 0 ok
+==== 4.5.2
+ SELECT * FROM pragma_foreign_key_list('c2')
+----
+stmt 0 ok
+==== 4.5.4
+ SELECT * FROM pragma_foreign_key_list('c1')
+----
+stmt 0 ok
+==== 4.5.5
+ SELECT * FROM pragma_foreign_key_list('c2')
+----
+stmt 0 ok
+==== 4.6.0
+
+  CREATE TABLE main.c1 (a, b, c REFERENCES t1(a));
+  CREATE TABLE aux.c2 (d, e, r REFERENCES t2(d));
+  INSERT INTO main.c1 VALUES(1, 2, 3);
+  INSERT INTO aux.c2 VALUES(4, 5, 6);
+----
+stmt 0 ok
+stmt 51 err 1 67 75 unknown database aux
+stmt 101 err 1 -1 140 no such table: main.c1
+stmt 140 err 1 -1 178 no such table: aux.c2
+==== 4.6.1
+ pragma foreign_key_check('c1')
+----
+stmt 0 err 1 -1 32 no such table: c1
+==== 4.6.2
+ pragma foreign_key_check('c2')
+----
+stmt 0 err 1 -1 32 no such table: c2
+==== 4.6.4
+ pragma foreign_key_check('c1')
+----
+stmt 0 err 1 -1 32 no such table: c1
+==== 4.6.5
+ 
+  pragma foreign_key_check('c2')
+----
+stmt 0 err 1 -1 35 no such table: c2
+==== 5.0
+
+  CREATE TABLE t4(a DEFAULT 'abc' /* comment */, b DEFAULT -1 -- comment
+     , c DEFAULT +4.0 /* another comment */
+  );
+  PRAGMA table_info = t4;
+----
+stmt 0 ok
+stmt 122 ok
+==== 6.0
+
+    DROP TABLE IF EXISTS t1;
+    DROP TABLE IF EXISTS t2;
+    CREATE TABLE t1(a INT PRIMARY KEY, b INT);
+    CREATE TABLE t2(c INT PRIMARY KEY, d INT REFERENCES t1);
+    SELECT t.name, f."table", f."from", i.name, i.pk
+      FROM pragma_table_list() AS t
+           JOIN pragma_foreign_key_list(t.name, t.schema) AS f
+           JOIN pragma_table_info(f."table", t.schema) AS i
+     WHERE i.pk;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 58 ok
+stmt 105 ok
+stmt 166 ok
+==== 6.1
+
+    CREATE VIEW v1 AS SELECT abs(a) FROM t1;
+    PRAGMA writable_schema=ON;
+    UPDATE sqlite_schema
+       SET sql=replace(sql,'abs(a)','nosuchfunc(a)')
+     WHERE name='v1';
+    PRAGMA writable_schema=RESET;
+----
+stmt 0 ok
+stmt 45 ok
+stmt 76 ok
+stmt 176 ok
+==== 6.2
+
+    PRAGMA table_list;
+----
+stmt 0 ok
+==== 7.0
+
+    CREATE TABLE t3 ("a" TEXT, "b" TEXT);
+    CREATE TABLE t4 ("a" TEXT, "b" TEXT, "c" TEXT);
+----
+stmt 0 ok
+stmt 42 ok
+==== 7.1
+
+    CREATE TABLE pragma_t3 AS SELECT * FROM pragma_table_info('t3');
+    CREATE TABLE pragma_t4 AS SELECT * FROM pragma_table_info('t4');
+----
+stmt 0 ok
+stmt 69 ok
+==== 7.2
+
+    SELECT pragma_t4.name, pragma_t3.name 
+      FROM pragma_t4 RIGHT JOIN pragma_t3 ON (pragma_t4.name=pragma_t3.name);
+----
+stmt 0 err 1 -1 121 no such table: pragma_t4
+==== 7.3
+
+    SELECT t4.name, t3.name 
+    FROM pragma_table_info('t4') t4 
+    RIGHT JOIN pragma_table_info('t3') t3 ON (t4.name=t3.name);
+----
+stmt 0 ok

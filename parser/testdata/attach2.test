@@ -1,0 +1,87 @@
+==== attach2-2.9
+
+    SELECT * FROM t1
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== attach2-2.12
+
+    COMMIT
+----
+stmt 0 ok
+==== attach2-4.13
+SELECT * FROM file2.t1
+----
+stmt 0 err 1 -1 23 no such table: file2.t1
+==== attach2-4.14
+INSERT INTO t1 VALUES(1, 2)
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== attach2-5.2
+
+    BEGIN;
+    CREATE TABLE tbl(a, b, c);
+    CREATE TABLE aux.tbl(a, b, c);
+    COMMIT;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 42 err 1 60 68 unknown database aux
+stmt 77 ok
+==== attach2-5.4
+
+    BEGIN;
+    DROP TABLE aux.tbl;
+    DROP TABLE tbl;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 -1 35 no such table: aux.tbl
+stmt 35 err 1 -1 55 no such table: tbl
+stmt 55 ok
+==== attach2-6.1
+
+    BEGIN;
+----
+stmt 0 ok
+==== attach2-6.2
+
+    ATTACH 'test3.db' as aux2;
+    DETACH aux2;
+----
+stmt 0 ok
+stmt 31 ok
+==== attach2-6.3
+
+    DETACH aux;
+----
+stmt 0 ok
+==== 2.1
+
+    PRAGMA encoding = 'utf16';
+    ATTACH 'test.db2' AS aux;
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 31 ok
+stmt 61 err 1 -1 83 no such table: t2
+==== 2.2
+
+    ATTACH 'test.db4' AS aux;
+    SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 30 err 1 -1 52 no such table: t4
+==== 2.3
+
+    ATTACH 'test.db3' AS aux;
+    SELECT * FROM t3;
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 30 err 1 -1 52 no such table: t3
+stmt 52 err 1 -1 74 no such table: t2
+==== 2.4
+
+    ATTACH 'test.db4' AS aux;
+----
+stmt 0 ok

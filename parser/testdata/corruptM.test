@@ -1,0 +1,114 @@
+==== corruptM-100
+
+  CREATE TABLE t1(a,b,c);
+  INSERT INTO t1 VALUES(111,222,333);
+  CREATE INDEX i1 ON t1(b);
+  CREATE VIEW v2 AS SELECT 15,22;
+  CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN SELECT 5; END;
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 ok
+stmt 26 err 1 -1 64 no such table: t1
+stmt 64 err 1 -1 92 no such table: main.t1
+stmt 92 ok
+stmt 126 err 1 -1 171 no such table: main.t1
+stmt 186 ok
+==== corruptM-101
+
+  PRAGMA writable_schema=on;
+  UPDATE sqlite_master SET tbl_name=NULL WHERE name='t1';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 87 ok
+==== corruptM-110
+
+  UPDATE sqlite_master SET tbl_name='tx' WHERE name='t1';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 58 table sqlite_master may not be modified
+stmt 58 ok
+==== corruptM-112
+
+  UPDATE sqlite_master SET tbl_name='t1', type='tabl' WHERE name='t1';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 71 table sqlite_master may not be modified
+stmt 71 ok
+==== corruptM-114
+
+  UPDATE sqlite_master SET tbl_name='t9',type='table',name='t9'WHERE name='t1';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 80 table sqlite_master may not be modified
+stmt 80 ok
+==== corruptM-120
+
+  UPDATE sqlite_master SET name='t1',tbl_name='T1' WHERE name='t9';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 68 table sqlite_master may not be modified
+stmt 68 ok
+==== corruptM-130
+
+  UPDATE sqlite_master SET type='view' WHERE name='t1';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 56 table sqlite_master may not be modified
+stmt 56 ok
+==== corruptM-140
+
+  UPDATE sqlite_master SET type='table', tbl_name='t1' WHERE name='t1';
+  UPDATE sqlite_master SET tbl_name='tx' WHERE name='i1';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 72 table sqlite_master may not be modified
+stmt 72 err 1 -1 130 table sqlite_master may not be modified
+stmt 130 ok
+==== corruptM-150
+
+  UPDATE sqlite_master SET type='table', tbl_name='t1' WHERE name='i1';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 72 table sqlite_master may not be modified
+stmt 72 ok
+==== corruptM-160
+
+  UPDATE sqlite_master SET type='view', tbl_name='t1' WHERE name='i1';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 71 table sqlite_master may not be modified
+stmt 71 ok
+==== corruptM-170
+
+  UPDATE sqlite_master SET type='index', tbl_name='t1' WHERE name='i1';
+  UPDATE sqlite_master SET type='table', tbl_name='v2' WHERE name='v2';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 72 table sqlite_master may not be modified
+stmt 72 err 1 -1 144 table sqlite_master may not be modified
+stmt 144 ok
+==== corruptM-180
+
+  UPDATE sqlite_master SET type='view',name='v3',tbl_name='v3' WHERE name='v2';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 80 table sqlite_master may not be modified
+stmt 80 ok
+==== corruptM-190
+
+  UPDATE sqlite_master SET type='view',name='v2',tbl_name='v2' WHERE name='v3';
+  UPDATE sqlite_master SET type='view' WHERE name='r1';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 80 table sqlite_master may not be modified
+stmt 80 err 1 -1 136 table sqlite_master may not be modified
+stmt 136 ok
+==== corruptM-192
+
+  UPDATE sqlite_master SET type='trigger',tbl_name='v2' WHERE name='r1';
+  SELECT type, name, tbl_name, '|' FROM sqlite_master;
+----
+stmt 0 err 1 -1 73 table sqlite_master may not be modified
+stmt 73 ok

@@ -1,0 +1,202 @@
+==== fkey3-1.1
+
+    PRAGMA foreign_keys=ON;
+    CREATE TABLE t1(x INTEGER PRIMARY KEY);
+    INSERT INTO t1 VALUES(100);
+    INSERT INTO t1 VALUES(101);
+    CREATE TABLE t2(y INTEGER REFERENCES t1 (x));
+    INSERT INTO t2 VALUES(100);
+    INSERT INTO t2 VALUES(101);
+    SELECT 1, x FROM t1;
+    SELECT 2, y FROM t2;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 72 err 1 -1 104 no such table: t1
+stmt 104 err 1 -1 136 no such table: t1
+stmt 136 ok
+stmt 186 err 1 -1 218 no such table: t2
+stmt 218 err 1 -1 250 no such table: t2
+stmt 250 err 1 -1 275 no such table: t1
+stmt 275 err 1 -1 300 no such table: t2
+==== fkey3-1.2
+
+    DELETE FROM t1 WHERE x=100;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== fkey3-1.3
+
+    DROP TABLE t1;
+----
+stmt 0 err 1 -1 19 no such table: t1
+==== fkey3-1.4
+
+    DROP TABLE t2;
+----
+stmt 0 err 1 -1 19 no such table: t2
+==== fkey3-1.5
+
+    DROP TABLE t1;
+----
+stmt 0 err 1 -1 19 no such table: t1
+==== 3.1.1
+
+  CREATE TABLE t3(a, b, c, d, 
+    UNIQUE(a, b),
+    FOREIGN KEY(c, d) REFERENCES t3(a, b)
+  );
+  INSERT INTO t3 VALUES(1, 2, 1, 2);
+----
+stmt 0 ok
+stmt 96 err 1 -1 133 no such table: t3
+==== 3.1.2
+
+  INSERT INTO t3 VALUES(NULL, 2, 5, 2);
+----
+stmt 0 err 1 -1 40 no such table: t3
+==== 3.1.3
+
+  INSERT INTO t3 VALUES(NULL, 3, 5, 2);
+----
+stmt 0 err 1 -1 40 no such table: t3
+==== 3.2.1
+
+  CREATE TABLE t4(a UNIQUE, b REFERENCES t4(a));
+----
+stmt 0 ok
+==== 3.2.2
+
+  INSERT INTO t4 VALUES(NULL, 1);
+----
+stmt 0 err 1 -1 34 no such table: t4
+==== 3.3.1
+
+  CREATE TABLE t5(a INTEGER PRIMARY KEY, b REFERENCES t5(a));
+  INSERT INTO t5 VALUES(NULL, 1);
+----
+stmt 0 ok
+stmt 62 err 1 -1 96 no such table: t5
+==== 3.3.2
+
+  INSERT INTO t5 VALUES(NULL, 3);
+----
+stmt 0 err 1 -1 34 no such table: t5
+==== 3.4.1
+
+  CREATE TABLE t6(a INTEGER PRIMARY KEY, b, c, d,
+    FOREIGN KEY(c, d) REFERENCES t6(a, b)
+  );
+  CREATE UNIQUE INDEX t6i ON t6(b, a);
+----
+stmt 0 ok
+stmt 97 err 1 -1 136 no such table: main.t6
+==== 3.4.2
+ INSERT INTO t6 VALUES(NULL, 'a', 1, 'a');
+----
+stmt 0 err 1 -1 42 no such table: t6
+==== 3.4.3
+ INSERT INTO t6 VALUES(2, 'a', 2, 'a');
+----
+stmt 0 err 1 -1 39 no such table: t6
+==== 3.4.4
+ INSERT INTO t6 VALUES(NULL, 'a', 1, 'a');
+----
+stmt 0 err 1 -1 42 no such table: t6
+==== 3.4.5
+ INSERT INTO t6 VALUES(5, 'a', 2, 'a');
+----
+stmt 0 err 1 -1 39 no such table: t6
+==== 3.4.6
+ 
+  INSERT INTO t6 VALUES(NULL, 'a', 65, 'a');
+----
+stmt 0 err 1 -1 46 no such table: t6
+==== 3.4.7
+
+  INSERT INTO t6 VALUES(100, 'one', 100, 'one');
+  DELETE FROM t6 WHERE a = 100;
+----
+stmt 0 err 1 -1 49 no such table: t6
+stmt 49 err 1 -1 81 no such table: t6
+==== 3.4.8
+
+  INSERT INTO t6 VALUES(100, 'one', 100, 'one');
+  UPDATE t6 SET c = 1, d = 'a' WHERE a = 100;
+  DELETE FROM t6 WHERE a = 100;
+----
+stmt 0 err 1 -1 49 no such table: t6
+stmt 49 err 1 -1 95 no such table: t6
+stmt 95 err 1 -1 127 no such table: t6
+==== 3.5.1
+
+  CREATE TABLE t7(a, b, c, d INTEGER PRIMARY KEY,
+    FOREIGN KEY(c, d) REFERENCES t7(a, b)
+  );
+  CREATE UNIQUE INDEX t7i ON t7(a, b);
+----
+stmt 0 ok
+stmt 97 err 1 -1 136 no such table: main.t7
+==== 3.5.2
+ INSERT INTO t7 VALUES('x', 1, 'x', NULL)
+----
+stmt 0 err 1 -1 42 no such table: t7
+==== 3.5.3
+ INSERT INTO t7 VALUES('x', 2, 'x', 2)
+----
+stmt 0 err 1 -1 39 no such table: t7
+==== 3.5.4
+ 
+  INSERT INTO t7 VALUES('x', 450, 'x', NULL);
+----
+stmt 0 err 1 -1 47 no such table: t7
+==== 3.5.5
+ 
+  INSERT INTO t7 VALUES('x', 450, 'x', 451);
+----
+stmt 0 err 1 -1 46 no such table: t7
+==== 3.6.1
+
+  CREATE TABLE t8(a, b, c, d, e, FOREIGN KEY(c, d) REFERENCES t8(a, b));
+  CREATE UNIQUE INDEX t8i1 ON t8(a, b);
+  CREATE UNIQUE INDEX t8i2 ON t8(c);
+  INSERT INTO t8 VALUES(1, 1, 1, 1, 1);
+----
+stmt 0 ok
+stmt 73 err 1 -1 113 no such table: main.t8
+stmt 113 err 1 -1 150 no such table: main.t8
+stmt 150 err 1 -1 190 no such table: t8
+==== 3.6.2
+ 
+  UPDATE t8 SET d = 2;
+----
+stmt 0 err 1 -1 24 no such table: t8
+==== 3.6.3
+ UPDATE t8 SET d = 1;
+----
+stmt 0 err 1 -1 21 no such table: t8
+==== 3.6.4
+ UPDATE t8 SET e = 2;
+----
+stmt 0 err 1 -1 21 no such table: t8
+==== 3.6.5
+
+  CREATE TABLE TestTable (
+    id INTEGER PRIMARY KEY,
+    name text,
+    source_id integer not null,
+    parent_id integer,
+
+    foreign key(source_id, parent_id) references TestTable(source_id, id)
+  );
+  CREATE UNIQUE INDEX testindex on TestTable(source_id, id);
+  PRAGMA foreign_keys=1;
+  INSERT INTO TestTable VALUES (1, 'parent', 1, null);
+  INSERT INTO TestTable VALUES (2, 'child', 1, 1);
+  UPDATE TestTable SET parent_id=1000 where id=2;
+----
+stmt 0 ok
+stmt 205 err 1 -1 266 no such table: main.TestTable
+stmt 266 ok
+stmt 291 err 1 -1 346 no such table: TestTable
+stmt 346 err 1 -1 397 no such table: TestTable
+stmt 397 err 1 -1 447 no such table: TestTable

@@ -1,0 +1,28 @@
+==== 0.0
+
+  CREATE TABLE t1(a NOT NULL, b);
+  CREATE INDEX i1 ON t1(a);
+----
+stmt 0 ok
+stmt 34 err 1 -1 62 no such table: main.t1
+==== 1.0
+
+  CREATE VIRTUAL TABLE ft USING fts3(c);
+  INSERT INTO ft(docid, c) VALUES(22, 'hello world');
+  INSERT INTO ft(docid, c) VALUES(44, 'hello world');
+  INSERT INTO ft(docid, c) VALUES(11, 'hello world');
+----
+stmt 0 ok
+stmt 41 err 1 -1 95 no such table: ft
+stmt 95 err 1 -1 149 no such table: ft
+stmt 149 err 1 -1 203 no such table: ft
+==== 1.2.1
+
+  SELECT max(rowid) FROM ft
+----
+stmt 0 err 1 -1 29 no such table: ft
+==== 1.2.2
+
+  SELECT min(rowid) FROM ft
+----
+stmt 0 err 1 -1 29 no such table: ft

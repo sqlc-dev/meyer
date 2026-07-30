@@ -1,0 +1,118 @@
+==== where7-1.1
+
+    CREATE TABLE t1(a INTEGER PRIMARY KEY,b,c,d);
+    INSERT INTO t1 VALUES(1,2,3,4);
+    INSERT INTO t1 VALUES(2,3,4,5);
+    INSERT INTO t1 VALUES(3,4,6,8);
+    INSERT INTO t1 VALUES(4,5,10,15);
+    INSERT INTO t1 VALUES(5,10,100,1000);
+    CREATE INDEX t1b ON t1(b);
+    CREATE INDEX t1c ON t1(c);
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 50 err 1 -1 86 no such table: t1
+stmt 86 err 1 -1 122 no such table: t1
+stmt 122 err 1 -1 158 no such table: t1
+stmt 158 err 1 -1 196 no such table: t1
+stmt 196 err 1 -1 238 no such table: t1
+stmt 238 err 1 -1 269 no such table: main.t1
+stmt 269 err 1 -1 300 no such table: main.t1
+stmt 300 err 1 -1 322 no such table: t1
+==== where7-1.1.1
+
+    CREATE TABLE t(a);
+    CREATE INDEX ta ON t(a);
+    INSERT INTO t(a) VALUES(1),(2);
+    SELECT * FROM t ORDER BY a;
+    SELECT * FROM t WHERE a<2 OR a<3 ORDER BY a;
+    PRAGMA count_changes=ON;
+    DELETE FROM t WHERE a<2 OR a<3;
+    SELECT * FROM t;
+    PRAGMA count_changes=OFF;
+    DROP TABLE t;
+----
+stmt 0 ok
+stmt 23 err 1 -1 52 no such table: main.t
+stmt 52 err 1 -1 88 no such table: t
+stmt 88 err 1 -1 120 no such table: t
+stmt 120 err 1 -1 169 no such table: t
+stmt 169 ok
+stmt 198 err 1 -1 234 no such table: t
+stmt 234 err 1 -1 255 no such table: t
+stmt 255 ok
+stmt 285 err 1 -1 303 no such table: t
+==== where7-1.1.1-noopt
+
+    CREATE TABLE t(a);
+    CREATE INDEX ta ON t(a);
+    INSERT INTO t(a) VALUES(1),(2);
+    SELECT * FROM t ORDER BY a;
+    SELECT * FROM t WHERE a<2 OR a<3 ORDER BY a;
+    PRAGMA count_changes=ON;
+    DELETE FROM t WHERE a<2 OR a<3;
+    SELECT * FROM t;
+    PRAGMA count_changes=OFF;
+    DROP TABLE t;
+----
+stmt 0 ok
+stmt 23 err 1 -1 52 no such table: main.t
+stmt 52 err 1 -1 88 no such table: t
+stmt 88 err 1 -1 120 no such table: t
+stmt 120 err 1 -1 169 no such table: t
+stmt 169 ok
+stmt 198 err 1 -1 234 no such table: t
+stmt 234 err 1 -1 255 no such table: t
+stmt 255 ok
+stmt 285 err 1 -1 303 no such table: t
+==== where7-3.1
+
+  CREATE TABLE t301 (
+      c8 INTEGER PRIMARY KEY,
+      c6 INTEGER,
+      c4 INTEGER,
+      c7 INTEGER,
+      FOREIGN KEY (c4) REFERENCES series(c4)
+  );
+  CREATE INDEX t301_c6 on t301(c6);
+  CREATE INDEX t301_c4 on t301(c4);
+  CREATE INDEX t301_c7 on t301(c7);
+  
+  CREATE TABLE t302 (
+      c1 INTEGER PRIMARY KEY,
+      c8 INTEGER,
+      c5 INTEGER,
+      c3 INTEGER,
+      c2 INTEGER,
+      c4 INTEGER,
+      FOREIGN KEY (c8) REFERENCES t301(c8)
+  );
+  CREATE INDEX t302_c3 on t302(c3);
+  CREATE INDEX t302_c8_c3 on t302(c8, c3);
+  CREATE INDEX t302_c5 on t302(c5);
+----
+stmt 0 ok
+stmt 156 err 1 -1 192 no such table: main.t301
+stmt 192 err 1 -1 228 no such table: main.t301
+stmt 228 err 1 -1 264 no such table: main.t301
+stmt 264 ok
+stmt 457 err 1 -1 493 no such table: main.t302
+stmt 493 err 1 -1 536 no such table: main.t302
+stmt 536 err 1 -1 572 no such table: main.t302
+==== 4.1
+
+  CREATE TABLE t0(w);
+  INSERT INTO t0(w) VALUES(1);
+  CREATE TABLE t1(x INT, y INT PRIMARY KEY, z); 
+  INSERT INTO t1 VALUES(0,111,222);
+  CREATE INDEX t1zxy ON t1(z,x,y);
+  SELECT y FROM t1
+   WHERE (z=222 OR y=111)
+     AND (false OR EXISTS(SELECT 1 FROM t0 WHERE t1.y));
+----
+stmt 0 ok
+stmt 22 err 1 -1 53 no such table: t0
+stmt 53 ok
+stmt 101 err 1 -1 138 no such table: t1
+stmt 138 err 1 -1 173 no such table: main.t1
+stmt 173 err 1 -1 275 no such table: t1

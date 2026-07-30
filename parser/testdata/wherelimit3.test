@@ -1,0 +1,14 @@
+==== 1.0
+
+  CREATE TABLE t1(a INT, b INT);
+  WITH RECURSIVE c(n) AS (VALUES(1) UNION ALL SELECT n+1 FROM c WHERE n<1000)
+    INSERT INTO t1 SELECT n, n FROM c;
+  CREATE INDEX t1a ON t1(a);
+  CREATE INDEX t1b ON t1(b);
+  ANALYZE;
+----
+stmt 0 ok
+stmt 33 err 1 -1 150 no such table: t1
+stmt 150 err 1 -1 179 no such table: main.t1
+stmt 179 err 1 -1 208 no such table: main.t1
+stmt 208 ok

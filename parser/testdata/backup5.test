@@ -1,0 +1,49 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(a, b);
+  INSERT INTO t2 VALUES(1, 1);
+  INSERT INTO t2 VALUES(2, 2);
+  INSERT INTO t2 VALUES(3, 3);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 81 no such table: t2
+stmt 81 err 1 -1 112 no such table: t2
+stmt 112 err 1 -1 143 no such table: t2
+==== 2.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(a, b);
+  INSERT INTO t2 VALUES(1, 1);
+  INSERT INTO t2 VALUES(2, 2);
+  INSERT INTO t2 VALUES(3, 3);
+  CREATE INDEX i1 ON t1(a);
+  CREATE INDEX i2 ON t2(a);
+  ATTACH 'test2.db' AS aux2;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 81 no such table: t2
+stmt 81 err 1 -1 112 no such table: t2
+stmt 112 err 1 -1 143 no such table: t2
+stmt 143 err 1 -1 171 no such table: main.t1
+stmt 171 err 1 -1 199 no such table: main.t2
+stmt 199 ok
+==== 2.2
+
+  CREATE TABLE aux7.t3(a, b);
+  CREATE TABLE aux7.t4(a, b);
+  INSERT INTO t4 VALUES(1, 1);
+  INSERT INTO t4 VALUES(2, 2);
+  INSERT INTO t4 VALUES(3, 3);
+  CREATE INDEX aux7.i3 ON t3(a);
+  CREATE INDEX aux7.i4 ON t4(a);
+----
+stmt 0 err 1 16 24 unknown database aux7
+stmt 30 err 1 46 54 unknown database aux7
+stmt 60 err 1 -1 91 no such table: t4
+stmt 91 err 1 -1 122 no such table: t4
+stmt 122 err 1 -1 153 no such table: t4
+stmt 153 err 1 169 186 unknown database aux7
+stmt 186 err 1 202 219 unknown database aux7

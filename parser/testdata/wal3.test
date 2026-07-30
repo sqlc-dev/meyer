@@ -1,0 +1,11 @@
+==== wal3-6.1.4
+
+    BEGIN;
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 11 err 1 -1 33 no such table: t1
+==== wal3-6.2.2
+ PRAGMA wal_checkpoint
+----
+stmt 0 ok

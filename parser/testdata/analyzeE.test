@@ -1,0 +1,377 @@
+==== analyzeE-1.0
+
+  CREATE TABLE t1(a,b);
+  WITH RECURSIVE
+    cnt(x) AS (VALUES(1000) UNION ALL SELECT x+1 FROM cnt WHERE x<2000)
+  INSERT INTO t1(a,b) SELECT x, x FROM cnt;
+  CREATE INDEX t1a ON t1(a);
+  ANALYZE;
+----
+stmt 0 ok
+stmt 24 err 1 -1 157 no such table: t1
+stmt 157 err 1 -1 186 no such table: main.t1
+stmt 186 ok
+==== analyzeE-1.1
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 500 AND 2500;
+----
+stmt 0 err 1 -1 70 no such table: t1
+==== analyzeE-1.2
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 2900 AND 3000;
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== analyzeE-1.3
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 1700 AND 1750;
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== analyzeE-1.4
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 1 AND 500
+----
+stmt 0 err 1 -1 67 no such table: t1
+==== analyzeE-1.5
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 3000 AND 3000000
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== analyzeE-1.6
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<500
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== analyzeE-1.7
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>2500
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== analyzeE-1.8
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>1900
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== analyzeE-1.9
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>1100
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== analyzeE-1.10
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<1100
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== analyzeE-1.11
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<1900
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== analyzeE-2.0
+
+  DROP INDEX t1a;
+  CREATE INDEX t1a ON t1(a DESC);
+  ANALYZE;
+----
+stmt 0 err 1 -1 18 no such index: t1a
+stmt 18 err 1 -1 52 no such table: main.t1
+stmt 52 ok
+==== analyzeE-2.1
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 500 AND 2500;
+----
+stmt 0 err 1 -1 70 no such table: t1
+==== analyzeE-2.2
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 2900 AND 3000;
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== analyzeE-2.3
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 1700 AND 1750;
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== analyzeE-2.4
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 1 AND 500
+----
+stmt 0 err 1 -1 67 no such table: t1
+==== analyzeE-2.5
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 3000 AND 3000000
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== analyzeE-2.6
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<500
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== analyzeE-2.7
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>2500
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== analyzeE-2.8
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>1900
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== analyzeE-2.9
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>1100
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== analyzeE-2.10
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<1100
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== analyzeE-2.11
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<1900
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== analyzeE-3.0
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a,b,c);
+  WITH RECURSIVE
+    cnt(x) AS (VALUES(1000) UNION ALL SELECT x+1 FROM cnt WHERE x<2000)
+  INSERT INTO t1(a,b,c) SELECT x, x, 123 FROM cnt;
+  CREATE INDEX t1ca ON t1(c,a);
+  ANALYZE;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 43 err 1 -1 183 no such table: t1
+stmt 183 err 1 -1 215 no such table: main.t1
+stmt 215 ok
+==== analyzeE-3.1
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 500 AND 2500 AND c=123;
+----
+stmt 0 err 1 -1 80 no such table: t1
+==== analyzeE-3.2
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 2900 AND 3000 AND c=123;
+----
+stmt 0 err 1 -1 81 no such table: t1
+==== analyzeE-3.3
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 1700 AND 1750 AND c=123;
+----
+stmt 0 err 1 -1 81 no such table: t1
+==== analyzeE-3.4
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 1 AND 500 AND c=123
+----
+stmt 0 err 1 -1 77 no such table: t1
+==== analyzeE-3.5
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 3000 AND 3000000 AND c=123
+----
+stmt 0 err 1 -1 84 no such table: t1
+==== analyzeE-3.6
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<500 AND c=123
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== analyzeE-3.7
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>2500 AND c=123
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== analyzeE-3.8
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>1900 AND c=123
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== analyzeE-3.9
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>1100 AND c=123
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== analyzeE-3.10
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<1100 AND c=123
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== analyzeE-3.11
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<1900 AND c=123
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== analyzeE-4.0
+
+  DROP INDEX t1ca;
+  CREATE INDEX t1ca ON t1(c ASC,a DESC);
+  ANALYZE;
+----
+stmt 0 err 1 -1 19 no such index: t1ca
+stmt 19 err 1 -1 60 no such table: main.t1
+stmt 60 ok
+==== analyzeE-4.1
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 500 AND 2500 AND c=123;
+----
+stmt 0 err 1 -1 80 no such table: t1
+==== analyzeE-4.2
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 2900 AND 3000 AND c=123;
+----
+stmt 0 err 1 -1 81 no such table: t1
+==== analyzeE-4.3
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 1700 AND 1750 AND c=123;
+----
+stmt 0 err 1 -1 81 no such table: t1
+==== analyzeE-4.4
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 1 AND 500 AND c=123
+----
+stmt 0 err 1 -1 77 no such table: t1
+==== analyzeE-4.5
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a BETWEEN 3000 AND 3000000 AND c=123
+----
+stmt 0 err 1 -1 84 no such table: t1
+==== analyzeE-4.6
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<500 AND c=123
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== analyzeE-4.7
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>2500 AND c=123
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== analyzeE-4.8
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>1900 AND c=123
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== analyzeE-4.9
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a>1100 AND c=123
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== analyzeE-4.10
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<1100 AND c=123
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== analyzeE-4.11
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a<1900 AND c=123
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== analyzeE-5.0
+
+  PRAGMA encoding = 'UTF-16';
+  CREATE TABLE t0 (c1 TEXT);
+  INSERT INTO t0 VALUES ('');
+  CREATE INDEX i0 ON t0(c1);
+  ANALYZE;
+  SELECT * FROM t0 WHERE t0.c1 BETWEEN '' AND (ABS(''));
+----
+stmt 0 ok
+stmt 30 ok
+stmt 59 err 1 -1 89 no such table: t0
+stmt 89 err 1 -1 118 no such table: main.t0
+stmt 118 ok
+stmt 129 err 1 -1 186 no such table: t0
+==== analyzeE-6.0
+
+  CREATE TABLE t1(x);
+  CREATE INDEX i1 ON t1(x,x,x,x,x||2);
+  CREATE INDEX i2 ON t1(1<2);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<1000)
+    INSERT INTO t1(x) SELECT x FROM c;
+  ANALYZE;
+----
+stmt 0 ok
+stmt 22 err 1 -1 61 no such table: main.t1
+stmt 61 err 1 -1 91 no such table: main.t1
+stmt 91 err 1 -1 208 no such table: t1
+stmt 208 ok
+==== analyzeE-6.1
+
+  SELECT count(*)>1 FROM sqlite_stat4 WHERE idx='i2' AND neq='1000 1';
+----
+stmt 0 err 1 -1 71 no such table: sqlite_stat4
+==== analyzeE-6.2
+
+  SELECT count(*) FROM sqlite_stat4 WHERE idx='i2' AND neq<>'1000 1';
+----
+stmt 0 err 1 -1 70 no such table: sqlite_stat4
+==== analyzeE-6.3
+
+  SELECT count(*)>1 FROM sqlite_stat4 WHERE idx='i1' AND neq='1 1 1 1 1 1';
+----
+stmt 0 err 1 -1 76 no such table: sqlite_stat4
+==== analyzeE-6.4
+
+  SELECT count(*) FROM sqlite_stat4 WHERE idx='i1' AND neq<>'1 1 1 1 1 1';
+----
+stmt 0 err 1 -1 75 no such table: sqlite_stat4
+==== analyzeE-7.0
+
+  CREATE TABLE t1(a TEXT COLLATE binary);
+  CREATE INDEX t1x ON t1(a);
+  INSERT INTO t1(a) VALUES(0),('apple'),(NULL),(''),('banana');
+  ANALYZE;
+  SELECT format('(%s)',a) FROM t1 WHERE t1.a > CAST(zeroblob(5) AS TEXT);
+----
+stmt 0 ok
+stmt 42 err 1 -1 71 no such table: main.t1
+stmt 71 err 1 -1 135 no such table: t1
+stmt 135 ok
+stmt 146 err 1 -1 220 no such table: t1
+==== analyzeE-7.1
+
+  SELECT format('(%s)',a) FROM t1 WHERE t1.a <= CAST(zeroblob(5) AS TEXT);
+----
+stmt 0 err 1 -1 75 no such table: t1

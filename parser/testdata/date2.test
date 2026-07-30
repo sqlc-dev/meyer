@@ -1,0 +1,215 @@
+==== date2-100
+
+  CREATE TABLE t1(x, y, CHECK( date(x) BETWEEN '2017-07-01' AND '2017-07-31' ));
+  INSERT INTO t1(x,y) VALUES('2017-07-20','one');
+----
+stmt 0 ok
+stmt 81 err 1 -1 131 no such table: t1
+==== date2-110
+
+  INSERT INTO t1(x,y) VALUES('now','two');
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== date2-120
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== date2-130
+
+  INSERT INTO t1(x,y) VALUES('2017-08-01','two');
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== date2-140
+
+  DROP TABLE t1;
+  CREATE TABLE t1(x, y, z AS (date()));
+  INSERT INTO t1(x,y) VALUES(1,2);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 57 err 1 -1 92 no such table: t1
+==== date2-200
+
+  CREATE TABLE t2(x,y);
+  INSERT INTO t2(x,y) VALUES(1, '2017-07-20'), (2, 'xyzzy');
+  CREATE INDEX t2y ON t2(date(y));
+----
+stmt 0 ok
+stmt 24 err 1 -1 85 no such table: t2
+stmt 85 err 1 -1 120 no such table: main.t2
+==== date2-210
+
+  INSERT INTO t2(x,y) VALUES(3, 'now');
+----
+stmt 0 err 1 -1 40 no such table: t2
+==== date2-220
+
+  SELECT x, y FROM t2 ORDER BY x;
+----
+stmt 0 err 1 -1 34 no such table: t2
+==== date2-300
+
+  CREATE TABLE t3(a INTEGER PRIMARY KEY,b);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<1000)
+    INSERT INTO t3(a,b) SELECT x, julianday('2017-07-01')+x FROM c;
+  UPDATE t3 SET b='now' WHERE a=500;
+----
+stmt 0 ok
+stmt 44 err 1 -1 190 no such table: t3
+stmt 190 err 1 -1 227 no such table: t3
+==== date2-310
+
+  CREATE INDEX t3b1 ON t3(datetime(b));
+----
+stmt 0 err 1 -1 40 no such table: main.t3
+==== date2-320
+
+  CREATE INDEX t3b1 ON t3(datetime(b)) WHERE typeof(b)='real';
+----
+stmt 0 err 1 -1 63 no such table: main.t3
+==== date2-330
+
+  EXPLAIN QUERY PLAN
+  SELECT a FROM t3
+   WHERE typeof(b)='real'
+     AND datetime(b) BETWEEN '2017-07-04' AND '2017-07-08';
+----
+stmt 0 err 1 -1 126 no such table: t3
+==== date2-331
+
+  SELECT a FROM t3
+   WHERE typeof(b)='real'
+     AND datetime(b) BETWEEN '2017-07-04' AND '2017-07-08'
+  ORDER BY a;
+----
+stmt 0 err 1 -1 118 no such table: t3
+==== date2-400
+
+  CREATE TABLE t4(a INTEGER PRIMARY KEY,b);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<1000)
+    INSERT INTO t4(a,b) SELECT x, julianday('2017-07-01')+x FROM c;
+  UPDATE t4 SET b='now' WHERE a=500;
+----
+stmt 0 ok
+stmt 44 err 1 -1 190 no such table: t4
+stmt 190 err 1 -1 227 no such table: t4
+==== date2-410
+
+  CREATE INDEX t4b1 ON t4(b)
+    WHERE date(b) BETWEEN '2017-06-01' AND '2017-08-31';
+----
+stmt 0 err 1 -1 86 no such table: main.t4
+==== date2-420
+
+  DELETE FROM t4 WHERE a=500;
+  CREATE INDEX t4b1 ON t4(b)
+    WHERE date(b) BETWEEN '2017-06-01' AND '2017-08-31';
+----
+stmt 0 err 1 -1 30 no such table: t4
+stmt 30 err 1 -1 116 no such table: main.t4
+==== date2-430
+
+  INSERT INTO t4(a,b) VALUES(9999,'now');
+----
+stmt 0 err 1 -1 42 no such table: t4
+==== date2-500
+
+  CREATE TABLE mods(x);
+  INSERT INTO mods(x) VALUES
+    ('+10 days'),
+    ('-10 days'),
+    ('+10 hours'),
+    ('-10 hours'),
+    ('+10 minutes'),
+    ('-10 minutes'),
+    ('+10 seconds'),
+    ('-10 seconds'),
+    ('+10 months'),
+    ('-10 months'),
+    ('+10 years'),
+    ('-10 years'),
+    ('start of month'),
+    ('start of year'),
+    ('start of day'),
+    ('weekday 1'),
+    ('unixepoch');
+  CREATE TABLE t5(y,m);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<5)
+    INSERT INTO t5(y,m) SELECT julianday('2017-07-01')+c.x, mods.x FROM c, mods;
+  CREATE INDEX t5x1 on t5(y) WHERE datetime(y,m) IS NOT NULL;
+----
+stmt 0 ok
+stmt 24 err 1 -1 396 no such table: mods
+stmt 396 ok
+stmt 420 err 1 -1 576 no such table: t5
+stmt 576 err 1 -1 638 no such table: main.t5
+==== date2-510
+
+  INSERT INTO t5(y,m) VALUES('2017-07-20','localtime');
+----
+stmt 0 err 1 -1 56 no such table: t5
+==== date2-520
+
+  INSERT INTO t5(y,m) VALUES('2017-07-20','utc');
+----
+stmt 0 err 1 -1 50 no such table: t5
+==== date2-600
+
+  CREATE TABLE t600(a REAL CHECK( a<julianday('now') ));
+  INSERT INTO t600(a) VALUES(1.0);
+----
+stmt 0 ok
+stmt 57 err 1 -1 92 no such table: t600
+==== date2-601
+
+  CREATE TABLE t601(a REAL, b TEXT, CHECK( a<julianday(b) ));
+  INSERT INTO t601(a,b) VALUES(1.0, '1970-01-01');
+----
+stmt 0 ok
+stmt 62 err 1 -1 113 no such table: t601
+==== date2-602
+
+  INSERT INTO t601(a,b) VALUES(1e100, '1970-01-01');
+----
+stmt 0 err 1 -1 53 no such table: t601
+==== date2-603
+
+  INSERT INTO t601(a,b) VALUES(10, 'now');
+----
+stmt 0 err 1 -1 43 no such table: t601
+==== date2-604
+
+  INSERT INTO t600(a) VALUES(julianday('now')+10);
+----
+stmt 0 err 1 -1 51 no such table: t600
+==== date2-610
+
+  CREATE TABLE t610(a,b);
+  CREATE INDEX t610x1 ON t610(julianday('now')+b);
+  INSERT INTO t610(a,b) VALUES(123,456);
+----
+stmt 0 ok
+stmt 26 err 1 -1 77 no such table: main.t610
+stmt 77 err 1 -1 118 no such table: t610
+==== date2-611
+
+  CREATE TABLE t611(a,b);
+  CREATE INDEX t611x1 ON t611(julianday(a)+b);
+  INSERT INTO t611(a,b) VALUES('1970-01-01',10.0);
+----
+stmt 0 ok
+stmt 26 err 1 -1 73 no such table: main.t611
+stmt 73 err 1 -1 124 no such table: t611
+==== date2-612
+
+  INSERT INTO t611(a,b) VALUES('now',10.0);
+----
+stmt 0 err 1 -1 44 no such table: t611
+==== date3-620
+
+  CREATE TABLE t620(a, b AS (a+julianday('now')));
+  INSERT INTO t620 VALUES(10);
+----
+stmt 0 ok
+stmt 51 err 1 -1 82 no such table: t620

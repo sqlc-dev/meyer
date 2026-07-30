@@ -1,0 +1,21 @@
+==== 1.1
+
+  PRAGMA page_size = 4096;
+  VACUUM;
+----
+stmt 0 ok
+stmt 27 ok
+==== 2.1
+
+  PRAGMA page_size = 4096;
+  VACUUM;
+----
+stmt 0 ok
+stmt 27 ok
+==== 3.1
+
+  PRAGMA page_size = 4096;
+  SELECT name FROM sqlite_master;
+----
+stmt 0 ok
+stmt 27 ok

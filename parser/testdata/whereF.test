@@ -1,0 +1,201 @@
+==== 1.0
+
+  PRAGMA automatic_index = 0;
+  CREATE TABLE t1(a, b, c);
+  CREATE TABLE t2(d, e, f);
+  CREATE UNIQUE INDEX i1 ON t1(a);
+  CREATE UNIQUE INDEX i2 ON t2(d);
+----
+stmt 0 ok
+stmt 30 ok
+stmt 58 ok
+stmt 86 err 1 -1 121 no such table: main.t1
+stmt 121 err 1 -1 156 no such table: main.t2
+==== 2.0
+
+  DROP TABLE t1;
+  DROP TABLE t2;
+  CREATE TABLE t1(a, b, c);
+  CREATE TABLE t2(d, e, f);
+
+  CREATE UNIQUE INDEX i1 ON t1(a);
+  CREATE UNIQUE INDEX i2 ON t1(b);
+  CREATE UNIQUE INDEX i3 ON t2(d);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 err 1 -1 34 no such table: t2
+stmt 34 ok
+stmt 62 ok
+stmt 90 err 1 -1 126 no such table: main.t1
+stmt 126 err 1 -1 161 no such table: main.t1
+stmt 161 err 1 -1 196 no such table: main.t2
+==== 3.0
+
+  DROP TABLE t1;
+  DROP TABLE t2;
+  CREATE TABLE t1(a, b, c);
+  CREATE TABLE t2(d, e, f);
+
+  CREATE UNIQUE INDEX i1 ON t1(a, b);
+  CREATE INDEX i2 ON t2(d);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 err 1 -1 34 no such table: t2
+stmt 34 ok
+stmt 62 ok
+stmt 90 err 1 -1 129 no such table: main.t1
+stmt 129 err 1 -1 157 no such table: main.t2
+==== 4.0
+
+  CREATE TABLE t4(a,b,c,d,e, PRIMARY KEY(a,b,c));
+  CREATE INDEX t4adc ON t4(a,d,c);
+  CREATE UNIQUE INDEX t4aebc ON t4(a,e,b,c);
+  EXPLAIN QUERY PLAN SELECT rowid FROM t4 WHERE a=? AND b=?;
+----
+stmt 0 ok
+stmt 50 err 1 -1 85 no such table: main.t4
+stmt 85 err 1 -1 130 no such table: main.t4
+stmt 130 err 1 -1 191 no such table: t4
+==== 5.0
+
+  CREATE TABLE t1(f1);
+  CREATE TABLE t2(f2);
+  CREATE INDEX t2f ON t2(f2);
+
+  INSERT INTO t1 VALUES(-1);
+  INSERT INTO t1 VALUES(-1);
+  INSERT INTO t1 VALUES(-1);
+  INSERT INTO t1 VALUES(-1);
+
+  WITH w(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM w WHERE i<1000
+  )
+  INSERT INTO t2 SELECT -1 FROM w;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 46 err 1 -1 76 no such table: main.t2
+stmt 76 err 1 -1 106 no such table: t1
+stmt 106 err 1 -1 135 no such table: t1
+stmt 135 err 1 -1 164 no such table: t1
+stmt 164 err 1 -1 193 no such table: t1
+stmt 193 err 1 -1 304 no such table: t2
+==== 5.1
+
+  SELECT count(*) FROM t1, t2 WHERE t2.rowid = +t1.rowid
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 5.3
+
+  SELECT count(*) FROM t1, t2 WHERE (
+    t2.rowid = +t1.rowid OR t2.f2 = t1.f1
+  )
+----
+stmt 0 err 1 -1 85 no such table: t1
+==== 5.5
+
+  SELECT count(*) FROM t1, t2 WHERE (
+    t2.rowid = +t1.rowid OR (t2.f2 = t1.f1 AND t1.f1!=-1)
+  )
+----
+stmt 0 err 1 -1 101 no such table: t1
+==== 6.1
+
+    CREATE TABLE t6(x);
+    SELECT * FROM t6 WHERE 1 IN (SELECT value FROM json_each(x));
+----
+stmt 0 ok
+stmt 24 err 1 -1 90 no such table: t6
+==== 7.1
+
+  DROP TABLE IF EXISTS cd;
+  CREATE TABLE cd ( cdid INTEGER PRIMARY KEY NOT NULL, genreid integer );
+  CREATE INDEX cd_idx_genreid ON cd (genreid);
+  INSERT INTO cd  ( cdid, genreid ) VALUES
+                     ( 1,    1 ),
+                     ( 2, NULL ),
+                     ( 3, NULL ),
+                     ( 4, NULL ),
+                     ( 5, NULL );
+  
+  SELECT cdid
+    FROM cd me
+  WHERE 2 > (
+    SELECT COUNT( * )
+      FROM cd rownum__emulation
+    WHERE
+      (
+        me.genreid IS NOT NULL
+          AND
+        rownum__emulation.genreid IS NULL
+      )
+        OR
+      (
+        me.genreid IS NOT NULL
+          AND
+        rownum__emulation.genreid IS NOT NULL
+          AND
+        rownum__emulation.genreid < me.genreid
+      )
+        OR
+      (
+        ( me.genreid = rownum__emulation.genreid OR ( me.genreid IS NULL
+  AND rownum__emulation.genreid IS NULL ) )
+          AND
+        rownum__emulation.cdid > me.cdid
+      )
+  );
+----
+stmt 0 ok
+stmt 27 ok
+stmt 101 err 1 -1 148 no such table: main.cd
+stmt 148 err 1 -1 361 no such table: cd
+stmt 361 err 1 -1 957 no such table: cd
+==== 7.2
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  INSERT INTO t1(a,b) VALUES(1,1);
+  CREATE TABLE t2(aa INTEGER PRIMARY KEY, bb);
+  INSERT INTO t2(aa,bb) VALUES(1,1),(2,NULL),(3,NULL);
+  SELECT (
+    SELECT COUNT(*) FROM t2
+     WHERE ( t1.b IS NOT NULL AND t2.bb IS NULL )
+        OR ( t2.bb < t1.b )
+        OR ( t1.b IS t2.bb AND t2.aa > t1.a )
+    )
+    FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 99 err 1 -1 134 no such table: t1
+stmt 134 ok
+stmt 181 err 1 -1 236 no such table: t2
+stmt 236 err 1 -1 418 no such table: t1
+==== 7.3
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b TEXT);
+  INSERT INTO t1(a,b) VALUES(1,'abcxyz');
+  CREATE TABLE t2(aa INTEGER PRIMARY KEY, bb TEXT);
+  INSERT INTO t2(aa,bb) VALUES(1,'abc'),(2,'wxyz'),(3,'xyz');
+  CREATE INDEX t2bb ON t2(bb);
+  EXPLAIN SELECT (
+    SELECT COUNT(*) FROM t2
+     WHERE ( t1.b GLOB 'a*z' AND t2.bb='xyz' )
+        OR ( t2.bb = t1.b )
+        OR ( t2.aa = t1.a )
+    )
+    FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 104 err 1 -1 146 no such table: t1
+stmt 146 ok
+stmt 198 err 1 -1 260 no such table: t2
+stmt 260 err 1 -1 291 no such table: main.t2
+stmt 291 err 1 -1 460 no such table: t1

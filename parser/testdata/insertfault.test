@@ -1,0 +1,9 @@
+==== 1.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b, c, d DEFAULT true);
+  INSERT INTO t1 DEFAULT VALUES;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 64 err 1 -1 97 no such table: t1
+stmt 97 err 1 -1 117 no such table: t1

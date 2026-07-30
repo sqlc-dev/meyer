@@ -1,0 +1,29 @@
+==== 1.0
+
+  CREATE TABLE blob(x INTEGER PRIMARY KEY, v BLOB);
+  INSERT INTO blob VALUES(1, 'hello world');
+  INSERT INTO blob VALUES(2, 'world hello');
+  INSERT INTO blob SELECT NULL, v FROM blob;
+  INSERT INTO blob SELECT NULL, v FROM blob;
+  INSERT INTO blob SELECT NULL, v FROM blob;
+  INSERT INTO blob SELECT NULL, v FROM blob;
+  INSERT INTO blob SELECT NULL, v FROM blob;
+  INSERT INTO blob SELECT NULL, v FROM blob;
+  INSERT INTO blob SELECT NULL, v FROM blob;
+  INSERT INTO blob SELECT NULL, v FROM blob;
+  INSERT INTO blob SELECT NULL, v FROM blob;
+  INSERT INTO blob SELECT NULL, v FROM blob;
+----
+stmt 0 ok
+stmt 52 err 1 -1 97 no such table: blob
+stmt 97 err 1 -1 142 no such table: blob
+stmt 142 err 1 -1 187 no such table: blob
+stmt 187 err 1 -1 232 no such table: blob
+stmt 232 err 1 -1 277 no such table: blob
+stmt 277 err 1 -1 322 no such table: blob
+stmt 322 err 1 -1 367 no such table: blob
+stmt 367 err 1 -1 412 no such table: blob
+stmt 412 err 1 -1 457 no such table: blob
+stmt 457 err 1 -1 502 no such table: blob
+stmt 502 err 1 -1 547 no such table: blob
+stmt 547 err 1 -1 592 no such table: blob

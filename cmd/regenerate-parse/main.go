@@ -22,7 +22,10 @@
 //
 //	go run ./cmd/regenerate-parse [-files select1,expr,...] [flags]
 //
-// With no -files, the starter set below is regenerated.
+// With no -files, every test script in the pinned source tree is
+// regenerated. Scripts that yield no literal-SQL cases (the tokenizer
+// tests written in C, the VFS and WAL harnesses, and so on) produce no
+// corpus file, and a stale one left over from an earlier run is removed.
 package main
 
 import (
@@ -37,6 +40,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -60,24 +64,21 @@ const (
 	srcSHA          = "d18fa15aec74d8c17e1463f861095adc01b5ad190256acb4f91d22f0368d232b"
 )
 
-// starterSet is the corpus from PLAN.md milestone 2: the dedicated
-// parser/tokenizer tests, the grammar-heavy statement suites, and the
-// evidence files that map 1:1 to the documented grammar.
-var starterSet = []string{
-	"parser1", "tokenize", "keyword1",
-	"select1", "select2", "select3", "select4", "select5", "select6",
-	"select7", "select8", "select9", "selectA", "selectB", "selectC",
-	"selectD", "selectE", "selectF", "selectG", "selectH",
-	"expr", "expr2", "in", "in2", "in3", "in4", "in5", "between",
-	"with1", "with2", "with3", "withM",
-	"window1", "window2", "window3", "window4", "window5",
-	"window6", "window7", "window8", "window9", "windowA",
-	"windowB", "windowC", "windowD", "windowE", "windowerr",
-	"alter", "alter2", "alter3", "alter4", "altertab", "altertab2", "altertab3",
-	"alterdropcol", "alterdropcol2",
-	"trigger1", "upsert1", "upsert2", "upsert3", "upsert4", "upsert5",
-	"returning1",
-	"e_select", "e_expr", "e_createtable", "e_insert", "e_update", "e_delete",
+// allScripts lists every test/*.test script of the pinned source tree, in
+// sorted order. PLAN.md milestone 2 named a hand-picked starter set; taking
+// the whole suite instead costs a few megabytes and quadruples the case
+// count, and needs no curation when the pin advances.
+func allScripts(testDir string) ([]string, error) {
+	paths, err := filepath.Glob(filepath.Join(testDir, "*.test"))
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, len(paths))
+	for i, path := range paths {
+		names[i] = strings.TrimSuffix(filepath.Base(path), ".test")
+	}
+	sort.Strings(names)
+	return names, nil
 }
 
 func main() {
@@ -89,11 +90,6 @@ func main() {
 	)
 	flag.Parse()
 
-	names := starterSet
-	if *files != "" {
-		names = strings.Split(*files, ",")
-	}
-
 	oracle, err := ensureOracle(*cacheDir)
 	if err != nil {
 		fatal(err)
@@ -102,11 +98,18 @@ func main() {
 	if err != nil {
 		fatal(err)
 	}
+
+	var names []string
+	if *files != "" {
+		names = strings.Split(*files, ",")
+	} else if names, err = allScripts(testDir); err != nil {
+		fatal(err)
+	}
 	if err := os.MkdirAll(*testdata, 0o755); err != nil {
 		fatal(err)
 	}
 
-	var totalCases, totalTodo int
+	var totalCases, totalTodo, usedScripts, emptyScripts int
 	var totals tclextract.Stats
 	for _, name := range names {
 		// Snapshot the previous corpus state before regenerating, so the
@@ -127,6 +130,17 @@ func main() {
 		if err != nil {
 			fatal(fmt.Errorf("%s: %w", name, err))
 		}
+		totals.Found += stats.Found
+		totals.SkippedSubst += stats.SkippedSubst
+		totals.SkippedForm += stats.SkippedForm
+		if len(cases) == 0 {
+			// Nothing extractable: leave no corpus file behind, and clear
+			// away one from an earlier run of a differently pinned tree.
+			os.Remove(testPath)
+			os.Remove(testfile.MetadataPath(testPath))
+			emptyScripts++
+			continue
+		}
 		todo, err := mergeMetadata(testPath, prevCases, prevMeta.Todo, cases)
 		if err != nil {
 			fatal(fmt.Errorf("%s: %w", name, err))
@@ -135,12 +149,11 @@ func main() {
 			name, len(cases), todo, stats.SkippedSubst, stats.SkippedForm)
 		totalCases += len(cases)
 		totalTodo += todo
-		totals.Found += stats.Found
-		totals.SkippedSubst += stats.SkippedSubst
-		totals.SkippedForm += stats.SkippedForm
+		usedScripts++
 	}
-	fmt.Printf("\ntotal: %d cases (%d todo) from %d files; %d of %d found blocks skipped (%d substitution, %d malformed/non-literal)\n",
-		totalCases, totalTodo, len(names),
+	fmt.Printf("\ntotal: %d cases (%d todo) from %d of %d scripts (%d yielded nothing); "+
+		"%d of %d found blocks skipped (%d substitution, %d malformed/non-literal)\n",
+		totalCases, totalTodo, usedScripts, len(names), emptyScripts,
 		totals.SkippedSubst+totals.SkippedForm, totals.Found,
 		totals.SkippedSubst, totals.SkippedForm)
 }
@@ -196,6 +209,9 @@ func regenerateFile(oracle, testDir, outDir, name string, jobs int) ([]testfile.
 		}
 		kept = append(kept, c)
 	}
+	if len(kept) == 0 {
+		return nil, stats, nil
+	}
 	if err := testfile.Write(filepath.Join(outDir, name+".test"), kept); err != nil {
 		return nil, stats, err
 	}
@@ -214,6 +230,17 @@ func runOracle(oracle, sql string) ([]testfile.StmtResult, error) {
 	}
 	var results []testfile.StmtResult
 	for _, line := range strings.Split(strings.TrimRight(out.String(), "\n"), "\n") {
+		// An error message can itself contain a newline, because the
+		// offending token can: "SELECT X'0102, 1" reports the rest of the
+		// input, newline included, as an unrecognized token. Such a line is
+		// a continuation of the message before it. The corpus file format
+		// cannot hold a multi-line message, so testfile.CheckCase drops the
+		// case later; joining here keeps the observation faithful until
+		// then instead of failing the whole run.
+		if !strings.HasPrefix(line, "stmt ") && len(results) > 0 {
+			results[len(results)-1].Message += "\n" + line
+			continue
+		}
 		if line == "" {
 			continue
 		}

@@ -1,0 +1,83 @@
+==== 1.1
+
+  PRAGMA page_size=1024;
+  PRAGMA auto_vacuum=0;
+  CREATE TABLE t1(x);
+
+  INSERT INTO t1 VALUES(randomblob(20));
+  INSERT INTO t1 VALUES(randomblob(100));   -- make this into a free slot
+  INSERT INTO t1 VALUES(randomblob(27));    -- this one will be corrupt
+  INSERT INTO t1 VALUES(randomblob(800));
+
+  DELETE FROM t1 WHERE rowid=2;  -- free the 100 byte slot
+  PRAGMA page_count
+----
+stmt 0 ok
+stmt 25 ok
+stmt 49 ok
+stmt 71 err 1 -1 113 no such table: t1
+stmt 113 err 1 -1 155 no such table: t1
+stmt 155 err 1 -1 228 no such table: t1
+stmt 228 err 1 -1 301 no such table: t1
+stmt 301 err 1 -1 334 no such table: t1
+stmt 334 ok
+==== 1.3
+
+  INSERT INTO t1 VALUES(randomblob(20));
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== 1.4
+
+  INSERT INTO t1 VALUES(randomblob(90));
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== 2.1
+
+  PRAGMA page_size=1024;
+  PRAGMA auto_vacuum=0;
+  CREATE TABLE t1(x);
+
+  INSERT INTO t1 VALUES(randomblob(20));
+  INSERT INTO t1 VALUES(randomblob(20));    -- free this one
+  INSERT INTO t1 VALUES(randomblob(20));
+  INSERT INTO t1 VALUES(randomblob(20));    -- and this one
+  INSERT INTO t1 VALUES(randomblob(20));    -- corrupt this one.
+
+  DELETE FROM t1 WHERE rowid IN(2, 4);
+  PRAGMA page_count
+----
+stmt 0 ok
+stmt 25 ok
+stmt 49 ok
+stmt 71 err 1 -1 113 no such table: t1
+stmt 113 err 1 -1 154 no such table: t1
+stmt 154 err 1 -1 215 no such table: t1
+stmt 215 err 1 -1 256 no such table: t1
+stmt 256 err 1 -1 316 no such table: t1
+stmt 316 err 1 -1 380 no such table: t1
+stmt 380 ok
+==== 2.3
+
+  INSERT INTO t1 VALUES(randomblob(900));
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== 3.1
+
+    PRAGMA page_size=1024;
+    CREATE TABLE t1(a, b, c);
+    CREATE TABLE t2(a, b, c);
+    CREATE TABLE t3(a, b, c);
+    CREATE TABLE t4(a, b, c);
+    CREATE TABLE t5(a, b, c);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 57 ok
+stmt 87 ok
+stmt 117 ok
+stmt 147 ok
+==== 3.3
+
+    PRAGMA integrity_check;
+----
+stmt 0 ok

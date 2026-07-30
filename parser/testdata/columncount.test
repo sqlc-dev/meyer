@@ -1,0 +1,7 @@
+==== 1.0
+
+  CREATE TABLE t1(x, y, z);
+  INSERT INTO t1 VALUES('a', 'b', 'c');
+----
+stmt 0 ok
+stmt 28 err 1 -1 68 no such table: t1

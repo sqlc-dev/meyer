@@ -1,0 +1,43 @@
+==== triggerB-1.1
+
+    CREATE TABLE x(x INTEGER PRIMARY KEY, y INT NOT NULL);
+    INSERT INTO x(y) VALUES(1);
+    INSERT INTO x(y) VALUES(1);
+    CREATE TEMP VIEW vx AS SELECT x, y, 0 AS yy FROM x;
+    CREATE TEMP TRIGGER tx INSTEAD OF UPDATE OF y ON vx
+    BEGIN
+      UPDATE x SET y = new.y WHERE x = new.x;
+    END;
+    SELECT * FROM vx;
+----
+stmt 0 ok
+stmt 59 err 1 -1 91 no such table: x
+stmt 91 err 1 -1 123 no such table: x
+stmt 123 ok
+stmt 179 err 1 -1 245 no such table: vx
+stmt 300 err 1 -1 322 no such table: vx
+==== triggerB-1.2
+
+    UPDATE vx SET y = yy;
+    SELECT * FROM vx;
+----
+stmt 0 err 1 -1 26 no such table: vx
+stmt 26 err 1 -1 48 no such table: vx
+==== triggerB-2.1
+
+    CREATE TRIGGER ty AFTER INSERT ON x BEGIN
+       SELECT wen.x; -- Unrecognized name
+    END;
+    INSERT INTO x VALUES(1,2);
+----
+stmt 0 err 1 -1 46 no such table: main.x
+stmt 97 err 1 -1 128 no such table: x
+==== triggerB-2.2
+
+    CREATE TRIGGER tz AFTER UPDATE ON x BEGIN
+       SELECT dlo.x; -- Unrecognized name
+    END;
+    UPDATE x SET y=y+1;
+----
+stmt 0 err 1 -1 46 no such table: main.x
+stmt 97 err 1 -1 121 no such table: x

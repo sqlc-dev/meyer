@@ -1,0 +1,35 @@
+==== tkt3918.1
+
+    PRAGMA page_size = 1024;
+    PRAGMA auto_vacuum = incremental;
+    CREATE TABLE t1(i, x);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 67 ok
+==== tkt3918.2
+
+    INSERT INTO t1 VALUES(1, randstr(1000,1000));
+    INSERT INTO t1 VALUES(2, zeroblob(248*1020 + 100));
+    INSERT INTO t1 VALUES(3, zeroblob(2*1020 + 100));
+----
+stmt 0 err 1 -1 50 no such table: t1
+stmt 50 err 1 -1 106 no such table: t1
+stmt 106 err 1 -1 160 no such table: t1
+==== tkt3918.3
+
+    DELETE FROM t1 WHERE i = 2;
+    DELETE FROM t1 WHERE i = 1;
+    DELETE FROM t1 WHERE i = 3;
+----
+stmt 0 err 1 -1 32 no such table: t1
+stmt 32 err 1 -1 64 no such table: t1
+stmt 64 err 1 -1 96 no such table: t1
+==== tkt3918.4
+ PRAGMA incremental_vacuum = 1
+----
+stmt 0 ok
+==== tkt3918.5
+ CREATE TABLE t2(a, b)
+----
+stmt 0 ok

@@ -1,0 +1,90 @@
+==== subtype1-100
+
+  SELECT test_getsubtype('hello');
+----
+stmt 0 err 1 10 35 no such function: test_getsubtype
+==== subtype1-110
+
+  SELECT test_getsubtype(test_setsubtype('hello',123));
+----
+stmt 0 err 1 26 56 no such function: test_setsubtype
+==== subtype1-120
+
+  SELECT typeof(test_setsubtype('hello',123));
+----
+stmt 0 err 1 17 47 no such function: test_setsubtype
+==== subtype1-130
+
+  SELECT test_setsubtype('hello',123);
+----
+stmt 0 err 1 10 39 no such function: test_setsubtype
+==== subtype1-200
+
+  CREATE TABLE t1(a); INSERT INTO t1 VALUES ('x');
+  CREATE VIEW t2(b) AS SELECT json(TRUE);
+  CREATE TABLE t3(b); INSERT INTO t3 VALUES(json(TRUE));
+----
+stmt 0 ok
+stmt 22 err 1 -1 51 no such table: t1
+stmt 51 ok
+stmt 93 ok
+stmt 115 err 1 -1 150 no such table: t3
+==== subtype1-210
+
+  SELECT * FROM t3, t1 WHERE NOT json_quote(b);
+----
+stmt 0 err 1 -1 48 no such table: t3
+==== subtype1-220
+
+  SELECT * FROM t2, t1 WHERE NOT json_quote(b);
+----
+stmt 0 err 1 -1 48 no such table: t2
+==== subtype1-230
+
+  WITH t4(a) AS MATERIALIZED (SELECT json(1)) SELECT subtype(a) FROM t4;
+----
+stmt 0 ok
+==== subtype1-231
+
+  WITH t4(a) AS NOT MATERIALIZED (SELECT json(1)) SELECT subtype(a) FROM t4;
+----
+stmt 0 ok
+==== subtype1-300
+
+  CREATE TABLE t0(c0);
+  INSERT INTO t0 VALUES ('1');
+  CREATE VIEW v0(c0) AS SELECT CASE WHEN 1 THEN json_patch('1', '1') END 
+                        FROM t0 GROUP BY t0.c0;
+  SELECT * FROM v0 WHERE json_quote(v0.c0) != '1';
+----
+stmt 0 ok
+stmt 23 err 1 -1 54 no such table: t0
+stmt 54 ok
+stmt 176 err 1 -1 227 no such table: v0
+==== subtype1-310
+
+  SELECT *, json_quote(y) FROM (SELECT +json('1') AS y);
+----
+stmt 0 ok
+==== subtype1-320
+
+  SELECT *, json_quote(y) FROM (SELECT +json('1') AS y)
+   WHERE json_quote(y)='"1"';
+----
+stmt 0 ok
+==== subtype1-400
+
+  WITH t400(id,j) AS (VALUES
+    (1,'{a:{x:1,y:2},b:{x:3,y:4}}'),
+    (2,'not json')
+  )
+  SELECT id, subtype(if(json_valid(j,6),j->'a')) FROM t400;
+----
+stmt 0 ok
+==== subtype1-500
+
+  CREATE TABLE t1(id, j);
+  INSERT INTO t1 VALUES (1,'{a:{x:1,y:2},b:{x:3,y:4}}'), (2,'not json');
+----
+stmt 0 ok
+stmt 26 err 1 -1 99 no such table: t1

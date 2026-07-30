@@ -1,0 +1,42 @@
+==== vtabB-2.1
+
+    INSERT INTO t1 VALUES(2);
+    INSERT INTO t1 VALUES(3);
+    CREATE TABLE t2(y);
+    INSERT INTO t2 VALUES(1);
+    INSERT INTO t2 VALUES(2);
+    CREATE VIRTUAL TABLE echo_t2 USING echo(t2);
+    SELECT * FROM t1 WHERE x IN (SELECT rowid FROM t2);
+----
+stmt 0 err 1 -1 30 no such table: t1
+stmt 30 err 1 -1 60 no such table: t1
+stmt 60 ok
+stmt 84 err 1 -1 114 no such table: t2
+stmt 114 err 1 -1 144 no such table: t2
+stmt 144 ok
+stmt 193 err 1 -1 249 no such table: t1
+==== vtab8-2.2
+
+    SELECT rowid FROM echo_t2
+----
+stmt 0 err 1 -1 31 no such table: echo_t2
+==== vtabB-2.3
+
+    SELECT * FROM t1 WHERE x IN (SELECT rowid FROM t2);
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== vtabB-2.4
+
+    SELECT * FROM t1 WHERE x IN (SELECT rowid FROM echo_t2);
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== vtabB-2.5
+
+    SELECT * FROM t1 WHERE x IN (SELECT y FROM t2);
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== vtabB-2.6
+
+    SELECT * FROM t1 WHERE x IN (SELECT y FROM echo_t2);
+----
+stmt 0 err 1 -1 57 no such table: t1

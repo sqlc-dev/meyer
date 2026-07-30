@@ -1,0 +1,12 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c);
+----
+stmt 0 ok
+==== 1.5
+ 
+    UPDATE t1 SET a=13 WHERE a = 3001;
+    ANALYZE;
+----
+stmt 0 err 1 -1 40 no such table: t1
+stmt 40 ok

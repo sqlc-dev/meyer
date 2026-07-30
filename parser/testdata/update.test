@@ -1,0 +1,636 @@
+==== update-3.5
+UPDATE test1 SET f2=f2*3
+----
+stmt 0 err 1 -1 25 no such table: test1
+==== update-3.6
+SELECT * FROM test1 ORDER BY f1
+----
+stmt 0 err 1 -1 32 no such table: test1
+==== update-3.8
+SELECT * FROM test1 ORDER BY f1
+----
+stmt 0 err 1 -1 32 no such table: test1
+==== update-3.9
+UPDATE test1 SET f2=f2/3 WHERE f1>5
+----
+stmt 0 err 1 -1 36 no such table: test1
+==== update-3.10
+SELECT * FROM test1 ORDER BY f1
+----
+stmt 0 err 1 -1 32 no such table: test1
+==== update-3.11
+UPDATE test1 SET F2=f1, F1=f2
+----
+stmt 0 err 1 -1 30 no such table: test1
+==== update-3.12
+SELECT * FROM test1 ORDER BY F1
+----
+stmt 0 err 1 -1 32 no such table: test1
+==== update-3.14
+SELECT * FROM test1 ORDER BY F1
+----
+stmt 0 err 1 -1 32 no such table: test1
+==== update-4.6
+
+    PRAGMA count_changes=on;
+    UPDATE test1 SET f1=f1-1 WHERE f1<=100 and f2==128;
+----
+stmt 0 ok
+stmt 29 err 1 -1 85 no such table: test1
+==== update-4.7
+
+    PRAGMA count_changes=off;
+    SELECT * FROM test1 ORDER BY f1,f2
+----
+stmt 0 ok
+stmt 30 err 1 -1 70 no such table: test1
+==== update-5.4.1
+SELECT * FROM test1 WHERE f1==78 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-5.4.2
+SELECT * FROM test1 WHERE f1==778 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-5.4.3
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-5.5
+UPDATE test1 SET f1=f1-1 WHERE f1>100 and f2==128
+----
+stmt 0 err 1 -1 50 no such table: test1
+==== update-5.5.1
+SELECT * FROM test1 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 35 no such table: test1
+==== update-5.5.2
+SELECT * FROM test1 WHERE f1==78 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-5.5.3
+SELECT * FROM test1 WHERE f1==778 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-5.5.4
+SELECT * FROM test1 WHERE f1==777 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-5.5.5
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-5.6
+
+    PRAGMA count_changes=on;
+    UPDATE test1 SET f1=f1-1 WHERE f1<=100 and f2==128;
+----
+stmt 0 ok
+stmt 29 err 1 -1 85 no such table: test1
+==== update-5.6.1
+
+    PRAGMA count_changes=off;
+    SELECT * FROM test1 ORDER BY f1,f2
+----
+stmt 0 ok
+stmt 30 err 1 -1 70 no such table: test1
+==== update-5.6.2
+SELECT * FROM test1 WHERE f1==77 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-5.6.3
+SELECT * FROM test1 WHERE f1==778 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-5.6.4
+SELECT * FROM test1 WHERE f1==777 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-5.6.5
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-6.1.1
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-6.1.2
+SELECT * FROM test1 WHERE f2==89 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-6.1.3
+SELECT * FROM test1 WHERE f1==88 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-6.3.1
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-6.3.2
+SELECT * FROM test1 WHERE f2==89 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-6.3.3
+SELECT * FROM test1 WHERE f2==88 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-6.4.1
+SELECT * FROM test1 WHERE f1==78 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-6.4.2
+SELECT * FROM test1 WHERE f1==778 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-6.4.3
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-6.5.1
+SELECT * FROM test1 WHERE f1==78 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-6.5.2
+SELECT * FROM test1 WHERE f1==778 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-6.5.3
+SELECT * FROM test1 WHERE f1==777 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-6.5.4
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-6.6.1
+SELECT * FROM test1 WHERE f1==77 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-6.6.2
+SELECT * FROM test1 WHERE f1==778 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-6.6.3
+SELECT * FROM test1 WHERE f1==777 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-6.6.4
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-7.1.1
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-7.1.2
+SELECT * FROM test1 WHERE f2==89 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-7.1.3
+SELECT * FROM test1 WHERE f1==88 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-7.3.1
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-7.3.2
+SELECT * FROM test1 WHERE f2==89 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-7.3.3
+SELECT * FROM test1 WHERE f2==88 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-7.4.1
+SELECT * FROM test1 WHERE f1==78 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-7.4.2
+SELECT * FROM test1 WHERE f1==778 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-7.4.3
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-7.5.1
+SELECT * FROM test1 WHERE f1==78 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-7.5.2
+SELECT * FROM test1 WHERE f1==778 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-7.5.3
+SELECT * FROM test1 WHERE f1==777 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-7.5.4
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-7.6.1
+SELECT * FROM test1 WHERE f1==77 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 48 no such table: test1
+==== update-7.6.2
+SELECT * FROM test1 WHERE f1==778 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-7.6.3
+SELECT * FROM test1 WHERE f1==777 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 49 no such table: test1
+==== update-7.6.4
+SELECT * FROM test1 WHERE f1==8 ORDER BY f1,f2
+----
+stmt 0 err 1 -1 47 no such table: test1
+==== update-10.1
+
+    DROP TABLE test1;
+    CREATE TABLE t1(
+       a integer primary key,
+       b UNIQUE, 
+       c, d,
+       e, f,
+       UNIQUE(c,d)
+    );
+    INSERT INTO t1 VALUES(1,2,3,4,5,6);
+    INSERT INTO t1 VALUES(2,3,4,4,6,7);
+    SELECT * FROM t1
+----
+stmt 0 err 1 -1 22 no such table: test1
+stmt 22 ok
+stmt 143 err 1 -1 183 no such table: t1
+stmt 183 err 1 -1 223 no such table: t1
+stmt 223 err 1 -1 245 no such table: t1
+==== update-10.2
+
+    UPDATE t1 SET a=1, e=9 WHERE f=6;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 38 no such table: t1
+stmt 38 err 1 -1 60 no such table: t1
+==== update-10.3
+
+    UPDATE t1 SET a=1, e=10 WHERE f=7;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 39 no such table: t1
+stmt 39 err 1 -1 61 no such table: t1
+==== update-10.4
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== update-10.5
+
+    UPDATE t1 SET b=2, e=11 WHERE f=6;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 39 no such table: t1
+stmt 39 err 1 -1 61 no such table: t1
+==== update-10.6
+
+    UPDATE t1 SET b=2, e=12 WHERE f=7;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 39 no such table: t1
+stmt 39 err 1 -1 61 no such table: t1
+==== update-10.7
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== update-10.8
+
+    UPDATE t1 SET c=3, d=4, e=13 WHERE f=6;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 44 no such table: t1
+stmt 44 err 1 -1 66 no such table: t1
+==== update-10.9
+
+    UPDATE t1 SET c=3, d=4, e=14 WHERE f=7;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 44 no such table: t1
+stmt 44 err 1 -1 66 no such table: t1
+==== update-10.10
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== update-11.1
+
+      UPDATE t1 SET e=e+1 WHERE b IN (SELECT b FROM t1);
+      SELECT b,e FROM t1;
+----
+stmt 0 err 1 -1 57 no such table: t1
+stmt 57 err 1 -1 83 no such table: t1
+==== update-11.2
+
+      UPDATE t1 SET e=e+1 WHERE a IN (SELECT a FROM t1);
+      SELECT a,e FROM t1;
+----
+stmt 0 err 1 -1 57 no such table: t1
+stmt 57 err 1 -1 83 no such table: t1
+==== update-11.3
+
+      UPDATE t1 AS xyz SET e=e+1 WHERE xyz.a IN (SELECT a FROM t1);
+      SELECT a,e FROM t1;
+----
+stmt 0 err 1 -1 68 no such table: t1
+stmt 68 err 1 -1 94 no such table: t1
+==== update-11.4
+
+      UPDATE t1 AS xyz SET e=e+1 WHERE EXISTS(SELECT 1 FROM t1 WHERE t1.a<xyz.a);
+      SELECT a,e FROM t1;
+----
+stmt 0 err 1 -1 82 no such table: t1
+stmt 82 err 1 -1 108 no such table: t1
+==== update-13.1
+
+    BEGIN;
+    CREATE TABLE t2(a);
+    INSERT INTO t2 VALUES(1);
+    INSERT INTO t2 VALUES(2);
+    INSERT INTO t2 SELECT a+2 FROM t2;
+    INSERT INTO t2 SELECT a+4 FROM t2;
+    INSERT INTO t2 SELECT a+8 FROM t2;
+    INSERT INTO t2 SELECT a+16 FROM t2;
+    INSERT INTO t2 SELECT a+32 FROM t2;
+    INSERT INTO t2 SELECT a+64 FROM t2;
+    INSERT INTO t2 SELECT a+128 FROM t2;
+    INSERT INTO t2 SELECT a+256 FROM t2;
+    INSERT INTO t2 SELECT a+512 FROM t2;
+    INSERT INTO t2 SELECT a+1024 FROM t2;
+    COMMIT;
+    SELECT count(*) FROM t2;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 35 err 1 -1 65 no such table: t2
+stmt 65 err 1 -1 95 no such table: t2
+stmt 95 err 1 -1 134 no such table: t2
+stmt 134 err 1 -1 173 no such table: t2
+stmt 173 err 1 -1 212 no such table: t2
+stmt 212 err 1 -1 252 no such table: t2
+stmt 252 err 1 -1 292 no such table: t2
+stmt 292 err 1 -1 332 no such table: t2
+stmt 332 err 1 -1 373 no such table: t2
+stmt 373 err 1 -1 414 no such table: t2
+stmt 414 err 1 -1 455 no such table: t2
+stmt 455 err 1 -1 497 no such table: t2
+stmt 497 ok
+stmt 509 err 1 -1 538 no such table: t2
+==== update-13.2
+
+    SELECT count(*) FROM t2 WHERE a=rowid;
+----
+stmt 0 err 1 -1 43 no such table: t2
+==== update-13.3
+
+    UPDATE t2 SET rowid=rowid-1;
+    SELECT count(*) FROM t2 WHERE a=rowid+1;
+----
+stmt 0 err 1 -1 33 no such table: t2
+stmt 33 err 1 -1 78 no such table: t2
+==== update-13.3.dup1
+
+    UPDATE t2 SET rowid=rowid+10000;
+    UPDATE t2 SET rowid=rowid-9999;
+    SELECT count(*) FROM t2 WHERE a=rowid;
+----
+stmt 0 err 1 -1 37 no such table: t2
+stmt 37 err 1 -1 73 no such table: t2
+stmt 73 err 1 -1 116 no such table: t2
+==== update-13.4
+
+    BEGIN;
+    INSERT INTO t2 SELECT a+2048 FROM t2;
+    INSERT INTO t2 SELECT a+4096 FROM t2;
+    INSERT INTO t2 SELECT a+8192 FROM t2;
+    SELECT count(*) FROM t2 WHERE a=rowid;
+    COMMIT;
+----
+stmt 0 ok
+stmt 11 err 1 -1 53 no such table: t2
+stmt 53 err 1 -1 95 no such table: t2
+stmt 95 err 1 -1 137 no such table: t2
+stmt 137 err 1 -1 180 no such table: t2
+stmt 180 ok
+==== update-13.5
+
+    UPDATE t2 SET rowid=rowid-1;
+    SELECT count(*) FROM t2 WHERE a=rowid+1;
+----
+stmt 0 err 1 -1 33 no such table: t2
+stmt 33 err 1 -1 78 no such table: t2
+==== update-14.1
+
+    CREATE TABLE t3(a,b,c);
+    CREATE TRIGGER t3r1 BEFORE UPDATE on t3 WHEN nosuchcol BEGIN
+      SELECT 'illegal WHEN clause';
+    END;
+----
+stmt 0 ok
+stmt 28 err 1 -1 93 no such table: main.t3
+==== update-14.2
+
+    UPDATE t3 SET a=1;
+----
+stmt 0 err 1 -1 23 no such table: t3
+==== update-14.3
+
+    CREATE TABLE t4(a,b,c);
+    CREATE TRIGGER t4r1 AFTER UPDATE on t4 WHEN nosuchcol BEGIN
+      SELECT 'illegal WHEN clause';
+    END;
+----
+stmt 0 ok
+stmt 28 err 1 -1 92 no such table: main.t4
+==== update-14.4
+
+    UPDATE t4 SET a=1;
+----
+stmt 0 err 1 -1 23 no such table: t4
+==== update-15.1
+
+    CREATE TABLE t15(a INTEGER PRIMARY KEY, b);
+    INSERT INTO t15(a,b) VALUES(10,'abc'),(20,'def'),(30,'ghi');
+    ALTER TABLE t15 ADD COLUMN c;
+    CREATE INDEX t15c ON t15(c);
+    INSERT INTO t15(a,b)
+      VALUES(5,'zyx'),(15,'wvu'),(25,'tsr'),(35,'qpo');
+    UPDATE t15 SET c=printf('y%d',a) WHERE c IS NULL;
+    SELECT a,b,c,'|' FROM t15 ORDER BY a;
+----
+stmt 0 ok
+stmt 48 err 1 -1 113 no such table: t15
+stmt 113 err 1 -1 147 no such table: t15
+stmt 147 err 1 -1 180 no such table: main.t15
+stmt 180 err 1 -1 261 no such table: t15
+stmt 261 err 1 -1 315 no such table: t15
+stmt 315 err 1 -1 357 no such table: t15
+==== update-16.1
+
+  CREATE TABLE t16(a INTEGER PRIMARY KEY ON CONFLICT REPLACE, b UNIQUE);
+  INSERT INTO t16(a,b) VALUES(1,2),(3,4),(5,6);
+  UPDATE t16 SET a=a;
+  SELECT * FROM t16 ORDER BY +a;
+----
+stmt 0 ok
+stmt 73 err 1 -1 121 no such table: t16
+stmt 121 err 1 -1 143 no such table: t16
+stmt 143 err 1 -1 176 no such table: t16
+==== update-17.10
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x,y);
+  INSERT INTO t1(x) VALUES(1);
+  CREATE INDEX t1x1 ON t1(1) WHERE 3;
+  UPDATE t1 SET x=2, y=3 WHERE 3;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 51 err 1 -1 82 no such table: t1
+stmt 82 err 1 -1 120 no such table: main.t1
+stmt 120 err 1 -1 154 no such table: t1
+stmt 154 err 1 -1 174 no such table: t1
+==== update-18.10
+
+  PRAGMA encoding = 'UTF16';
+  CREATE TABLE t0(c0 REAL, c1);
+  INSERT INTO t0(c0,c1) VALUES('xyz',11),('uvw',22);
+  CREATE INDEX i0 ON t0(c1) WHERE c0 GLOB 3;
+  CREATE INDEX i1 ON t0(c0,c1) WHERE typeof(c0)='text' AND typeof(c1)='integer';
+  UPDATE t0 SET c1=345;
+  SELECT * FROM t0;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 61 err 1 -1 114 no such table: t0
+stmt 114 err 1 -1 159 no such table: main.t0
+stmt 159 err 1 -1 240 no such table: main.t0
+stmt 240 err 1 -1 264 no such table: t0
+stmt 264 err 1 -1 284 no such table: t0
+==== update-18.20
+
+  PRAGMA encoding = 'utf16';
+  CREATE TABLE t0(c0 TEXT);
+  CREATE INDEX i0 ON t0(0 LIKE COALESCE(c0, 0));
+  INSERT INTO t0(c0) VALUES (0), (0);
+  SELECT * FROM t0;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 57 err 1 -1 106 no such table: main.t0
+stmt 106 err 1 -1 144 no such table: t0
+stmt 144 err 1 -1 164 no such table: t0
+==== update-19.10
+
+  CREATE TABLE t1(
+   a TEXT,
+   b INTEGER PRIMARY KEY UNIQUE
+  ); 
+  INSERT INTO t1 VALUES(1,2);
+  UPDATE t1 SET a = quote(b) WHERE b>=2;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 67 err 1 -1 98 no such table: t1
+stmt 98 err 1 -1 139 no such table: t1
+stmt 139 err 1 -1 159 no such table: t1
+==== update-20.10
+
+  PRAGMA recursive_triggers = true;
+  CREATE TABLE t1(a UNIQUE ON CONFLICT REPLACE, b);
+  INSERT INTO t1(a,b) VALUES(4,12),(9,13);
+  CREATE INDEX i0 ON t1(b);
+  CREATE TRIGGER tr0 DELETE ON t1 BEGIN
+    UPDATE t1 SET b = a;
+  END;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 36 ok
+stmt 88 err 1 -1 131 no such table: t1
+stmt 131 err 1 -1 159 no such table: main.t1
+stmt 159 err 1 -1 199 no such table: main.t1
+stmt 231 ok
+==== update-20.20
+
+  UPDATE t1 SET a=0;
+----
+stmt 0 err 1 -1 21 no such table: t1
+==== update-20.30
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== update-21.1
+
+  CREATE TABLE t1 (vkey INTEGER, c5 INTEGER);
+  INSERT INTO t1 VALUES(3,NULL),(6,-54);
+----
+stmt 0 ok
+stmt 46 err 1 -1 87 no such table: t1
+==== update-21.2
+
+  BEGIN;
+  UPDATE t1 SET vkey = 100 WHERE c5 is null;
+  SELECT * FROM t1 ORDER BY vkey, c5;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 -1 54 no such table: t1
+stmt 54 err 1 -1 92 no such table: t1
+stmt 92 ok
+==== update-21.3
+
+  BEGIN;
+  UPDATE t1 SET vkey = 100 WHERE NOT (-10*(select min(vkey) from t1) >= c5);
+  SELECT * FROM t1 ORDER BY vkey, c5;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 -1 86 no such table: t1
+stmt 86 err 1 -1 124 no such table: t1
+stmt 124 ok
+==== update-21.4
+
+  BEGIN;
+  UPDATE t1 SET vkey = 100 WHERE c5 is null OR NOT (-10*(select min(vkey) from t1) >= c5);
+  SELECT * FROM t1 ORDER BY vkey, c5;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 -1 100 no such table: t1
+stmt 100 err 1 -1 138 no such table: t1
+stmt 138 ok
+==== update-21.11
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b INT);
+  CREATE TABLE t2(d INT);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 66 ok
+==== update-22.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x INT, y INT);
+  INSERT INTO t1(x) VALUES(1),(2),(3),(4),(5);
+  UPDATE t1 SET x=x+100, y=x<=(SELECT min(x) FROM t1)
+   WHERE x<3 OR (1 BETWEEN 0 AND x<=(SELECT min(x)+2 FROM t1));
+  SELECT x FROM t1 WHERE x<100 ORDER BY x;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 60 err 1 -1 107 no such table: t1
+stmt 107 err 1 -1 225 no such table: t1
+stmt 225 err 1 -1 268 no such table: t1

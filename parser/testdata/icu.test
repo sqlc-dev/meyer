@@ -1,0 +1,72 @@
+==== icu-2.9
+
+    SELECT upper(char(0xfb04,0xfb04,0xfb04,0xfb04));
+----
+stmt 0 ok
+==== icu-4.1
+
+    CREATE TABLE fruit(name);
+    INSERT INTO fruit VALUES('plum');
+    INSERT INTO fruit VALUES('cherry');
+    INSERT INTO fruit VALUES('apricot');
+    INSERT INTO fruit VALUES('peach');
+    INSERT INTO fruit VALUES('chokecherry');
+    INSERT INTO fruit VALUES('yamot');
+----
+stmt 0 ok
+stmt 30 err 1 -1 68 no such table: fruit
+stmt 68 err 1 -1 108 no such table: fruit
+stmt 108 err 1 -1 149 no such table: fruit
+stmt 149 err 1 -1 188 no such table: fruit
+stmt 188 err 1 -1 233 no such table: fruit
+stmt 233 err 1 -1 272 no such table: fruit
+==== icu-4.3
+
+    SELECT name FROM fruit ORDER BY name COLLATE Lithuanian ASC;
+----
+stmt 0 err 1 -1 65 no such table: fruit
+==== icu-5.5
+SELECT 'abc' REGEXP
+----
+stmt 0 err 1 -1 20 incomplete input
+==== icu-5.6
+SELECT 'abc' REGEXP, 1
+----
+stmt 0 err 1 19 20 near ",": syntax error
+==== icu-6.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(id INTEGER PRIMARY KEY, x TEXT);
+  INSERT INTO t1 VALUES
+    (1,'abcde'),
+    (2,'abc_'),
+    (3,'abc__'),
+    (4,'abc%'),
+    (5,'abc%%');
+  SELECT id FROM t1 WHERE x LIKE 'abc%%' ESCAPE '%';
+----
+stmt 0 ok
+stmt 27 ok
+stmt 78 err 1 -1 185 no such table: t1
+stmt 185 err 1 -1 238 no such table: t1
+==== icu-6.1
+
+  SELECT id FROM t1 WHERE x LIKE 'abc__' ESCAPE '_';
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== icu-7.1
+
+  SELECT icu_load_collation('en_US','error','xyzzy');
+----
+stmt 0 err 1 10 54 no such function: icu_load_collation
+==== icu-7.2
+
+  SELECT icu_load_collation('en_US','prim','PRIMARY'),
+         icu_load_collation('en_US','dflt','DEFAULT');
+----
+stmt 0 err 1 10 110 no such function: icu_load_collation
+==== icu-7.3
+
+  SELECT char(0x100)=='a', char(0x100)=='a' COLLATE dflt, char(0x100)=='a' COLLATE prim;
+----
+stmt 0 err 1 -1 89 no such collation sequence: dflt

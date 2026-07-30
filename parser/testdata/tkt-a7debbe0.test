@@ -1,0 +1,114 @@
+==== tkt-a7debbe0-generated
+
+    CREATE TABLE t0(xyz INTEGER);
+    INSERT INTO t0(xyz) VALUES(456);
+    CREATE VIEW v2(a, B) AS 
+        SELECT 'a', 'B' COLLATE NOCASE FROM t0;
+    CREATE TABLE t2(a, B COLLATE NOCASE);
+    INSERT INTO t2 VALUES('a', 'B');
+    CREATE VIEW v3(a, B) AS
+        SELECT 'a' COLLATE BINARY, 'B' COLLATE NOCASE FROM t0;
+
+    CREATE VIEW v4(a, B) AS
+        SELECT 'a', +CAST('B' COLLATE NOCASE AS TEXT) FROM t0;
+
+    CREATE VIEW v5(a, B) AS
+        SELECT 'a', ('B' COLLATE NOCASE) || '' FROM t0;
+----
+stmt 0 ok
+stmt 34 err 1 -1 71 no such table: t0
+stmt 71 ok
+stmt 148 ok
+stmt 190 err 1 -1 227 no such table: t2
+stmt 227 ok
+stmt 318 ok
+stmt 410 ok
+==== tkt-a7debbe0-generated.dup1
+ SELECT a   >= B FROM t2;
+----
+stmt 0 err 1 -1 25 no such table: t2
+==== tkt-a7debbe0-generated.dup2
+ SELECT 'a' >= 'B' COLLATE NOCASE
+----
+stmt 0 ok
+==== tkt-a7debbe0-generated.dup3
+ SELECT a   >= B FROM v2
+----
+stmt 0 err 1 -1 25 no such table: v2
+==== tkt-a7debbe0-generated.dup4
+ SELECT a   >= B FROM v3
+----
+stmt 0 err 1 -1 25 no such table: v3
+==== tkt-a7debbe0-generated.dup5
+ SELECT a   >= B FROM v4
+----
+stmt 0 err 1 -1 25 no such table: v4
+==== tkt-a7debbe0-generated.dup6
+ SELECT a   >= B FROM v5
+----
+stmt 0 err 1 -1 25 no such table: v5
+==== tkt-a7debbe0-generated.dup7
+ SELECT B   < a FROM t2
+----
+stmt 0 err 1 -1 24 no such table: t2
+==== tkt-a7debbe0-generated.dup8
+ SELECT 'B' COLLATE NOCASE < 'a'
+----
+stmt 0 ok
+==== tkt-a7debbe0-generated.dup9
+ SELECT B   < a FROM v2
+----
+stmt 0 err 1 -1 24 no such table: v2
+==== tkt-a7debbe0-generated.dup10
+ SELECT B   < a FROM v3
+----
+stmt 0 err 1 -1 24 no such table: v3
+==== tkt-a7debbe0-generated.dup11
+ SELECT a  < B FROM v4
+----
+stmt 0 err 1 -1 23 no such table: v4
+==== tkt-a7debbe0-generated.dup12
+ SELECT a  < B FROM v5
+----
+stmt 0 err 1 -1 23 no such table: v5
+==== tkt-a7debbe0-generated.dup13
+
+    CREATE TABLE t5(a, b COLLATE NOCASE);
+    INSERT INTO t5 VALUES(1, 'XYZ');
+----
+stmt 0 ok
+stmt 42 err 1 -1 79 no such table: t5
+==== tkt-a7debbe0-generated.dup14
+
+    SELECT xyz==b FROM ( SELECT a, 'xyz' AS xyz FROM t5 ), t5;
+----
+stmt 0 err 1 -1 63 no such table: t5
+==== tkt-a7debbe0-generated.dup15
+
+    SELECT 'xyz'==b FROM ( SELECT a, 'xyz' AS xyz FROM t5 ), t5;
+----
+stmt 0 err 1 -1 65 no such table: t5
+==== tkt-a7debbe0-generated.dup16
+
+    DROP TABLE t0;
+    DROP VIEW v2;
+
+    CREATE TABLE t0(c0);
+    INSERT INTO t0(c0) VALUES('');
+    CREATE VIEW v2(c0, c1) AS 
+        SELECT 'B' COLLATE NOCASE, 'a' FROM t0 ORDER BY t0.c0;
+    SELECT SUM(count) FROM (
+      SELECT v2.c1 BETWEEN v2.c0 AND v2.c1 as count FROM v2
+    );
+----
+stmt 0 err 1 -1 19 no such table: t0
+stmt 19 err 1 -1 37 no such view: v2
+stmt 37 ok
+stmt 63 err 1 -1 98 no such table: t0
+stmt 98 ok
+stmt 192 err 1 -1 288 no such table: v2
+==== tkt-a7debbe0-generated.dup17
+
+    SELECT v2.c1 BETWEEN v2.c0 AND v2.c1 as count FROM v2;
+----
+stmt 0 err 1 -1 59 no such table: v2

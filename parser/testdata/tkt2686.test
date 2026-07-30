@@ -1,0 +1,12 @@
+==== tkt2686-generated
+
+      DELETE FROM filler 
+       WHERE rowid <= (SELECT MAX(rowid) FROM filler LIMIT 20)
+----
+stmt 0 err 1 -1 90 no such table: filler
+==== tkt2686-generated.dup1
+
+      DELETE FROM filler 
+       WHERE rowid <= (SELECT MAX(rowid) FROM filler LIMIT 20)
+----
+stmt 0 err 1 -1 90 no such table: filler

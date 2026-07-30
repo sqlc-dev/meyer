@@ -1,0 +1,17 @@
+==== 200
+
+    CREATE TABLE t1(a,b);
+----
+stmt 0 ok
+==== 297
+
+    DROP TABLE t1;
+----
+stmt 0 err 1 -1 19 no such table: t1
+==== 298
+
+    CREATE TABLE t1(a,b,c,d,e,"col f",w,x,y,z);
+    CREATE TABLE t2(x,"col y");
+----
+stmt 0 ok
+stmt 48 ok

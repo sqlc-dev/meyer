@@ -1,0 +1,74 @@
+==== tkt-f7772-1.1
+
+     CREATE TEMP TABLE t1(x UNIQUE);
+     INSERT INTO t1 VALUES(1);
+     CREATE TABLE t2(x, y);
+     INSERT INTO t2 VALUES(1, 2);
+     CREATE TEMP TABLE t3(w, z);
+----
+stmt 0 ok
+stmt 37 err 1 -1 68 no such table: t1
+stmt 68 ok
+stmt 96 err 1 -1 130 no such table: t2
+stmt 130 ok
+==== tkt-f7772-1.2
+
+    BEGIN IMMEDIATE;
+    CREATE TABLE xyzzy(abc);
+    SELECT x, force_rollback(), EXISTS(SELECT 1 FROM t3 WHERE w=x) FROM t2;
+----
+stmt 0 ok
+stmt 21 ok
+stmt 50 err 1 -1 126 no such table: t2
+==== tkt-f7772-2.1
+
+     DROP TABLE IF EXISTS t1;
+     DROP TABLE IF EXISTS t2;
+     DROP TABLE IF EXISTS t3;
+
+     CREATE TEMP TABLE t1(x UNIQUE);
+     INSERT INTO t1 VALUES(1);
+     CREATE TABLE t2(x, y);
+     INSERT INTO t2 VALUES(1, 2);
+----
+stmt 0 ok
+stmt 30 ok
+stmt 60 ok
+stmt 90 ok
+stmt 128 err 1 -1 159 no such table: t1
+stmt 159 ok
+stmt 187 err 1 -1 221 no such table: t2
+==== tkt-f7772-3.1
+
+    DROP TABLE IF EXISTS t1;
+    DROP TABLE IF EXISTS t2;
+    DROP TABLE IF EXISTS t3;
+
+    CREATE TEMP TABLE t1(x);
+    CREATE TABLE t2(x);
+    CREATE TABLE t3(x);
+  
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(2);
+    INSERT INTO t2 VALUES(1);
+    INSERT INTO t2 VALUES(2);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 58 ok
+stmt 87 ok
+stmt 117 ok
+stmt 141 ok
+stmt 165 err 1 -1 198 no such table: t1
+stmt 198 err 1 -1 228 no such table: t1
+stmt 228 err 1 -1 258 no such table: t2
+stmt 258 err 1 -1 288 no such table: t2
+==== tkt-f7772-3.2
+
+    SELECT ins() AS x FROM t2 UNION ALL SELECT ins() AS x FROM t1
+----
+stmt 0 err 1 -1 67 no such table: t1
+==== tkt-f7772-3.3
+ SELECT * FROM t3
+----
+stmt 0 err 1 -1 18 no such table: t3

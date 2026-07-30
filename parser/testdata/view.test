@@ -1,0 +1,674 @@
+==== view-1.0
+
+    CREATE TABLE t1(a,b,c);
+    INSERT INTO t1 VALUES(1,2,3);
+    INSERT INTO t1 VALUES(4,5,6);
+    INSERT INTO t1 VALUES(7,8,9);
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 28 err 1 -1 62 no such table: t1
+stmt 62 err 1 -1 96 no such table: t1
+stmt 96 err 1 -1 130 no such table: t1
+stmt 130 err 1 -1 152 no such table: t1
+==== view-1.1
+
+    BEGIN;
+    CREATE VIEW IF NOT EXISTS v1 AS SELECT a,b FROM t1;
+    SELECT * FROM v1 ORDER BY a;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 67 err 1 -1 100 no such table: v1
+==== view-1.1.101
+
+  CREATE TEMP VIEW v1temp AS SELECT a, b FROM t1;
+  SELECT * FROM v1temp ORDER BY a;
+----
+stmt 0 ok
+stmt 50 err 1 -1 85 no such table: v1temp
+==== view-1.1.120
+
+    SELECT name, type FROM pragma_table_list('v1');
+----
+stmt 0 ok
+==== view-1.2
+
+    ROLLBACK;
+    SELECT * FROM v1 ORDER BY a;
+----
+stmt 0 ok
+stmt 14 err 1 -1 47 no such table: v1
+==== view-1.3
+
+    CREATE VIEW v1 AS SELECT a,b FROM t1;
+    SELECT * FROM v1 ORDER BY a;
+----
+stmt 0 ok
+stmt 42 err 1 -1 75 no such table: v1
+==== view-1.4
+
+    DROP VIEW IF EXISTS v1;
+    SELECT * FROM v1 ORDER BY a;
+----
+stmt 0 ok
+stmt 28 err 1 -1 61 no such table: v1
+==== view-1.5
+
+    CREATE VIEW v1 AS SELECT a,b FROM t1;
+    SELECT * FROM v1 ORDER BY a;
+----
+stmt 0 ok
+stmt 42 err 1 -1 75 no such table: v1
+==== view-1.6
+
+    DROP TABLE t1;
+    SELECT * FROM v1 ORDER BY a;
+----
+stmt 0 err 1 -1 19 no such table: t1
+stmt 19 err 1 -1 52 no such table: v1
+==== view-1.7
+
+    CREATE TABLE t1(x,a,b,c);
+    INSERT INTO t1 VALUES(1,2,3,4);
+    INSERT INTO t1 VALUES(4,5,6,7);
+    INSERT INTO t1 VALUES(7,8,9,10);
+    SELECT * FROM v1 ORDER BY a;
+----
+stmt 0 ok
+stmt 30 err 1 -1 66 no such table: t1
+stmt 66 err 1 -1 102 no such table: t1
+stmt 102 err 1 -1 139 no such table: t1
+stmt 139 err 1 -1 172 no such table: v1
+==== view-1.10
+
+  CREATE TABLE t9(x INTEGER);
+  CREATE VIEW v9a AS SELECT x FROM t9;
+  CREATE VIEW v9b AS SELECT * FROM t9;
+  CREATE VIEW v9c(x) AS SELECT x FROM t9;
+  CREATE VIEW v9d(x) AS SELECT * FROM t9;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 69 ok
+stmt 108 ok
+stmt 150 ok
+==== view-1.11
+
+  PRAGMA table_info(v9a);
+----
+stmt 0 ok
+==== view-1.12
+
+  PRAGMA table_info(v9b);
+----
+stmt 0 ok
+==== view-1.13
+
+  PRAGMA table_info(v9c);
+----
+stmt 0 ok
+==== view-1.14
+
+  PRAGMA table_info(v9d);
+----
+stmt 0 ok
+==== view-2.2
+
+    INSERT INTO v2 VALUES(1,2,3,4);
+----
+stmt 0 err 1 -1 36 no such table: v2
+==== view-2.3
+
+    UPDATE v2 SET a=10 WHERE a=5;
+----
+stmt 0 err 1 -1 34 no such table: v2
+==== view-2.4
+
+    DELETE FROM v2;
+----
+stmt 0 err 1 -1 20 no such table: v2
+==== view-2.5
+
+    INSERT INTO t1 VALUES(11,12,13,14);
+    SELECT * FROM v2 ORDER BY x;
+----
+stmt 0 err 1 -1 40 no such table: t1
+stmt 40 err 1 -1 73 no such table: v2
+==== view-2.6
+
+    SELECT x FROM v2 WHERE a>10
+----
+stmt 0 err 1 -1 33 no such table: v2
+==== view-3.3.4
+
+  CREATE VIEW v1err(x,y DESC,z) AS SELECT a, b+c, c-b FROM t1;
+----
+stmt 0 err 1 -1 30 syntax error after column name "y"
+==== view-3.3.5
+
+  DROP VIEW IF EXISTS v1err;
+  CREATE VIEW v1err(x,y) AS SELECT a, b+c, c-b FROM t1;
+  SELECT * FROM v1err;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 85 err 1 -1 108 no such table: v1err
+==== view-3.3.6
+
+  DROP VIEW IF EXISTS v1err;
+  CREATE VIEW v1err(w,x,y,z) AS SELECT a, b+c, c-b FROM t1;
+  SELECT * FROM v1err;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 89 err 1 -1 112 no such table: v1err
+==== view-4.1
+
+    DROP VIEW t1;
+----
+stmt 0 err 1 -1 18 no such view: t1
+==== view-4.2
+
+    SELECT 1 FROM t1 LIMIT 1;
+----
+stmt 0 err 1 -1 30 no such table: t1
+==== view-4.3
+
+    DROP TABLE v1;
+----
+stmt 0 err 1 -1 19 no such table: v1
+==== view-4.4
+
+     SELECT 1 FROM v1 LIMIT 1;
+----
+stmt 0 err 1 -1 31 no such table: v1
+==== view-4.5
+
+    CREATE INDEX i1v1 ON v1(xyz);
+----
+stmt 0 err 1 -1 34 no such table: main.v1
+==== view-5.1
+
+    CREATE TABLE t2(y,a);
+    INSERT INTO t2 VALUES(22,2);
+    INSERT INTO t2 VALUES(33,3);
+    INSERT INTO t2 VALUES(44,4);
+    INSERT INTO t2 VALUES(55,5);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 26 err 1 -1 59 no such table: t2
+stmt 59 err 1 -1 92 no such table: t2
+stmt 92 err 1 -1 125 no such table: t2
+stmt 125 err 1 -1 158 no such table: t2
+stmt 158 err 1 -1 180 no such table: t2
+==== view-5.2
+
+    CREATE VIEW v5 AS
+      SELECT t1.x AS v, t2.y AS w FROM t1 JOIN t2 USING(a);
+    SELECT * FROM v5;
+----
+stmt 0 ok
+stmt 82 err 1 -1 104 no such table: v5
+==== view-5.4
+
+    SELECT * FROM v5 AS a, t2 AS b WHERE a.w=b.y;
+----
+stmt 0 err 1 -1 50 no such table: v5
+==== view-5.6
+
+    SELECT * FROM t2 AS b, v5 AS a WHERE a.w=b.y;
+----
+stmt 0 err 1 -1 50 no such table: t2
+==== view-5.8
+
+    SELECT * FROM t1 AS a, v5 AS b, t2 AS c WHERE a.x=b.v AND b.w=c.y;
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== view-6.1
+
+    SELECT min(x), min(a), min(b), min(c), min(a+b+c) FROM v2;
+----
+stmt 0 err 1 -1 63 no such table: v2
+==== view-6.2
+
+    SELECT max(x), max(a), max(b), max(c), max(a+b+c) FROM v2;
+----
+stmt 0 err 1 -1 63 no such table: v2
+==== view-7.1
+
+    CREATE TABLE test1(id integer primary key, a);
+    CREATE TABLE test2(id integer, b);
+    INSERT INTO test1 VALUES(1,2);
+    INSERT INTO test2 VALUES(1,3);
+    CREATE VIEW test AS
+      SELECT test1.id, a, b
+      FROM test1 JOIN test2 ON test2.id=test1.id;
+    SELECT * FROM test;
+----
+stmt 0 ok
+stmt 51 ok
+stmt 90 err 1 -1 125 no such table: test1
+stmt 125 err 1 -1 160 no such table: test2
+stmt 160 ok
+stmt 262 err 1 -1 286 no such table: test
+==== view-7.3
+
+    DROP VIEW test;
+    CREATE VIEW test AS
+      SELECT test1.id, a, b
+      FROM test1 JOIN test2 USING(id);
+    SELECT * FROM test;
+----
+stmt 0 err 1 -1 20 no such view: test
+stmt 20 ok
+stmt 111 err 1 -1 135 no such table: test
+==== view-7.5
+
+    DROP VIEW test;
+    CREATE VIEW test AS
+      SELECT test1.id, a, b
+      FROM test1 NATURAL JOIN test2;
+    SELECT * FROM test;
+----
+stmt 0 err 1 -1 20 no such view: test
+stmt 20 ok
+stmt 109 err 1 -1 133 no such table: test
+==== view-8.1
+
+    CREATE VIEW v6 AS SELECT pqr, xyz FROM v1;
+    SELECT * FROM v6 ORDER BY xyz;
+----
+stmt 0 ok
+stmt 47 err 1 -1 82 no such table: v6
+==== view-8.3
+
+    CREATE VIEW v7(a) AS SELECT pqr+xyz FROM v6;
+    SELECT * FROM v7 ORDER BY a;
+----
+stmt 0 ok
+stmt 49 err 1 -1 82 no such table: v7
+==== view-8.4
+
+      CREATE VIEW v8 AS SELECT max(cnt) AS mx FROM
+        (SELECT a%2 AS eo, count(*) AS cnt FROM t1 GROUP BY eo);
+      SELECT * FROM v8;
+----
+stmt 0 ok
+stmt 116 err 1 -1 140 no such table: v8
+==== view-8.5
+
+      SELECT mx+10, mx*2 FROM v8;
+----
+stmt 0 err 1 -1 34 no such table: v8
+==== view-8.6
+
+      SELECT mx+10, pqr FROM v6, v8 WHERE xyz=2;
+----
+stmt 0 err 1 -1 49 no such table: v6
+==== view-8.7
+
+      SELECT mx+10, pqr FROM v6, v8 WHERE xyz>2;
+----
+stmt 0 err 1 -1 49 no such table: v6
+==== view-9.1
+
+    INSERT INTO t2 SELECT * FROM t2 WHERE a<5;
+    INSERT INTO t2 SELECT * FROM t2 WHERE a<4;
+    INSERT INTO t2 SELECT * FROM t2 WHERE a<3;
+    SELECT DISTINCT count(*) FROM t2 GROUP BY a ORDER BY 1;
+----
+stmt 0 err 1 -1 47 no such table: t2
+stmt 47 err 1 -1 94 no such table: t2
+stmt 94 err 1 -1 141 no such table: t2
+stmt 141 err 1 -1 201 no such table: t2
+==== view-9.2
+
+    SELECT DISTINCT count(*) FROM t2 GROUP BY a ORDER BY 1 LIMIT 3;
+----
+stmt 0 err 1 -1 68 no such table: t2
+==== view-9.3
+
+    CREATE VIEW v9 AS 
+       SELECT DISTINCT count(*) FROM t2 GROUP BY a ORDER BY 1 LIMIT 3;
+    SELECT * FROM v9;
+----
+stmt 0 ok
+stmt 94 err 1 -1 116 no such table: v9
+==== view-9.4
+
+    SELECT * FROM v9 ORDER BY 1 DESC;
+----
+stmt 0 err 1 -1 38 no such table: v9
+==== view-9.5
+
+    CREATE VIEW v10 AS 
+       SELECT DISTINCT a, count(*) FROM t2 GROUP BY a ORDER BY 2 LIMIT 3;
+    SELECT * FROM v10;
+----
+stmt 0 ok
+stmt 98 err 1 -1 121 no such table: v10
+==== view-9.6
+
+    SELECT * FROM v10 ORDER BY 1;
+----
+stmt 0 err 1 -1 34 no such table: v10
+==== view-10.2
+
+    SELECT * FROM v_t3_b;
+----
+stmt 0 err 1 -1 26 no such table: v_t3_b
+==== view-11.1
+
+    CREATE TABLE t4(a COLLATE NOCASE);
+    INSERT INTO t4 VALUES('This');
+    INSERT INTO t4 VALUES('this');
+    INSERT INTO t4 VALUES('THIS');
+    SELECT * FROM t4 WHERE a = 'THIS';
+----
+stmt 0 ok
+stmt 39 err 1 -1 74 no such table: t4
+stmt 74 err 1 -1 109 no such table: t4
+stmt 109 err 1 -1 144 no such table: t4
+stmt 144 err 1 -1 183 no such table: t4
+==== view-11.2
+
+      SELECT * FROM (SELECT * FROM t4) WHERE a = 'THIS';
+----
+stmt 0 err 1 -1 57 no such table: t4
+==== view-11.3
+
+    CREATE VIEW v11 AS SELECT * FROM t4;
+    SELECT * FROM v11 WHERE a = 'THIS';
+----
+stmt 0 ok
+stmt 41 err 1 -1 81 no such table: v11
+==== view-12.1
+
+    CREATE VIEW v12 AS SELECT a FROM t1 WHERE b=?
+----
+stmt 0 err 1 -1 51 parameters are not allowed in views
+==== view-12.2
+
+    CREATE VIEW v12(x) AS SELECT a FROM t1 WHERE b=?
+----
+stmt 0 err 1 -1 54 parameters are not allowed in views
+==== view-14.1
+
+    CREATE TEMP VIEW t1 AS SELECT a,b FROM t1;
+    SELECT * FROM temp.t1;
+----
+stmt 0 ok
+stmt 47 err 1 -1 74 no such table: temp.t1
+==== view-14.2
+
+    DROP VIEW IF EXISTS temp.t1;
+    CREATE TEMP VIEW t1(a,b) AS SELECT a,b FROM t1;
+    SELECT * FROM temp.t1;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 85 err 1 -1 112 no such table: temp.t1
+==== view-16.1
+
+    CREATE VIEW IF NOT EXISTS v1 AS SELECT * FROM t1;
+----
+stmt 0 ok
+==== view-16.2
+
+    SELECT sql FROM sqlite_master WHERE name='v1'
+----
+stmt 0 ok
+==== view-16.3
+
+    DROP VIEW IF EXISTS nosuchview
+----
+stmt 0 ok
+==== view-17.1
+
+    DROP VIEW nosuchview
+----
+stmt 0 err 1 -1 26 no such view: nosuchview
+==== view-17.2
+
+    DROP VIEW main.nosuchview
+----
+stmt 0 err 1 -1 31 no such view: main.nosuchview
+==== view-18.1
+
+    DROP VIEW t1;
+    DROP TABLE t1;
+    CREATE TABLE t1(a, b, c);
+    INSERT INTO t1 VALUES(1, 2, 3);
+    INSERT INTO t1 VALUES(4, 5, 6);
+
+    CREATE VIEW vv1 AS SELECT * FROM t1;
+    CREATE VIEW vv2 AS SELECT * FROM vv1;
+    CREATE VIEW vv3 AS SELECT * FROM vv2;
+    CREATE VIEW vv4 AS SELECT * FROM vv3;
+    CREATE VIEW vv5 AS SELECT * FROM vv4;
+
+    SELECT * FROM vv5;
+----
+stmt 0 err 1 -1 18 no such view: t1
+stmt 18 err 1 -1 37 no such table: t1
+stmt 37 ok
+stmt 67 err 1 -1 103 no such table: t1
+stmt 103 err 1 -1 139 no such table: t1
+stmt 139 ok
+stmt 181 ok
+stmt 223 ok
+stmt 265 ok
+stmt 307 ok
+stmt 349 err 1 -1 373 no such table: vv5
+==== view-20.1
+
+    DROP TABLE IF EXISTS t1;
+    DROP VIEW IF EXISTS v1;
+    CREATE TABLE t1(c1);
+    CREATE VIEW v1 AS SELECT c1 FROM (SELECT t1.c1 FROM t1);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 57 ok
+stmt 82 ok
+==== view-22.1
+
+  CREATE VIEW x1 AS SELECT 123 AS '', 234 AS '', 345 AS '';
+  SELECT * FROM x1;
+----
+stmt 0 ok
+stmt 60 err 1 -1 80 no such table: x1
+==== view-26.0
+
+  CREATE TABLE t16(a, b, c UNIQUE);
+  INSERT INTO t16 VALUES(1, 1, 1);
+  INSERT INTO t16 VALUES(2, 2, 2);
+  INSERT INTO t16 VALUES(3, 3, 3);
+  CREATE VIEW v16 AS SELECT max(a) AS mx, min(b) AS mn FROM t16 GROUP BY c;
+
+  SELECT * FROM v16 AS one, v16 AS two WHERE one.mx=1;
+----
+stmt 0 ok
+stmt 36 err 1 -1 71 no such table: t16
+stmt 71 err 1 -1 106 no such table: t16
+stmt 106 err 1 -1 141 no such table: t16
+stmt 141 ok
+stmt 217 err 1 -1 273 no such table: v16
+==== view-26.1
+
+  WITH v17(x,y) AS (SELECT max(a), min(b) FROM t16 GROUP BY c)
+  SELECT * FROM v17 AS one, v17 AS two WHERE one.x=1;
+----
+stmt 0 err 1 -1 117 no such table: t16
+==== view-27.0
+
+  CREATE TABLE t0(c0 TEXT, c1);
+  INSERT INTO t0(c0, c1) VALUES (-1, 0);
+  CREATE VIEW v0(c0, c1) AS SELECT t0.c0, AVG(t0.c1) FROM t0;
+----
+stmt 0 ok
+stmt 32 err 1 -1 73 no such table: t0
+stmt 73 ok
+==== view-27.1
+
+  SELECT c0, typeof(c0), c1, typeof(c1) FROM v0;
+----
+stmt 0 err 1 -1 49 no such table: v0
+==== view-27.2
+ SELECT c0<c1 FROM v0
+----
+stmt 0 err 1 -1 22 no such table: v0
+==== view-27.3
+ SELECT c1<c0 FROM v0
+----
+stmt 0 err 1 -1 22 no such table: v0
+==== view-27.4
+
+  SELECT 1 FROM v0 WHERE c1<c0
+----
+stmt 0 err 1 -1 32 no such table: v0
+==== view-27.5
+
+  SELECT 1 FROM v0 WHERE c0<c1
+----
+stmt 0 err 1 -1 32 no such table: v0
+==== view-27.6
+ 
+  SELECT c0<c1 FROM (SELECT t0.c0 AS c0, AVG(t0.c1) AS c1 FROM t0)
+----
+stmt 0 err 1 -1 69 no such table: t0
+==== view-27.7
+ 
+  SELECT c1<c0 FROM (SELECT t0.c0 AS c0, AVG(t0.c1) AS c1 FROM t0)
+----
+stmt 0 err 1 -1 69 no such table: t0
+==== view-27.8
+
+  SELECT 1 FROM (SELECT t0.c0 AS c0, AVG(t0.c1) AS c1 FROM t0) WHERE c1<c0
+----
+stmt 0 err 1 -1 76 no such table: t0
+==== view-27.9
+
+  SELECT 1 FROM (SELECT t0.c0 AS c0, AVG(t0.c1) AS c1 FROM t0) WHERE c0<c1
+----
+stmt 0 err 1 -1 76 no such table: t0
+==== view-28.0
+
+  CREATE TABLE t0(c0 TEXT);
+  CREATE VIEW v0(c0) AS SELECT t0.c0 FROM t0;
+  INSERT INTO t0(c0) VALUES ('0');
+----
+stmt 0 ok
+stmt 28 ok
+stmt 74 err 1 -1 109 no such table: t0
+==== view-28.1
+
+  SELECT 0 IN (c0) FROM t0;
+----
+stmt 0 err 1 -1 28 no such table: t0
+==== view-28.2
+
+  SELECT 0 IN (c0) FROM (SELECT c0 FROM t0);
+----
+stmt 0 err 1 -1 45 no such table: t0
+==== view-29.0
+
+  CREATE TABLE t1(a,b,c);
+  CREATE VIEW IF NOT EXISTS IF AS SELECT null;
+----
+stmt 0 ok
+stmt 26 ok
+==== view-29.1
+
+  CREATE TABLE t2(c,d,e);
+  SELECT name FROM sqlite_schema ORDER BY name;
+----
+stmt 0 ok
+stmt 26 ok
+==== view-30.0
+
+  CREATE TABLE t0(a INT, b TEXT);
+
+  INSERT INTO t0 VALUES(1,'one');
+
+  CREATE VIEW t1      AS SELECT a, b FROM t0 UNION ALL SELECT 2, 2;
+  CREATE VIEW t2(a,b) AS SELECT a, b FROM t0 UNION ALL SELECT 2, 2;
+----
+stmt 0 ok
+stmt 34 err 1 -1 69 no such table: t0
+stmt 69 ok
+stmt 138 ok
+==== view-30.1
+
+    PRAGMA table_info = t1;
+----
+stmt 0 ok
+==== view-30.2
+
+    PRAGMA table_info = t2;
+----
+stmt 0 ok
+==== view-31.1
+
+  CREATE TABLE x2(b TEXT);
+  CREATE TABLE x1(a TEXT);
+  INSERT INTO x1 VALUES('123');
+  -- Two queries get the same result even though the order of terms
+  -- in the CTE is reversed
+  WITH c(x) AS ( SELECT b FROM x2 UNION SELECT 123 )
+    SELECT count(*) FROM x1 WHERE a IN c; 
+  WITH c(x) AS ( SELECT 123 UNION SELECT b FROM x2 )
+    SELECT count(*) FROM x1 WHERE a IN c;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 err 1 -1 86 no such table: x1
+stmt 86 err 1 -1 277 no such table: x1
+stmt 277 err 1 -1 373 no such table: x1
+==== view-31.2
+
+  CREATE TABLE t3(a INTEGER, b TEXT);
+  INSERT INTO t3 VALUES(123, 123);
+  WITH s AS ( VALUES(123), (456) ) SELECT * FROM t3 WHERE b IN s;
+----
+stmt 0 ok
+stmt 38 err 1 -1 73 no such table: t3
+stmt 73 err 1 -1 139 no such table: t3
+==== view-32.1
+
+  CREATE TABLE t0(a);
+  INSERT INTO t0 VALUES(0);
+  CREATE VIEW v1(a) AS SELECT a+1 FROM t0;
+  CREATE VIEW v2(a) AS SELECT a+1 FROM v1;
+  CREATE VIEW v3(a) AS SELECT a+1 FROM v2;
+  CREATE VIEW v4(a) AS SELECT a+1 FROM v3;
+  CREATE VIEW v5(a) AS SELECT a+1 FROM v4;
+  CREATE VIEW v6(a) AS SELECT a+1 FROM v5;
+  CREATE VIEW v7(a) AS SELECT a+1 FROM v6;
+----
+stmt 0 ok
+stmt 22 err 1 -1 50 no such table: t0
+stmt 50 ok
+stmt 93 ok
+stmt 136 ok
+stmt 179 ok
+stmt 222 ok
+stmt 265 ok
+stmt 308 ok
+==== view-32.2
+
+    SELECT * FROM v7;
+----
+stmt 0 err 1 -1 22 no such table: v7
+==== view-32.3
+
+    SELECT * FROM v7;
+----
+stmt 0 err 1 -1 22 no such table: v7
+==== view-32.4
+
+  SELECT * FROM v7;
+----
+stmt 0 err 1 -1 20 no such table: v7

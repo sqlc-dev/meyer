@@ -1,0 +1,49 @@
+==== 2.2
+
+  BEGIN;
+    CREATE VIRTUAL TABLE t2 USING fts4(order=desc);
+    INSERT INTO t2 VALUES('aa bb');
+    INSERT INTO t2 VALUES('bb cc');
+    INSERT INTO t2 VALUES('cc aa');
+    SELECT docid FROM t2 WHERE t2 MATCH 'aa';
+  END;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 61 err 1 -1 97 no such table: t2
+stmt 97 err 1 -1 133 no such table: t2
+stmt 133 err 1 -1 169 no such table: t2
+stmt 169 err 1 -1 215 no such table: t2
+stmt 215 ok
+==== 2.3
+
+  SELECT docid FROM t2 WHERE t2 MATCH 'aa';
+----
+stmt 0 err 1 -1 44 no such table: t2
+==== 2.4
+
+  SELECT docid FROM t2 WHERE t2 MATCH 'aa' ORDER BY content;
+----
+stmt 0 err 1 -1 61 no such table: t2
+==== 3.1
+
+  CREATE VIRTUAL TABLE t3 USING fts4(x, order=DESC);
+  INSERT INTO t3(docid, x) VALUES(113382409004785664, 'aa');
+  INSERT INTO t3(docid, x) VALUES(1, 'ab');
+  SELECT rowid FROM t3 WHERE x MATCH 'a*' ORDER BY docid DESC;
+----
+stmt 0 ok
+stmt 53 err 1 -1 114 no such table: t3
+stmt 114 err 1 -1 158 no such table: t3
+stmt 158 err 1 -1 221 no such table: t3
+==== 3.2
+
+  CREATE VIRTUAL TABLE t4 USING fts4(x);
+  INSERT INTO t4(docid, x) VALUES(-113382409004785664, 'aa');
+  INSERT INTO t4(docid, x) VALUES(1, 'ab');
+  SELECT rowid FROM t4 WHERE x MATCH 'a*';
+----
+stmt 0 ok
+stmt 41 err 1 -1 103 no such table: t4
+stmt 103 err 1 -1 147 no such table: t4
+stmt 147 err 1 -1 190 no such table: t4

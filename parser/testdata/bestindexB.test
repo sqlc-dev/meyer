@@ -1,0 +1,33 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE x1 USING tcl(vtab_command);
+  CREATE TABLE y1(a, b);
+  CREATE TABLE y2(a, b);
+----
+stmt 0 ok
+stmt 51 ok
+stmt 76 ok
+==== 1.1
+
+  SELECT * FROM x1
+----
+stmt 0 err 1 -1 20 no such table: x1
+==== 1.2
+
+  INSERT INTO y1 VALUES(1, 2) RETURNING rowid;
+----
+stmt 0 err 1 -1 47 no such table: y1
+==== 1.3
+
+  CREATE TRIGGER y1tr BEFORE INSERT ON y1 BEGIN
+    SELECT * FROM x1;
+  END;
+  INSERT INTO y1 VALUES(3, 4) RETURNING rowid;
+----
+stmt 0 err 1 -1 48 no such table: main.y1
+stmt 77 err 1 -1 124 no such table: y1
+==== 1.4
+
+  INSERT INTO y1 VALUES(5, 6) RETURNING rowid;
+----
+stmt 0 err 1 -1 47 no such table: y1

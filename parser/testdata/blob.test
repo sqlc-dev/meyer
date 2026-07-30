@@ -1,0 +1,36 @@
+==== blob-1.4
+SELECT X'01020k304', 100
+----
+stmt 0 err 1 7 7 unrecognized token: "X'01020k304'"
+==== blob-1.6
+SELECT X'01020 100'
+----
+stmt 0 err 1 7 7 unrecognized token: "X'01020 100'"
+==== blob-1.7
+SELECT X'01001'
+----
+stmt 0 err 1 7 7 unrecognized token: "X'01001'"
+==== blob-1.8
+SELECT x'012/45'
+----
+stmt 0 err 1 7 7 unrecognized token: "x'012/45'"
+==== blob-1.9
+SELECT x'012:45'
+----
+stmt 0 err 1 7 7 unrecognized token: "x'012:45'"
+==== blob-1.10
+SELECT x'012@45'
+----
+stmt 0 err 1 7 7 unrecognized token: "x'012@45'"
+==== blob-1.11
+SELECT x'012G45'
+----
+stmt 0 err 1 7 7 unrecognized token: "x'012G45'"
+==== blob-1.12
+SELECT x'012`45'
+----
+stmt 0 err 1 7 7 unrecognized token: "x'012`45'"
+==== blob-1.13
+SELECT x'012g45'
+----
+stmt 0 err 1 7 7 unrecognized token: "x'012g45'"

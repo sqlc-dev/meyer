@@ -1,0 +1,228 @@
+==== collate3-1.0
+
+    CREATE TABLE collate3t1(c1 UNIQUE);
+----
+stmt 0 ok
+==== collate3-1.1
+
+    SELECT * FROM collate3t1 ORDER BY 1 collate garbage;
+----
+stmt 0 err 1 -1 57 no such table: collate3t1
+==== collate3-1.1.2
+
+    SELECT DISTINCT c1 COLLATE garbage FROM collate3t1;
+----
+stmt 0 err 1 -1 56 no such table: collate3t1
+==== collate3-1.2
+
+    CREATE TABLE collate3t2(c1 collate garbage);
+----
+stmt 0 err 1 -1 48 no such collation sequence: garbage
+==== collate3-1.3
+
+    CREATE INDEX collate3i1 ON collate3t1(c1 COLLATE garbage);
+----
+stmt 0 err 1 -1 63 no such table: main.collate3t1
+==== collate3-1.8
+ DROP TABLE t1
+----
+stmt 0 err 1 -1 15 no such table: t1
+==== collate3-2.1
+
+    SELECT * FROM collate3t1 ORDER BY 1 COLLATE string_compare;
+----
+stmt 0 err 1 -1 64 no such table: collate3t1
+==== collate3-2.2
+
+    SELECT * FROM collate3t1 ORDER BY c1;
+----
+stmt 0 err 1 -1 42 no such table: collate3t1
+==== collate3-2.3
+
+    SELECT * FROM collate3t1 WHERE c1 = 'xxx';
+----
+stmt 0 err 1 -1 47 no such table: collate3t1
+==== collate3-2.4
+
+    CREATE TABLE collate3t2(c1 COLLATE string_compare);
+----
+stmt 0 err 1 -1 55 no such collation sequence: string_compare
+==== collate3-2.5
+
+    CREATE INDEX collate3t1_i1 ON collate3t1(c1);
+----
+stmt 0 err 1 -1 50 no such table: main.collate3t1
+==== collate3-2.6
+
+    SELECT * FROM collate3t1;
+----
+stmt 0 err 1 -1 30 no such table: collate3t1
+==== collate3-2.7.1
+
+    SELECT count(*) FROM collate3t1 GROUP BY c1;
+----
+stmt 0 err 1 -1 49 no such table: collate3t1
+==== collate3-2.7.2
+
+    SELECT * FROM collate3t1 GROUP BY c1;
+----
+stmt 0 err 1 -1 42 no such table: collate3t1
+==== collate3-2.8
+
+    SELECT DISTINCT c1 FROM collate3t1;
+----
+stmt 0 err 1 -1 40 no such table: collate3t1
+==== collate3-2.9
+
+      SELECT c1 FROM collate3t1 UNION SELECT c1 FROM collate3t1;
+----
+stmt 0 err 1 -1 65 no such table: collate3t1
+==== collate3-2.10
+
+      SELECT c1 FROM collate3t1 EXCEPT SELECT c1 FROM collate3t1;
+----
+stmt 0 err 1 -1 66 no such table: collate3t1
+==== collate3-2.11
+
+      SELECT c1 FROM collate3t1 INTERSECT SELECT c1 FROM collate3t1;
+----
+stmt 0 err 1 -1 69 no such table: collate3t1
+==== collate3-2.12
+
+      SELECT c1 FROM collate3t1 UNION ALL SELECT c1 FROM collate3t1;
+----
+stmt 0 err 1 -1 69 no such table: collate3t1
+==== collate3-2.13
+
+      SELECT 10 UNION ALL SELECT 20 ORDER BY 1 COLLATE string_compare;
+----
+stmt 0 err 1 -1 71 no such collation sequence: string_compare
+==== collate3-2.14
+
+      SELECT 10 INTERSECT SELECT 20 ORDER BY 1 COLLATE string_compare;
+----
+stmt 0 err 1 -1 71 no such collation sequence: string_compare
+==== collate3-2.15
+
+      SELECT 10 EXCEPT SELECT 20 ORDER BY 1 COLLATE string_compare;
+----
+stmt 0 err 1 -1 68 no such collation sequence: string_compare
+==== collate3-2.16
+
+      SELECT 10 UNION SELECT 20 ORDER BY 1 COLLATE string_compare;
+----
+stmt 0 err 1 -1 67 no such collation sequence: string_compare
+==== collate3-2.17
+
+      SELECT c1 FROM collate3t1 UNION ALL SELECT c1 FROM collate3t1 ORDER BY 1;
+----
+stmt 0 err 1 -1 80 no such table: collate3t1
+==== collate3-3.1
+
+    INSERT INTO collate3t1 VALUES('xxx', 0);
+----
+stmt 0 err 1 -1 45 no such table: collate3t1
+==== collate3-3.2
+
+    UPDATE collate3t1 SET c1 = 'xxx';
+----
+stmt 0 err 1 -1 38 no such table: collate3t1
+==== collate3-3.3
+
+    UPDATE collate3t1 SET c2 = 'xxx';
+----
+stmt 0 err 1 -1 38 no such table: collate3t1
+==== collate3-3.4
+
+    DELETE FROM collate3t1 WHERE 1;
+----
+stmt 0 err 1 -1 36 no such table: collate3t1
+==== collate3-3.5
+
+    SELECT * FROM collate3t1;
+----
+stmt 0 err 1 -1 30 no such table: collate3t1
+==== collate3-3.6
+
+    DELETE FROM collate3t1;
+----
+stmt 0 err 1 -1 28 no such table: collate3t1
+==== collate3-3.8
+
+      PRAGMA integrity_check
+----
+stmt 0 ok
+==== collate3-3.9
+
+    SELECT * FROM collate3t1;
+----
+stmt 0 err 1 -1 30 no such table: collate3t1
+==== collate3-3.10
+
+    SELECT * FROM collate3t1 ORDER BY 1 COLLATE string_compare;
+----
+stmt 0 err 1 -1 64 no such table: collate3t1
+==== collate3-3.11
+
+    SELECT * FROM collate3t1 ORDER BY c1;
+----
+stmt 0 err 1 -1 42 no such table: collate3t1
+==== collate3-3.12
+
+    SELECT * FROM collate3t1 WHERE c1 = 'xxx';
+----
+stmt 0 err 1 -1 47 no such table: collate3t1
+==== collate3-3.13
+
+    CREATE TABLE collate3t2(c1 COLLATE string_compare);
+----
+stmt 0 err 1 -1 55 no such collation sequence: string_compare
+==== collate3-3.14
+
+    CREATE INDEX collate3t1_i2 ON collate3t1(c1);
+----
+stmt 0 err 1 -1 50 no such table: main.collate3t1
+==== collate3-3.15
+
+    DROP TABLE collate3t1;
+----
+stmt 0 err 1 -1 27 no such table: collate3t1
+==== collate3-4.8.3
+
+    DROP TABLE collate3t1;
+----
+stmt 0 err 1 -1 27 no such table: collate3t1
+==== collate3-4.12
+
+    DROP TABLE collate3t1;
+----
+stmt 0 err 1 -1 27 no such table: collate3t1
+==== collate3-5.0
+
+    CREATE TABLE collate3t1(a);
+    INSERT INTO collate3t1 VALUES(10);
+    SELECT a FROM collate3t1 ORDER BY 1 COLLATE unk;
+----
+stmt 0 ok
+stmt 32 err 1 -1 71 no such table: collate3t1
+stmt 71 err 1 -1 124 no such table: collate3t1
+==== collate3-5.2
+
+    SELECT a FROM collate3t1 ORDER BY 1 COLLATE unk;
+----
+stmt 0 err 1 -1 53 no such table: collate3t1
+==== collate3-5.4
+
+    SELECT a FROM collate3t1 ORDER BY 1 COLLATE unk;
+----
+stmt 0 err 1 -1 53 no such table: collate3t1
+==== collate3-5.6
+
+    SELECT a FROM collate3t1 ORDER BY 1 COLLATE unk;
+----
+stmt 0 err 1 -1 53 no such table: collate3t1
+==== collate3-5.9
+
+    DROP TABLE collate3t1;
+----
+stmt 0 err 1 -1 27 no such table: collate3t1

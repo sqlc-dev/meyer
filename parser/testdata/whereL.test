@@ -1,0 +1,248 @@
+==== 100
+
+  CREATE TABLE t1(a INT PRIMARY KEY, b, c, d, e);
+  CREATE TABLE t2(a INT PRIMARY KEY, f, g, h, i);
+  CREATE TABLE t3(a INT PRIMARY KEY, j, k, l, m);
+  CREATE VIEW v4 AS SELECT * FROM t2 UNION ALL SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 50 ok
+stmt 100 ok
+stmt 150 ok
+==== 200
+
+  CREATE TABLE c3(x COLLATE binary, y COLLATE nocase, z COLLATE binary);
+  CREATE INDEX c3x ON c3(x);
+  INSERT INTO c3 VALUES('ABC', 'ABC', 'abc');
+  SELECT * FROM c3 WHERE x=y AND y=z AND z='abc';
+----
+stmt 0 ok
+stmt 73 err 1 -1 102 no such table: main.c3
+stmt 102 err 1 -1 148 no such table: c3
+stmt 148 err 1 -1 198 no such table: c3
+==== 201
+
+  SELECT * FROM c3 WHERE x='abc' AND y='abc' AND z='abc';
+----
+stmt 0 err 1 -1 58 no such table: c3
+==== 300
+
+  CREATE TABLE A(id INTEGER PRIMARY KEY, label TEXT);
+  CREATE TABLE B(id INTEGER PRIMARY KEY, label TEXT, Aid INTEGER);
+  CREATE TABLE C(
+    id INTEGER PRIMARY KEY,
+    xx INTEGER NOT NULL,
+    yy INTEGER,
+    zz INTEGER
+  );
+  CREATE UNIQUE INDEX x2 ON C(yy);
+  CREATE UNIQUE INDEX x4 ON C(yy, zz);
+  INSERT INTO A(id) VALUES(1);
+  INSERT INTO B(id) VALUES(2);
+  INSERT INTO C(id,xx,yy,zz) VALUES(99,50,1,2);
+  SELECT 1
+    FROM A,
+         (SELECT id,xx,yy,zz FROM C) subq,
+         B
+   WHERE A.id='1'
+     AND A.id=subq.yy
+     AND B.id=subq.zz;
+----
+stmt 0 ok
+stmt 54 ok
+stmt 121 ok
+stmt 228 err 1 -1 263 no such table: main.C
+stmt 263 err 1 -1 302 no such table: main.C
+stmt 302 err 1 -1 333 no such table: A
+stmt 333 err 1 -1 364 no such table: B
+stmt 364 err 1 -1 412 no such table: C
+stmt 412 err 1 -1 552 no such table: A
+==== 301
+
+  SELECT 1
+    FROM A,
+         (SELECT id,xx,yy,zz FROM C) subq,
+         B
+   WHERE A.id=1
+     AND A.id=subq.yy
+     AND B.id=subq.zz;
+----
+stmt 0 err 1 -1 138 no such table: A
+==== 302
+
+  SELECT 1
+    FROM A,
+         (SELECT id,yy,zz FROM C) subq,
+         B
+   WHERE A.id='1'
+     AND A.id=subq.yy
+     AND B.id=subq.zz;
+----
+stmt 0 err 1 -1 137 no such table: A
+==== 400
+
+  CREATE TABLE x(a, b, c);
+  CREATE TABLE y(a, b);
+  INSERT INTO x VALUES (1, 0, 1);
+  INSERT INTO y VALUES (1, 2);
+  SELECT x.a FROM x JOIN y ON x.c = y.a WHERE x.b = 1 AND x.b = 1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 51 err 1 -1 85 no such table: x
+stmt 85 err 1 -1 116 no such table: y
+stmt 116 err 1 -1 183 no such table: x
+==== 500
+
+  PRAGMA automatic_index=OFF;
+  CREATE TABLE t0(c0);
+  INSERT INTO t0 VALUES('0');
+  CREATE VIEW v0(c0) AS SELECT CAST(0 AS INT) FROM t0;
+  SELECT 200, * FROM t0, v0 WHERE 0 = t0.c0 AND t0.c0 = v0.c0;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 53 err 1 -1 83 no such table: t0
+stmt 83 ok
+stmt 138 err 1 -1 201 no such table: t0
+==== 510
+
+  SELECT 200, * FROM t0, v0 WHERE t0.c0 = 0 AND t0.c0 = v0.c0;
+----
+stmt 0 err 1 -1 63 no such table: t0
+==== 520
+
+  SELECT 200, * FROM t0, v0 WHERE 0 = t0.c0 AND v0.c0 = t0.c0;
+----
+stmt 0 err 1 -1 63 no such table: t0
+==== 530
+
+  SELECT 200, * FROM t0, v0 WHERE t0.c0 = 0 AND v0.c0 = t0.c0;
+----
+stmt 0 err 1 -1 63 no such table: t0
+==== 600
+
+  CREATE TABLE t1(x TEXT);
+  CREATE TABLE t2(y TEXT);
+  INSERT INTO t1 VALUES('good'),('bad');
+  INSERT INTO t2 VALUES('good'),('bad');
+  SELECT * FROM t1 JOIN t2 ON x=y
+   WHERE x='good' AND y='good';
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 err 1 -1 95 no such table: t1
+stmt 95 err 1 -1 136 no such table: t2
+stmt 136 err 1 -1 202 no such table: t1
+==== 610
+
+  CREATE TABLE tableA(
+    ID           int,
+    RunYearMonth int
+  );
+  INSERT INTO tableA VALUES(1,202003),(2,202003),(3,202003),(4,202004),
+    (5,202004),(6,202004),(7,202004),(8,202004);
+  CREATE TABLE tableB (
+    ID           int,
+    RunYearMonth int
+  );
+  INSERT INTO tableB VALUES(1,202004),(2,202004),(3,202004),(4,202004),
+  (5,202004);
+  SELECT *
+   FROM (
+        SELECT *
+        FROM tableA
+        WHERE RunYearMonth = 202004
+    ) AS A
+    INNER JOIN (
+        SELECT *
+        FROM tableB
+        WHERE RunYearMonth = 202004
+    ) AS B
+    ON A.ID = B.ID
+    AND A.RunYearMonth = B.RunYearMonth;
+----
+stmt 0 ok
+stmt 71 err 1 -1 192 no such table: tableA
+stmt 192 ok
+stmt 264 err 1 -1 350 no such table: tableB
+stmt 350 err 1 -1 616 no such table: tableA
+==== 700
+
+  CREATE TABLE t1(v INTEGER);
+  WITH RECURSIVE c(x) AS (VALUES(-10) UNION ALL SELECT x+1 FROM c WHERE x<10)
+    INSERT INTO t1(v) SELECT x FROM c;
+  CREATE INDEX idx ON t1( abs(v) );
+  SELECT v FROM t1 WHERE abs(v)=1 and v=1;
+----
+stmt 0 ok
+stmt 30 err 1 -1 147 no such table: t1
+stmt 147 err 1 -1 183 no such table: main.t1
+stmt 183 err 1 -1 226 no such table: t1
+==== 800
+
+  CREATE TABLE t0(c0, c1);
+  CREATE TABLE t1(c2);
+  CREATE INDEX i0 ON t1(NULL);
+  INSERT INTO t1(c2) VALUES (0.2);
+  CREATE VIEW v0(c3) AS SELECT DISTINCT c2 FROM t1;
+  SELECT * FROM v0 LEFT JOIN t0 ON c3<NULL LEFT JOIN t1 ON 1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 50 err 1 -1 81 no such table: main.t1
+stmt 81 err 1 -1 116 no such table: t1
+stmt 116 ok
+stmt 168 err 1 -1 230 no such table: v0
+==== 810
+
+  SELECT * FROM v0 LEFT JOIN t0 ON c3<NULL LEFT JOIN t1 ON 1 WHERE c2/0.1;
+----
+stmt 0 err 1 -1 75 no such table: v0
+==== 900
+
+  SELECT * FROM (SELECT 1.0 AS abc) WHERE abc=1;
+----
+stmt 0 ok
+==== 910
+
+  SELECT * FROM (SELECT 1.0 AS abc) WHERE abc LIKE '1.0';
+----
+stmt 0 ok
+==== 920
+
+  SELECT * FROM (SELECT 1.0 AS abc) WHERE abc=1 AND abc LIKE '1.0';
+----
+stmt 0 ok
+==== 930
+
+  CREATE TABLE IF NOT EXISTS t0 (c0 BLOB);
+  CREATE TABLE IF NOT EXISTS t1 (c0 INTEGER);
+
+  INSERT INTO t1 VALUES ('1');
+  INSERT INTO t0 VALUES (''), (''), ('2');
+----
+stmt 0 ok
+stmt 43 ok
+stmt 89 err 1 -1 121 no such table: t1
+stmt 121 err 1 -1 164 no such table: t0
+==== 940
+
+  SELECT *
+    FROM (SELECT 0.0 AS col_0) as subQuery
+    LEFT JOIN t0 ON ((CASE ''
+          WHEN t0.c0 THEN subQuery.col_0
+          ELSE (t0.c0) END) LIKE (((((subQuery.col_0))))))
+    LEFT JOIN t1 ON ((subQuery.col_0) == (false));
+----
+stmt 0 err 1 -1 235 no such table: t0
+==== 950
+
+  SELECT *
+    FROM (SELECT 0.0 AS col_0) as subQuery
+    LEFT JOIN t0 ON ((CASE ''
+          WHEN t0.c0 THEN subQuery.col_0
+          ELSE (t0.c0) END) LIKE (((((subQuery.col_0))))))
+    LEFT JOIN t1 ON ((subQuery.col_0) == (false)) WHERE t1.c0;
+----
+stmt 0 err 1 -1 247 no such table: t0

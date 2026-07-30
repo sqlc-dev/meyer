@@ -1,0 +1,92 @@
+==== 1.0
+
+  CREATE TABLE t2(c, d);
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, 1);
+  INSERT INTO t1 VALUES(2, 2);
+  INSERT INTO t1 VALUES(1, 3);
+  INSERT INTO t1 VALUES(2, 4);
+  INSERT INTO t1 VALUES(1, 5);
+  INSERT INTO t1 VALUES(2, 6);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 51 err 1 -1 82 no such table: t1
+stmt 82 err 1 -1 113 no such table: t1
+stmt 113 err 1 -1 144 no such table: t1
+stmt 144 err 1 -1 175 no such table: t1
+stmt 175 err 1 -1 206 no such table: t1
+stmt 206 err 1 -1 237 no such table: t1
+==== 2.4a
+
+  SELECT x,y FROM (
+    SELECT a AS x, sum(b) AS y FROM t1 
+    GROUP BY a
+  ) WHERE x BETWEEN 2 AND 9999
+----
+stmt 0 err 1 -1 107 no such table: t1
+==== 2.4b
+
+  SELECT x,y FROM (
+    SELECT a AS x, sum(b) AS y FROM t1 
+    WHERE x BETWEEN 2 AND 9999 
+    GROUP BY a
+  )
+----
+stmt 0 err 1 -1 112 no such table: t1
+==== 4.1
+
+  CREATE TABLE t3(a, b);
+  INSERT INTO t3 VALUES(1, 1);
+  INSERT INTO t3 VALUES(1, 2);
+  INSERT INTO t3 VALUES(1, 3);
+  INSERT INTO t3 VALUES(2, 1);
+  INSERT INTO t3 VALUES(2, 2);
+  INSERT INTO t3 VALUES(2, 3);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t3
+stmt 56 err 1 -1 87 no such table: t3
+stmt 87 err 1 -1 118 no such table: t3
+stmt 118 err 1 -1 149 no such table: t3
+stmt 149 err 1 -1 180 no such table: t3
+stmt 180 err 1 -1 211 no such table: t3
+==== 4.2
+
+  SELECT a, sum(b) FROM t3 GROUP BY a HAVING nondeter(a)
+----
+stmt 0 err 1 -1 58 no such table: t3
+==== 4.3
+
+  SELECT a, sum(b) FROM t3 WHERE nondeter(a) GROUP BY a
+----
+stmt 0 err 1 -1 57 no such table: t3
+==== 5.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(x, y);
+  INSERT INTO t1 VALUES('a', 'b');
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 85 no such table: t1
+==== 5.1
+
+  SELECT min(b), (
+    SELECT x FROM t2 WHERE a=2 GROUP BY y HAVING 0
+  ) FROM t1;
+----
+stmt 0 err 1 -1 83 no such table: t1
+==== 5.2
+
+  SELECT EXISTS (
+    SELECT * FROM (
+      SELECT * FROM (
+        SELECT 1
+      ) WHERE Col0 = 1   GROUP BY 1
+    )   WHERE 0
+  )
+  FROM (SELECT 1 Col0)   GROUP BY 1
+----
+stmt 0 ok

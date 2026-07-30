@@ -1,0 +1,277 @@
+==== 1.0
+
+  DROP TABLE IF EXISTS t3;
+  CREATE TABLE t3(a INTEGER);
+  INSERT INTO t3 VALUES(NULL), (10), (30), (20), (NULL);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 57 err 1 -1 114 no such table: t3
+==== 2.0
+
+  CREATE TABLE t2(a, b, c);
+  CREATE INDEX i2 ON t2(a, b);
+  INSERT INTO t2 VALUES(1, 1, 1);
+  INSERT INTO t2 VALUES(1, NULL, 2);
+  INSERT INTO t2 VALUES(1, NULL, 3);
+  INSERT INTO t2 VALUES(1, 4, 4);
+----
+stmt 0 ok
+stmt 28 err 1 -1 59 no such table: main.t2
+stmt 59 err 1 -1 93 no such table: t2
+stmt 93 err 1 -1 130 no such table: t2
+stmt 130 err 1 -1 167 no such table: t2
+stmt 167 err 1 -1 201 no such table: t2
+==== 2.1
+
+  SELECT * FROM t2 WHERE a=1 ORDER BY b NULLS LAST
+----
+stmt 0 err 1 -1 52 no such table: t2
+==== 2.2
+
+  SELECT * FROM t2 WHERE a=1 ORDER BY b DESC NULLS FIRST
+----
+stmt 0 err 1 -1 58 no such table: t2
+==== 3.0
+
+  CREATE TABLE t1(a, b, c, d, UNIQUE (b));
+----
+stmt 0 ok
+==== 3.2
+
+  CREATE TABLE first(nulls, last);
+  INSERT INTO first(last, nulls) VALUES(100,200), (300,400), (200,300);
+  SELECT * FROM first ORDER BY nulls;
+----
+stmt 0 ok
+stmt 35 err 1 -1 107 no such table: first
+stmt 107 err 1 -1 145 no such table: first
+==== 4.0
+
+    CREATE TABLE tx(a INTEGER PRIMARY KEY, b, c);
+    CREATE INDEX i1 ON tx(b);
+    INSERT INTO tx VALUES(1, 1, 1);
+    INSERT INTO tx VALUES(2, NULL, 2);
+    INSERT INTO tx VALUES(3, 3, 3);
+    INSERT INTO tx VALUES(4, NULL, 4);
+    INSERT INTO tx VALUES(5, 5, 5);
+    CREATE VIRTUAL TABLE te USING echo(tx);
+----
+stmt 0 ok
+stmt 50 err 1 -1 80 no such table: main.tx
+stmt 80 err 1 -1 116 no such table: tx
+stmt 116 err 1 -1 155 no such table: tx
+stmt 155 err 1 -1 191 no such table: tx
+stmt 191 err 1 -1 230 no such table: tx
+stmt 230 err 1 -1 266 no such table: tx
+stmt 266 ok
+==== 4.1
+
+    SELECT * FROM tx ORDER BY b NULLS FIRST;
+----
+stmt 0 err 1 -1 45 no such table: tx
+==== 4.2
+
+    SELECT * FROM te ORDER BY b NULLS FIRST;
+----
+stmt 0 err 1 -1 45 no such table: te
+==== 4.3
+
+    SELECT * FROM tx ORDER BY b NULLS LAST;
+----
+stmt 0 err 1 -1 44 no such table: tx
+==== 4.4
+
+    SELECT * FROM te ORDER BY b NULLS LAST;
+----
+stmt 0 err 1 -1 44 no such table: te
+==== 5.0
+
+  CREATE TABLE t4(a, b, c);
+  INSERT INTO t4 VALUES(1, 1, 11);
+  INSERT INTO t4 VALUES(1, 2, 12);
+  INSERT INTO t4 VALUES(1, NULL, 1);
+
+  INSERT INTO t4 VALUES(2, NULL, 1);
+  INSERT INTO t4 VALUES(2, 2, 12);
+  INSERT INTO t4 VALUES(2, 1, 11);
+
+  INSERT INTO t4 VALUES(3, NULL, 1);
+  INSERT INTO t4 VALUES(3, 2, 12);
+  INSERT INTO t4 VALUES(3, NULL, 3);
+----
+stmt 0 ok
+stmt 28 err 1 -1 63 no such table: t4
+stmt 63 err 1 -1 98 no such table: t4
+stmt 98 err 1 -1 135 no such table: t4
+stmt 135 err 1 -1 173 no such table: t4
+stmt 173 err 1 -1 208 no such table: t4
+stmt 208 err 1 -1 243 no such table: t4
+stmt 243 err 1 -1 281 no such table: t4
+stmt 281 err 1 -1 316 no such table: t4
+stmt 316 err 1 -1 353 no such table: t4
+==== 5.1
+
+  SELECT * FROM t4 WHERE a IN (1, 2, 3) ORDER BY a, b NULLS LAST
+----
+stmt 0 err 1 -1 66 no such table: t4
+==== 5.2
+
+  CREATE INDEX t4ab ON t4(a, b);
+  SELECT * FROM t4 WHERE a IN (1, 2, 3) ORDER BY a, b NULLS LAST
+----
+stmt 0 err 1 -1 33 no such table: main.t4
+stmt 33 err 1 -1 99 no such table: t4
+==== 5.4
+
+  SELECT * FROM t4 WHERE a IN (1, 2, 3) ORDER BY a DESC, b DESC NULLS FIRST
+----
+stmt 0 err 1 -1 77 no such table: t4
+==== 6.0
+
+  CREATE TABLE t5(a, b, c);
+  WITH s(i) AS (
+    VALUES(1) UNION ALL SELECT i+1 FROM s WHERE i<200
+  ) 
+  INSERT INTO t5 SELECT i%2, CASE WHEN (i%10)==0 THEN NULL ELSE i END, i FROM s;
+----
+stmt 0 ok
+stmt 28 err 1 -1 185 no such table: t5
+==== 6.1.1
+
+  CREATE INDEX t5ab ON t5(a, b, c);
+  SELECT a,b FROM t5 WHERE a=1 ORDER BY b NULLS LAST, c;
+----
+stmt 0 err 1 -1 36 no such table: main.t5
+stmt 36 err 1 -1 93 no such table: t5
+==== 6.2.1
+
+  SELECT a,b FROM t5 WHERE a=1 ORDER BY b DESC NULLS FIRST, c DESC
+----
+stmt 0 err 1 -1 68 no such table: t5
+==== 7.0
+
+  CREATE TABLE t71(a, b, c);
+  CREATE INDEX t71abc ON t71(a, b, c);
+
+  SELECT * FROM t71 WHERE a=1 AND b=2 ORDER BY c NULLS LAST;
+  SELECT * FROM t71 WHERE a=1 AND b=2 ORDER BY c DESC NULLS FIRST;
+
+  SELECT * FROM t71 ORDER BY a NULLS LAST;
+  SELECT * FROM t71 ORDER BY a DESC NULLS FIRST;
+----
+stmt 0 ok
+stmt 29 err 1 -1 68 no such table: main.t71
+stmt 68 err 1 -1 130 no such table: t71
+stmt 130 err 1 -1 197 no such table: t71
+stmt 197 err 1 -1 241 no such table: t71
+stmt 241 err 1 -1 290 no such table: t71
+==== 8.0
+
+  CREATE TABLE t80(a, b INTEGER, PRIMARY KEY(b NULLS LAST)) WITHOUT ROWID;
+----
+stmt 0 err 1 -1 60 unsupported use of NULLS LAST
+==== 9.0
+
+  CREATE TABLE v0 (c1, c2, c3);
+  CREATE INDEX v3 ON v0 (c1, c2, c3);
+----
+stmt 0 ok
+stmt 32 err 1 -1 70 no such table: main.v0
+==== 9.1
+
+  ANALYZE sqlite_master;
+  INSERT INTO sqlite_stat1 VALUES('v0','v3','648 324 81');
+  ANALYZE sqlite_master;
+----
+stmt 0 ok
+stmt 25 err 1 -1 84 no such table: sqlite_stat1
+stmt 84 ok
+==== 9.2
+
+  INSERT INTO v0 VALUES
+      (1, 10, 'b'),
+      (1, 10, 'd'),
+      (1, 10, NULL),
+      (2, 10, 'a'),
+      (2, 10, NULL),
+      (1, 10, 'c'),
+      (2, 10, 'b'),
+      (1, 10, 'a'),
+      (1, 10, NULL),
+      (2, 10, NULL),
+      (2, 10, 'd'),
+      (2, 10, 'c');
+----
+stmt 0 err 1 -1 268 no such table: v0
+==== 9.3
+
+  SELECT c1, c2, ifnull(c3, 'NULL') FROM v0 
+  WHERE c2=10 ORDER BY c1, c3 NULLS LAST
+----
+stmt 0 err 1 -1 87 no such table: v0
+==== 10.10
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1(x) VALUES('X');
+  CREATE TABLE t2(c, d);
+  CREATE INDEX t2dc ON t2(d, c);
+  SELECT c FROM t1 LEFT JOIN t2 ON d=NULL ORDER BY d, c NULLS LAST;
+----
+stmt 0 ok
+stmt 22 err 1 -1 55 no such table: t1
+stmt 55 ok
+stmt 80 err 1 -1 113 no such table: main.t2
+stmt 113 err 1 -1 181 no such table: t1
+==== 10.20
+
+  INSERT INTO t2(c,d) VALUES(5,'X'),(6,'Y'),(7,'Z'),(3,'A'),(4,'B');
+  SELECT c FROM t1 LEFT JOIN t2 ON d=x ORDER BY d, c NULLS LAST;
+----
+stmt 0 err 1 -1 69 no such table: t2
+stmt 69 err 1 -1 134 no such table: t1
+==== 10.30
+
+  UPDATE t2 SET d='X';
+  UPDATE t2 SET c=NULL WHERE c=6;
+  SELECT c FROM t1 LEFT JOIN t2 ON d=x ORDER BY d NULLS FIRST, c NULLS FIRST;
+----
+stmt 0 err 1 -1 23 no such table: t2
+stmt 23 err 1 -1 57 no such table: t2
+stmt 57 err 1 -1 135 no such table: t1
+==== 10.40
+
+  SELECT c FROM t1 LEFT JOIN t2 ON d=x ORDER BY d NULLS LAST, c NULLS LAST;
+----
+stmt 0 err 1 -1 76 no such table: t1
+==== 10.41
+
+  SELECT c FROM t1 LEFT JOIN t2 ON d=x ORDER BY c NULLS LAST;
+----
+stmt 0 err 1 -1 62 no such table: t1
+==== 10.42
+
+  SELECT c FROM t1 LEFT JOIN t2 ON d=x ORDER BY +d NULLS LAST, +c NULLS LAST;
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== 10.50
+
+  INSERT INTO t1(x) VALUES(NULL),('Y');
+  SELECT x, c, d, '|' FROM t1 LEFT JOIN t2 ON d=x
+   ORDER BY d NULLS LAST, c NULLS LAST;
+----
+stmt 0 err 1 -1 40 no such table: t1
+stmt 40 err 1 -1 130 no such table: t1
+==== 10.51
+
+  SELECT x, c, d, '|' FROM t1 LEFT JOIN t2 ON d=x
+   ORDER BY +d NULLS LAST, +c NULLS LAST;
+----
+stmt 0 err 1 -1 92 no such table: t1
+==== nulls1-generated
+
+    CREATE TABLE t1(a TEXT COLLATE NOCASE, b TEXT);
+    INSERT INTO t1 VALUES('Hello', 'world');
+----
+stmt 0 ok
+stmt 52 err 1 -1 97 no such table: t1

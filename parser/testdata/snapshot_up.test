@@ -1,0 +1,52 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c);
+  PRAGMA journal_mode = wal;
+  INSERT INTO t1 VALUES(1, 2, 3);
+  INSERT INTO t1 VALUES(4, 5, 6);
+  INSERT INTO t1 VALUES(7, 8, 9);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 57 err 1 -1 91 no such table: t1
+stmt 91 err 1 -1 125 no such table: t1
+stmt 125 err 1 -1 159 no such table: t1
+==== 1.2
+
+  BEGIN;
+    SELECT * FROM t1
+----
+stmt 0 ok
+stmt 9 err 1 -1 31 no such table: t1
+==== 1.6
+
+  SELECT * FROM t1
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 1.8
+
+  SELECT * FROM t1
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 1.11
+ 
+    BEGIN;
+      SELECT * FROM t1
+----
+stmt 0 ok
+stmt 12 err 1 -1 36 no such table: t1
+==== 1.14
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== 1.15
+
+  BEGIN;
+    SELECT * FROM t1
+----
+stmt 0 ok
+stmt 9 err 1 -1 31 no such table: t1
+==== 1.17
+ COMMIT
+----
+stmt 0 ok

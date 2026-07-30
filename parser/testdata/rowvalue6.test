@@ -1,0 +1,27 @@
+==== 1.1
+
+  CREATE TABLE t1(a,b,c);
+  CREATE INDEX t1x1 ON t1(a,b);
+  INSERT INTO t1 VALUES(1,NULL,200);
+
+  CREATE TABLE t2(x,y,z);
+  INSERT INTO t2 VALUES(1,NULL,55);
+
+  SELECT c FROM t1 WHERE (a,b) IN (SELECT x,y FROM t2 WHERE z==55);
+----
+stmt 0 ok
+stmt 26 err 1 -1 58 no such table: main.t1
+stmt 58 err 1 -1 95 no such table: t1
+stmt 95 ok
+stmt 122 err 1 -1 158 no such table: t2
+stmt 158 err 1 -1 227 no such table: t1
+==== 1.2
+
+  INSERT INTO t1 VALUES(2,3,400);
+  INSERT INTO t2 VALUES(2,3,55);  
+
+  SELECT c FROM t1 WHERE (a,b) IN (SELECT x,y FROM t2 WHERE z==55);
+----
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 err 1 -1 67 no such table: t2
+stmt 67 err 1 -1 138 no such table: t1

@@ -1,0 +1,20 @@
+==== quota-2.1.4
+ INSERT INTO t1 VALUES(3, randomblob(1100))
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== quota-2.2.1
+ INSERT INTO t1 VALUES(3, randomblob(1100))
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== quota-2.4.2
+ INSERT INTO t1 VALUES(3, randomblob(1100))
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== quota-3.1.4
+ CREATE TABLE t3(a, b)
+----
+stmt 0 ok
+==== quota-4.1.7
+INSERT INTO t2 VALUES(zeroblob(200000))
+----
+stmt 0 err 1 -1 40 no such table: t2

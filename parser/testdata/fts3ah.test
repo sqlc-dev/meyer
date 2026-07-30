@@ -1,0 +1,4 @@
+==== fts3ah-1.1
+SELECT rowid FROM t1 WHERE t1 MATCH 'something'
+----
+stmt 0 err 1 -1 48 no such table: t1

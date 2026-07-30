@@ -1,0 +1,195 @@
+==== fuzz-1.1
+
+    SELECT 'abc' LIKE X'ABCD';
+----
+stmt 0 ok
+==== fuzz-1.2
+
+    SELECT 'abc' LIKE zeroblob(10);
+----
+stmt 0 ok
+==== fuzz-1.3
+
+    SELECT zeroblob(10) LIKE 'abc';
+----
+stmt 0 ok
+==== fuzz-1.4
+
+    SELECT (- -21) % NOT (456 LIKE zeroblob(10));
+----
+stmt 0 ok
+==== fuzz-1.5
+
+    SELECT (SELECT (
+        SELECT (SELECT -2147483648) FROM (SELECT 1) ORDER BY 1
+    ))
+----
+stmt 0 ok
+==== fuzz-1.6
+
+    SELECT 'abc', zeroblob(1) FROM (SELECT 1) ORDER BY 1
+----
+stmt 0 ok
+==== fuzz-1.7
+
+    SELECT ( SELECT zeroblob(1000) FROM ( 
+      SELECT * FROM (SELECT 'first') ORDER BY NOT 'in') 
+    )
+----
+stmt 0 ok
+==== fuzz-1.14.2
+
+    DROP TABLE abc;
+----
+stmt 0 err 1 -1 20 no such table: abc
+==== fuzz-1.15
+
+    SELECT hex(CAST(zeroblob(1000) AS integer))
+----
+stmt 0 ok
+==== fuzz-1.16.1
+
+    CREATE TABLE abc(a, b, c);
+    CREATE TABLE def(a, b, c);
+    CREATE TABLE ghi(a, b, c);
+----
+stmt 0 ok
+stmt 31 ok
+stmt 62 ok
+==== fuzz-1.16.2
+
+    SELECT DISTINCT EXISTS(
+       SELECT 1
+       FROM (
+         SELECT C FROM (SELECT 1)
+       )
+       WHERE (SELECT c)
+    )
+    FROM abc
+----
+stmt 0 err 1 -1 145 no such table: abc
+==== fuzz-1.16.3
+
+    SELECT DISTINCT substr(-456 ISNULL,zeroblob(1000), EXISTS(
+         SELECT DISTINCT EXISTS(
+           SELECT DISTINCT b FROM abc
+           ORDER BY EXISTS (
+             SELECT DISTINCT 2147483647 UNION ALL SELECT -2147483648
+           ) ASC
+         )
+         FROM (
+           SELECT c, c FROM (
+             SELECT 456, 'injection' ORDER BY 56.1 ASC, -56.1 DESC
+           )
+         )
+         GROUP BY (SELECT ALL (SELECT DISTINCT 'hardware')) 
+         HAVING (
+           SELECT DISTINCT c
+           FROM (
+             SELECT ALL -2147483648, 'experiments'
+             ORDER BY -56.1 ASC, -56.1 DESC
+           )
+           GROUP BY (SELECT DISTINCT 456) IN 
+                   (SELECT DISTINCT 'injection') NOT IN (SELECT ALL -456)
+           HAVING EXISTS (
+             SELECT ALL 'injection'
+           )
+         )
+         UNION ALL
+         SELECT a IN (
+           SELECT -2147483647
+           UNION ALL
+           SELECT ALL 'injection'
+         )
+         FROM sqlite_master
+       ) -- end EXISTS
+    ) /* end SUBSTR() */, c NOTNULL ISNULL
+    FROM abc
+    ORDER BY CAST(-56.1 AS blob) ASC
+----
+stmt 0 err 1 -1 1121 no such table: abc
+==== fuzz-1.16.4
+
+    DROP TABLE abc; DROP TABLE def; DROP TABLE ghi;
+----
+stmt 0 err 1 -1 20 no such table: abc
+stmt 20 err 1 -1 36 no such table: def
+stmt 36 err 1 -1 52 no such table: ghi
+==== fuzz-1.17
+
+    SELECT 'hardware', 56.1 NOTNULL, random()&0
+    FROM (
+       SELECT ALL lower(~ EXISTS (
+           SELECT 1 NOT IN (SELECT ALL 1)
+       )), CAST(456 AS integer), -2147483647
+       FROM (
+         SELECT DISTINCT -456, CAST(1 AS integer) ISNULL
+         FROM (SELECT ALL 2147483647, typeof(2147483649))
+       )
+    )
+    GROUP BY CAST(CAST('experiments' AS blob) AS blob)
+    HAVING random()
+----
+stmt 0 ok
+==== fuzz-1.18
+
+     SELECT -2147483649 << upper('fault' NOT IN (
+        SELECT ALL (
+           SELECT ALL -1
+           ORDER BY -2147483649
+           LIMIT (
+              SELECT ALL (
+                 SELECT 0 EXCEPT SELECT DISTINCT 'experiments' ORDER BY 1 ASC
+              )
+           )
+           OFFSET EXISTS (
+              SELECT ALL 
+                  (SELECT ALL -2147483648) NOT IN (
+                     SELECT ALL 123456789.1234567899
+                  ) IN (SELECT 2147483649) 
+              FROM sqlite_master
+           ) NOT IN (SELECT ALL 'The')
+        )
+     ))
+----
+stmt 0 ok
+==== fuzz-1.20
+ DROP TABLE t1
+----
+stmt 0 err 1 -1 15 no such table: t1
+==== fuzz-3.1
+
+    CREATE TABLE abc(a, b, c);
+    CREATE TABLE def(a, b, c);
+    CREATE TABLE ghi(a, b, c);
+----
+stmt 0 ok
+stmt 31 ok
+stmt 62 ok
+==== fuzz-4.1
+
+    INSERT INTO abc VALUES(1, 2, 3);
+    INSERT INTO abc VALUES(4, 5, 6);
+    INSERT INTO abc VALUES(7, 8, 9);
+    INSERT INTO def VALUES(1, 2, 3);
+    INSERT INTO def VALUES(4, 5, 6);
+    INSERT INTO def VALUES(7, 8, 9);
+    INSERT INTO ghi VALUES(1, 2, 3);
+    INSERT INTO ghi VALUES(4, 5, 6);
+    INSERT INTO ghi VALUES(7, 8, 9);
+    CREATE INDEX abc_i ON abc(a, b, c);
+    CREATE INDEX def_i ON def(c, a, b);
+    CREATE INDEX ghi_i ON ghi(b, c, a);
+----
+stmt 0 err 1 -1 37 no such table: abc
+stmt 37 err 1 -1 74 no such table: abc
+stmt 74 err 1 -1 111 no such table: abc
+stmt 111 err 1 -1 148 no such table: def
+stmt 148 err 1 -1 185 no such table: def
+stmt 185 err 1 -1 222 no such table: def
+stmt 222 err 1 -1 259 no such table: ghi
+stmt 259 err 1 -1 296 no such table: ghi
+stmt 296 err 1 -1 333 no such table: ghi
+stmt 333 err 1 -1 373 no such table: main.abc
+stmt 373 err 1 -1 413 no such table: main.def
+stmt 413 err 1 -1 453 no such table: main.ghi

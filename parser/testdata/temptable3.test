@@ -1,0 +1,36 @@
+==== 1.1
+
+  PRAGMA cache_size = 1;
+  PRAGMA page_size = 1024;
+  PRAGMA auto_vacuum = 2;
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES( randomblob(800) );
+  INSERT INTO t1 VALUES( randomblob(800) );
+  CREATE TABLE t2(x);
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 52 ok
+stmt 78 ok
+stmt 100 err 1 -1 144 no such table: t1
+stmt 144 err 1 -1 188 no such table: t1
+stmt 188 ok
+stmt 210 ok
+==== 1.2
+
+  PRAGMA cache_size = 1;
+  PRAGMA auto_vacuum = 2;
+  CREATE TABLE t1(x);
+  CREATE TABLE t2(x UNIQUE);
+  INSERT INTO t2 VALUES(1), (2), (3);
+  DROP TABLE t1;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 51 ok
+stmt 73 ok
+stmt 102 err 1 -1 140 no such table: t2
+stmt 140 err 1 -1 157 no such table: t1
+stmt 157 ok

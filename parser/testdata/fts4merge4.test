@@ -1,0 +1,24 @@
+==== 1.1
+ CREATE VIRTUAL TABLE t1 USING fts4
+----
+stmt 0 ok
+==== 2.0
+ CREATE VIRTUAL TABLE t1 USING fts4
+----
+stmt 0 ok
+==== 2.2
+ SELECT count(*) FROM t1_segdir;
+----
+stmt 0 err 1 -1 32 no such table: t1_segdir
+==== 2.3
+ INSERT INTO t1(t1) VALUES('optimize')
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== 2.4
+ SELECT count(*) FROM t1_segdir;
+----
+stmt 0 err 1 -1 32 no such table: t1_segdir
+==== 2.1
+ CREATE VIRTUAL TABLE t2 USING fts4;
+----
+stmt 0 ok

@@ -1,0 +1,9 @@
+==== instrfault-generated
+
+    CREATE TABLE h1(a, b);
+    INSERT INTO h1 VALUES('abcdefg%200hijkl', randomblob(200));
+    INSERT INTO h1 SELECT b, a FROM h1;
+----
+stmt 0 ok
+stmt 27 err 1 -1 91 no such table: h1
+stmt 91 err 1 -1 131 no such table: h1

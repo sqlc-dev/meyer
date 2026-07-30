@@ -1,0 +1,319 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING fts3(a, b);
+  INSERT INTO t1 VALUES('one', 'i');
+  INSERT INTO t1 VALUES('one', 'ii');
+  INSERT INTO t1 VALUES('two', 'i');
+  INSERT INTO t1 VALUES('two', 'ii');
+----
+stmt 0 ok
+stmt 44 err 1 -1 81 no such table: t1
+stmt 81 err 1 -1 119 no such table: t1
+stmt 119 err 1 -1 156 no such table: t1
+stmt 156 err 1 -1 194 no such table: t1
+==== 1.1
+
+  SELECT a.a, b.b FROM t1 a, t1 b WHERE a.t1 MATCH 'two' AND b.t1 MATCH 'i'
+----
+stmt 0 err 1 -1 77 no such table: t1
+==== 2.1
+
+  SELECT rowid FROM t2 WHERE t2 MATCH '"a b c"'
+----
+stmt 0 err 1 -1 49 no such table: t2
+==== 2.2
+
+  SELECT rowid FROM t2 WHERE t2 MATCH '"g h i"'
+----
+stmt 0 err 1 -1 49 no such table: t2
+==== 2.3
+
+  SELECT rowid FROM t2 WHERE t2 MATCH '"i h"'
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 2.4
+
+  SELECT rowid FROM t2 WHERE t2 MATCH '"f e"'
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 2.5
+
+  SELECT rowid FROM t2 WHERE t2 MATCH '"e f"'
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 2.6
+
+  SELECT rowid FROM t2 WHERE t2 MATCH 'e' AND rowid BETWEEN NULL AND 45;
+----
+stmt 0 err 1 -1 73 no such table: t2
+==== 2.7
+
+  SELECT rowid FROM t2 WHERE t2 MATCH 'e' AND rowid BETWEEN 11.5 AND 48.2;
+----
+stmt 0 err 1 -1 75 no such table: t2
+==== 2.8
+
+  SELECT rowid FROM t2 WHERE t2 MATCH 'e' AND rowid BETWEEN '11.5' AND '48.2';
+----
+stmt 0 err 1 -1 79 no such table: t2
+==== 3.1.1
+
+  CREATE VIRTUAL TABLE t3 USING fts3;
+  INSERT INTO t3 VALUES('a b c');
+  INSERT INTO t3 VALUES('d e f');
+  INSERT INTO t3 VALUES('a b d');
+  INSERT INTO t3 VALUES('1 2 3 4 5 6 7 8 9 10 11');
+----
+stmt 0 ok
+stmt 38 err 1 -1 72 no such table: t3
+stmt 72 err 1 -1 106 no such table: t3
+stmt 106 err 1 -1 140 no such table: t3
+stmt 140 err 1 -1 192 no such table: t3
+==== 3.1.2
+
+  SELECT * FROM t3 WHERE t3 MATCH '"a b x y"' ORDER BY docid DESC
+----
+stmt 0 err 1 -1 67 no such table: t3
+==== 3.1.3
+
+  SELECT * FROM t3 WHERE t3 MATCH '"a b c" OR "a b x y"' ORDER BY docid DESC
+----
+stmt 0 err 1 -1 78 no such table: t3
+==== 3.1.4
+
+  SELECT * FROM t3 WHERE t3 MATCH '"a* b* x* a*"'
+----
+stmt 0 err 1 -1 51 no such table: t3
+==== 3.1.5
+
+  SELECT rowid FROM t3 WHERE t3 MATCH '"2 3 4 5 6 7 8 9"'
+----
+stmt 0 err 1 -1 59 no such table: t3
+==== 4.0
+
+    PRAGMA page_size = 512;
+    CREATE VIRTUAL TABLE t4 USING fts4;
+    WITH s(i) AS ( SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<8000 )
+    INSERT INTO t4 SELECT 'a b c a b c a b c' FROM s;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 68 err 1 -1 193 no such table: t4
+==== 4.1
+
+    SELECT count(*) FROM t4 WHERE t4 MATCH '"a b c" OR "c a b"'
+----
+stmt 0 err 1 -1 65 no such table: t4
+==== 4.2
+
+    SELECT quote(value) from t4_stat where id=0
+----
+stmt 0 err 1 -1 49 no such table: t4_stat
+==== 4.3
+
+    UPDATE t4_stat SET value = X'C03EC0B204C0A60800' WHERE id=0;
+----
+stmt 0 err 1 -1 65 no such table: t4_stat
+==== 4.4
+
+    SELECT count(*) FROM t4 WHERE t4 MATCH '"a b c" OR "c a b"'
+----
+stmt 0 err 1 -1 65 no such table: t4
+==== 4.5
+
+    UPDATE t4_stat SET value = X'00C03EC0B204C0A608' WHERE id=0;
+----
+stmt 0 err 1 -1 65 no such table: t4_stat
+==== 4.6
+
+    SELECT count(*) FROM t4 WHERE t4 MATCH '"a b c" OR "c a b"'
+----
+stmt 0 err 1 -1 65 no such table: t4
+==== 5.0
+
+  CREATE VIRTUAL TABLE t5 USING fts4;
+  INSERT INTO t5 VALUES('a x x x x b x x x x c');
+  INSERT INTO t5 VALUES('a x x x x b x x x x c');
+  INSERT INTO t5 VALUES('a x x x x b x x x x c');
+----
+stmt 0 ok
+stmt 38 err 1 -1 88 no such table: t5
+stmt 88 err 1 -1 138 no such table: t5
+stmt 138 err 1 -1 188 no such table: t5
+==== 5.1
+
+  SELECT rowid FROM t5 WHERE t5 MATCH 'a NEAR/4 b NEAR/4 c'
+----
+stmt 0 err 1 -1 61 no such table: t5
+==== 5.2
+
+  SELECT rowid FROM t5 WHERE t5 MATCH 'a NEAR/3 b NEAR/4 c'
+----
+stmt 0 err 1 -1 61 no such table: t5
+==== 5.3
+
+  SELECT rowid FROM t5 WHERE t5 MATCH 'a NEAR/4 b NEAR/3 c'
+----
+stmt 0 err 1 -1 61 no such table: t5
+==== 5.4
+
+  SELECT rowid FROM t5 WHERE t5 MATCH 'y NEAR/4 b NEAR/4 c'
+----
+stmt 0 err 1 -1 61 no such table: t5
+==== 5.5
+
+  SELECT rowid FROM t5 WHERE t5 MATCH 'x OR a NEAR/3 b NEAR/3 c'
+----
+stmt 0 err 1 -1 66 no such table: t5
+==== 5.5.dup1
+
+  SELECT rowid FROM t5 WHERE t5 MATCH 'x OR y NEAR/3 b NEAR/3 c'
+----
+stmt 0 err 1 -1 66 no such table: t5
+==== 6.0
+
+  CREATE VIRTUAL TABLE t6 USING fts4;
+
+  BEGIN;
+  WITH s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<50000)
+    INSERT INTO t6 SELECT 'x x x x x x x x x x x' FROM s;
+
+  INSERT INTO t6 VALUES('x x x x x x x x x x x A');
+  INSERT INTO t6 VALUES('x x x x x x x x x x x B');
+  INSERT INTO t6 VALUES('x x x x x x x x x x x A');
+  INSERT INTO t6 VALUES('x x x x x x x x x x x B');
+
+  WITH s(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<50000)
+    INSERT INTO t6 SELECT 'x x x x x x x x x x x' FROM s;
+  COMMIT;
+----
+stmt 0 ok
+stmt 38 ok
+stmt 48 err 1 -1 174 no such table: t6
+stmt 174 err 1 -1 227 no such table: t6
+stmt 227 err 1 -1 279 no such table: t6
+stmt 279 err 1 -1 331 no such table: t6
+stmt 331 err 1 -1 383 no such table: t6
+stmt 383 err 1 -1 510 no such table: t6
+stmt 510 ok
+==== 6.1
+
+  SELECT rowid FROM t6 WHERE t6 MATCH 'b OR "x a"'
+----
+stmt 0 err 1 -1 52 no such table: t6
+==== 7.0
+
+  CREATE VIRTUAL TABLE vt0 USING fts3(c0);
+  INSERT INTO vt0 VALUES (x'00');
+----
+stmt 0 ok
+stmt 43 err 1 -1 77 no such table: vt0
+==== 7.1
+
+  INSERT INTO vt0(vt0) VALUES('integrity-check');
+----
+stmt 0 err 1 -1 50 no such table: vt0
+==== 7.0.1
+
+  CREATE VIRTUAL TABLE vt0 USING fts4(c0, order=DESC);
+  INSERT INTO vt0(c0) VALUES (0), (0);
+----
+stmt 0 ok
+stmt 55 err 1 -1 94 no such table: vt0
+==== 7.0.2
+
+  INSERT INTO vt0(vt0) VALUES('integrity-check');
+----
+stmt 0 err 1 -1 50 no such table: vt0
+==== 7.1.1
+
+  CREATE VIRTUAL TABLE vt0 USING fts4(c0, order=ASC);
+  INSERT INTO vt0(c0) VALUES (0), (0);
+----
+stmt 0 ok
+stmt 54 err 1 -1 93 no such table: vt0
+==== 7.1.2
+
+  INSERT INTO vt0(vt0) VALUES('integrity-check');
+----
+stmt 0 err 1 -1 50 no such table: vt0
+==== 7.2.1
+
+  CREATE VIRTUAL TABLE ft USING fts4(c0, c1, order=DESC, prefix=1);
+  INSERT INTO ft VALUES('a b c d', 'hello world');
+  INSERT INTO ft VALUES('negative', 'positive');
+  INSERT INTO ft VALUES('hello world', 'a b c d');
+----
+stmt 0 ok
+stmt 68 err 1 -1 119 no such table: ft
+stmt 119 err 1 -1 168 no such table: ft
+stmt 168 err 1 -1 219 no such table: ft
+==== 7.2.2
+
+  INSERT INTO vt0(vt0) VALUES('integrity-check');
+----
+stmt 0 err 1 -1 50 no such table: vt0
+==== 8.1
+
+  CREATE VIRTUAL TABLE vt0 USING fts4(c0, prefix=1);
+----
+stmt 0 ok
+==== 8.2
+
+  BEGIN;
+    INSERT INTO vt0 VALUES (0);
+    INSERT INTO vt0(vt0) VALUES('optimize');
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 err 1 -1 41 no such table: vt0
+stmt 41 err 1 -1 86 no such table: vt0
+stmt 86 ok
+==== 8.3
+
+  INSERT INTO vt0(vt0) VALUES('integrity-check');
+----
+stmt 0 err 1 -1 50 no such table: vt0
+==== 9.0
+
+  CREATE VIRTUAL TABLE t1 using fts4(mailcontent);
+  insert into t1(rowid, mailcontent) values
+      (-4764623217061966105, 'we are going to upgrade'),
+      (8324454597464624651, 'we are going to upgrade');
+----
+stmt 0 ok
+stmt 51 err 1 -1 208 no such table: t1
+==== 9.1
+
+  INSERT INTO t1(t1) VALUES('integrity-check');
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== 9.2
+
+  SELECT rowid FROM t1 WHERE t1 MATCH 'upgrade';
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== 10.0
+
+  CREATE VIRTUAL TABLE f USING fts3(a,b);
+  CREATE TABLE 'f_stat'(id INTEGER PRIMARY KEY, value BLOB);
+  INSERT INTO f_stat VALUES (1,x'3b3b3b3b3b3b3b28ffffffffffffffffff1807f9073481f1d43bc93b3b3b3b3b3b3b3b3b3b18073b3b3b3b3b3b3b9b003b');
+----
+stmt 0 ok
+stmt 42 ok
+stmt 103 err 1 -1 238 no such table: f_stat
+==== 10.1
+
+  INSERT INTO f(f) VALUES ('merge=69,59');
+----
+stmt 0 err 1 -1 43 no such table: f
+==== 11.0
+
+  CREATE VIRTUAL TABLE xyz USING fts3();
+----
+stmt 0 ok
+==== 11.1
+
+  SELECT * FROM xyz WHERE xyz MATCH 'a NEAR/4294836224 a';
+----
+stmt 0 err 1 -1 59 no such table: xyz

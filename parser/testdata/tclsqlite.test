@@ -1,0 +1,102 @@
+==== tcl-5.2
+
+      SELECT typeof(a), typeof(b), typeof(c) FROM t3
+----
+stmt 0 err 1 -1 54 no such table: t3
+==== tcl-5.4
+
+      SELECT typeof(a), typeof(b), typeof(c) FROM t3
+----
+stmt 0 err 1 -1 54 no such table: t3
+==== tcl-14.1
+
+  CREATE TABLE t6(x);
+  INSERT INTO t6 VALUES(1);
+----
+stmt 0 ok
+stmt 22 err 1 -1 50 no such table: t6
+==== tcl-16.100
+
+  CREATE TABLE t1(a,b);
+  INSERT INTO t1 VALUES(1,2),(2,NULL),(3,'xyz');
+----
+stmt 0 ok
+stmt 24 err 1 -1 73 no such table: t1
+==== 17.0
+
+  SELECT quote( add_i(2, 3) );
+  SELECT quote( add_r(2, 3) );
+  SELECT quote( add_t(2, 3) );
+  SELECT quote( add_b(2, 3) );
+  SELECT quote( add_a(2, 3) );
+----
+stmt 0 err 1 17 31 no such function: add_i
+stmt 31 err 1 48 62 no such function: add_r
+stmt 62 err 1 79 93 no such function: add_t
+stmt 93 err 1 110 124 no such function: add_b
+stmt 124 err 1 141 155 no such function: add_a
+==== 17.1
+
+  SELECT quote( add_i(2.2, 3.3) );
+  SELECT quote( add_r(2.2, 3.3) );
+  SELECT quote( add_t(2.2, 3.3) );
+  SELECT quote( add_b(2.2, 3.3) );
+  SELECT quote( add_a(2.2, 3.3) );
+----
+stmt 0 err 1 17 35 no such function: add_i
+stmt 35 err 1 52 70 no such function: add_r
+stmt 70 err 1 87 105 no such function: add_t
+stmt 105 err 1 122 140 no such function: add_b
+stmt 140 err 1 157 175 no such function: add_a
+==== 17.2
+
+  SELECT quote( ret_i(2.5) );
+  SELECT quote( ret_r(2.5) );
+  SELECT quote( ret_t(2.5) );
+  SELECT quote( ret_b(2.5) );
+  SELECT quote( ret_a(2.5) );
+----
+stmt 0 err 1 17 30 no such function: ret_i
+stmt 30 err 1 47 60 no such function: ret_r
+stmt 60 err 1 77 90 no such function: ret_t
+stmt 90 err 1 107 120 no such function: ret_b
+stmt 120 err 1 137 150 no such function: ret_a
+==== 17.3
+
+  SELECT quote( ret_i('2.5') );
+  SELECT quote( ret_r('2.5') );
+  SELECT quote( ret_t('2.5') );
+  SELECT quote( ret_b('2.5') );
+  SELECT quote( ret_a('2.5') );
+----
+stmt 0 err 1 17 32 no such function: ret_i
+stmt 32 err 1 49 64 no such function: ret_r
+stmt 64 err 1 81 96 no such function: ret_t
+stmt 96 err 1 113 128 no such function: ret_b
+stmt 128 err 1 145 160 no such function: ret_a
+==== 17.4
+
+  SELECT quote( ret_i('abc') );
+  SELECT quote( ret_r('abc') );
+  SELECT quote( ret_t('abc') );
+  SELECT quote( ret_b('abc') );
+  SELECT quote( ret_a('abc') );
+----
+stmt 0 err 1 17 32 no such function: ret_i
+stmt 32 err 1 49 64 no such function: ret_r
+stmt 64 err 1 81 96 no such function: ret_t
+stmt 96 err 1 113 128 no such function: ret_b
+stmt 128 err 1 145 160 no such function: ret_a
+==== 17.5
+
+  SELECT quote( ret_i(X'616263') );
+  SELECT quote( ret_r(X'616263') );
+  SELECT quote( ret_t(X'616263') );
+  SELECT quote( ret_b(X'616263') );
+  SELECT quote( ret_a(X'616263') );
+----
+stmt 0 err 1 17 36 no such function: ret_i
+stmt 36 err 1 53 72 no such function: ret_r
+stmt 72 err 1 89 108 no such function: ret_t
+stmt 108 err 1 125 144 no such function: ret_b
+stmt 144 err 1 161 180 no such function: ret_a

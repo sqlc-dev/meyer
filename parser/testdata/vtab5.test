@@ -1,0 +1,79 @@
+==== vtab5-1.1
+
+    CREATE TABLE treal(a VARCHAR(16), b INTEGER, c FLOAT);
+    INSERT INTO treal VALUES('a', 'b', 'c');
+    CREATE VIRTUAL TABLE techo USING echo(treal);
+----
+stmt 0 ok
+stmt 59 err 1 -1 104 no such table: treal
+stmt 104 ok
+==== vtab5.1.2
+
+    SELECT * FROM techo;
+----
+stmt 0 err 1 -1 25 no such table: techo
+==== vtab5.1.X
+
+    DROP TABLE techo;
+    DROP TABLE treal;
+----
+stmt 0 err 1 -1 22 no such table: techo
+stmt 22 err 1 -1 44 no such table: treal
+==== vtab5.2.1
+
+    CREATE TABLE strings(str COLLATE NOCASE);
+    INSERT INTO strings VALUES('abc1');
+    INSERT INTO strings VALUES('Abc3');
+    INSERT INTO strings VALUES('ABc2');
+    INSERT INTO strings VALUES('aBc4');
+    SELECT str FROM strings ORDER BY 1;
+----
+stmt 0 ok
+stmt 46 err 1 -1 86 no such table: strings
+stmt 86 err 1 -1 126 no such table: strings
+stmt 126 err 1 -1 166 no such table: strings
+stmt 166 err 1 -1 206 no such table: strings
+stmt 206 err 1 -1 246 no such table: strings
+==== vtab5.2.2
+
+    CREATE VIRTUAL TABLE echo_strings USING echo(strings);
+    SELECT str FROM echo_strings ORDER BY 1;
+----
+stmt 0 ok
+stmt 59 err 1 -1 104 no such table: echo_strings
+==== vtab5.2.3
+
+    SELECT str||'' FROM echo_strings ORDER BY 1;
+----
+stmt 0 err 1 -1 49 no such table: echo_strings
+==== vtab5.3.1
+
+      CREATE TRIGGER trig INSTEAD OF INSERT ON echo_strings BEGIN
+        SELECT 1, 2, 3;
+      END;
+----
+stmt 0 err 1 -1 66 no such table: main.echo_strings
+==== vtab5.3.2
+
+      CREATE TRIGGER trig AFTER INSERT ON echo_strings BEGIN
+        SELECT 1, 2, 3;
+      END;
+----
+stmt 0 err 1 -1 61 no such table: main.echo_strings
+==== vtab5.3.2.dup1
+
+      CREATE TRIGGER trig BEFORE INSERT ON echo_strings BEGIN
+        SELECT 1, 2, 3;
+      END;
+----
+stmt 0 err 1 -1 62 no such table: main.echo_strings
+==== vtab5.4.1
+
+    CREATE INDEX echo_strings_i ON echo_strings(str);
+----
+stmt 0 err 1 -1 54 no such table: main.echo_strings
+==== vtab5.4.2
+
+      ALTER TABLE echo_strings ADD COLUMN col2;
+----
+stmt 0 err 1 -1 48 no such table: echo_strings

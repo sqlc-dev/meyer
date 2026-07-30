@@ -1,0 +1,26 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE temp.t1 USING fts3(a);
+  BEGIN;
+  CREATE TABLE t2(x);
+----
+stmt 0 ok
+stmt 46 ok
+stmt 55 ok
+==== 1.1
+
+  ALTER TABLE t1_content RENAME c0a TO docid;
+----
+stmt 0 err 1 -1 46 no such table: t1_content
+==== 1.2
+
+  UPDATE t1 SET Col0 = 1 ;
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== 1.3
+
+  ROLLBACK;
+  DROP TABLE t1;
+----
+stmt 0 ok
+stmt 12 err 1 -1 29 no such table: t1

@@ -1,0 +1,156 @@
+==== fts3cov-1.1
+ 
+    CREATE VIRTUAL TABLE t1 USING fts3(x);
+    INSERT INTO t1(t1) VALUES('nodesize=24');
+    BEGIN;
+      INSERT INTO t1 VALUES('Is the night chilly and dark?');
+      INSERT INTO t1 VALUES('The night is chilly, but not dark.');
+      INSERT INTO t1 VALUES('The thin gray cloud is spread on high,');
+      INSERT INTO t1 VALUES('It covers but not hides the sky.');
+    COMMIT;
+    SELECT count(*)>0 FROM t1_segments;
+----
+stmt 0 ok
+stmt 44 err 1 -1 90 no such table: t1
+stmt 90 ok
+stmt 101 err 1 -1 163 no such table: t1
+stmt 163 err 1 -1 230 no such table: t1
+stmt 230 err 1 -1 301 no such table: t1
+stmt 301 err 1 -1 366 no such table: t1
+stmt 366 ok
+stmt 378 err 1 -1 418 no such table: t1_segments
+==== fts3cov-4.1
+
+    CREATE VIRTUAL TABLE t3 USING fts3(x);
+    INSERT INTO t3(t3) VALUES('nodesize=24');
+    INSERT INTO t3(t3) VALUES('maxpending=100');
+----
+stmt 0 ok
+stmt 43 err 1 -1 89 no such table: t3
+stmt 89 err 1 -1 138 no such table: t3
+==== fts3cov-5.1
+
+    CREATE VIRTUAL TABLE t4 USING fts3(x);
+    INSERT INTO t4(t4) VALUES('nodesize=24');
+----
+stmt 0 ok
+stmt 43 err 1 -1 89 no such table: t4
+==== fts3cov-5.3
+ INSERT INTO t4 VALUES('extra!')
+----
+stmt 0 err 1 -1 33 no such table: t4
+==== fts3cov-5.5
+ INSERT INTO t4 VALUES('more extra!')
+----
+stmt 0 err 1 -1 38 no such table: t4
+==== fts3cov-7.1
+
+    CREATE VIRTUAL TABLE t7 USING fts3(a, b, c);
+    INSERT INTO t7 VALUES('A', 'B', 'C');
+    UPDATE t7 SET docid = 5;
+    SELECT docid, * FROM t7;
+----
+stmt 0 ok
+stmt 49 err 1 -1 91 no such table: t7
+stmt 91 err 1 -1 120 no such table: t7
+stmt 120 err 1 -1 149 no such table: t7
+==== fts3cov-7.2
+
+    INSERT INTO t7 VALUES('D', 'E', 'F');
+    UPDATE t7 SET docid = 1 WHERE docid = 6;
+    SELECT docid, * FROM t7;
+----
+stmt 0 err 1 -1 42 no such table: t7
+stmt 42 err 1 -1 87 no such table: t7
+stmt 87 err 1 -1 116 no such table: t7
+==== fts3cov-9.1
+ CREATE VIRTUAL TABLE xx USING fts3
+----
+stmt 0 ok
+==== fts3cov-9.5
+ INSERT INTO xx(xx) VALUES('optimize')
+----
+stmt 0 err 1 -1 39 no such table: xx
+==== 14.0
+
+  CREATE VIRTUAL TABLE t14 USING fts4(a, b);
+  INSERT INTO t14 VALUES('one two three', 'one three four');
+  INSERT INTO t14 VALUES('a b c', 'd e a');
+----
+stmt 0 ok
+stmt 45 err 1 -1 106 no such table: t14
+stmt 106 err 1 -1 150 no such table: t14
+==== 14.1
+
+  SELECT rowid FROM t14 WHERE t14 MATCH '"one two three"'
+----
+stmt 0 err 1 -1 59 no such table: t14
+==== 14.2
+
+  SELECT rowid FROM t14 WHERE t14 MATCH '"one four"'
+----
+stmt 0 err 1 -1 54 no such table: t14
+==== 14.3
+
+  SELECT rowid FROM t14 WHERE t14 MATCH '"e a"'
+----
+stmt 0 err 1 -1 49 no such table: t14
+==== 14.5
+
+  SELECT rowid FROM t14 WHERE t14 MATCH '"e b"'
+----
+stmt 0 err 1 -1 49 no such table: t14
+==== 14.6
+
+  SELECT rowid FROM t14 WHERE rowid MATCH 'one'
+----
+stmt 0 err 1 -1 49 no such table: t14
+==== 14.7
+
+  SELECT rowid FROM t14 WHERE docid MATCH 'one'
+----
+stmt 0 err 1 -1 49 no such table: t14
+==== 15.0
+
+  CREATE VIRTUAL TABLE t15 USING fts4(a, b, c);
+  INSERT INTO t15 VALUES('abc def ghi', 'abc2 def2 ghi2', 'abc3 def3 ghi3');
+  INSERT INTO t15 VALUES('abc2 def2 ghi2', 'abc2 def2 ghi2', 'abc def3 ghi3');
+----
+stmt 0 ok
+stmt 48 err 1 -1 125 no such table: t15
+stmt 125 err 1 -1 204 no such table: t15
+==== 15.1
+
+  SELECT rowid FROM t15 WHERE t15 MATCH '"abc* def2"'
+----
+stmt 0 err 1 -1 55 no such table: t15
+==== 16.1
+
+  CREATE VIRTUAL TABLE t16 USING fts4;
+  INSERT INTO t16 VALUES('theoretical work to examine the relationship');
+  INSERT INTO t16 VALUES('solution of our problems on the invisible');
+  DELETE FROM t16_content WHERE rowid = 2;
+----
+stmt 0 ok
+stmt 39 err 1 -1 113 no such table: t16
+stmt 113 err 1 -1 184 no such table: t16
+stmt 184 err 1 -1 227 no such table: t16_content
+==== 16.2
+
+  SELECT * FROM t16 WHERE t16 MATCH 'invisible'
+----
+stmt 0 err 1 -1 49 no such table: t16
+==== 17.1
+
+  CREATE VIRTUAL TABLE t17 USING fts4;
+  INSERT INTO t17(content) VALUES('one one one');
+  UPDATE t17_segdir SET root = X'00036F6E65FFFFFFFFFFFFFFFFFFFFFF02030300'
+----
+stmt 0 ok
+stmt 39 err 1 -1 89 no such table: t17
+stmt 89 err 1 -1 165 no such table: t17_segdir
+==== 17.2
+
+  SELECT * FROM t17 WHERE t17 MATCH 'one'
+----
+stmt 0 err 1 -1 43 no such table: t17

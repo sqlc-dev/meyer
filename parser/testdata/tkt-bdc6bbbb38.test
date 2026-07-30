@@ -1,0 +1,37 @@
+==== tkt-bdc6bbbb38-generated
+ INSERT INTO t2 VALUES('a b c')
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== tkt-bdc6bbbb38-generated.dup1
+
+    SELECT offsets(t2) FROM t2 WHERE t2 MATCH 'a AND d OR b' ORDER BY docid ASC
+----
+stmt 0 err 1 -1 81 no such table: t2
+==== tkt-bdc6bbbb38-generated.dup2
+ INSERT INTO t2 VALUES('a c d')
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== tkt-bdc6bbbb38-generated.dup3
+
+    SELECT offsets(t2) FROM t2 WHERE t2 MATCH 'a AND d OR b' ORDER BY docid ASC
+----
+stmt 0 err 1 -1 81 no such table: t2
+==== tkt-bdc6bbbb38-generated.dup4
+ INSERT INTO t3 VALUES('a c d')
+----
+stmt 0 err 1 -1 32 no such table: t3
+==== tkt-bdc6bbbb38-generated.dup5
+
+    SELECT offsets(t3) FROM t3 WHERE t3 MATCH 'a AND d OR b' ORDER BY docid DESC
+----
+stmt 0 err 1 -1 82 no such table: t3
+==== tkt-bdc6bbbb38-generated.dup6
+ 
+    INSERT INTO t3 VALUES('a b c');
+----
+stmt 0 err 1 -1 37 no such table: t3
+==== tkt-bdc6bbbb38-generated.dup7
+
+    SELECT offsets(t3) FROM t3 WHERE t3 MATCH 'a AND d OR b' ORDER BY docid DESC
+----
+stmt 0 err 1 -1 82 no such table: t3

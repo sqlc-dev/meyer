@@ -1,0 +1,15 @@
+==== stmtvtab1-140
+
+  SELECT count(*) FROM sqlite_stmt WHERE NOT busy;
+----
+stmt 0 err 1 -1 51 no such table: sqlite_stmt
+==== stmtvtab1-150
+
+  SELECT count(*) FROM sqlite_stmt WHERE mem>5000;
+----
+stmt 0 err 1 -1 51 no such table: sqlite_stmt
+==== stmtvtab1-160
+
+  SELECT * FROM sqlite_stmt WHERE NOT busy;
+----
+stmt 0 err 1 -1 44 no such table: sqlite_stmt

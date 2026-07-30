@@ -1,0 +1,42 @@
+==== 3.1
+
+  CREATE TABLE t1(x);
+  CREATE TABLE t2(y);
+  CREATE TABLE t3(z);
+
+  CREATE INDEX i1 ON t1(x);
+  CREATE INDEX i2 ON t2(y);
+
+  INSERT INTO t1 VALUES(1);
+  INSERT INTO t2 VALUES(1);
+  ANALYZE;
+
+  SELECT * FROM t1 WHERE x=1;
+  SELECT * FROM t2 WHERE y=1;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 ok
+stmt 66 err 1 -1 95 no such table: main.t1
+stmt 95 err 1 -1 123 no such table: main.t2
+stmt 123 err 1 -1 152 no such table: t1
+stmt 152 err 1 -1 180 no such table: t2
+stmt 180 ok
+stmt 191 err 1 -1 222 no such table: t1
+stmt 222 err 1 -1 252 no such table: t2
+==== 3.3
+ PRAGMA optimize
+----
+stmt 0 ok
+==== 3.5
+ PRAGMA optimize
+----
+stmt 0 ok
+==== 3.7
+ PRAGMA optimize
+----
+stmt 0 ok
+==== 3.8
+ PRAGMA optimize
+----
+stmt 0 ok

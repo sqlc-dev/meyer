@@ -1,0 +1,382 @@
+==== percentile-generated
+SELECT median(x) FROM t1
+----
+stmt 0 err 1 -1 25 no such table: t1
+==== percentile-generated.dup1
+SELECT median() WITHIN GROUP (ORDER BY x) FROM t1
+----
+stmt 0 err 1 29 30 near "(": syntax error
+==== percentile-1.1.median
+
+  SELECT median(x) FROM t1;
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== percentile-1.1.median.dup1
+
+    SELECT median() WITHIN GROUP (ORDER BY x) FROM t1;
+----
+stmt 0 err 1 34 35 near "(": syntax error
+==== percentile-1.1.distinct.1
+
+    SELECT median(DISTINCT x) FROM t1;
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== percentile-1.1.distinct.2
+
+    SELECT percentile(DISTINCT 50) WITHIN GROUP (ORDER BY x) FROM t1;
+----
+stmt 0 err 1 49 50 near "(": syntax error
+==== percentile-1.1.median.dup2
+
+    SELECT median() WITHIN GROUP (ORDER BY x) FROM t1;
+----
+stmt 0 err 1 34 35 near "(": syntax error
+==== percentile-1.2
+INSERT INTO t1 VALUES(NULL),(NULL);
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== percentile-generated.dup2
+SELECT median(x) FROM t1
+----
+stmt 0 err 1 -1 25 no such table: t1
+==== percentile-generated.dup3
+SELECT median() WITHIN GROUP (ORDER BY x) FROM t1
+----
+stmt 0 err 1 29 30 near "(": syntax error
+==== percentile-1.4.1
+SELECT round(percentile(x, 15+0.000001*rowid),1) FROM t1
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== percentile-1.4.2
+SELECT round(percentile_cont(x,(15+0.000001*rowid)*0.01),1) FROM t1
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== percentile-1.4.3
+SELECT percentile_disc(x, (15+0.000001*rowid)*0.01) FROM t1
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== percentile-1.5.1
+SELECT percentile(x, 15+0.1*rowid) FROM t1
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== percentile-1.5.2
+SELECT percentile_cont(x, (15+0.1*rowid)*0.01) FROM t1
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== percentile-1.5.3
+SELECT percentile_disc(x, (15+0.1*rowid)*0.01) FROM t1
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== percentile-1.6
+
+    CREATE TABLE t2(x);
+    INSERT INTO t2 SELECT x+0.0 FROM t1 ORDER BY random();
+----
+stmt 0 ok
+stmt 24 err 1 -1 83 no such table: t2
+==== percentile-generated.dup4
+SELECT median(x) FROM t2
+----
+stmt 0 err 1 -1 25 no such table: t2
+==== percentile-generated.dup5
+SELECT median() WITHIN GROUP (ORDER BY x) FROM t2
+----
+stmt 0 err 1 29 30 near "(": syntax error
+==== percentile-1.8.1
+SELECT percentile(x,0,1) FROM t1
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== percentile-1.8.2
+SELECT percentile_cont(x,0,1) FROM t1
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== percentile-1.8.3
+SELECT percentile_disc(x,0,1) FROM t1
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== percentile-1.8.4
+SELECT median(x,0) FROM t1
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== percentile-1.8.5
+SELECT percentile(0,1) WITHIN GROUP(ORDER BY x) FROM t1
+----
+stmt 0 err 1 35 36 near "(": syntax error
+==== percentile-1.8.2.dup1
+SELECT percentile_cont(0,1)WITHIN GROUP (ORDER BY x) FROM t1
+----
+stmt 0 err 1 40 41 near "(": syntax error
+==== percentile-1.8.3.dup1
+SELECT percentile_disc(0,1)WITHIN GROUP (ORDER BY x) FROM t1
+----
+stmt 0 err 1 40 41 near "(": syntax error
+==== percentile-1.8.4.dup1
+SELECT median(x) WITHIN GROUP (ORDER BY x) FROM t1
+----
+stmt 0 err 1 30 31 near "(": syntax error
+==== percentile-1.9.1
+SELECT percentile(x) FROM t1
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== percentile-1.9.2
+SELECT percentile_cont(x) FROM t1
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== percentile-1.9.3
+SELECT percentile_disc(x) FROM t1
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== percentile-1.9.4
+SELECT median() FROM t1
+----
+stmt 0 err 1 -1 24 no such table: t1
+==== percentile-1.9.5
+SELECT percentile() WITHIN GROUP(ORDER BY x) FROM t1
+----
+stmt 0 err 1 32 33 near "(": syntax error
+==== percentile-1.9.6
+SELECT percentile_cont()WITHIN GROUP (ORDER BY x) FROM t1
+----
+stmt 0 err 1 37 38 near "(": syntax error
+==== percentile-1.9.7
+SELECT percentile_disc()WITHIN GROUP (ORDER BY x) FROM t1
+----
+stmt 0 err 1 37 38 near "(": syntax error
+==== percentile-1.10
+SELECT percentile(x,null) FROM t1
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== percentile-1.11
+SELECT percentile(x,'fifty') FROM t1
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== percentile-1.12
+SELECT percentile(x,x'3530') FROM t1
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== percentile-1.13
+SELECT percentile(x,-0.0000001) FROM t1
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== percentile-1.14
+SELECT percentile(x,100.0000001) FROM t1
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== percentile-1.14.2
+SELECT percentile_cont(x,1.0000001) FROM t1
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== percentile-1.14.3
+SELECT percentile_disc(x,1.0000001) FROM t1
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== percentile-1.15.1
+
+    BEGIN;
+    UPDATE t1 SET x='50' WHERE x IS NULL;
+    SELECT percentile(x, 50) FROM t1;
+----
+stmt 0 ok
+stmt 11 err 1 -1 53 no such table: t1
+stmt 53 err 1 -1 91 no such table: t1
+==== percentile-1.15.2
+
+    SELECT percentile_cont(x, 0.50) FROM t1;
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== percentile-1.15.3
+
+    SELECT percentile_disc(x, 0.50) FROM t1;
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== percentile-1.15.4
+
+    SELECT median(x) FROM t1;
+----
+stmt 0 err 1 -1 30 no such table: t1
+==== percentile-1.16
+
+    ROLLBACK;
+    BEGIN;
+    UPDATE t1 SET x=x'3530' WHERE x IS NULL;
+    SELECT percentile(x, 50) FROM t1;
+----
+stmt 0 ok
+stmt 14 ok
+stmt 25 err 1 -1 70 no such table: t1
+stmt 70 err 1 -1 108 no such table: t1
+==== percentile-1.17
+
+    ROLLBACK;
+    SELECT percentile(x, 50) FROM t1;
+----
+stmt 0 ok
+stmt 14 err 1 -1 52 no such table: t1
+==== percentile-1.18
+
+    UPDATE t1 SET x=NULL;
+    SELECT ifnull(percentile(x, 50),'NULL') FROM t1
+----
+stmt 0 err 1 -1 26 no such table: t1
+stmt 26 err 1 -1 79 no such table: t1
+==== percentile-1.19
+
+    UPDATE t1 SET x=12345 WHERE rowid=5;
+    SELECT percentile(x, 0), percentile(x, 50), percentile(x,100) FROM t1
+----
+stmt 0 err 1 -1 41 no such table: t1
+stmt 41 err 1 -1 116 no such table: t1
+==== percentile-1.20.1
+
+    DELETE FROM t1;
+    INSERT INTO t1 SELECT x+0.0 FROM t2;
+    UPDATE t1 SET x=1.0e300*1.0e300 WHERE rowid=5;
+    SELECT percentile(x,50) from t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 61 no such table: t1
+stmt 61 err 1 -1 112 no such table: t1
+stmt 112 err 1 -1 149 no such table: t1
+==== percentile-1.20.2
+
+    SELECT percentile_cont(x,0.50) from t1;
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== percentile-1.20.3
+
+    SELECT percentile_disc(x,0.50) from t1;
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== percentile-1.20.4
+
+    SELECT median(x) from t1;
+----
+stmt 0 err 1 -1 30 no such table: t1
+==== percentile-1.20.5
+
+      SELECT percentile(50) WITHIN GROUP (ORDER BY x) from t1;
+----
+stmt 0 err 1 42 43 near "(": syntax error
+==== percentile-1.20.6
+
+      SELECT percentile_cont(0.50) WITHIN GROUP (ORDER BY x) from t1;
+----
+stmt 0 err 1 49 50 near "(": syntax error
+==== percentile-1.20.7
+
+      SELECT percentile_disc(0.50) WITHIN GROUP(ORDER BY X) from t1;
+----
+stmt 0 err 1 48 49 near "(": syntax error
+==== percentile-1.20.8
+
+      SELECT median() WITHIN GROUP (ORDER BY x) from t1;
+----
+stmt 0 err 1 36 37 near "(": syntax error
+==== percentile-1.21
+
+    UPDATE t1 SET x=-1.0e300*1.0e300 WHERE rowid=5;
+    SELECT percentile(x,50) from t1;
+----
+stmt 0 err 1 -1 52 no such table: t1
+stmt 52 err 1 -1 89 no such table: t1
+==== percentile-3.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b, c, d);
+  INSERT INTO t1 VALUES (1, 'A', 'one',   8.4),
+                        (2, 'B', 'two',   7.1),
+                        (3, 'C', 'three', 5.9),
+                        (4, 'D', 'one',  11.0),
+                        (5, 'E', 'two',  12.5),
+                        (6, 'F', 'three', 0.0),
+                        (7, 'G', 'one',   2.7);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 78 err 1 -1 414 no such table: t1
+==== percential-4.0
+
+  CREATE TABLE products(
+    vendorId INT,
+    productId INTEGER PRIMARY KEY,
+    productName REAL,
+    price REAL
+  );
+  INSERT INTO products VALUES
+    (1001, 17,  'Left-handed screwdriver', 25.99),
+    (1001, 49,  'Right-handed screwdriver', 25.99),
+    (1001, 216, 'Long weight (blue)', 14.75),
+    (1001, 31,  'Long weight (green)', 11.99),
+    (1002, 37,  'Sledge hammer', 33.49),
+    (1003, 7,   'Chainsaw', 245.00),
+    (1003, 8,   'Straw dog box', 55.99),
+    (1003, 12,  'Hammock', 11.01),
+    (1004, 113, 'Teapot', 12.45),
+    (1004, 117, 'Bottomless coffee mug', 9.99);
+----
+stmt 0 ok
+stmt 120 err 1 -1 582 no such table: products
+==== percentile-4.1
+
+  SELECT VendorId, ProductId, /* ProductName,*/ Price,
+         avg(price) OVER (PARTITION BY vendorId) AS "Average",
+         median(price) OVER (PARTITION BY vendorId) AS "Median"
+    FROM products
+   ORDER BY vendorId, productId;
+----
+stmt 0 err 1 -1 233 no such table: products
+==== percentile-4.2
+
+  SELECT vendorId, median(price) FROM products
+   GROUP BY 1 ORDER BY 1;
+----
+stmt 0 err 1 -1 73 no such table: products
+==== percentile-5.0
+
+  CREATE TABLE user(name TEXT, class TEXT, cost REAL);
+  INSERT INTO user VALUES
+    ('Alice', 'Y',  3578.27),
+    ('Bob',   'X',  3399.99),
+    ('Cindy', 'Z',  699.10),
+    ('Dave',  'Y',  3078.27),
+    ('Emma',  'Z',  2319.99),
+    ('Fred',  'Y',  539.99),
+    ('Gina',  'X',  2320.49),
+    ('Hank',  'W',  24.99),
+    ('Irma',  'W',  24.99),
+    ('Jake',  'X',  2234.99),
+    ('Kim',   'Y',  4319.99),
+    ('Liam',  'X',  4968.59),
+    ('Mia',   'W',  59.53),
+    ('Nate',  'W',  23.50);
+----
+stmt 0 ok
+stmt 55 err 1 -1 491 no such table: user
+==== percentile-5.1
+
+  SELECT name, class, cost,
+    percentile(cost,   0) OVER w1 AS 'P0',
+    percentile(cost,  25) OVER w1 AS 'P1',
+    percentile(cost,  50) OVER w1 AS 'P2',
+    percentile(cost,  75) OVER w1 AS 'P3',
+    percentile(cost, 100) OVER w1 AS 'P4'
+  FROM user
+  WINDOW w1 AS (PARTITION BY class)
+  ORDER BY class, cost;
+----
+stmt 0 err 1 -1 314 no such table: user
+==== percentile-6.0
+
+  WITH RECURSIVE c(n) AS (VALUES(1) UNION ALL SELECT n+1 FROM c WHERE n<12)
+  SELECT median(iif(n%2,0.1,1.0)) FROM c;
+----
+stmt 0 err 1 86 118 no such function: median
+==== percentile-7.0
+
+  WITH RECURSIVE t1(n,x) AS (
+    VALUES(1,1.0)
+    UNION ALL
+    SELECT n+1, if(n%2,n*2.0,999998.0-2.0*n) FROM t1 WHERE n<1000000
+  ) SELECT median(x) FROM t1;
+----
+stmt 0 err 1 143 161 no such function: median

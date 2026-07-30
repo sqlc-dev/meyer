@@ -1,0 +1,27 @@
+==== walbig-1.0
+
+    PRAGMA journal_mode = WAL;
+    CREATE TABLE t1(a PRIMARY KEY, b UNIQUE);
+    INSERT INTO t1 VALUES(a_string(300), a_string(500));
+    INSERT INTO t1 SELECT a_string(300), a_string(500) FROM t1;
+    INSERT INTO t1 SELECT a_string(300), a_string(500) FROM t1;
+    INSERT INTO t1 SELECT a_string(300), a_string(500) FROM t1;
+----
+stmt 0 ok
+stmt 31 ok
+stmt 77 err 1 -1 134 no such table: t1
+stmt 134 err 1 -1 198 no such table: t1
+stmt 198 err 1 -1 262 no such table: t1
+stmt 262 err 1 -1 326 no such table: t1
+==== walbig-1.1
+ INSERT INTO t1 SELECT a_string(300), a_string(500) FROM t1
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== walbig-1.2
+ SELECT a FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== walbig-1.3
+ SELECT b FROM t1 ORDER BY b
+----
+stmt 0 err 1 -1 29 no such table: t1

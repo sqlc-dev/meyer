@@ -1,0 +1,383 @@
+==== 1.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4;
+  INSERT INTO t1 VALUES('one two three four');
+  INSERT INTO t1 VALUES('three four five six');
+  INSERT INTO t1 VALUES('one three five seven');
+
+  CREATE VIRTUAL TABLE terms USING fts4aux(t1);
+  SELECT term, documents, occurrences FROM terms WHERE col = '*';
+----
+stmt 0 ok
+stmt 38 err 1 -1 85 no such table: t1
+stmt 85 err 1 -1 133 no such table: t1
+stmt 133 err 1 -1 182 no such table: t1
+stmt 182 ok
+stmt 231 err 1 -1 297 no such table: terms
+==== 1.2
+
+  INSERT INTO t1 VALUES('one one one three three three');
+  SELECT term, documents, occurrences FROM terms WHERE col = '*';
+----
+stmt 0 err 1 -1 58 no such table: t1
+stmt 58 err 1 -1 124 no such table: terms
+==== 1.3.1
+ DELETE FROM t1;
+----
+stmt 0 err 1 -1 16 no such table: t1
+==== 1.3.2
+
+  SELECT term, documents, occurrences FROM terms WHERE col = '*';
+----
+stmt 0 err 1 -1 66 no such table: terms
+==== 1.4
+
+  INSERT INTO t1 VALUES('a b a b a b a');
+  INSERT INTO t1 SELECT * FROM t1;
+  INSERT INTO t1 SELECT * FROM t1;
+  INSERT INTO t1 SELECT * FROM t1;
+  INSERT INTO t1 SELECT * FROM t1;
+  INSERT INTO t1 SELECT * FROM t1;
+  INSERT INTO t1 SELECT * FROM t1;
+  INSERT INTO t1 SELECT * FROM t1;
+  INSERT INTO t1 SELECT * FROM t1;
+  SELECT term, documents, occurrences FROM terms WHERE col = '*';
+----
+stmt 0 err 1 -1 42 no such table: t1
+stmt 42 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 112 no such table: t1
+stmt 112 err 1 -1 147 no such table: t1
+stmt 147 err 1 -1 182 no such table: t1
+stmt 182 err 1 -1 217 no such table: t1
+stmt 217 err 1 -1 252 no such table: t1
+stmt 252 err 1 -1 287 no such table: t1
+stmt 287 err 1 -1 322 no such table: t1
+stmt 322 err 1 -1 388 no such table: terms
+==== 2.0
+
+  DROP TABLE t1;
+  DROP TABLE terms;
+
+  CREATE VIRTUAL TABLE x1 USING fts4(x);
+  INSERT INTO x1(x1) VALUES('nodesize=24');
+  CREATE VIRTUAL TABLE terms USING fts4aux(x1);
+
+  CREATE VIEW terms_v AS 
+  SELECT term, documents, occurrences FROM terms WHERE col = '*';
+
+  INSERT INTO x1 VALUES('braes brag bragged bragger bragging');
+  INSERT INTO x1 VALUES('brags braid braided braiding braids');
+  INSERT INTO x1 VALUES('brain brainchild brained braining brains');
+  INSERT INTO x1 VALUES('brainstem brainstems brainstorm brainstorms');
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 err 1 -1 37 no such table: terms
+stmt 37 ok
+stmt 79 err 1 -1 123 no such table: x1
+stmt 123 ok
+stmt 171 ok
+stmt 264 err 1 -1 329 no such table: x1
+stmt 329 err 1 -1 393 no such table: x1
+stmt 393 err 1 -1 462 no such table: x1
+stmt 462 err 1 -1 534 no such table: x1
+==== 2.1.1.1
+
+  EXPLAIN QUERY PLAN SELECT * FROM terms WHERE term='braid'
+----
+stmt 0 err 1 -1 61 no such table: terms
+==== 2.1.1.2
+
+  EXPLAIN QUERY PLAN SELECT * FROM terms WHERE +term='braid'
+----
+stmt 0 err 1 -1 62 no such table: terms
+==== 2.1.4.1
+ SELECT * FROM terms_v WHERE term='braid'
+----
+stmt 0 err 1 -1 42 no such table: terms_v
+==== 2.1.4.2
+ SELECT * FROM terms_v WHERE +term='braid'
+----
+stmt 0 err 1 -1 43 no such table: terms_v
+==== 2.1.4.3
+ SELECT * FROM terms_v WHERE term='breakfast'
+----
+stmt 0 err 1 -1 46 no such table: terms_v
+==== 2.1.4.4
+ SELECT * FROM terms_v WHERE +term='breakfast'
+----
+stmt 0 err 1 -1 47 no such table: terms_v
+==== 2.1.4.5
+ SELECT * FROM terms_v WHERE term='cba'
+----
+stmt 0 err 1 -1 40 no such table: terms_v
+==== 2.1.4.6
+ SELECT * FROM terms_v WHERE +term='cba'
+----
+stmt 0 err 1 -1 41 no such table: terms_v
+==== 2.1.4.7
+ SELECT * FROM terms_v WHERE term='abc'
+----
+stmt 0 err 1 -1 40 no such table: terms_v
+==== 2.1.4.8
+ SELECT * FROM terms_v WHERE +term='abc'
+----
+stmt 0 err 1 -1 41 no such table: terms_v
+==== 2.1.5
+ SELECT * FROM terms WHERE term=NULL
+----
+stmt 0 err 1 -1 37 no such table: terms
+==== 2.2.1.1
+
+  EXPLAIN QUERY PLAN SELECT * FROM terms WHERE term>'brain'
+----
+stmt 0 err 1 -1 61 no such table: terms
+==== 2.2.1.2
+
+  EXPLAIN QUERY PLAN SELECT * FROM terms WHERE +term>'brain'
+----
+stmt 0 err 1 -1 62 no such table: terms
+==== 2.2.1.3
+
+  EXPLAIN QUERY PLAN SELECT * FROM terms WHERE term<'brain'
+----
+stmt 0 err 1 -1 61 no such table: terms
+==== 2.2.1.4
+
+  EXPLAIN QUERY PLAN SELECT * FROM terms WHERE +term<'brain'
+----
+stmt 0 err 1 -1 62 no such table: terms
+==== 2.2.1.5
+
+  EXPLAIN QUERY PLAN SELECT * FROM terms WHERE term BETWEEN 'brags' AND 'brain'
+----
+stmt 0 err 1 -1 81 no such table: terms
+==== 2.2.1.6
+
+  EXPLAIN QUERY PLAN SELECT * FROM terms WHERE +term BETWEEN 'brags' AND 'brain'
+----
+stmt 0 err 1 -1 82 no such table: terms
+==== 2.2.2.3
+
+  SELECT term, documents, occurrences FROM terms_v WHERE term>'brain'
+----
+stmt 0 err 1 -1 71 no such table: terms_v
+==== 2.2.2.4
+
+  SELECT term, documents, occurrences FROM terms_v WHERE +term>'brain'
+----
+stmt 0 err 1 -1 72 no such table: terms_v
+==== 2.2.2.5
+
+  SELECT term, documents, occurrences FROM terms_v WHERE term>='brain'
+----
+stmt 0 err 1 -1 72 no such table: terms_v
+==== 2.2.2.6
+
+  SELECT term, documents, occurrences FROM terms_v WHERE +term>='brain'
+----
+stmt 0 err 1 -1 73 no such table: terms_v
+==== 2.2.2.7
+
+  SELECT term, documents, occurrences FROM terms_v WHERE term>='abc'
+----
+stmt 0 err 1 -1 70 no such table: terms_v
+==== 2.2.2.8
+
+  SELECT term, documents, occurrences FROM terms_v WHERE +term>='abc'
+----
+stmt 0 err 1 -1 71 no such table: terms_v
+==== 2.2.2.9
+
+  SELECT term, documents, occurrences FROM terms_v WHERE term>='brainstorms'
+----
+stmt 0 err 1 -1 78 no such table: terms_v
+==== 2.2.2.10
+
+  SELECT term, documents, occurrences FROM terms_v WHERE term>='brainstorms'
+----
+stmt 0 err 1 -1 78 no such table: terms_v
+==== 2.2.2.11
+ SELECT * FROM terms_v WHERE term>'brainstorms'
+----
+stmt 0 err 1 -1 48 no such table: terms_v
+==== 2.2.2.12
+ SELECT * FROM terms_v WHERE term>'brainstorms'
+----
+stmt 0 err 1 -1 48 no such table: terms_v
+==== 2.2.2.13
+ SELECT * FROM terms_v WHERE term>'cba'
+----
+stmt 0 err 1 -1 40 no such table: terms_v
+==== 2.2.2.14
+ SELECT * FROM terms_v WHERE term>'cba'
+----
+stmt 0 err 1 -1 40 no such table: terms_v
+==== 2.2.3.3
+
+  SELECT term, documents, occurrences FROM terms_v WHERE term<'brain'
+----
+stmt 0 err 1 -1 71 no such table: terms_v
+==== 2.2.3.4
+
+  SELECT term, documents, occurrences FROM terms_v WHERE +term<'brain'
+----
+stmt 0 err 1 -1 72 no such table: terms_v
+==== 2.2.3.5
+
+  SELECT term, documents, occurrences FROM terms_v WHERE term<='brain'
+----
+stmt 0 err 1 -1 72 no such table: terms_v
+==== 2.2.3.6
+
+  SELECT term, documents, occurrences FROM terms_v WHERE +term<='brain'
+----
+stmt 0 err 1 -1 73 no such table: terms_v
+==== 2.2.4.3
+
+  SELECT term, documents, occurrences FROM terms_v 
+  WHERE rec('cnt', term) AND term BETWEEN 'brags' AND 'brain'
+----
+stmt 0 err 1 -1 115 no such table: terms_v
+==== 2.2.4.4
+
+  SELECT term, documents, occurrences FROM terms_v 
+  WHERE rec('cnt', term) AND +term BETWEEN 'brags' AND 'brain'
+----
+stmt 0 err 1 -1 116 no such table: terms_v
+==== 2.2.4.5
+
+  SELECT term, documents, occurrences FROM terms_v 
+  WHERE rec('cnt', term) AND term > 'brags' AND term < 'brain'
+----
+stmt 0 err 1 -1 116 no such table: terms_v
+==== 2.2.4.6
+
+  SELECT term, documents, occurrences FROM terms_v 
+  WHERE rec('cnt', term) AND +term > 'brags' AND +term < 'brain'
+----
+stmt 0 err 1 -1 118 no such table: terms_v
+==== 3.1.1
+
+  CREATE VIRTUAL TABLE t2 USING fts4;
+----
+stmt 0 ok
+==== 3.1.2
+
+  CREATE VIRTUAL TABLE terms2 USING fts4aux;
+----
+stmt 0 ok
+==== 3.1.3
+
+  CREATE VIRTUAL TABLE terms2 USING fts4aux(t2, t2);
+----
+stmt 0 ok
+==== 3.2.1
+
+  CREATE VIRTUAL TABLE terms3 USING fts4aux(does_not_exist)
+----
+stmt 0 ok
+==== 3.2.2
+
+  SELECT * FROM terms3
+----
+stmt 0 err 1 -1 24 no such table: terms3
+==== 3.2.3
+
+  SELECT * FROM terms3 WHERE term = 'abc'
+----
+stmt 0 err 1 -1 43 no such table: terms3
+==== 3.3.1
+
+  INSERT INTO terms VALUES(1,2,3);
+----
+stmt 0 err 1 -1 35 no such table: terms
+==== 3.3.2
+
+  DELETE FROM terms
+----
+stmt 0 err 1 -1 21 no such table: terms
+==== 3.3.3
+
+  UPDATE terms set documents = documents+1;
+----
+stmt 0 err 1 -1 44 no such table: terms
+==== 4.1
+
+  CREATE VIRTUAL TABLE x1 USING fts4(x);
+  CREATE VIRTUAL TABLE terms USING fts4aux(x1);
+  CREATE TABLE x2(y);
+  CREATE TABLE x3(y);
+  CREATE INDEX i1 ON x3(y);
+
+  INSERT INTO x1 VALUES('a b c d e');
+  INSERT INTO x1 VALUES('f g h i j');
+  INSERT INTO x1 VALUES('k k l l a');
+
+  INSERT INTO x2 SELECT term FROM terms WHERE col = '*';
+  INSERT INTO x3 SELECT term FROM terms WHERE col = '*';
+----
+stmt 0 ok
+stmt 41 ok
+stmt 89 ok
+stmt 111 ok
+stmt 133 err 1 -1 161 no such table: main.x3
+stmt 161 err 1 -1 200 no such table: x1
+stmt 200 err 1 -1 238 no such table: x1
+stmt 238 err 1 -1 276 no such table: x1
+stmt 276 err 1 -1 334 no such table: x2
+stmt 334 err 1 -1 391 no such table: x3
+==== 5.1
+
+  CREATE VIRTUAL TABLE "abc '!' def" USING fts4(x, y);
+  INSERT INTO "abc '!' def" VALUES('XX', 'YY');
+
+  CREATE VIRTUAL TABLE terms3 USING fts4aux("abc '!' def");
+  SELECT * FROM terms3;
+----
+stmt 0 ok
+stmt 55 err 1 -1 103 no such table: abc '!' def
+stmt 103 ok
+stmt 164 err 1 -1 188 no such table: terms3
+==== 5.2
+
+  CREATE VIRTUAL TABLE "%%^^%%" USING fts4aux('abc ''!'' def');
+  SELECT * FROM "%%^^%%";
+----
+stmt 0 ok
+stmt 64 err 1 -1 90 no such table: %%^^%%
+==== 6.1
+
+  CREATE VIRTUAL TABLE ft1 USING fts4(x, y);
+  INSERT INTO ft1 VALUES('a b', 'c d');
+  INSERT INTO ft1 VALUES('e e', 'c d');
+  INSERT INTO ft1 VALUES('a a', 'b b');
+  CREATE VIRTUAL TABLE temp.aux1 USING fts4aux(main, ft1);
+  SELECT * FROM aux1;
+----
+stmt 0 ok
+stmt 45 err 1 -1 85 no such table: ft1
+stmt 85 err 1 -1 125 no such table: ft1
+stmt 125 err 1 -1 165 no such table: ft1
+stmt 165 ok
+stmt 224 err 1 -1 246 no such table: aux1
+==== 6.2
+
+  ATTACH 'test.db2' AS att;
+  CREATE VIRTUAL TABLE att.ft1 USING fts4(x, y);
+  INSERT INTO att.ft1 VALUES('v w', 'x y');
+  INSERT INTO att.ft1 VALUES('z z', 'x y');
+  INSERT INTO att.ft1 VALUES('v v', 'w w');
+  CREATE VIRTUAL TABLE temp.aux2 USING fts4aux(att, ft1);
+  SELECT * FROM aux2;
+----
+stmt 0 ok
+stmt 28 err 1 52 71 unknown database att
+stmt 77 err 1 -1 121 no such table: att.ft1
+stmt 121 err 1 -1 165 no such table: att.ft1
+stmt 165 err 1 -1 209 no such table: att.ft1
+stmt 209 ok
+stmt 267 err 1 -1 289 no such table: aux2
+==== 8.1
+ CREATE VIRTUAL TABLE att.aux3 USING fts4aux(main, ft1)
+----
+stmt 0 err 1 22 45 unknown database att

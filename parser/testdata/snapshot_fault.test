@@ -1,0 +1,41 @@
+==== 4.0
+
+  PRAGMA journal_mode = wal;
+  CREATE TABLE t1(zzz);
+  INSERT INTO t1 VALUES('abc');
+  INSERT INTO t1 VALUES('def');
+----
+stmt 0 ok
+stmt 29 ok
+stmt 53 err 1 -1 85 no such table: t1
+stmt 85 err 1 -1 117 no such table: t1
+==== 4.1.0
+
+  PRAGMA page_size = 512;
+  PRAGMA journal_mode = wal;
+  PRAGMA wal_autocheckpoint = 0;
+  CREATE TABLE t1(zzz);
+  INSERT INTO t1 VALUES(randomblob( 500 * 9500 ));
+  PRAGMA user_version = 211;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 55 ok
+stmt 88 ok
+stmt 112 err 1 -1 163 no such table: t1
+stmt 163 ok
+==== 5.0
+
+  PRAGMA page_size = 512;
+  PRAGMA journal_mode = wal;
+  PRAGMA wal_autocheckpoint = 0;
+  CREATE TABLE t1(zzz);
+  INSERT INTO t1 VALUES(randomblob( 5000 ));
+  PRAGMA user_version = 211;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 55 ok
+stmt 88 ok
+stmt 112 err 1 -1 157 no such table: t1
+stmt 157 ok

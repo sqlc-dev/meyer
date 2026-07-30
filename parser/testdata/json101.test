@@ -1,0 +1,566 @@
+==== json101-1.1.00
+
+  SELECT json_array(1,2.5,null,'hello');
+----
+stmt 0 ok
+==== json101-1.1.01
+
+  SELECT json_array(1,'{"abc":2.5,"def":null,"ghi":hello}',99);
+  -- the second term goes in as a string:
+----
+stmt 0 ok
+==== json101-1.1.02
+
+  SELECT json_array(1,json('{"abc":2.5,"def":null,"ghi":"hello"}'),99);
+  -- the second term goes in as JSON
+----
+stmt 0 ok
+==== json101-1.1.03
+
+  SELECT json_array(1,json_object('abc',2.5,'def',null,'ghi','hello'),99);
+  -- the second term goes in as JSON
+----
+stmt 0 ok
+==== json101-1.3
+
+  SELECT json_array(1,printf('%.1000c','x'),x'abcd',3);
+----
+stmt 0 ok
+==== json101-1.3b
+
+  SELECT jsonb_array(1,printf('%.1000c','x'),x'abcd',3);
+----
+stmt 0 ok
+==== json101-1.4
+
+  SELECT json_array(-9223372036854775808,9223372036854775807,0,1,-1,
+                    0.0, 1.0, -1.0, -1e99, +2e100,
+                    'one','two','three',
+                    4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                    19, NULL, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+                    'abcdefghijklmnopqrstuvwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+                    'abcdefghijklmnopqrstuvwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+                    'abcdefghijklmnopqrstuvwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+                    99);
+----
+stmt 0 ok
+==== json101-1.4b
+
+  SELECT json(jsonb_array(-9223372036854775808,9223372036854775807,0,1,-1,
+                    0.0, 1.0, -1.0, -1e99, +2e100,
+                    'one','two','three',
+                    4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                    19, NULL, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+                    'abcdefghijklmnopqrstuvwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+                    'abcdefghijklmnopqrstuvwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+                    'abcdefghijklmnopqrstuvwyxzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+                    99));
+----
+stmt 0 ok
+==== json101-2.1
+
+  SELECT json_object('a',1,'b',2.5,'c',null,'d','String Test');
+----
+stmt 0 ok
+==== json101-2.1b
+
+  SELECT json(jsonb_object('a',1,'b',2.5,'c',null,'d','String Test'));
+----
+stmt 0 ok
+==== json101-2.2
+
+  SELECT json_object('a',printf('%.1000c','x'),2,2.5);
+----
+stmt 0 ok
+==== json101-2.2b
+
+  SELECT jsonb_object('a',printf('%.1000c','x'),2,2.5);
+----
+stmt 0 ok
+==== json101-2.2.2
+
+  SELECT json_object('a',json_array('xyx',77,4.5),'x',2.5);
+----
+stmt 0 ok
+==== json101-2.2.2b
+
+  SELECT json(jsonb_object('a',json_array('xyx',77,4.5),'x',2.5));
+----
+stmt 0 ok
+==== json101-2.2.3
+
+  SELECT json_object('a',jsonb_array('xyx',77,4.5),'x',2.5);
+----
+stmt 0 ok
+==== json101-2.2.3b
+
+  SELECT json(jsonb_object('a',jsonb_array('xyx',77,4.5),'x',2.5));
+----
+stmt 0 ok
+==== json101-2.3
+
+  SELECT json_object('a',1,'b');
+----
+stmt 0 ok
+==== json101-2.4
+
+  SELECT json_object('a',printf('%.1000c','x'),'b',x'abcd');
+----
+stmt 0 ok
+==== json101-2.5
+
+  SELECT json_object('a',printf('%.10c','x'),'b',jsonb_array(1,2,3));
+----
+stmt 0 ok
+==== json101-4.2
+
+  SELECT * FROM j1 WHERE NOT json_valid(char(0x20,0x09,0x0a,0x0d)||x);
+----
+stmt 0 err 1 -1 71 no such table: j1
+==== json101-4.3
+
+  SELECT * FROM j1 WHERE NOT json_valid(x||char(0x20,0x09,0x0a,0x0d));
+----
+stmt 0 err 1 -1 71 no such table: j1
+==== json101-4.4
+
+  SELECT json_valid(''), json_valid(char(0x20,0x09,0x0a,0x0d));
+----
+stmt 0 ok
+==== json101-4.5
+
+  SELECT x FROM j1 WHERE json_remove(x)<>x;
+----
+stmt 0 err 1 -1 44 no such table: j1
+==== json101-4.6
+
+  SELECT x FROM j1 WHERE json_replace(x)<>x;
+----
+stmt 0 err 1 -1 45 no such table: j1
+==== json101-4.7
+
+  SELECT x FROM j1 WHERE json_set(x)<>x;
+----
+stmt 0 err 1 -1 41 no such table: j1
+==== json101-4.8
+
+  SELECT x FROM j1 WHERE json_insert(x)<>x;
+----
+stmt 0 err 1 -1 44 no such table: j1
+==== json101-5.2
+
+  SELECT id, json_valid(json), json_type(json), '|' FROM j2 ORDER BY id;
+----
+stmt 0 err 1 -1 73 no such table: j2
+==== json101-5.2b
+
+  SELECT id, json_valid(json,5), json_type(json), '|' FROM j2b ORDER BY id;
+----
+stmt 0 err 1 -1 76 no such table: j2b
+==== json101-5.5
+
+  SELECT j2.rowid, jx.rowid, fullkey, path, key
+    FROM j2, json_each(j2.json) AS jx
+   WHERE jx.json<>j2.json;
+----
+stmt 0 err 1 -1 113 no such table: j2
+==== json101-5.6
+
+  SELECT j2.rowid, jx.rowid, fullkey, path, key
+    FROM j2, json_tree(j2.json) AS jx
+   WHERE jx.json<>j2.json;
+----
+stmt 0 err 1 -1 113 no such table: j2
+==== json101-5.7
+
+  SELECT j2.rowid, jx.rowid, fullkey, path, key
+    FROM j2, json_each(j2.json) AS jx
+   WHERE jx.value<>jx.atom AND type NOT IN ('array','object');
+----
+stmt 0 err 1 -1 149 no such table: j2
+==== json101-5.8
+
+  SELECT j2.rowid, jx.rowid, fullkey, path, key
+    FROM j2, json_tree(j2.json) AS jx
+   WHERE jx.value<>jx.atom AND type NOT IN ('array','object');
+----
+stmt 0 err 1 -1 149 no such table: j2
+==== json101-6.1
+
+  SELECT json_valid('{"a":55,"b":72,}');
+----
+stmt 0 ok
+==== json101-6.2
+
+  SELECT json_error_position('{"a":55,"b":72,}');
+----
+stmt 0 ok
+==== json101-6.3
+
+  SELECT json_valid(json('{"a":55,"b":72,}'));
+----
+stmt 0 ok
+==== json101-6.4
+
+  SELECT json_valid('{"a":55,"b":72 , }');
+----
+stmt 0 ok
+==== json101-6.5
+
+  SELECT json_error_position('{"a":55,"b":72 , }');
+----
+stmt 0 ok
+==== json101-6.6
+
+  SELECT json_error_position('{"a":55,"b":72,,}');
+----
+stmt 0 ok
+==== json101-6.7
+
+  SELECT json_valid('{"a":55,"b":72}');
+----
+stmt 0 ok
+==== json101-8.1
+
+  DROP TABLE IF EXISTS t8;
+  CREATE TABLE t8(a,b);
+  INSERT INTO t8(a) VALUES('abc' || char(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35) || 'xyz');
+  UPDATE t8 SET b=json_array(a);
+  SELECT b FROM t8;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 51 err 1 -1 200 no such table: t8
+stmt 200 err 1 -1 233 no such table: t8
+stmt 233 err 1 -1 253 no such table: t8
+==== json101-8.1b
+
+  DROP TABLE IF EXISTS t8;
+  CREATE TABLE t8(a,b);
+  INSERT INTO t8(a) VALUES('abc' || char(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35) || 'xyz');
+  UPDATE t8 SET b=jsonb_array(a);
+  SELECT json(b) FROM t8;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 51 err 1 -1 200 no such table: t8
+stmt 200 err 1 -1 234 no such table: t8
+stmt 234 err 1 -1 260 no such table: t8
+==== json101-8.3
+
+  SELECT json_valid(char(0x22,0xe4,0x22));
+----
+stmt 0 ok
+==== json101-9.1
+
+  SELECT json_quote('abc"xyz');
+----
+stmt 0 ok
+==== json101-9.2
+
+  SELECT json_quote(3.14159);
+----
+stmt 0 ok
+==== json101-9.3
+
+  SELECT json_quote(12345);
+----
+stmt 0 ok
+==== json101-9.4
+
+  SELECT json_quote(null);
+----
+stmt 0 ok
+==== json101-9.5
+
+  SELECT json_quote(x'3031323334');
+----
+stmt 0 ok
+==== json101-9.6
+
+  SELECT json_quote(123,456)
+----
+stmt 0 err 1 10 30 wrong number of arguments to function json_quote()
+==== json101-9.7
+
+  SELECT json_quote()
+----
+stmt 0 err 1 10 23 wrong number of arguments to function json_quote()
+==== json101-12.100
+
+  CREATE TABLE t12(x);
+  INSERT INTO t12(x) VALUES(
+    '{"settings":
+        {"layer2":
+           {"hapax.legomenon":
+              {"forceDisplay":true,
+               "transliterate":true,
+               "add.footnote":true,
+               "summary.report":true},
+            "dis.legomenon":
+              {"forceDisplay":true,
+               "transliterate":false,
+               "add.footnote":false,
+               "summary.report":true},
+            "tris.legomenon":
+              {"forceDisplay":true,
+               "transliterate":false,
+               "add.footnote":false,
+               "summary.report":false}
+           }
+        }
+     }');
+----
+stmt 0 ok
+stmt 23 err 1 -1 660 no such table: t12
+==== json101-14.100
+
+  SELECT fullkey FROM json_each('123');
+----
+stmt 0 ok
+==== json101-14.110
+
+  SELECT fullkey FROM json_each('123.56');
+----
+stmt 0 ok
+==== json101-14.120
+
+  SELECT fullkey FROM json_each('"hello"');
+----
+stmt 0 ok
+==== json101-14.130
+
+  SELECT fullkey FROM json_each('null');
+----
+stmt 0 ok
+==== json101-14.140
+
+  SELECT fullkey FROM json_tree('123');
+----
+stmt 0 ok
+==== json101-14.150
+
+  SELECT fullkey FROM json_tree('123.56');
+----
+stmt 0 ok
+==== json101-14.160
+
+  SELECT fullkey FROM json_tree('"hello"');
+----
+stmt 0 ok
+==== json101-14.170
+
+  SELECT fullkey FROM json_tree('null');
+----
+stmt 0 ok
+==== json101-15.100
+
+  SELECT * FROM JSON_EACH('{"a":1, "b":2}');
+----
+stmt 0 ok
+==== json101-15.110
+
+  SELECT xyz.* FROM JSON_EACH('{"a":1, "b":2}') AS xyz;
+----
+stmt 0 ok
+==== json101-15.120
+
+  SELECT * FROM (JSON_EACH('{"a":1, "b":2}'));
+----
+stmt 0 ok
+==== json101-15.130
+
+  SELECT xyz.* FROM (JSON_EACH('{"a":1, "b":2}')) AS xyz;
+----
+stmt 0 ok
+==== json101-17.1
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1(a,b,c);
+  CREATE TABLE t2(d);
+  SELECT * FROM t1 LEFT JOIN t2 ON (SELECT b FROM json_each ORDER BY 1);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 80 ok
+stmt 102 err 1 -1 175 no such table: t1
+==== json101-18.1
+
+  SELECT json_valid('{"":5}');
+----
+stmt 0 ok
+==== json101-19.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x);
+----
+stmt 0 ok
+stmt 27 ok
+==== json101-19.2
+
+  BEGIN;
+  INSERT INTO t1 VALUES(0), (json('not-valid-json'));
+----
+stmt 0 ok
+stmt 9 err 1 -1 63 no such table: t1
+==== json101-19.3
+
+  COMMIT;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 10 err 1 -1 30 no such table: t1
+==== json101-20.1
+
+  SELECT json_object('a',2e370,'b',-3e380);
+----
+stmt 0 ok
+==== json101-20.2
+
+  SELECT json_object('a',2e370,'b',-3e380)->>'a';
+----
+stmt 0 ok
+==== json101-20.3
+
+  SELECT json_object('a',2e370,'b',-3e380)->>'b';
+----
+stmt 0 ok
+==== json101-21.1-legacy
+
+    SELECT json_valid(NULL);
+----
+stmt 0 ok
+==== json101-21.1-correct
+
+    SELECT json_valid(NULL);
+----
+stmt 0 ok
+==== json101-21.2
+
+  SELECT json_error_position(NULL);
+----
+stmt 0 ok
+==== json101-21.3
+
+  SELECT json(NULL);
+----
+stmt 0 ok
+==== json101-21.4
+
+  SELECT json_array(NULL);
+----
+stmt 0 ok
+==== json101-21.5
+
+  SELECT json_extract(NULL);
+----
+stmt 0 ok
+==== json101-21.7
+
+  SELECT NULL->0;
+----
+stmt 0 ok
+==== json101-21.8
+
+  SELECT NULL->>0;
+----
+stmt 0 ok
+==== json101-21.9
+
+  SELECT '{a:5}'->NULL;
+----
+stmt 0 ok
+==== json101-21.10
+
+  SELECT '{a:5}'->>NULL;
+----
+stmt 0 ok
+==== json101-21.11
+
+  SELECT json_object(NULL,5);
+----
+stmt 0 ok
+==== json101-21.12
+
+  SELECT json_patch(NULL,'{a:5}');
+----
+stmt 0 ok
+==== json101-21.13
+
+  SELECT json_patch('{a:5}',NULL);
+----
+stmt 0 ok
+==== json101-21.14
+
+  SELECT json_patch(NULL,NULL);
+----
+stmt 0 ok
+==== json101-21.16
+
+  SELECT json_remove('{a:5,b:7}',NULL);
+----
+stmt 0 ok
+==== json101-21.18
+
+  SELECT json_replace('{a:5,b:7}',NULL,NULL);
+----
+stmt 0 ok
+==== json101-21.20
+
+  SELECT json_set('{a:5,b:7}',NULL,NULL);
+----
+stmt 0 ok
+==== json101-21.21
+
+  SELECT json_type(NULL);
+----
+stmt 0 ok
+==== json101-21.22
+
+  SELECT json_type('{a:5,b:7}',NULL);
+----
+stmt 0 ok
+==== json101-21.23
+
+  SELECT json_quote(NULL);
+----
+stmt 0 ok
+==== json101-21.24
+
+  SELECT count(*) FROM json_each(NULL);
+----
+stmt 0 ok
+==== json101-21.25
+
+  SELECT count(*) FROM json_tree(NULL);
+----
+stmt 0 ok
+==== json101-21.26
+
+  WITH c(x) AS (VALUES(1),(2.0),(NULL),('three'))
+  SELECT json_group_array(x) FROM c;
+----
+stmt 0 ok
+==== json101-21.27
+
+  WITH c(x,y) AS (VALUES('a',1),('b',2.0),('c',NULL),(NULL,'three'),('e','four'))
+  SELECT json_group_object(x,y) FROM c;
+----
+stmt 0 ok
+==== json101-25.1
+
+  SELECT json_array(0.1234567890123456789)->>0 = 0.1234567890123456789;
+----
+stmt 0 ok
+==== json101-26.1
+
+  SELECT value FROM json_each(x'CC141761133117621332176313331764133437656565') WHERE key='eee';
+----
+stmt 0 ok
+==== json101-26.2
+
+  SELECT json_valid(x'CC141761133117621332176313331764133437656565',8);
+----
+stmt 0 ok

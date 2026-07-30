@@ -1,0 +1,382 @@
+==== collate4-1.1.0
+
+    CREATE TABLE collate4t1(a COLLATE NOCASE, b COLLATE TEXT);
+    INSERT INTO collate4t1 VALUES( 'a', 'a' );
+    INSERT INTO collate4t1 VALUES( 'b', 'b' );
+    INSERT INTO collate4t1 VALUES( NULL, NULL );
+    INSERT INTO collate4t1 VALUES( 'B', 'B' );
+    INSERT INTO collate4t1 VALUES( 'A', 'A' );
+    CREATE INDEX collate4i1 ON collate4t1(a);
+    CREATE INDEX collate4i2 ON collate4t1(b);
+----
+stmt 0 err 1 -1 62 no such collation sequence: TEXT
+stmt 63 err 1 -1 110 no such table: collate4t1
+stmt 110 err 1 -1 157 no such table: collate4t1
+stmt 157 err 1 -1 206 no such table: collate4t1
+stmt 206 err 1 -1 253 no such table: collate4t1
+stmt 253 err 1 -1 300 no such table: collate4t1
+stmt 300 err 1 -1 346 no such table: main.collate4t1
+stmt 346 err 1 -1 392 no such table: main.collate4t1
+==== collate4-1.1.7
+
+    CREATE TABLE collate4t2(
+      a PRIMARY KEY COLLATE NOCASE, 
+      b UNIQUE COLLATE TEXT
+    );
+    INSERT INTO collate4t2 VALUES( 'a', 'a' );
+    INSERT INTO collate4t2 VALUES( NULL, NULL );
+    INSERT INTO collate4t2 VALUES( 'B', 'B' );
+----
+stmt 0 err 1 -1 100 no such collation sequence: TEXT
+stmt 101 err 1 -1 148 no such table: collate4t2
+stmt 148 err 1 -1 197 no such table: collate4t2
+stmt 197 err 1 -1 244 no such table: collate4t2
+==== collate4-1.1.14
+
+    CREATE TABLE collate4t3(
+      b COLLATE TEXT,  
+      a COLLATE NOCASE, 
+      UNIQUE(a), PRIMARY KEY(b)
+    );
+    INSERT INTO collate4t3 VALUES( 'a', 'a' );
+    INSERT INTO collate4t3 VALUES( NULL, NULL );
+    INSERT INTO collate4t3 VALUES( 'B', 'B' );
+----
+stmt 0 err 1 -1 51 no such collation sequence: TEXT
+stmt 117 err 1 -1 164 no such table: collate4t3
+stmt 164 err 1 -1 213 no such table: collate4t3
+stmt 213 err 1 -1 260 no such table: collate4t3
+==== collate4-1.1.21
+
+    CREATE TABLE collate4t4(a COLLATE NOCASE, b COLLATE TEXT);
+    INSERT INTO collate4t4 VALUES( 'a', 'a' );
+    INSERT INTO collate4t4 VALUES( 'b', 'b' );
+    INSERT INTO collate4t4 VALUES( NULL, NULL );
+    INSERT INTO collate4t4 VALUES( 'B', 'B' );
+    INSERT INTO collate4t4 VALUES( 'A', 'A' );
+    CREATE INDEX collate4i3 ON collate4t4(a COLLATE TEXT);
+    CREATE INDEX collate4i4 ON collate4t4(b COLLATE NOCASE);
+----
+stmt 0 err 1 -1 62 no such collation sequence: TEXT
+stmt 63 err 1 -1 110 no such table: collate4t4
+stmt 110 err 1 -1 157 no such table: collate4t4
+stmt 157 err 1 -1 206 no such table: collate4t4
+stmt 206 err 1 -1 253 no such table: collate4t4
+stmt 253 err 1 -1 300 no such table: collate4t4
+stmt 300 err 1 -1 359 no such table: main.collate4t4
+stmt 359 err 1 -1 420 no such table: main.collate4t4
+==== collate4-1.1.30
+
+    DROP TABLE collate4t1;
+    DROP TABLE collate4t2;
+    DROP TABLE collate4t3;
+    DROP TABLE collate4t4;
+----
+stmt 0 err 1 -1 27 no such table: collate4t1
+stmt 27 err 1 -1 54 no such table: collate4t2
+stmt 54 err 1 -1 81 no such table: collate4t3
+stmt 81 err 1 -1 108 no such table: collate4t4
+==== collate4-1.2.0
+
+    CREATE TABLE collate4t1(a COLLATE NOCASE, b COLLATE TEXT);
+    INSERT INTO collate4t1 VALUES( 'a', 'a' );
+    INSERT INTO collate4t1 VALUES( 'b', 'b' );
+    INSERT INTO collate4t1 VALUES( NULL, NULL );
+    INSERT INTO collate4t1 VALUES( 'B', 'B' );
+    INSERT INTO collate4t1 VALUES( 'A', 'A' );
+    CREATE INDEX collate4i1 ON collate4t1(a, b);
+----
+stmt 0 err 1 -1 62 no such collation sequence: TEXT
+stmt 63 err 1 -1 110 no such table: collate4t1
+stmt 110 err 1 -1 157 no such table: collate4t1
+stmt 157 err 1 -1 206 no such table: collate4t1
+stmt 206 err 1 -1 253 no such table: collate4t1
+stmt 253 err 1 -1 300 no such table: collate4t1
+stmt 300 err 1 -1 349 no such table: main.collate4t1
+==== collate4-1.2.7
+
+    CREATE TABLE collate4t2(
+      a COLLATE NOCASE, 
+      b COLLATE TEXT, 
+      PRIMARY KEY(a, b)
+    );
+    INSERT INTO collate4t2 VALUES( 'a', 'a' );
+    INSERT INTO collate4t2 VALUES( NULL, NULL );
+    INSERT INTO collate4t2 VALUES( 'B', 'B' );
+----
+stmt 0 err 1 -1 76 no such collation sequence: TEXT
+stmt 108 err 1 -1 155 no such table: collate4t2
+stmt 155 err 1 -1 204 no such table: collate4t2
+stmt 204 err 1 -1 251 no such table: collate4t2
+==== collate4-1.2.14
+
+    CREATE TABLE collate4t3(a COLLATE NOCASE, b COLLATE TEXT);
+    INSERT INTO collate4t3 VALUES( 'a', 'a' );
+    INSERT INTO collate4t3 VALUES( 'b', 'b' );
+    INSERT INTO collate4t3 VALUES( NULL, NULL );
+    INSERT INTO collate4t3 VALUES( 'B', 'B' );
+    INSERT INTO collate4t3 VALUES( 'A', 'A' );
+    CREATE INDEX collate4i2 ON collate4t3(a COLLATE TEXT, b COLLATE NOCASE);
+----
+stmt 0 err 1 -1 62 no such collation sequence: TEXT
+stmt 63 err 1 -1 110 no such table: collate4t3
+stmt 110 err 1 -1 157 no such table: collate4t3
+stmt 157 err 1 -1 206 no such table: collate4t3
+stmt 206 err 1 -1 253 no such table: collate4t3
+stmt 253 err 1 -1 300 no such table: collate4t3
+stmt 300 err 1 -1 377 no such table: main.collate4t3
+==== collate4-1.2.25
+
+    DROP TABLE collate4t1;
+    DROP TABLE collate4t2;
+    DROP TABLE collate4t3;
+----
+stmt 0 err 1 -1 27 no such table: collate4t1
+stmt 27 err 1 -1 54 no such table: collate4t2
+stmt 54 err 1 -1 81 no such table: collate4t3
+==== collate4-2.1.0
+
+    PRAGMA automatic_index=OFF;
+    CREATE TABLE collate4t1(a COLLATE NOCASE);
+    CREATE TABLE collate4t2(b COLLATE TEXT);
+
+    INSERT INTO collate4t1 VALUES('a');
+    INSERT INTO collate4t1 VALUES('A');
+    INSERT INTO collate4t1 VALUES('b');
+    INSERT INTO collate4t1 VALUES('B');
+    INSERT INTO collate4t1 VALUES('c');
+    INSERT INTO collate4t1 VALUES('C');
+    INSERT INTO collate4t1 VALUES('d');
+    INSERT INTO collate4t1 VALUES('D');
+    INSERT INTO collate4t1 VALUES('e');
+    INSERT INTO collate4t1 VALUES('D');
+
+    INSERT INTO collate4t2 VALUES('A');
+    INSERT INTO collate4t2 VALUES('Z');
+----
+stmt 0 ok
+stmt 32 ok
+stmt 79 err 1 -1 123 no such collation sequence: TEXT
+stmt 124 err 1 -1 165 no such table: collate4t1
+stmt 165 err 1 -1 205 no such table: collate4t1
+stmt 205 err 1 -1 245 no such table: collate4t1
+stmt 245 err 1 -1 285 no such table: collate4t1
+stmt 285 err 1 -1 325 no such table: collate4t1
+stmt 325 err 1 -1 365 no such table: collate4t1
+stmt 365 err 1 -1 405 no such table: collate4t1
+stmt 405 err 1 -1 445 no such table: collate4t1
+stmt 445 err 1 -1 485 no such table: collate4t1
+stmt 485 err 1 -1 525 no such table: collate4t1
+stmt 525 err 1 -1 566 no such table: collate4t2
+stmt 566 err 1 -1 606 no such table: collate4t2
+==== collate4-2.1.10
+
+    DROP TABLE collate4t1;
+    DROP TABLE collate4t2;
+----
+stmt 0 err 1 -1 27 no such table: collate4t1
+stmt 27 err 1 -1 54 no such table: collate4t2
+==== collate4-2.2.0
+
+    CREATE TABLE collate4t1(a COLLATE nocase, b COLLATE text, c);
+    CREATE TABLE collate4t2(a COLLATE nocase, b COLLATE text, c COLLATE TEXT);
+
+    INSERT INTO collate4t1 VALUES('0', '0', '0');
+    INSERT INTO collate4t1 VALUES('0', '0', '1');
+    INSERT INTO collate4t1 VALUES('0', '1', '0');
+    INSERT INTO collate4t1 VALUES('0', '1', '1');
+    INSERT INTO collate4t1 VALUES('1', '0', '0');
+    INSERT INTO collate4t1 VALUES('1', '0', '1');
+    INSERT INTO collate4t1 VALUES('1', '1', '0');
+    INSERT INTO collate4t1 VALUES('1', '1', '1');
+    insert into collate4t2 SELECT * FROM collate4t1;
+----
+stmt 0 err 1 -1 62 no such collation sequence: text
+stmt 66 err 1 -1 128 no such collation sequence: text
+stmt 145 err 1 -1 196 no such table: collate4t1
+stmt 196 err 1 -1 246 no such table: collate4t1
+stmt 246 err 1 -1 296 no such table: collate4t1
+stmt 296 err 1 -1 346 no such table: collate4t1
+stmt 346 err 1 -1 396 no such table: collate4t1
+stmt 396 err 1 -1 446 no such table: collate4t1
+stmt 446 err 1 -1 496 no such table: collate4t1
+stmt 496 err 1 -1 546 no such table: collate4t1
+stmt 546 err 1 -1 599 no such table: collate4t2
+==== collate4-2.2.10
+
+    DROP TABLE collate4t1;
+    DROP TABLE collate4t2;
+----
+stmt 0 err 1 -1 27 no such table: collate4t1
+stmt 27 err 1 -1 54 no such table: collate4t2
+==== collate4-3.0
+
+    CREATE TABLE collate4t1(a PRIMARY KEY COLLATE NOCASE);
+----
+stmt 0 ok
+==== collate4-3.1
+
+    INSERT INTO collate4t1 VALUES('abc');
+    INSERT INTO collate4t1 VALUES('ABC');
+----
+stmt 0 err 1 -1 42 no such table: collate4t1
+stmt 42 err 1 -1 84 no such table: collate4t1
+==== collate4-3.2
+
+    SELECT * FROM collate4t1;
+----
+stmt 0 err 1 -1 30 no such table: collate4t1
+==== collate4-3.3
+
+    INSERT INTO collate4t1 SELECT upper(a) FROM collate4t1;
+----
+stmt 0 err 1 -1 60 no such table: collate4t1
+==== collate4-3.4
+
+    INSERT INTO collate4t1 VALUES(1);
+    UPDATE collate4t1 SET a = 'abc';
+----
+stmt 0 err 1 -1 38 no such table: collate4t1
+stmt 38 err 1 -1 75 no such table: collate4t1
+==== collate4-3.5
+
+    DROP TABLE collate4t1;
+    CREATE TABLE collate4t1(a COLLATE NOCASE UNIQUE);
+----
+stmt 0 err 1 -1 27 no such table: collate4t1
+stmt 27 ok
+==== collate4-3.6
+
+    INSERT INTO collate4t1 VALUES('abc');
+    INSERT INTO collate4t1 VALUES('ABC');
+----
+stmt 0 err 1 -1 42 no such table: collate4t1
+stmt 42 err 1 -1 84 no such table: collate4t1
+==== collate4-3.7
+
+    SELECT * FROM collate4t1;
+----
+stmt 0 err 1 -1 30 no such table: collate4t1
+==== collate4-3.8
+
+    INSERT INTO collate4t1 SELECT upper(a) FROM collate4t1;
+----
+stmt 0 err 1 -1 60 no such table: collate4t1
+==== collate4-3.9
+
+    INSERT INTO collate4t1 VALUES(1);
+    UPDATE collate4t1 SET a = 'abc';
+----
+stmt 0 err 1 -1 38 no such table: collate4t1
+stmt 38 err 1 -1 75 no such table: collate4t1
+==== collate4-3.10
+
+    DROP TABLE collate4t1;
+    CREATE TABLE collate4t1(a);
+    CREATE UNIQUE INDEX collate4i1 ON collate4t1(a COLLATE NOCASE);
+----
+stmt 0 err 1 -1 27 no such table: collate4t1
+stmt 27 ok
+stmt 59 err 1 -1 127 no such table: main.collate4t1
+==== collate4-3.11
+
+    INSERT INTO collate4t1 VALUES('abc');
+    INSERT INTO collate4t1 VALUES('ABC');
+----
+stmt 0 err 1 -1 42 no such table: collate4t1
+stmt 42 err 1 -1 84 no such table: collate4t1
+==== collate4-3.12
+
+    SELECT * FROM collate4t1;
+----
+stmt 0 err 1 -1 30 no such table: collate4t1
+==== collate4-3.13
+
+    INSERT INTO collate4t1 SELECT upper(a) FROM collate4t1;
+----
+stmt 0 err 1 -1 60 no such table: collate4t1
+==== collate4-3.14
+
+    INSERT INTO collate4t1 VALUES(1);
+    UPDATE collate4t1 SET a = 'abc';
+----
+stmt 0 err 1 -1 38 no such table: collate4t1
+stmt 38 err 1 -1 75 no such table: collate4t1
+==== collate4-3.15
+
+    DROP TABLE collate4t1;
+----
+stmt 0 err 1 -1 27 no such table: collate4t1
+==== collate4-4.0
+
+    CREATE TABLE collate4t1(a COLLATE TEXT);
+    INSERT INTO collate4t1 VALUES('2');
+    INSERT INTO collate4t1 VALUES('10');
+    INSERT INTO collate4t1 VALUES('20');
+    INSERT INTO collate4t1 VALUES('104');
+----
+stmt 0 err 1 -1 44 no such collation sequence: TEXT
+stmt 45 err 1 -1 85 no such table: collate4t1
+stmt 85 err 1 -1 126 no such table: collate4t1
+stmt 126 err 1 -1 167 no such table: collate4t1
+stmt 167 err 1 -1 209 no such table: collate4t1
+==== collate4-4.7
+
+    DROP TABLE collate4t1;
+----
+stmt 0 err 1 -1 27 no such table: collate4t1
+==== collate4-4.8
+
+    CREATE TABLE collate4t1(a COLLATE TEXT, b COLLATE NUMERIC);
+    INSERT INTO collate4t1 VALUES('11', '101');
+    INSERT INTO collate4t1 VALUES('101', '11')
+----
+stmt 0 err 1 -1 44 no such collation sequence: TEXT
+stmt 64 err 1 -1 112 no such table: collate4t1
+stmt 112 err 1 -1 160 no such table: collate4t1
+==== collate4-4.9
+
+    SELECT max(a, b) FROM collate4t1;
+----
+stmt 0 err 1 -1 38 no such table: collate4t1
+==== collate4-4.10
+
+    SELECT max(b, a) FROM collate4t1;
+----
+stmt 0 err 1 -1 38 no such table: collate4t1
+==== collate4-4.11
+
+    SELECT max(a, '101') FROM collate4t1;
+----
+stmt 0 err 1 -1 42 no such table: collate4t1
+==== collate4-4.12
+
+    SELECT max('101', a) FROM collate4t1;
+----
+stmt 0 err 1 -1 42 no such table: collate4t1
+==== collate4-4.13
+
+    SELECT max(b, '101') FROM collate4t1;
+----
+stmt 0 err 1 -1 42 no such table: collate4t1
+==== collate4-4.14
+
+    SELECT max('101', b) FROM collate4t1;
+----
+stmt 0 err 1 -1 42 no such table: collate4t1
+==== collate4-4.15
+
+    DROP TABLE collate4t1;
+----
+stmt 0 err 1 -1 27 no such table: collate4t1
+==== collate4-6.0
+
+    CREATE TABLE collate4t1(a INTEGER PRIMARY KEY);
+    INSERT INTO collate4t1 VALUES(101);
+    INSERT INTO collate4t1 VALUES(10);
+    INSERT INTO collate4t1 VALUES(15);
+----
+stmt 0 ok
+stmt 52 err 1 -1 92 no such table: collate4t1
+stmt 92 err 1 -1 131 no such table: collate4t1
+stmt 131 err 1 -1 170 no such table: collate4t1

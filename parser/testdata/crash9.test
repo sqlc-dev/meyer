@@ -1,0 +1,21 @@
+==== 1.0
+
+  CREATE TABLE t1(x INTEGER PRIMARY KEY, y);
+  CREATE INDEX i1 ON t1(y);
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<10
+  )
+  INSERT INTO t1 SELECT i, randomblob(900) FROM s;
+
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.t2(x, y);
+----
+stmt 0 ok
+stmt 45 err 1 -1 73 no such table: main.t1
+stmt 73 err 1 -1 197 no such table: t1
+stmt 197 ok
+stmt 226 err 1 242 249 unknown database aux
+==== crash9-generated
+ PRAGMA integrity_check
+----
+stmt 0 ok

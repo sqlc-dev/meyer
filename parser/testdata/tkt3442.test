@@ -1,0 +1,11 @@
+==== tkt3442-1.1
+
+     CREATE TABLE listhash(
+       key INTEGER PRIMARY KEY,
+       id TEXT,
+       node INTEGER
+     );
+     CREATE UNIQUE INDEX ididx ON listhash(id);
+----
+stmt 0 ok
+stmt 104 err 1 -1 152 no such table: main.listhash

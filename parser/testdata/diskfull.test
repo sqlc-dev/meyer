@@ -1,0 +1,21 @@
+==== diskfull-1.1
+
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(randstr(1000,1000));
+    INSERT INTO t1 SELECT * FROM t1;
+    INSERT INTO t1 SELECT * FROM t1;
+    INSERT INTO t1 SELECT * FROM t1;
+    INSERT INTO t1 SELECT * FROM t1;
+    CREATE INDEX t1i1 ON t1(x);
+    CREATE TABLE t2 AS SELECT x AS a, x AS b FROM t1;
+    CREATE INDEX t2i1 ON t2(b);
+----
+stmt 0 ok
+stmt 24 err 1 -1 71 no such table: t1
+stmt 71 err 1 -1 108 no such table: t1
+stmt 108 err 1 -1 145 no such table: t1
+stmt 145 err 1 -1 182 no such table: t1
+stmt 182 err 1 -1 219 no such table: t1
+stmt 219 err 1 -1 251 no such table: main.t1
+stmt 251 err 1 -1 305 no such table: t1
+stmt 305 err 1 -1 337 no such table: main.t2

@@ -1,0 +1,122 @@
+==== 1.1
+
+  CREATE TABLE t1(a INT, b INT, ex TEXT);
+  CREATE INDEX i1 ON t1(a);
+  CREATE INDEX i2 ON t1(b);
+  CREATE TABLE t2(a INT, b INT, ex TEXT);
+  CREATE TABLE t3(a INT, b INT, ex TEXT);
+----
+stmt 0 ok
+stmt 42 err 1 -1 70 no such table: main.t1
+stmt 70 err 1 -1 98 no such table: main.t1
+stmt 98 ok
+stmt 140 ok
+==== 2.1
+
+  CREATE TABLE t1(x INT, y INT, ex TEXT);
+
+  CREATE TABLE t2(x INT, y INT, ex TEXT);
+  CREATE INDEX t2i1 ON t2(x);
+----
+stmt 0 ok
+stmt 42 ok
+stmt 85 err 1 -1 115 no such table: main.t2
+==== 5.1.0
+ CREATE TABLE t1(a INT, b INT, ex TEXT)
+----
+stmt 0 ok
+==== 5.2.0
+ CREATE INDEX i1 ON t1(a)
+----
+stmt 0 err 1 -1 26 no such table: main.t1
+==== 5.3.0
+ CREATE INDEX i2 ON t1(a, b)
+----
+stmt 0 err 1 -1 29 no such table: main.t1
+==== 5.4.0
+CREATE TABLE t2(c INT, d INT, ex TEXT)
+----
+stmt 0 ok
+==== 5.5.0
+CREATE INDEX i3 ON t1(b)
+----
+stmt 0 err 1 -1 25 no such table: main.t1
+==== 5.8.0
+CREATE INDEX i4 ON t2(c)
+----
+stmt 0 err 1 -1 25 no such table: main.t2
+==== 7.0
+
+  CREATE TABLE t1(a INT, b INT, ex CHAR(100));
+  CREATE TABLE t2(a INT, b INT, ex CHAR(100));
+  CREATE INDEX i1 ON t2(a);
+----
+stmt 0 ok
+stmt 47 ok
+stmt 94 err 1 -1 122 no such table: main.t2
+==== 7.3
+
+  INSERT INTO t1(a,b) VALUES(1, 2);
+  INSERT INTO t1(a,b) VALUES(3, 4);
+
+  INSERT INTO t2(a,b) VALUES(1, 2);
+  INSERT INTO t2(a,b) VALUES(3, 4);
+  INSERT INTO t2(a,b) VALUES(5, 6);
+ 
+  ANALYZE;
+----
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 72 no such table: t1
+stmt 72 err 1 -1 109 no such table: t2
+stmt 109 err 1 -1 145 no such table: t2
+stmt 145 err 1 -1 181 no such table: t2
+stmt 181 ok
+==== 8.0
+
+  CREATE TABLE t1(a, b, c, PRIMARY KEY(b, c)) WITHOUT ROWID;
+  CREATE TABLE t2(a, b, c);
+----
+stmt 0 ok
+stmt 61 ok
+==== 9.0
+
+  -- Schema from Fossil 2018-08-16
+  CREATE TABLE forumpost(
+    fpid INTEGER PRIMARY KEY,
+    froot INT,
+    fprev INT,
+    firt INT,
+    fmtime REAL
+  );
+  CREATE INDEX forumthread ON forumpost(froot,fmtime);
+  CREATE TABLE blob(
+    rid INTEGER PRIMARY KEY,
+    rcvid INTEGER,
+    size INTEGER,
+    uuid TEXT UNIQUE NOT NULL,
+    content BLOB,
+    CHECK( length(uuid)>=40 AND rid>0 )
+  );
+  CREATE TABLE event(
+    type TEXT,
+    mtime DATETIME,
+    objid INTEGER PRIMARY KEY,
+    tagid INTEGER,
+    uid INTEGER REFERENCES user,
+    bgcolor TEXT,
+    euser TEXT,
+    user TEXT,
+    ecomment TEXT,
+    comment TEXT,
+    brief TEXT,
+    omtime DATETIME
+  );
+  CREATE INDEX event_i1 ON event(mtime);
+  CREATE TABLE private(rid INTEGER PRIMARY KEY);
+----
+stmt 0 ok
+stmt 156 err 1 -1 211 no such table: main.forumpost
+stmt 211 ok
+stmt 392 ok
+stmt 659 err 1 -1 700 no such table: main.event
+stmt 700 ok

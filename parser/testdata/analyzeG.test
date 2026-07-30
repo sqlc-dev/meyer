@@ -1,0 +1,26 @@
+==== 1.0
+
+  PRAGMA automatic_index = 0;
+  CREATE TABLE t1(a, x);
+  CREATE TABLE t2(b, y);
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<100
+  )
+  INSERT INTO t1 SELECT (i%50), NULL FROM s;
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<100
+  )
+  INSERT INTO t2 SELECT (CASE WHEN i<95 THEN 44 ELSE i END), NULL FROM s;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 55 ok
+stmt 80 err 1 -1 199 no such table: t1
+stmt 199 err 1 -1 347 no such table: t2
+==== 1.2
+
+  CREATE INDEX t2b ON t2(b);
+  ANALYZE;
+----
+stmt 0 err 1 -1 29 no such table: main.t2
+stmt 29 ok

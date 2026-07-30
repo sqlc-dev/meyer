@@ -1,0 +1,10 @@
+==== collate7-1.3
+
+    CREATE TABLE abc(a COLLATE CASELESS, b, c);
+----
+stmt 0 err 1 -1 41 no such collation sequence: CASELESS
+==== collate7-2.4
+
+    SELECT * FROM abc16 WHERE a < 'abc';
+----
+stmt 0 err 1 -1 41 no such table: abc16

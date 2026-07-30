@@ -1,0 +1,107 @@
+==== filefmt-1.3
+
+    SELECT count(*) FROM sqlite_master
+----
+stmt 0 ok
+==== filefmt-2.1.1
+
+  PRAGMA page_size = 1024;
+  PRAGMA auto_vacuum = 0;
+  CREATE TABLE t1(a);
+  CREATE INDEX i1 ON t1(a);
+  INSERT INTO t1 VALUES(a_string(3000));
+  CREATE TABLE t2(a);
+  INSERT INTO t2 VALUES(1);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 53 ok
+stmt 75 err 1 -1 103 no such table: main.t1
+stmt 103 err 1 -1 144 no such table: t1
+stmt 144 ok
+stmt 166 err 1 -1 194 no such table: t2
+==== filefmt-2.1.4
+ INSERT INTO t2 VALUES(2)
+----
+stmt 0 err 1 -1 26 no such table: t2
+==== filefmt-2.2.1
+
+  PRAGMA page_size = 1024;
+  PRAGMA auto_vacuum = 0;
+  CREATE TABLE t1(a);
+  CREATE INDEX i1 ON t1(a);
+  INSERT INTO t1 VALUES(a_string(3000));
+  CREATE TABLE t2(a);
+  INSERT INTO t2 VALUES(1);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 53 ok
+stmt 75 err 1 -1 103 no such table: main.t1
+stmt 103 err 1 -1 144 no such table: t1
+stmt 144 ok
+stmt 166 err 1 -1 194 no such table: t2
+==== filefmt-2.2.4
+ 
+  PRAGMA integrity_check;
+  BEGIN;
+    INSERT INTO t2 VALUES(2);
+    SAVEPOINT a;
+      INSERT INTO t2 VALUES(3);
+    ROLLBACK TO a;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 36 err 1 -1 66 no such table: t2
+stmt 66 ok
+stmt 83 err 1 -1 115 no such table: t2
+stmt 115 ok
+==== filefmt-2.2.6
+ COMMIT
+----
+stmt 0 ok
+==== filefmt-3.1
+
+  PRAGMA auto_vacuum = 1;
+  CREATE TABLE t1(a, b);
+----
+stmt 0 ok
+stmt 26 ok
+==== filefmt-3.3
+
+  SELECT * FROM sqlite_master;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 31 ok
+==== filefmt-4.1
+
+  PRAGMA auto_vacuum = 1;
+  CREATE TABLE t1(x, y);
+  CREATE TABLE t2(x, y);
+
+  INSERT INTO t1 VALUES(randomblob(100), randomblob(100));
+  INSERT INTO t1 VALUES(randomblob(100), randomblob(100));
+  INSERT INTO t1 VALUES(randomblob(100), randomblob(100));
+  INSERT INTO t1 VALUES(randomblob(100), randomblob(100));
+  INSERT INTO t1 VALUES(randomblob(100), randomblob(100));
+  INSERT INTO t1 VALUES(randomblob(100), randomblob(100));
+
+  INSERT INTO t2 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t2 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t2 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t2 SELECT randomblob(100), randomblob(100) FROM t1;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 51 ok
+stmt 76 err 1 -1 136 no such table: t1
+stmt 136 err 1 -1 195 no such table: t1
+stmt 195 err 1 -1 254 no such table: t1
+stmt 254 err 1 -1 313 no such table: t1
+stmt 313 err 1 -1 372 no such table: t1
+stmt 372 err 1 -1 431 no such table: t1
+stmt 431 err 1 -1 498 no such table: t2
+stmt 498 err 1 -1 564 no such table: t2
+stmt 564 err 1 -1 630 no such table: t2
+stmt 630 err 1 -1 696 no such table: t2

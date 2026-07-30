@@ -1,0 +1,227 @@
+==== regexp1-1.1.2
+
+  SELECT regexpi('abc','ABC');
+----
+stmt 0 err 1 10 31 no such function: regexpi
+==== regexp1-1.1.3
+
+  SELECT regexpi('ABC','ABC');
+----
+stmt 0 err 1 10 31 no such function: regexpi
+==== regexp1-1.1.4
+
+  SELECT regexpi('ABC','abc');
+----
+stmt 0 err 1 10 31 no such function: regexpi
+==== regexp1-1.1.5
+
+  SELECT regexpi('ABC.','ABC');
+----
+stmt 0 err 1 10 32 no such function: regexpi
+==== regexp1-1.2
+
+  SELECT x FROM t1 WHERE y REGEXP 'by|in' ORDER BY x;
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== regexp1-1.3.1
+
+  SELECT x FROM t1 WHERE y REGEXP 'by|Christ' ORDER BY x;
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== regexp1-1.3.2
+
+  SELECT x FROM t1 WHERE regexp('by|christ',y) ORDER BY x;
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== regexp1-1.3.3
+
+  SELECT x FROM t1 WHERE regexpi('by|christ',y) ORDER BY x;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== regexp1-1.3.4
+
+  SELECT x FROM t1 WHERE regexpi('BY|CHRIST',y) ORDER BY x;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== regexp1-1.4
+
+  SELECT x FROM t1 WHERE y REGEXP 'shal+ al+' ORDER BY x;
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== regexp1-1.5.1
+
+  SELECT x FROM t1 WHERE y REGEXP 'shall x*y*z*all' ORDER BY x;
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== regexp1-1.5.2
+
+  SELECT x FROM t1 WHERE regexp('shall x*y*z*all',y) ORDER BY x;
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== regexp1-1.5.3
+
+  SELECT x FROM t1 WHERE regexp('SHALL x*y*z*all',y) ORDER BY x;
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== regexp1-1.5.4
+
+  SELECT x FROM t1 WHERE regexpi('SHALL x*y*z*all',y) ORDER BY x;
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== regexp1-1.6
+
+  SELECT x FROM t1 WHERE y REGEXP 'shallx?y? ?z?all' ORDER BY x;
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== regexp1-1.7
+
+  SELECT x FROM t1 WHERE y REGEXP 'r{2}' ORDER BY x;
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== regexp1-1.8
+
+  SELECT x FROM t1 WHERE y REGEXP 'r{3}' ORDER BY x;
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== regexp1-1.9
+
+  SELECT x FROM t1 WHERE y REGEXP 'r{1}' ORDER BY x;
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== regexp1-1.10
+
+  SELECT x FROM t1 WHERE y REGEXP 'ur{2,10}e' ORDER BY x;
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== regexp1-1.14
+
+  SELECT x FROM t1 WHERE y REGEXP 'alive' ORDER BY x;
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== regexp1-1.15
+
+  SELECT x FROM t1 WHERE y REGEXP '^alive' ORDER BY x;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== regexp1-2.1
+
+  SELECT 'aaaabbbbcccc' REGEXP 'ab*c', 
+         'aaaacccc' REGEXP 'ab*c';
+----
+stmt 0 err 1 25 75 no such function: REGEXP
+==== regexp1-2.2
+
+  SELECT 'aaaabbbbcccc' REGEXP 'ab+c',
+         'aaaacccc' REGEXP 'ab+c';
+----
+stmt 0 err 1 25 74 no such function: REGEXP
+==== regexp1-2.3
+
+  SELECT 'aaaabbbbcccc' REGEXP 'ab?c',
+         'aaaacccc' REGEXP 'ab?c';
+----
+stmt 0 err 1 25 74 no such function: REGEXP
+==== regexp1-2.4
+
+  SELECT 'aaaabbbbbbcccc' REGEXP 'ab{3,5}c',
+         'aaaabbbbbcccc' REGEXP 'ab{3,5}c',
+         'aaaabbbbcccc' REGEXP 'ab{3,5}c',
+         'aaaabbbcccc' REGEXP 'ab{3,5}c',
+         'aaaabbcccc' REGEXP 'ab{3,5}c',
+         'aaaabcccc' REGEXP 'ab{3,5}c'
+----
+stmt 0 err 1 27 255 no such function: REGEXP
+==== regexp1-3.1
+
+  CREATE TABLE t1(id INTEGER PRIMARY KEY, a TEXT);
+  INSERT INTO t1(id, a) VALUES(1, '日本語');
+  SELECT a, hex(a), length(a) FROM t1;
+----
+stmt 0 ok
+stmt 51 err 1 -1 99 no such table: t1
+stmt 99 err 1 -1 138 no such table: t1
+==== regexp1-3.2
+
+  SELECT * FROM t1 WHERE a='日本語';
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== regexp1-3.3
+
+  SELECT * FROM t1 WHERE a LIKE '日本語';
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== regexp1-3.4
+
+  SELECT * FROM t1 wHERE a REGEXP '日本語';
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== regexp1-6.6
+SELECT 'abc' REGEXP '(^abc|def)';
+----
+stmt 0 err 1 13 33 no such function: REGEXP
+==== regexp1-6.7
+SELECT 'xabc' REGEXP '(^abc|def)';
+----
+stmt 0 err 1 14 34 no such function: REGEXP
+==== regexp1-6.8
+SELECT 'def' REGEXP '(^abc|def)';
+----
+stmt 0 err 1 13 33 no such function: REGEXP
+==== regexp1-6.9
+SELECT 'xdef' REGEXP '(^abc|def)';
+----
+stmt 0 err 1 14 34 no such function: REGEXP
+==== regexp1-7.1
+
+  SELECT char(0x61,0x7ff,0x62) REGEXP char(0x7ff);
+----
+stmt 0 err 1 32 51 no such function: REGEXP
+==== regexp1-7.2
+
+  SELECT char(0x61,0x800,0x62) REGEXP char(0x800);
+----
+stmt 0 err 1 32 51 no such function: REGEXP
+==== regexp1-7.3
+
+  SELECT char(0x61,0xabc,0x62) REGEXP char(0xabc);
+----
+stmt 0 err 1 32 51 no such function: REGEXP
+==== regexp1-7.4
+
+  SELECT char(0x61,0xfff,0x62) REGEXP char(0xfff);
+----
+stmt 0 err 1 32 51 no such function: REGEXP
+==== regexp1-7.5
+
+  SELECT char(0x61,0x1000,0x62) REGEXP char(0x1000);
+----
+stmt 0 err 1 33 53 no such function: REGEXP
+==== regexp1-7.10
+
+  SELECT char(0x61,0xffff,0x62) REGEXP char(0xffff);
+----
+stmt 0 err 1 33 53 no such function: REGEXP
+==== regexp1-7.11
+
+  SELECT char(0x61,0x10000,0x62) REGEXP char(0x10000);
+----
+stmt 0 err 1 34 55 no such function: REGEXP
+==== regexp1-7.12
+
+  SELECT char(0x61,0x10ffff,0x62) REGEXP char(0x10ffff);
+----
+stmt 0 err 1 35 57 no such function: REGEXP
+==== regexp1-8.0
+
+  CREATE TABLE t2(a);
+  INSERT INTO t2 VALUES('abc-def');
+  SELECT length(a) FROM t2;
+----
+stmt 0 ok
+stmt 22 err 1 -1 58 no such table: t2
+stmt 58 err 1 -1 86 no such table: t2
+==== regexp1-8.5
+
+  SELECT rowid FROM t2 WHERE a REGEXP '-';
+----
+stmt 0 err 1 -1 43 no such table: t2

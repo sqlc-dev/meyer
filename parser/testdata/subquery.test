@@ -1,0 +1,561 @@
+==== subquery-1.2
+
+    UPDATE t1 SET b=b+(SELECT y FROM t2 WHERE x=a);
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 52 no such table: t1
+stmt 52 err 1 -1 74 no such table: t1
+==== subquery-1.3
+
+    SELECT b FROM t1 WHERE EXISTS(SELECT * FROM t2 WHERE y=a)
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== subquery-1.4
+
+    SELECT b FROM t1 WHERE NOT EXISTS(SELECT * FROM t2 WHERE y=a)
+----
+stmt 0 err 1 -1 67 no such table: t1
+==== subquery-1.5
+
+    SELECT a, x FROM t1, t2 WHERE t1.a = (SELECT x);
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== subquery-1.6
+
+    CREATE INDEX i1 ON t1(a);
+    SELECT a, x FROM t1, t2 WHERE t1.a = (SELECT x);
+----
+stmt 0 err 1 -1 30 no such table: main.t1
+stmt 30 err 1 -1 83 no such table: t1
+==== subquery-1.7
+
+    SELECT a, x FROM t2, t1 WHERE t1.a = (SELECT x);
+----
+stmt 0 err 1 -1 53 no such table: t2
+==== subquery-1.8
+
+    SELECT count(*) FROM t1 WHERE a > (SELECT count(*) FROM t2);
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== subquery-1.9.1
+
+    SELECT (y*2)>b FROM t1, t2 WHERE a=x;
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== subquery-1.9.2
+
+    SELECT a FROM t1 WHERE (SELECT (y*2)>b FROM t2 WHERE a=x);
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== subquery-1.10.1
+
+    SELECT (SELECT a), b FROM t1;
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== subquery-1.10.2
+
+    SELECT * FROM (SELECT (SELECT a), b FROM t1);
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== subquery-1.10.3
+
+    SELECT * FROM (SELECT (SELECT sum(a) FROM t1));
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== subquery-1.10.4
+
+    CREATE TABLE t5 (val int, period text PRIMARY KEY);
+    INSERT INTO t5 VALUES(5, '2001-3');
+    INSERT INTO t5 VALUES(10, '2001-4');
+    INSERT INTO t5 VALUES(15, '2002-1');
+    INSERT INTO t5 VALUES(5, '2002-2');
+    INSERT INTO t5 VALUES(10, '2002-3');
+    INSERT INTO t5 VALUES(15, '2002-4');
+    INSERT INTO t5 VALUES(10, '2003-1');
+    INSERT INTO t5 VALUES(5, '2003-2');
+    INSERT INTO t5 VALUES(25, '2003-3');
+    INSERT INTO t5 VALUES(5, '2003-4');
+
+    SELECT period, vsum
+    FROM (SELECT 
+      a.period,
+      (select sum(val) from t5 where period between a.period and '2002-4') vsum
+      FROM t5 a where a.period between '2002-1' and '2002-4')
+    WHERE vsum < 45 ;
+----
+stmt 0 ok
+stmt 56 err 1 -1 96 no such table: t5
+stmt 96 err 1 -1 137 no such table: t5
+stmt 137 err 1 -1 178 no such table: t5
+stmt 178 err 1 -1 218 no such table: t5
+stmt 218 err 1 -1 259 no such table: t5
+stmt 259 err 1 -1 300 no such table: t5
+stmt 300 err 1 -1 341 no such table: t5
+stmt 341 err 1 -1 381 no such table: t5
+stmt 381 err 1 -1 422 no such table: t5
+stmt 422 err 1 -1 462 no such table: t5
+stmt 462 err 1 -1 685 no such table: t5
+==== subquery-1.10.5
+
+    SELECT period, vsum from
+      (select a.period,
+      (select sum(val) from t5 where period between a.period and '2002-4') vsum
+    FROM t5 a where a.period between '2002-1' and '2002-4') 
+    WHERE vsum < 45 ;
+----
+stmt 0 err 1 -1 216 no such table: t5
+==== subquery-1.10.6
+
+    DROP TABLE t5;
+----
+stmt 0 err 1 -1 19 no such table: t5
+==== subquery-2.1
+
+    SELECT (SELECT 10);
+----
+stmt 0 ok
+==== subquery-2.2.1
+
+    CREATE TABLE t3(a PRIMARY KEY, b);
+    INSERT INTO t3 VALUES(1, 2);
+    INSERT INTO t3 VALUES(3, 1);
+----
+stmt 0 ok
+stmt 39 err 1 -1 72 no such table: t3
+stmt 72 err 1 -1 105 no such table: t3
+==== subquery-2.2.2
+
+    SELECT * FROM t3 WHERE a IN (SELECT b FROM t3);
+----
+stmt 0 err 1 -1 52 no such table: t3
+==== subquery-2.2.3
+
+    DROP TABLE t3;
+----
+stmt 0 err 1 -1 19 no such table: t3
+==== subquery-2.3.1
+
+    CREATE TABLE t3(a TEXT);
+    INSERT INTO t3 VALUES('10');
+----
+stmt 0 ok
+stmt 29 err 1 -1 62 no such table: t3
+==== subquery-2.3.2
+
+    SELECT a IN (10.0, 20) FROM t3;
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== subquery-2.3.3
+
+    DROP TABLE t3;
+----
+stmt 0 err 1 -1 19 no such table: t3
+==== subquery-2.4.1
+
+    CREATE TABLE t3(a TEXT);
+    INSERT INTO t3 VALUES('XX');
+----
+stmt 0 ok
+stmt 29 err 1 -1 62 no such table: t3
+==== subquery-2.4.2
+
+    SELECT count(*) FROM t3 WHERE a IN (SELECT 'XX')
+----
+stmt 0 err 1 -1 54 no such table: t3
+==== subquery-2.4.3
+
+    DROP TABLE t3;
+----
+stmt 0 err 1 -1 19 no such table: t3
+==== subquery-2.5.1
+
+    CREATE TABLE t3(a INTEGER);
+    INSERT INTO t3 VALUES(10);
+
+    CREATE TABLE t4(x TEXT);
+    INSERT INTO t4 VALUES('10.0');
+----
+stmt 0 ok
+stmt 32 err 1 -1 63 no such table: t3
+stmt 63 ok
+stmt 93 err 1 -1 128 no such table: t4
+==== subquery-2.5.4
+
+    DROP TABLE t3;
+    DROP TABLE t4;
+----
+stmt 0 err 1 -1 19 no such table: t3
+stmt 19 err 1 -1 38 no such table: t4
+==== subquery-3.1.1
+
+      SELECT * FROM v1 WHERE EXISTS(SELECT 1);
+----
+stmt 0 err 1 -1 47 no such table: v1
+==== subquery-3.3.1
+
+    SELECT a, (SELECT b) FROM t1 GROUP BY a;
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== subquery-3.3.3
+
+    INSERT INTO t1 VALUES(2, 4);
+    SELECT max(a), (SELECT d FROM t2 WHERE a=c) FROM t1;
+----
+stmt 0 err 1 -1 33 no such table: t1
+stmt 33 err 1 -1 90 no such table: t1
+==== subquery-3.3.4
+
+    SELECT a, (SELECT (SELECT d FROM t2 WHERE a=c)) FROM t1 GROUP BY a;
+----
+stmt 0 err 1 -1 72 no such table: t1
+==== subquery-3.3.5
+
+    SELECT a, (SELECT count(*) FROM t2 WHERE a=c) FROM t1;
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== subquery-3.4.1
+
+    CREATE TABLE t34(x,y);
+    INSERT INTO t34 VALUES(106,4), (107,3), (106,5), (107,5);
+    SELECT a.x, avg(a.y)
+      FROM t34 AS a
+     GROUP BY a.x
+     HAVING NOT EXISTS( SELECT b.x, avg(b.y)
+                          FROM t34 AS b
+                         GROUP BY b.x
+                         HAVING avg(a.y) > avg(b.y));
+----
+stmt 0 ok
+stmt 27 err 1 -1 89 no such table: t34
+stmt 89 err 1 -1 329 no such table: t34
+==== subquery-3.4.2
+
+    SELECT a.x, avg(a.y) AS avg1
+      FROM t34 AS a
+     GROUP BY a.x
+     HAVING NOT EXISTS( SELECT b.x, avg(b.y) AS avg2
+                          FROM t34 AS b
+                         GROUP BY b.x
+                         HAVING avg1 > avg2);
+----
+stmt 0 err 1 -1 248 no such table: t34
+==== subquery-3.4.3
+
+    SELECT
+       a.x,
+       avg(a.y),
+       NOT EXISTS ( SELECT b.x, avg(b.y)
+                      FROM t34 AS b
+                      GROUP BY b.x
+                     HAVING avg(a.y) > avg(b.y)),
+       EXISTS ( SELECT c.x, avg(c.y)
+                  FROM t34 AS c
+                  GROUP BY c.x
+                 HAVING avg(a.y) > avg(c.y))
+      FROM t34 AS a
+     GROUP BY a.x
+     ORDER BY a.x;
+----
+stmt 0 err 1 -1 404 no such table: t34
+==== subquery-3.5.1
+
+    CREATE TABLE t35a(x); INSERT INTO t35a VALUES(1),(2),(3);
+    CREATE TABLE t35b(y); INSERT INTO t35b VALUES(98), (99);
+    SELECT max((SELECT avg(y) FROM t35b)) FROM t35a;
+----
+stmt 0 ok
+stmt 26 err 1 -1 62 no such table: t35a
+stmt 62 ok
+stmt 88 err 1 -1 123 no such table: t35b
+stmt 123 err 1 -1 176 no such table: t35a
+==== subquery-3.5.2
+
+    SELECT max((SELECT count(y) FROM t35b)) FROM t35a;
+----
+stmt 0 err 1 -1 55 no such table: t35a
+==== subquery-3.5.3
+
+    SELECT max((SELECT count() FROM t35b)) FROM t35a;
+----
+stmt 0 err 1 -1 54 no such table: t35a
+==== subquery-3.5.4
+
+    SELECT max((SELECT count(x) FROM t35b)) FROM t35a;
+----
+stmt 0 err 1 -1 55 no such table: t35a
+==== subquery-3.5.5
+
+    SELECT max((SELECT count(x) FROM t35b)) FROM t35a;
+----
+stmt 0 err 1 -1 55 no such table: t35a
+==== subquery-3.5.6
+
+    SELECT max((SELECT a FROM (SELECT count(x) AS a FROM t35b))) FROM t35a;
+----
+stmt 0 err 1 -1 76 no such table: t35a
+==== subquery-3.5.7
+
+    SELECT max((SELECT a FROM (SELECT count(y) AS a FROM t35b))) FROM t35a;
+----
+stmt 0 err 1 -1 76 no such table: t35a
+==== subquery-4.1.1
+
+    SELECT (SELECT a FROM t1);
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== subquery-4.2
+
+    DELETE FROM t1;
+    SELECT (SELECT a FROM t1);
+----
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 51 no such table: t1
+==== subquery-4.2.2
+INSERT INTO t3 VALUES((SELECT max(a) FROM t3)+1)
+----
+stmt 0 err 1 -1 49 no such table: t3
+==== subquery-7.1
+
+    CREATE TABLE t7(c7);
+    INSERT INTO t7 VALUES(1);
+    INSERT INTO t7 VALUES(2);
+    INSERT INTO t7 VALUES(3);
+    CREATE TABLE t8(c8);
+    INSERT INTO t8 VALUES(100);
+    INSERT INTO t8 VALUES(200);
+    INSERT INTO t8 VALUES(300);
+    CREATE TABLE t9(c9);
+    INSERT INTO t9 VALUES(10000);
+    INSERT INTO t9 VALUES(20000);
+    INSERT INTO t9 VALUES(30000);
+
+    SELECT (SELECT c7+c8 FROM t7) FROM t8;
+----
+stmt 0 ok
+stmt 25 err 1 -1 55 no such table: t7
+stmt 55 err 1 -1 85 no such table: t7
+stmt 85 err 1 -1 115 no such table: t7
+stmt 115 ok
+stmt 140 err 1 -1 172 no such table: t8
+stmt 172 err 1 -1 204 no such table: t8
+stmt 204 err 1 -1 236 no such table: t8
+stmt 236 ok
+stmt 261 err 1 -1 295 no such table: t9
+stmt 295 err 1 -1 329 no such table: t9
+stmt 329 err 1 -1 363 no such table: t9
+stmt 363 err 1 -1 407 no such table: t8
+==== subquery-7.2
+
+    SELECT (SELECT max(c7)+c8 FROM t7) FROM t8;
+----
+stmt 0 err 1 -1 48 no such table: t8
+==== subquery-7.3
+
+    SELECT (SELECT c7+max(c8) FROM t8) FROM t7
+----
+stmt 0 err 1 -1 48 no such table: t7
+==== subquery-7.4
+
+    SELECT (SELECT max(c7)+max(c8) FROM t8) FROM t7
+----
+stmt 0 err 1 -1 53 no such table: t7
+==== subquery-7.5
+
+    SELECT (SELECT c8 FROM t8 WHERE rowid=max(c7)) FROM t7
+----
+stmt 0 err 1 -1 60 no such table: t7
+==== subquery-7.6
+
+    SELECT (SELECT (SELECT max(c7+c8+c9) FROM t9) FROM t8) FROM t7
+----
+stmt 0 err 1 -1 68 no such table: t7
+==== subquery-7.7
+
+    SELECT (SELECT (SELECT c7+max(c8+c9) FROM t9) FROM t8) FROM t7
+----
+stmt 0 err 1 -1 68 no such table: t7
+==== subquery-7.8
+
+    SELECT (SELECT (SELECT max(c7)+c8+c9 FROM t9) FROM t8) FROM t7
+----
+stmt 0 err 1 -1 68 no such table: t7
+==== subquery-7.9
+
+    SELECT (SELECT (SELECT c7+max(c8)+c9 FROM t9) FROM t8) FROM t7
+----
+stmt 0 err 1 -1 68 no such table: t7
+==== subquery-7.10
+
+    SELECT (SELECT (SELECT c7+c8+max(c9) FROM t9) FROM t8) FROM t7
+----
+stmt 0 err 1 -1 68 no such table: t7
+==== subquery-7.11
+
+    SELECT (SELECT (SELECT max(c7)+max(c8)+max(c9) FROM t9) FROM t8) FROM t7
+----
+stmt 0 err 1 -1 78 no such table: t7
+==== subquery-8.1
+
+  CREATE TABLE t8(a TEXT, b INT);
+  SELECT (SELECT 0 FROM (SELECT * FROM t1)) AS x WHERE x;
+  SELECT (SELECT 0 FROM (SELECT * FROM (SELECT 0))) AS x WHERE x;
+----
+stmt 0 ok
+stmt 34 err 1 -1 92 no such table: t1
+stmt 92 ok
+==== subquery-9.1
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(1),(1),(1);
+  SELECT (SELECT DISTINCT x FROM t1 ORDER BY +x LIMIT 1 OFFSET 100) FROM t1;
+----
+stmt 0 ok
+stmt 22 err 1 -1 58 no such table: t1
+stmt 58 err 1 -1 135 no such table: t1
+==== subquery-9.2
+
+  SELECT (SELECT DISTINCT x FROM t1 ORDER BY +x LIMIT 1 OFFSET 0) FROM t1;
+----
+stmt 0 err 1 -1 75 no such table: t1
+==== subquery-9.3
+
+  INSERT INTO t1 VALUES(2);
+  SELECT (SELECT DISTINCT x FROM t1 ORDER BY +x LIMIT 1 OFFSET 1) FROM t1;
+----
+stmt 0 err 1 -1 28 no such table: t1
+stmt 28 err 1 -1 103 no such table: t1
+==== subquery-9.4
+
+  SELECT (SELECT DISTINCT x FROM t1 ORDER BY +x LIMIT 1 OFFSET 2) FROM t1;
+----
+stmt 0 err 1 -1 75 no such table: t1
+==== subquery-10.1
+
+  CREATE TABLE t1(aa TEXT, bb INT, cc TEXT);
+  CREATE INDEX x11 on t1(bb);
+  CREATE INDEX x12 on t1(aa);
+  CREATE TABLE t2(aa TEXT, xx INT);
+  ANALYZE sqlite_master;
+  INSERT INTO sqlite_stat1(tbl, idx, stat) VALUES('t1', 'x11', '156789 28');
+  INSERT INTO sqlite_stat1(tbl, idx, stat) VALUES('t1', 'x12', '156789 1');
+  ANALYZE sqlite_master;
+----
+stmt 0 ok
+stmt 45 err 1 -1 75 no such table: main.t1
+stmt 75 err 1 -1 105 no such table: main.t1
+stmt 105 ok
+stmt 141 ok
+stmt 166 err 1 -1 243 no such table: sqlite_stat1
+stmt 243 err 1 -1 319 no such table: sqlite_stat1
+stmt 319 ok
+==== 10.3
+
+  CREATE TABLE blob(
+    rid INTEGER PRIMARY KEY,
+    size INT,
+    uuid TEXT
+  );
+  CREATE TABLE delta(
+    rid INTEGER PRIMARY KEY,
+    srcid INT
+  );
+  CREATE INDEX delta_i1 ON delta(srcid);
+----
+stmt 0 ok
+stmt 83 ok
+stmt 153 err 1 -1 194 no such table: main.delta
+==== subquery-11.1
+
+  CREATE TABLE t1(ix INT, rx REAL, bx BLOB, tx TEXT, ax);
+  INSERT INTO t1 VALUES(1,1.0,x'31','x',NULL);
+  WITH c(a) AS (SELECT 'y' UNION SELECT tx FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT tx FROM t1 UNION SELECT 'y') SELECT affinity(a) FROM c;
+----
+stmt 0 ok
+stmt 58 err 1 -1 105 no such table: t1
+stmt 105 err 1 -1 184 no such table: t1
+stmt 184 err 1 -1 263 no such table: t1
+==== subquery-11.2
+
+  WITH c(a) AS (SELECT 2 UNION SELECT tx FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT tx FROM t1 UNION SELECT 2) SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 154 no such table: t1
+==== subquery-11.3
+
+  WITH c(a) AS (SELECT 2.0 UNION SELECT tx FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT tx FROM t1 UNION SELECT 2.0) SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 158 no such table: t1
+==== subquery-11.4
+
+  WITH c(a) AS (SELECT null UNION SELECT tx FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT tx FROM t1 UNION SELECT null) SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 80 no such table: t1
+stmt 80 err 1 -1 160 no such table: t1
+==== subquery-11.5
+
+  WITH c(a) AS (SELECT x'32' UNION SELECT tx FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT tx FROM t1 UNION SELECT x'32') SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 81 no such table: t1
+stmt 81 err 1 -1 162 no such table: t1
+==== subquery-11.6
+
+  WITH c(a) AS (SELECT 3 UNION SELECT ix FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT ix FROM t1 UNION SELECT 3) SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 154 no such table: t1
+==== subquery-11.7
+
+  WITH c(a) AS (SELECT 3.0 UNION SELECT ix FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT ix FROM t1 UNION SELECT 3.0) SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 158 no such table: t1
+==== subquery-11.8
+
+  WITH c(a) AS (SELECT '3' UNION SELECT ix FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT ix FROM t1 UNION SELECT '3') SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 158 no such table: t1
+==== subquery-11.10
+
+  WITH c(a) AS (SELECT x'32' UNION SELECT ix FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT ix FROM t1 UNION SELECT x'32') SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 81 no such table: t1
+stmt 81 err 1 -1 162 no such table: t1
+==== subquery-11.11
+
+  WITH c(a) AS (SELECT 4 UNION SELECT rx FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT rx FROM t1 UNION SELECT 4) SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 154 no such table: t1
+==== subquery-11.12
+
+  WITH c(a) AS (SELECT '4' UNION SELECT rx FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT rx FROM t1 UNION SELECT '4') SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 158 no such table: t1
+==== subquery-11.13
+
+  WITH c(a) AS (SELECT null UNION SELECT rx FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT rx FROM t1 UNION SELECT null) SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 80 no such table: t1
+stmt 80 err 1 -1 160 no such table: t1
+==== subquery-11.14
+
+  WITH c(a) AS (SELECT x'b4' UNION SELECT rx FROM t1) SELECT affinity(a) FROM c;
+  WITH c(a) AS (SELECT rx FROM t1 UNION SELECT x'b4') SELECT affinity(a) FROM c;
+----
+stmt 0 err 1 -1 81 no such table: t1
+stmt 81 err 1 -1 162 no such table: t1

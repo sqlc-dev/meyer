@@ -1,0 +1,57 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING tcl(vtab_command)
+----
+stmt 0 ok
+==== 1.3
+
+  CREATE TABLE t0(c0);
+  INSERT INTO t0 VALUES(0);
+  INSERT INTO t0 VALUES(1);
+----
+stmt 0 ok
+stmt 23 err 1 -1 51 no such table: t0
+stmt 51 err 1 -1 79 no such table: t0
+==== 2.0
+
+  CREATE TABLE real_t1(a, b);
+
+  INSERT INTO real_t1 VALUES (1, 'a');
+  INSERT INTO real_t1 VALUES (2, 'a');
+  INSERT INTO real_t1 VALUES (1, 'a');
+
+  INSERT INTO real_t1 VALUES (2, 'b');
+  INSERT INTO real_t1 VALUES (1, 'b');
+  INSERT INTO real_t1 VALUES (2, 'b');
+
+  INSERT INTO real_t1 VALUES (3, 'a');
+  INSERT INTO real_t1 VALUES (4, 'b');
+  INSERT INTO real_t1 VALUES (3, 'a');
+
+  INSERT INTO real_t1 VALUES (4, 'b');
+  INSERT INTO real_t1 VALUES (3, 'a');
+  INSERT INTO real_t1 VALUES (4, 'b');
+----
+stmt 0 ok
+stmt 30 err 1 -1 70 no such table: real_t1
+stmt 70 err 1 -1 109 no such table: real_t1
+stmt 109 err 1 -1 148 no such table: real_t1
+stmt 148 err 1 -1 188 no such table: real_t1
+stmt 188 err 1 -1 227 no such table: real_t1
+stmt 227 err 1 -1 266 no such table: real_t1
+stmt 266 err 1 -1 306 no such table: real_t1
+stmt 306 err 1 -1 345 no such table: real_t1
+stmt 345 err 1 -1 384 no such table: real_t1
+stmt 384 err 1 -1 424 no such table: real_t1
+stmt 424 err 1 -1 463 no such table: real_t1
+stmt 463 err 1 -1 502 no such table: real_t1
+==== 2.0.dup1
+
+  CREATE VIRTUAL TABLE t1 USING tcl(vtab_command)
+----
+stmt 0 ok
+==== 2.1
+
+  SELECT a, b FROM t1
+----
+stmt 0 err 1 -1 23 no such table: t1

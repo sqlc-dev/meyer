@@ -1,0 +1,112 @@
+==== 1.1.0
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, 2);
+  BEGIN;
+    INSERT INTO t1 VALUES(3, 4);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t1
+stmt 56 ok
+stmt 65 err 1 -1 98 no such table: t1
+==== 1.2.0
+
+  COMMIT;
+  CREATE TABLE t2(a, b);
+  BEGIN;
+    INSERT INTO t1 VALUES(5, 6);
+    INSERT INTO t2 VALUES('a', 'b');
+----
+stmt 0 ok
+stmt 10 ok
+stmt 35 ok
+stmt 44 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 114 no such table: t2
+==== 1.3.0
+
+  COMMIT;
+  CREATE TABLE t3(a, b);
+  BEGIN;
+    INSERT INTO t1 VALUES(7, 8);
+    INSERT INTO t2 VALUES('c', 'd');
+    INSERT INTO t3 VALUES('i', 'ii');
+----
+stmt 0 ok
+stmt 10 ok
+stmt 35 ok
+stmt 44 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 114 no such table: t2
+stmt 114 err 1 -1 152 no such table: t3
+==== 1.4.0
+
+  COMMIT;
+  BEGIN;
+    INSERT INTO t1 VALUES(9, 10);
+----
+stmt 0 ok
+stmt 10 ok
+stmt 19 err 1 -1 53 no such table: t1
+==== 1.4.5
+ COMMIT
+----
+stmt 0 ok
+==== 2.1.0
+
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.t4(x, y);
+  INSERT INTO t4 VALUES('A', 'B');
+  BEGIN;
+    INSERT INTO t1 VALUES(11, 12);
+    INSERT INTO t4 VALUES('C', 'D');
+----
+stmt 0 ok
+stmt 28 err 1 44 51 unknown database aux
+stmt 57 err 1 -1 92 no such table: t4
+stmt 92 ok
+stmt 101 err 1 -1 136 no such table: t1
+stmt 136 err 1 -1 173 no such table: t4
+==== 2.1.5
+ COMMIT
+----
+stmt 0 ok
+==== 2.2.0
+
+  BEGIN;
+    INSERT INTO t1 VALUES(13, 14);
+    INSERT INTO t4 VALUES('E', 'F');
+----
+stmt 0 ok
+stmt 9 err 1 -1 44 no such table: t1
+stmt 44 err 1 -1 81 no such table: t4
+==== 2.2.7
+ COMMIT
+----
+stmt 0 ok
+==== 3.1
+ PRAGMA integrity_check
+----
+stmt 0 ok
+==== 3.2
+ COMMIT
+----
+stmt 0 ok
+==== 3.3
+ PRAGMA integrity_check
+----
+stmt 0 ok
+==== 3.4
+ 
+  SELECT count(*) FROM t1;
+  SELECT count(*) FROM t2;
+----
+stmt 0 err 1 -1 28 no such table: t1
+stmt 28 err 1 -1 55 no such table: t2
+==== 4.5
+ 
+    ROLLBACK;
+    SELECT a FROM ta;
+    SELECT b FROM tb;
+----
+stmt 0 ok
+stmt 15 err 1 -1 37 no such table: ta
+stmt 37 err 1 -1 59 no such table: tb

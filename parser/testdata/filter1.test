@@ -1,0 +1,274 @@
+==== 1.0
+
+  CREATE TABLE t1(a);
+  CREATE INDEX i1 ON t1(a);
+  INSERT INTO t1 VALUES(1), (2), (3), (4), (5), (6), (7), (8), (9);
+----
+stmt 0 ok
+stmt 22 err 1 -1 50 no such table: main.t1
+stmt 50 err 1 -1 118 no such table: t1
+==== 1.1
+ SELECT sum(a) FROM t1;
+----
+stmt 0 err 1 -1 23 no such table: t1
+==== 1.2
+ SELECT sum(a) FILTER( WHERE a<5 ) FROM t1;
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== 1.3
+ 
+  SELECT sum(a) FILTER( WHERE a>9 ),
+         sum(a) FILTER( WHERE a>8 ),
+         sum(a) FILTER( WHERE a>7 ),
+         sum(a) FILTER( WHERE a>6 ),
+         sum(a) FILTER( WHERE a>5 ),
+         sum(a) FILTER( WHERE a>4 ),
+         sum(a) FILTER( WHERE a>3 ),
+         sum(a) FILTER( WHERE a>2 ),
+         sum(a) FILTER( WHERE a>1 ),
+         sum(a) FILTER( WHERE a>0 )
+  FROM t1;
+----
+stmt 0 err 1 -1 381 no such table: t1
+==== 1.4
+
+  SELECT max(a) FILTER (WHERE (a % 2)==0) FROM t1
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 1.5
+
+  SELECT min(a) FILTER (WHERE a>4) FROM t1
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== 1.6
+
+  SELECT count(*) FILTER (WHERE a!=5) FROM t1
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 1.7
+
+  SELECT min(a) FILTER (WHERE a>3) FROM t1 GROUP BY (a%2) ORDER BY 1;
+----
+stmt 0 err 1 -1 70 no such table: t1
+==== 1.8
+
+  CREATE VIEW vv AS 
+  SELECT sum(a) FILTER( WHERE a>9 ),
+         sum(a) FILTER( WHERE a>8 ),
+         sum(a) FILTER( WHERE a>7 ),
+         sum(a) FILTER( WHERE a>6 ),
+         sum(a) FILTER( WHERE a>5 ),
+         sum(a) FILTER( WHERE a>4 ),
+         sum(a) FILTER( WHERE a>3 ),
+         sum(a) FILTER( WHERE a>2 ),
+         sum(a) FILTER( WHERE a>1 ),
+         sum(a) FILTER( WHERE a>0 )
+  FROM t1;
+  SELECT * FROM vv;
+----
+stmt 0 ok
+stmt 401 err 1 -1 421 no such table: vv
+==== 2.0
+
+  CREATE TABLE t1(a);
+  INSERT INTO t1 VALUES(1), (2), (3), (4), (5), (6), (7), (8), (9);
+----
+stmt 0 ok
+stmt 22 err 1 -1 90 no such table: t1
+==== 2.1
+
+  SELECT upper(a) FILTER (WHERE a=1) FROM t1
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== 2.2
+
+  SELECT sum(a) FILTER (WHERE 1 - max(a) OVER () > 0) FROM t1
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== 2.3
+
+  SELECT sum(a) FILTER (WHERE 1 - count(a)) FROM t1
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== 3.0
+
+  CREATE TABLE t1(a,b);
+  INSERT INTO t1 VALUES(1, 1);
+----
+stmt 0 ok
+stmt 24 err 1 -1 55 no such table: t1
+==== 3.1
+
+  SELECT b, max(a) FILTER (WHERE b='x') FROM t1;
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== 3.2
+
+  CREATE TABLE t2(a, b, c);
+  INSERT INTO t2 VALUES(1, 2, 3);
+  INSERT INTO t2 VALUES(1, 3, 4);
+  INSERT INTO t2 VALUES(2, 5, 6);
+  INSERT INTO t2 VALUES(2, 7, 8);
+----
+stmt 0 ok
+stmt 28 err 1 -1 62 no such table: t2
+stmt 62 err 1 -1 96 no such table: t2
+stmt 96 err 1 -1 130 no such table: t2
+stmt 130 err 1 -1 164 no such table: t2
+==== 3.3
+
+  SELECT a, c, max(b) FILTER (WHERE c='x') FROM t2 GROUP BY a;
+----
+stmt 0 err 1 -1 63 no such table: t2
+==== 3.4
+
+  DELETE FROM t2;
+  INSERT INTO t2 VALUES(1, 5, 'x');
+  INSERT INTO t2 VALUES(1, 2, 3);
+  INSERT INTO t2 VALUES(1, 4, 'x');
+  INSERT INTO t2 VALUES(2, 5, 6);
+  INSERT INTO t2 VALUES(2, 7, 8);
+----
+stmt 0 err 1 -1 18 no such table: t2
+stmt 18 err 1 -1 54 no such table: t2
+stmt 54 err 1 -1 88 no such table: t2
+stmt 88 err 1 -1 124 no such table: t2
+stmt 124 err 1 -1 158 no such table: t2
+stmt 158 err 1 -1 192 no such table: t2
+==== 3.5
+
+  SELECT a, c, max(b) FILTER (WHERE c='x') FROM t2 GROUP BY a;
+----
+stmt 0 err 1 -1 63 no such table: t2
+==== 4.0
+
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES('a', 0, 5);
+  INSERT INTO t1 VALUES('a', 1, 10);
+  INSERT INTO t1 VALUES('a', 0, 15);
+
+  INSERT INTO t1 VALUES('b', 0, 5);
+  INSERT INTO t1 VALUES('b', 1, 1000);
+  INSERT INTO t1 VALUES('b', 0, 5);
+
+  INSERT INTO t1 VALUES('c', 0, 1);
+  INSERT INTO t1 VALUES('c', 1, 2);
+  INSERT INTO t1 VALUES('c', 0, 3);
+----
+stmt 0 ok
+stmt 28 err 1 -1 64 no such table: t1
+stmt 64 err 1 -1 101 no such table: t1
+stmt 101 err 1 -1 138 no such table: t1
+stmt 138 err 1 -1 175 no such table: t1
+stmt 175 err 1 -1 214 no such table: t1
+stmt 214 err 1 -1 250 no such table: t1
+stmt 250 err 1 -1 287 no such table: t1
+stmt 287 err 1 -1 323 no such table: t1
+stmt 323 err 1 -1 359 no such table: t1
+==== 4.1
+
+  SELECT avg(c) FILTER (WHERE b!=1) AS h FROM t1 GROUP BY a ORDER BY h;
+----
+stmt 0 err 1 -1 72 no such table: t1
+==== 4.2
+
+  SELECT avg(c) FILTER (WHERE b!=1) AS h FROM t1 GROUP BY a ORDER BY (h+1.0);
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== 4.3
+
+  SELECT a, avg(c) FILTER (WHERE b!=1) AS h FROM t1 GROUP BY a ORDER BY avg(c);
+----
+stmt 0 err 1 -1 80 no such table: t1
+==== 4.4
+
+  SELECT a, avg(c) FILTER (WHERE b!=1) FROM t1 GROUP BY a ORDER BY 2
+----
+stmt 0 err 1 -1 70 no such table: t1
+==== 5.0
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(1, 3);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t1
+stmt 56 err 1 -1 87 no such table: t1
+==== 5.1
+
+  SELECT count(*) FILTER (WHERE b>2) FROM (SELECT * FROM t1)
+----
+stmt 0 err 1 -1 62 no such table: t1
+==== 5.2
+
+  SELECT count(*) FILTER (WHERE b>2) OVER () FROM (SELECT * FROM t1)
+----
+stmt 0 err 1 -1 70 no such table: t1
+==== 5.3
+
+  SELECT count(*) FILTER (WHERE b>2) OVER (ORDER BY b) FROM (SELECT * FROM t1)
+----
+stmt 0 err 1 -1 80 no such table: t1
+==== 6.0
+
+  CREATE TABLE t1(a,b);
+  INSERT INTO t1 VALUES(1,1);
+  INSERT INTO t1 VALUES(2,2);
+  CREATE TABLE t2(x,y);
+  INSERT INTO t2 VALUES(1,1);
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t1
+stmt 54 err 1 -1 84 no such table: t1
+stmt 84 ok
+stmt 108 err 1 -1 138 no such table: t2
+==== 6.1
+
+  SELECT (SELECT COUNT(a) FILTER(WHERE x) FROM t2) FROM t1;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== 6.2
+
+  SELECT (SELECT COUNT(a+x) FROM t2) FROM t1;
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== 6.3
+
+  SELECT (SELECT COUNT(a) FROM t2) FROM t1;
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== 7.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  INSERT INTO t1 VALUES(321, 100000);
+  INSERT INTO t1 VALUES(111, 110000);
+  INSERT INTO t1 VALUES(444, 120000);
+  INSERT INTO t1 VALUES(222, 130000);
+----
+stmt 0 ok
+stmt 45 err 1 -1 83 no such table: t1
+stmt 83 err 1 -1 121 no such table: t1
+stmt 121 err 1 -1 159 no such table: t1
+stmt 159 err 1 -1 197 no such table: t1
+==== 7.1
+
+  SELECT max(a), max(a) FILTER (WHERE b<12345), b FROM t1;
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== 8.0
+
+  CREATE TABLE t0(c0 INT);
+  CREATE TABLE t1a(a INTEGER PRIMARY KEY, b TEXT);
+  INSERT INTO t1a VALUES(1,'one'),(2,NULL),(3,'three');
+  CREATE TABLE t1b(c INTEGER PRIMARY KEY, d TEXT);
+  INSERT INTO t1b VALUES(4,'four'),(5,NULL),(6,'six');
+  CREATE VIEW t1 AS SELECT a, b FROM t1a UNION ALL SELECT c, d FROM t1b;
+  SELECT count()FILTER(WHERE b IS NULL) FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 78 err 1 -1 134 no such table: t1a
+stmt 134 ok
+stmt 185 err 1 -1 240 no such table: t1b
+stmt 240 ok
+stmt 313 err 1 -1 362 no such table: t1

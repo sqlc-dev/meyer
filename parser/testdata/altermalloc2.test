@@ -1,0 +1,45 @@
+==== 1.0
+
+  CREATE TABLE t1(abcd, efgh);
+----
+stmt 0 ok
+==== 2.0
+
+  PRAGMA encoding = 'utf-16';
+  CREATE TABLE t1(abcd, efgh);
+----
+stmt 0 ok
+stmt 30 ok
+==== 3.0
+
+  CREATE TABLE t1(abcd, efgh);
+  CREATE VIEW v1 AS SELECT * FROM t1 WHERE abcd>efgh;
+----
+stmt 0 ok
+stmt 31 ok
+==== 4.0
+
+  CREATE TABLE rr(a, b);
+  CREATE VIEW vv AS SELECT * FROM rr;
+
+  CREATE TRIGGER vv1 INSTEAD OF INSERT ON vv BEGIN
+    SELECT 1, 2, 3;
+  END;
+  CREATE TRIGGER tr1 AFTER INSERT ON rr BEGIN
+    INSERT INTO vv VALUES(new.a, new.b);
+  END;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 63 err 1 -1 115 no such table: main.vv
+stmt 142 err 1 -1 188 no such table: main.rr
+==== 5.0
+
+  CREATE TABLE rr(a, b);
+  CREATE VIEW vv AS SELECT * FROM (
+    WITH abc(d, e) AS (SELECT * FROM rr)
+    SELECT * FROM abc
+  );
+----
+stmt 0 ok
+stmt 25 ok

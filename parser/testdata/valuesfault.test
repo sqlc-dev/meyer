@@ -1,0 +1,5 @@
+==== 1.0
+
+  CREATE TABLE x1(a, b, c);
+----
+stmt 0 ok

@@ -1,0 +1,78 @@
+==== misc7-7.2
+
+    DETACH aux;
+----
+stmt 0 ok
+==== misc7-9
+
+    SELECT * 
+    FROM (SELECT name+1 AS one FROM sqlite_master LIMIT 1 OFFSET 1) 
+    WHERE one LIKE 'hello%';
+----
+stmt 0 ok
+==== misc7-10.1
+
+    INSERT INTO t1(a,b,c) VALUES(12345,2,3) ON CONFLICT(a) DO NOTHING;
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== misc7-11
+
+      SELECT t1.a, t2.a FROM t1, t1 AS t2 ORDER BY 2 LIMIT 1;
+----
+stmt 0 err 1 -1 62 no such table: t1
+==== misc7-14.0
+
+    CREATE TABLE abc(a PRIMARY KEY, b, c);
+----
+stmt 0 ok
+==== misc7-15.2
+
+    DELETE FROM abc WHERE rowid > 12;
+    INSERT INTO abc SELECT 
+            randstr(100,100), randstr(100,100), randstr(100,100) FROM abc;
+----
+stmt 0 err 1 -1 38 no such table: abc
+stmt 38 err 1 -1 141 no such table: abc
+==== misc7-16.X
+
+    SELECT count(*) FROM t3;
+----
+stmt 0 err 1 -1 29 no such table: t3
+==== misc7-18.1
+
+    CREATE TABLE table_1 (col_10);
+    CREATE TABLE table_2 (
+      col_1, col_2, col_3, col_4, col_5,
+      col_6, col_7, col_8, col_9, col_10
+    );
+    SELECT a.col_10
+    FROM
+      (SELECT table_1.col_10 AS col_10 FROM table_1) a,
+      (SELECT table_1.col_10, table_2.col_9 AS qcol_9
+         FROM table_1, table_2
+        GROUP BY table_1.col_10, qcol_9);
+----
+stmt 0 ok
+stmt 35 ok
+stmt 151 err 1 -1 363 no such table: table_1
+==== misc7-22.2
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== 23.0
+
+    CREATE TABLE t1(x, y);
+    INSERT INTO t1 VALUES(1, 2);
+----
+stmt 0 ok
+stmt 27 err 1 -1 60 no such table: t1
+==== 23.2
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== 23.3
+
+    INSERT INTO t1 VALUES(3, 4);
+----
+stmt 0 err 1 -1 33 no such table: t1

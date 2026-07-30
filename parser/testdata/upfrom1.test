@@ -1,0 +1,261 @@
+==== 1.1.0
+
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t2(a INTEGER PRIMARY KEY, b INTEGER, c INTEGER) WITHOUT ROWID;
+  INSERT INTO t2 VALUES(1, 2, 3);
+  INSERT INTO t2 VALUES(4, 5, 6);
+  INSERT INTO t2 VALUES(7, 8, 9);
+
+  DROP TABLE IF EXISTS chng;
+  CREATE TABLE chng(a INTEGER, b INTEGER, c INTEGER);
+  INSERT INTO chng VALUES(1, 100, 1000);
+  INSERT INTO chng VALUES(7, 700, 7000);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 105 err 1 -1 139 no such table: t2
+stmt 139 err 1 -1 173 no such table: t2
+stmt 173 err 1 -1 207 no such table: t2
+stmt 207 ok
+stmt 237 ok
+stmt 291 err 1 -1 332 no such table: chng
+stmt 332 err 1 -1 373 no such table: chng
+==== 1.1.1
+
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 20 no such table: t2
+==== 1.1.2
+
+  UPDATE t2 SET b = chng.b, c = chng.c FROM chng WHERE chng.a = t2.a;
+  SELECT * FROM t2 ORDER BY a;
+----
+stmt 0 err 1 -1 70 no such table: t2
+stmt 70 err 1 -1 101 no such table: t2
+==== 1.1.3
+
+  DELETE FROM t2;
+  INSERT INTO t2 VALUES(1, 2, 3);
+  INSERT INTO t2 VALUES(4, 5, 6);
+  INSERT INTO t2 VALUES(7, 8, 9);
+----
+stmt 0 err 1 -1 18 no such table: t2
+stmt 18 err 1 -1 52 no such table: t2
+stmt 52 err 1 -1 86 no such table: t2
+stmt 86 err 1 -1 120 no such table: t2
+==== 1.1.4
+
+  UPDATE t2 SET (b, c) = (SELECT b, c FROM chng WHERE a=t2.a) 
+    WHERE a IN (SELECT a FROM chng);
+  SELECT * FROM t2 ORDER BY a;
+----
+stmt 0 err 1 -1 100 no such table: t2
+stmt 100 err 1 -1 131 no such table: t2
+==== 1.1.5
+
+  DROP TABLE IF EXISTS t3;
+  CREATE TABLE t3(a INTEGER PRIMARY KEY, b INTEGER, c TEXT) WITHOUT ROWID;
+  INSERT INTO t3 VALUES(1, 1, 'one');
+  INSERT INTO t3 VALUES(2, 2, 'two');
+  INSERT INTO t3 VALUES(3, 3, 'three');
+
+  DROP TABLE IF EXISTS t4;
+  CREATE TABLE t4(x TEXT);
+  INSERT INTO t4 VALUES('five');
+
+  SELECT * FROM t3 ORDER BY a;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 102 err 1 -1 140 no such table: t3
+stmt 140 err 1 -1 178 no such table: t3
+stmt 178 err 1 -1 218 no such table: t3
+stmt 218 ok
+stmt 246 ok
+stmt 273 err 1 -1 306 no such table: t4
+stmt 306 err 1 -1 338 no such table: t3
+==== 1.1.6
+
+  UPDATE t3 SET c=x FROM t4;
+  SELECT * FROM t3 ORDER BY a;
+----
+stmt 0 err 1 -1 29 no such table: t3
+stmt 29 err 1 -1 60 no such table: t3
+==== 1.2.0
+
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t2(a INTEGER PRIMARY KEY, b INTEGER, c INTEGER) ;
+  INSERT INTO t2 VALUES(1, 2, 3);
+  INSERT INTO t2 VALUES(4, 5, 6);
+  INSERT INTO t2 VALUES(7, 8, 9);
+
+  DROP TABLE IF EXISTS chng;
+  CREATE TABLE chng(a INTEGER, b INTEGER, c INTEGER);
+  INSERT INTO chng VALUES(1, 100, 1000);
+  INSERT INTO chng VALUES(7, 700, 7000);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 92 err 1 -1 126 no such table: t2
+stmt 126 err 1 -1 160 no such table: t2
+stmt 160 err 1 -1 194 no such table: t2
+stmt 194 ok
+stmt 224 ok
+stmt 278 err 1 -1 319 no such table: chng
+stmt 319 err 1 -1 360 no such table: chng
+==== 1.2.1
+
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 20 no such table: t2
+==== 1.2.2
+
+  UPDATE t2 SET b = chng.b, c = chng.c FROM chng WHERE chng.a = t2.a;
+  SELECT * FROM t2 ORDER BY a;
+----
+stmt 0 err 1 -1 70 no such table: t2
+stmt 70 err 1 -1 101 no such table: t2
+==== 1.2.3
+
+  DELETE FROM t2;
+  INSERT INTO t2 VALUES(1, 2, 3);
+  INSERT INTO t2 VALUES(4, 5, 6);
+  INSERT INTO t2 VALUES(7, 8, 9);
+----
+stmt 0 err 1 -1 18 no such table: t2
+stmt 18 err 1 -1 52 no such table: t2
+stmt 52 err 1 -1 86 no such table: t2
+stmt 86 err 1 -1 120 no such table: t2
+==== 1.2.4
+
+  UPDATE t2 SET (b, c) = (SELECT b, c FROM chng WHERE a=t2.a) 
+    WHERE a IN (SELECT a FROM chng);
+  SELECT * FROM t2 ORDER BY a;
+----
+stmt 0 err 1 -1 100 no such table: t2
+stmt 100 err 1 -1 131 no such table: t2
+==== 1.2.5
+
+  DROP TABLE IF EXISTS t3;
+  CREATE TABLE t3(a INTEGER PRIMARY KEY, b INTEGER, c TEXT) ;
+  INSERT INTO t3 VALUES(1, 1, 'one');
+  INSERT INTO t3 VALUES(2, 2, 'two');
+  INSERT INTO t3 VALUES(3, 3, 'three');
+
+  DROP TABLE IF EXISTS t4;
+  CREATE TABLE t4(x TEXT);
+  INSERT INTO t4 VALUES('five');
+
+  SELECT * FROM t3 ORDER BY a;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 89 err 1 -1 127 no such table: t3
+stmt 127 err 1 -1 165 no such table: t3
+stmt 165 err 1 -1 205 no such table: t3
+stmt 205 ok
+stmt 233 ok
+stmt 260 err 1 -1 293 no such table: t4
+stmt 293 err 1 -1 325 no such table: t3
+==== 1.2.6
+
+  UPDATE t3 SET c=x FROM t4;
+  SELECT * FROM t3 ORDER BY a;
+----
+stmt 0 err 1 -1 29 no such table: t3
+stmt 29 err 1 -1 60 no such table: t3
+==== 2.1
+
+  DROP TABLE IF EXISTS t5;
+  DROP TABLE IF EXISTS m1;
+  DROP TABLE IF EXISTS m2;
+  CREATE TABLE t5(a INTEGER PRIMARY KEY, b TEXT, c TEXT);
+  CREATE TABLE m1(x INTEGER PRIMARY KEY, y TEXT);
+  CREATE TABLE m2(u INTEGER PRIMARY KEY, v TEXT);
+
+  INSERT INTO t5 VALUES(1, 'one', 'ONE');
+  INSERT INTO t5 VALUES(2, 'two', 'TWO');
+  INSERT INTO t5 VALUES(3, 'three', 'THREE');
+  INSERT INTO t5 VALUES(4, 'four', 'FOUR');
+
+  INSERT INTO m1 VALUES(1, 'i');
+  INSERT INTO m1 VALUES(2, 'ii');
+  INSERT INTO m1 VALUES(3, 'iii');
+
+  INSERT INTO m2 VALUES(1, 'I');
+  INSERT INTO m2 VALUES(3, 'II');
+  INSERT INTO m2 VALUES(4, 'III');
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 81 ok
+stmt 139 ok
+stmt 189 ok
+stmt 239 err 1 -1 282 no such table: t5
+stmt 282 err 1 -1 324 no such table: t5
+stmt 324 err 1 -1 370 no such table: t5
+stmt 370 err 1 -1 414 no such table: t5
+stmt 414 err 1 -1 448 no such table: m1
+stmt 448 err 1 -1 482 no such table: m1
+stmt 482 err 1 -1 517 no such table: m1
+stmt 517 err 1 -1 551 no such table: m2
+stmt 551 err 1 -1 585 no such table: m2
+stmt 585 err 1 -1 620 no such table: m2
+==== 2.2
+
+  UPDATE t5 SET b=y, c=v FROM m1 LEFT JOIN m2 ON (x=u) WHERE x=a;
+  SELECT * FROM t5 ORDER BY a;
+----
+stmt 0 err 1 -1 66 no such table: t5
+stmt 66 err 1 -1 97 no such table: t5
+==== 3.1
+
+  CREATE TABLE t0(a);
+  CREATE TABLE t1(b);
+  UPDATE t1 SET b=sum(a) FROM t0;
+  SELECT * FROM t0, t1;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 78 no such table: t1
+stmt 78 err 1 -1 102 no such table: t0
+==== 4.1
+
+  CREATE TABLE t1(x INT);  INSERT INTO t1 VALUES(1);
+  CREATE TABLE t2(y INT);  INSERT INTO t2 VALUES(2);
+  WITH t1 AS (SELECT y+100 AS x FROM t2) 
+    UPDATE t1 SET x=(SELECT x FROM t1);
+  SELECT x, y FROM t1, t2;
+----
+stmt 0 ok
+stmt 26 err 1 -1 53 no such table: t1
+stmt 53 ok
+stmt 79 err 1 -1 106 no such table: t2
+stmt 106 err 1 -1 188 no such table: t1
+stmt 188 err 1 -1 215 no such table: t1
+==== 4.2
+
+  WITH t1 AS (SELECT y+100 AS x FROM t2)
+    UPDATE t1 SET x=x+y FROM t2;
+  SELECT x, y FROM t1, t2;
+----
+stmt 0 err 1 -1 74 no such table: t1
+stmt 74 err 1 -1 101 no such table: t1
+==== 5.1
+
+  CREATE TABLE t1(a);
+  INSERT INTO t1(a) VALUES(5);
+  CREATE VIEW t2 AS SELECT a FROM t1 UNION ALL SELECT a FROM t1;
+  CREATE TABLE t3(b,c);
+  INSERT INTO t3(b,c) VALUES(1,2);
+  UPDATE t3 SET (c,b) = (SELECT 3,4) FROM t1, t2;
+  SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 22 err 1 -1 53 no such table: t1
+stmt 53 ok
+stmt 118 ok
+stmt 142 err 1 -1 177 no such table: t3
+stmt 177 err 1 -1 227 no such table: t3
+stmt 227 err 1 -1 247 no such table: t3

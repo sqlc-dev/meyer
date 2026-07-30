@@ -1,0 +1,7 @@
+==== tkt2565-generated
+
+      BEGIN EXCLUSIVE;
+      INSERT INTO a VALUES(1, 'ABCDEFGHIJKLMNOP');
+----
+stmt 0 ok
+stmt 23 err 1 -1 74 no such table: a

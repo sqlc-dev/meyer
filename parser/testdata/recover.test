@@ -1,0 +1,51 @@
+==== 2.1.0
+
+  PRAGMA auto_vacuum = 0;
+  CREATE TABLE t1(a, b, c, PRIMARY KEY(b, c)) WITHOUT ROWID;
+  INSERT INTO t1 VALUES(1, 2, 3);
+  INSERT INTO t1 VALUES(4, 5, 6);
+  INSERT INTO t1 VALUES(7, 8, 9);
+----
+stmt 0 ok
+stmt 26 ok
+stmt 87 err 1 -1 121 no such table: t1
+stmt 121 err 1 -1 155 no such table: t1
+stmt 155 err 1 -1 189 no such table: t1
+==== 2.2.0
+
+  PRAGMA writable_schema = 1;
+  DELETE FROM sqlite_master WHERE name='t1';
+----
+stmt 0 ok
+stmt 30 ok
+==== 2.3.0
+
+  CREATE TABLE lost_and_found(a, b, c);
+----
+stmt 0 ok
+==== 2.4.0
+
+  CREATE TABLE lost_and_found_0(a, b, c);
+----
+stmt 0 ok
+==== 4.0
+
+  CREATE TABLE t1(a, b, c);
+  CREATE TABLE t2(d, e, f);
+  CREATE TABLE t3(g, h, i);
+
+  INSERT INTO t2 VALUES(1, 2, 3);
+  INSERT INTO t2 VALUES('a', 'b', 'c');
+
+  INSERT INTO t3 VALUES('one', 'two', 'three');
+  DROP TABLE t1;
+  DROP TABLE t2;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 56 ok
+stmt 84 err 1 -1 119 no such table: t2
+stmt 119 err 1 -1 159 no such table: t2
+stmt 159 err 1 -1 208 no such table: t3
+stmt 208 err 1 -1 225 no such table: t1
+stmt 225 err 1 -1 242 no such table: t2

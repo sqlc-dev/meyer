@@ -1,0 +1,50 @@
+==== crash3-generated
+
+        PRAGMA page_size = 1024;
+        BEGIN;
+        CREATE TABLE abc(a, b, c);
+        INSERT INTO abc VALUES(1, 2, 3);
+        COMMIT;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 48 ok
+stmt 83 err 1 -1 124 no such table: abc
+stmt 124 ok
+==== crash3-2.0
+
+    BEGIN;
+    CREATE TABLE abc(a PRIMARY KEY, b, c);
+    CREATE TABLE def(d PRIMARY KEY, e, f);
+    PRAGMA default_cache_size = 10;
+    INSERT INTO abc VALUES(randstr(10,1000),randstr(10,1000),randstr(10,1000));
+    INSERT INTO abc 
+      SELECT randstr(10,1000),randstr(10,1000),randstr(10,1000) FROM abc;
+    INSERT INTO abc 
+      SELECT randstr(10,1000),randstr(10,1000),randstr(10,1000) FROM abc;
+    INSERT INTO abc 
+      SELECT randstr(10,1000),randstr(10,1000),randstr(10,1000) FROM abc;
+    INSERT INTO abc 
+      SELECT randstr(10,1000),randstr(10,1000),randstr(10,1000) FROM abc;
+    INSERT INTO abc 
+      SELECT randstr(10,1000),randstr(10,1000),randstr(10,1000) FROM abc;
+    INSERT INTO abc 
+      SELECT randstr(10,1000),randstr(10,1000),randstr(10,1000) FROM abc;
+    COMMIT;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 54 ok
+stmt 97 ok
+stmt 133 err 1 -1 213 no such table: abc
+stmt 213 err 1 -1 308 no such table: abc
+stmt 308 err 1 -1 403 no such table: abc
+stmt 403 err 1 -1 498 no such table: abc
+stmt 498 err 1 -1 593 no such table: abc
+stmt 593 err 1 -1 688 no such table: abc
+stmt 688 err 1 -1 783 no such table: abc
+stmt 783 ok
+==== crash3-generated.dup1
+PRAGMA integrity_check
+----
+stmt 0 ok

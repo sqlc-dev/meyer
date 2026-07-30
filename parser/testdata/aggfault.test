@@ -1,0 +1,7 @@
+==== 1
+
+  CREATE TABLE t1(x);
+  CREATE INDEX t1x ON t1(x, x=0);
+----
+stmt 0 ok
+stmt 22 err 1 -1 56 no such table: main.t1

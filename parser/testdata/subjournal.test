@@ -1,0 +1,59 @@
+==== 1.0
+
+  PRAGMA temp_store = memory;
+  CREATE TABLE t1(a,b,c);
+  INSERT INTO t1 VALUES(1, 2, 3);
+----
+stmt 0 ok
+stmt 30 ok
+stmt 56 err 1 -1 90 no such table: t1
+==== 1.1
+
+  BEGIN;
+    INSERT INTO t1 VALUES(4, 5, 6);
+    SAVEPOINT one;
+      INSERT INTO t1 VALUES(7, 8, 9);
+    ROLLBACK TO one;
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 9 err 1 -1 45 no such table: t1
+stmt 45 ok
+stmt 64 err 1 -1 102 no such table: t1
+stmt 102 ok
+stmt 123 err 1 -1 145 no such table: t1
+==== 1.2
+
+  COMMIT;
+----
+stmt 0 ok
+==== 2.0
+
+  PRAGMA cache_size = 5;
+  CREATE TABLE t2(a BLOB);
+  CREATE INDEX i2 ON t2(a);
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<100
+  ) INSERT INTO t2 SELECT randomblob(500) FROM s;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 52 err 1 -1 80 no such table: main.t2
+stmt 80 err 1 -1 200 no such table: t2
+==== 2.2
+
+  BEGIN;
+    UPDATE t2 SET a=randomblob(499);
+    SAVEPOINT two;
+      UPDATE t2 SET a=randomblob(498);
+    ROLLBACK TO two;
+  COMMIT;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 9 err 1 -1 46 no such table: t2
+stmt 46 ok
+stmt 65 err 1 -1 104 no such table: t2
+stmt 104 ok
+stmt 125 ok
+stmt 135 ok

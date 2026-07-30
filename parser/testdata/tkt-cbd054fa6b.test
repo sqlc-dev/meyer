@@ -1,0 +1,16 @@
+==== tkt-cbd05-1.3
+ 
+    SELECT tbl,idx,string_agg(s(sample),' ') 
+    FROM vvv 
+    WHERE idx = 't1_x' 
+    GROUP BY tbl,idx
+----
+stmt 0 err 1 -1 107 no such table: vvv
+==== tkt-cbd05-2.3
+ 
+    SELECT tbl,idx,group_concat(s(sample),' ') 
+    FROM vvv 
+    WHERE idx = 't1_x' 
+    GROUP BY tbl,idx
+----
+stmt 0 err 1 -1 109 no such table: vvv

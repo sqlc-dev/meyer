@@ -1,0 +1,33 @@
+==== tkt-b351d95.1
+
+    CREATE table t1(a,b);
+    INSERT INTO t1 VALUES('name1','This is a test');
+    INSERT INTO t1 VALUES('name2','xyz');
+    CREATE TABLE t2(x,y);
+    INSERT INTO t2 SELECT a, CASE b WHEN 'xyz' THEN null ELSE b END FROM t1;
+    SELECT x, y FROM t2 ORDER BY x;
+----
+stmt 0 ok
+stmt 26 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 121 no such table: t1
+stmt 121 ok
+stmt 147 err 1 -1 224 no such table: t2
+stmt 224 err 1 -1 260 no such table: t2
+==== tkt-b351d95.2
+
+    DELETE FROM t2;
+    INSERT INTO t2 SELECT a, coalesce(b,a) FROM t1;
+    SELECT x, y FROM t2 ORDER BY x;
+----
+stmt 0 err 1 -1 20 no such table: t2
+stmt 20 err 1 -1 72 no such table: t2
+stmt 72 err 1 -1 108 no such table: t2
+==== tkt-b351d95.3
+
+    DELETE FROM t2;
+    INSERT INTO t2 SELECT a, coalesce(b,a) FROM t1;
+    SELECT x, y BETWEEN 'xy' AND 'xz' FROM t2 ORDER BY x;
+----
+stmt 0 err 1 -1 20 no such table: t2
+stmt 20 err 1 -1 72 no such table: t2
+stmt 72 err 1 -1 130 no such table: t2

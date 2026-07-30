@@ -1,0 +1,179 @@
+==== 1.0.1
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b REAL);
+  INSERT INTO t1 VALUES(10, 10.0);
+  INSERT INTO t1 VALUES(15, 15.0);
+  INSERT INTO t1 VALUES(20, 20.0);
+  INSERT INTO t1 VALUES(25, 25.0);
+  INSERT INTO t1 VALUES(30, 30.0);
+  CREATE INDEX i1 ON t1((b+0.0));
+----
+stmt 0 ok
+stmt 50 err 1 -1 85 no such table: t1
+stmt 85 err 1 -1 120 no such table: t1
+stmt 120 err 1 -1 155 no such table: t1
+stmt 155 err 1 -1 190 no such table: t1
+stmt 190 err 1 -1 225 no such table: t1
+stmt 225 err 1 -1 259 no such table: main.t1
+==== 1.1.1
+
+  UPDATE x1 SET b=21.0 WHERE rowid=20;
+----
+stmt 0 err 1 -1 39 no such table: x1
+==== 1.1.1b
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== 1.1.2
+
+  DELETE FROM t1 WHERE a=20;
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== 1.1.3
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== 1.2.1
+
+  UPDATE x1 SET b=26.0 WHERE rowid=25;
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 39 no such table: x1
+stmt 39 ok
+==== 1.2.3
+
+  DELETE FROM t1 WHERE a=25;
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== 1.2.4
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== 1.3.1
+
+  DELETE FROM t1;
+  INSERT INTO t1 VALUES(5,  15.0);
+  INSERT INTO t1 VALUES(10, 20.0);
+  INSERT INTO t1 VALUES(15, 20.0);
+  INSERT INTO t1 VALUES(20, 20.0);
+  INSERT INTO t1 VALUES(25, 20.0);
+  INSERT INTO t1 VALUES(30, 20.0);
+  INSERT INTO t1 VALUES(35, 25.0);
+
+  UPDATE x1 SET b=19.0 WHERE b=20.0;
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 53 no such table: t1
+stmt 53 err 1 -1 88 no such table: t1
+stmt 88 err 1 -1 123 no such table: t1
+stmt 123 err 1 -1 158 no such table: t1
+stmt 158 err 1 -1 193 no such table: t1
+stmt 193 err 1 -1 228 no such table: t1
+stmt 228 err 1 -1 263 no such table: t1
+stmt 263 err 1 -1 301 no such table: x1
+stmt 301 ok
+==== 1.3.4
+
+  PRAGMA integrity_check
+----
+stmt 0 ok
+==== 2.2
+
+  UPDATE x1 SET c=hex(randomblob(50)) WHERE (a%2)!=0
+----
+stmt 0 err 1 -1 54 no such table: x1
+==== 3.0
+
+  CREATE TABLE y1(a, b, c GENERATED ALWAYS AS (a*b) VIRTUAL);
+  CREATE INDEX i1 ON y1(c);
+  INSERT INTO y1 VALUES(2, 3);
+  INSERT INTO y1 VALUES(4, 5);
+----
+stmt 0 ok
+stmt 62 err 1 -1 90 no such table: main.y1
+stmt 90 err 1 -1 121 no such table: y1
+stmt 121 err 1 -1 152 no such table: y1
+==== 3.2
+
+  UPDATE x1 SET c=19 WHERE rowid=2;
+----
+stmt 0 err 1 -1 36 no such table: x1
+==== 3.4
+
+  DELETE FROM y1 WHERE a=4;
+----
+stmt 0 err 1 -1 28 no such table: y1
+==== 4.0
+
+  CREATE TABLE z1(a INTEGER PRIMARY KEY, b);
+  CREATE INDEX z1b ON z1(b+0.0);
+  INSERT INTO z1 VALUES(1, 1.0);
+  INSERT INTO z1 VALUES(2, 4.0);
+  INSERT INTO z1 VALUES(3, 4.0);
+  INSERT INTO z1 VALUES(4, 4.0);
+  INSERT INTO z1 VALUES(5, 4.0);
+  INSERT INTO z1 VALUES(6, 4.0);
+  INSERT INTO z1 VALUES(7, 4.0);
+  INSERT INTO z1 VALUES(8, 1.0);
+----
+stmt 0 ok
+stmt 45 err 1 -1 78 no such table: main.z1
+stmt 78 err 1 -1 111 no such table: z1
+stmt 111 err 1 -1 144 no such table: z1
+stmt 144 err 1 -1 177 no such table: z1
+stmt 177 err 1 -1 210 no such table: z1
+stmt 210 err 1 -1 243 no such table: z1
+stmt 243 err 1 -1 276 no such table: z1
+stmt 276 err 1 -1 309 no such table: z1
+stmt 309 err 1 -1 342 no such table: z1
+==== 4.2
+
+  UPDATE x1 SET b=4.000000000000001 WHERE a=2;          -- 1 ULP
+  UPDATE x1 SET b=4.000000000000002 WHERE a=3;          -- 2 ULP
+  UPDATE x1 SET b=4.000000000000003 WHERE a=4;          -- 3 ULP
+  UPDATE x1 SET b=3.9999999999999996 WHERE a=5;         -- -1 ULP
+  UPDATE x1 SET b=3.9999999999999992 WHERE a=6;         -- -2 ULP
+  UPDATE x1 SET b=3.9999999999999988 WHERE a=7;         -- -3 ULP
+----
+stmt 0 err 1 -1 47 no such table: x1
+stmt 47 err 1 -1 112 no such table: x1
+stmt 112 err 1 -1 177 no such table: x1
+stmt 177 err 1 -1 243 no such table: x1
+stmt 243 err 1 -1 309 no such table: x1
+stmt 309 err 1 -1 375 no such table: x1
+==== 4.3
+
+  PRAGMA integrity_check
+----
+stmt 0 ok
+==== 4.4
+
+  UPDATE z1 SET b=-4.0 WHERE b=4.0;
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 36 no such table: z1
+stmt 36 ok
+==== 4.5
+
+  UPDATE x1 SET b=-4.000000000000001 WHERE a=2;          -- -1 ULP
+  UPDATE x1 SET b=-4.000000000000002 WHERE a=3;          -- -2 ULP
+  UPDATE x1 SET b=-4.000000000000003 WHERE a=4;          -- -3 ULP
+  UPDATE x1 SET b=-3.9999999999999996 WHERE a=5;         -- 1 ULP
+  UPDATE x1 SET b=-3.9999999999999992 WHERE a=6;         -- 2 ULP
+  UPDATE x1 SET b=-3.9999999999999988 WHERE a=7;         -- 3 ULP
+----
+stmt 0 err 1 -1 48 no such table: x1
+stmt 48 err 1 -1 115 no such table: x1
+stmt 115 err 1 -1 182 no such table: x1
+stmt 182 err 1 -1 250 no such table: x1
+stmt 250 err 1 -1 316 no such table: x1
+stmt 316 err 1 -1 382 no such table: x1
+==== 4.6
+
+  PRAGMA integrity_check
+----
+stmt 0 ok

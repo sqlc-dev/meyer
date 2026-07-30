@@ -1,0 +1,11 @@
+==== tkt-fc62af4523.3
+ PRAGMA journal_mode = DELETE
+----
+stmt 0 ok
+==== tkt-fc62af4523.6
+
+    PRAGMA integrity_check;
+    SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 28 err 1 -1 57 no such table: t1

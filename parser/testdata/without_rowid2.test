@@ -1,0 +1,97 @@
+==== without_rowid2-1.0
+
+    CREATE TABLE t1(
+      a INT PRIMARY KEY,
+      b INT
+           REFERENCES t1 ON DELETE CASCADE
+           REFERENCES t2,
+      c TEXT,
+      FOREIGN KEY (b,c) REFERENCES t2(x,y) ON UPDATE CASCADE
+    ) WITHOUT rowid;
+----
+stmt 0 ok
+==== without_rowid2-1.1
+
+    CREATE TABLE t2(
+      x INT PRIMARY KEY,
+      y TEXT
+    ) WITHOUT rowid;
+----
+stmt 0 ok
+==== without_rowid2-1.2
+
+    CREATE TABLE t3(
+      a INT REFERENCES t2,
+      b INT REFERENCES t1,
+      FOREIGN KEY (a,b) REFERENCES t2(x,y)
+    );
+----
+stmt 0 ok
+==== without_rowid2-2.1
+
+    CREATE TABLE t4(a int primary key) WITHOUT rowid;
+    CREATE TABLE t5(x references t4);
+    CREATE TABLE t6(x references t4);
+    CREATE TABLE t7(x references t4);
+    CREATE TABLE t8(x references t4);
+    CREATE TABLE t9(x references t4);
+    CREATE TABLE t10(x references t4);
+    DROP TABLE t7;
+    DROP TABLE t9;
+    DROP TABLE t5;
+    DROP TABLE t8;
+    DROP TABLE t6;
+    DROP TABLE t10;
+----
+stmt 0 ok
+stmt 54 ok
+stmt 92 ok
+stmt 130 ok
+stmt 168 ok
+stmt 206 ok
+stmt 244 ok
+stmt 283 err 1 -1 302 no such table: t7
+stmt 302 err 1 -1 321 no such table: t9
+stmt 321 err 1 -1 340 no such table: t5
+stmt 340 err 1 -1 359 no such table: t8
+stmt 359 err 1 -1 378 no such table: t6
+stmt 378 err 1 -1 398 no such table: t10
+==== without_rowid2-3.1
+
+    CREATE TABLE t5(a PRIMARY KEY, b, c) WITHOUT rowid;
+    CREATE TABLE t6(
+      d REFERENCES t5,
+      e REFERENCES t5(c)
+    );
+    PRAGMA foreign_key_list(t6);
+----
+stmt 0 ok
+stmt 56 ok
+stmt 132 ok
+==== without_rowid2-3.2
+
+    CREATE TABLE t7(d, e, f,
+      FOREIGN KEY (d, e) REFERENCES t5(a, b)
+    );
+    PRAGMA foreign_key_list(t7);
+----
+stmt 0 ok
+stmt 81 ok
+==== without_rowid2-3.3
+
+    CREATE TABLE t8(d, e, f,
+      FOREIGN KEY (d, e) REFERENCES t5 ON DELETE CASCADE ON UPDATE SET NULL
+    );
+    PRAGMA foreign_key_list(t8);
+----
+stmt 0 ok
+stmt 112 ok
+==== without_rowid2-3.4
+
+    CREATE TABLE t9(d, e, f,
+      FOREIGN KEY (d, e) REFERENCES t5 ON DELETE CASCADE ON UPDATE SET DEFAULT
+    );
+    PRAGMA foreign_key_list(t9);
+----
+stmt 0 ok
+stmt 115 ok

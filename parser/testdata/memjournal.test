@@ -1,0 +1,19 @@
+==== 1.0
+
+  PRAGMA journal_mode = memory;
+  CREATE TABLE t1(a);
+----
+stmt 0 ok
+stmt 32 ok
+==== 1.1
+
+  BEGIN;
+    INSERT INTO t1 VALUES( randomblob(500) );
+----
+stmt 0 ok
+stmt 9 err 1 -1 55 no such table: t1
+==== 1.3
+
+  COMMIT;
+----
+stmt 0 ok

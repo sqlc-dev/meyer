@@ -1,0 +1,24 @@
+==== memdb2-generated
+
+    CREATE TABLE t1(x, y);
+    INSERT INTO t1 VALUES(1, 2);
+----
+stmt 0 ok
+stmt 27 err 1 -1 60 no such table: t1
+==== memdb2-generated.dup1
+
+    BEGIN;
+      INSERT INTO t1 VALUES(3, 4);
+----
+stmt 0 ok
+stmt 11 err 1 -1 46 no such table: t1
+==== memdb2-generated.dup2
+
+    COMMIT
+----
+stmt 0 ok
+==== memdb2-generated.dup3
+
+    COMMIT
+----
+stmt 0 ok

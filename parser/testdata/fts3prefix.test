@@ -1,0 +1,290 @@
+==== 1.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4(prefix='1,3,6');
+
+  CREATE VIRTUAL TABLE p1 USING fts4term(t1, 1);
+  CREATE VIRTUAL TABLE p2 USING fts4term(t1, 2);
+  CREATE VIRTUAL TABLE p3 USING fts4term(t1, 3);
+  CREATE VIRTUAL TABLE terms USING fts4term(t1);
+----
+stmt 0 ok
+stmt 54 ok
+stmt 104 ok
+stmt 153 ok
+stmt 202 ok
+==== 1.2
+
+  INSERT INTO t1 VALUES('sqlite mysql firebird');
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 1.3.1
+ SELECT term FROM p1
+----
+stmt 0 err 1 -1 21 no such table: p1
+==== 1.3.2
+ SELECT term FROM p2
+----
+stmt 0 err 1 -1 21 no such table: p2
+==== 1.3.3
+ SELECT term FROM p3
+----
+stmt 0 err 1 -1 21 no such table: p3
+==== 1.4
+
+  SELECT term FROM terms;
+----
+stmt 0 err 1 -1 26 no such table: terms
+==== 2.1
+
+  INSERT INTO t1 VALUES('FTS3 and FTS4 are an SQLite virtual table modules');
+  INSERT INTO t1 VALUES('that allows users to perform full-text searches on');
+  INSERT INTO t1 VALUES('a set of documents. The most common (and');
+  INSERT INTO t1 VALUES('effective) way to describe full-text searches is');
+  INSERT INTO t1 VALUES('"what Google, Yahoo and Altavista do with');
+  INSERT INTO t1 VALUES('documents placed on the World Wide Web". Users');
+  INSERT INTO t1 VALUES('input a term, or series of terms, perhaps');
+  INSERT INTO t1 VALUES('connected by a binary operator or grouped together');
+  INSERT INTO t1 VALUES('into a phrase, and the full-text query system');
+  INSERT INTO t1 VALUES('finds the set of documents that best matches those');
+  INSERT INTO t1 VALUES('terms considering the operators and groupings the');
+  INSERT INTO t1 VALUES('user has specified. This article describes the');
+  INSERT INTO t1 VALUES('deployment and usage of FTS3 and FTS4.');
+  INSERT INTO t1 VALUES('FTS1 and FTS2 are obsolete full-text search');
+  INSERT INTO t1 VALUES('modules for SQLite. There are known issues with');
+  INSERT INTO t1 VALUES('these older modules and their use should be');
+  INSERT INTO t1 VALUES('avoided. Portions of the original FTS3 code were');
+  INSERT INTO t1 VALUES('contributed to the SQLite project by Scott Hess of');
+  INSERT INTO t1 VALUES('Google. It is now developed and maintained as part');
+  INSERT INTO t1 VALUES('of SQLite. ');
+----
+stmt 0 err 1 -1 78 no such table: t1
+stmt 78 err 1 -1 157 no such table: t1
+stmt 157 err 1 -1 226 no such table: t1
+stmt 226 err 1 -1 303 no such table: t1
+stmt 303 err 1 -1 373 no such table: t1
+stmt 373 err 1 -1 448 no such table: t1
+stmt 448 err 1 -1 518 no such table: t1
+stmt 518 err 1 -1 597 no such table: t1
+stmt 597 err 1 -1 671 no such table: t1
+stmt 671 err 1 -1 750 no such table: t1
+stmt 750 err 1 -1 828 no such table: t1
+stmt 828 err 1 -1 903 no such table: t1
+stmt 903 err 1 -1 970 no such table: t1
+stmt 970 err 1 -1 1042 no such table: t1
+stmt 1042 err 1 -1 1118 no such table: t1
+stmt 1118 err 1 -1 1190 no such table: t1
+stmt 1190 err 1 -1 1267 no such table: t1
+stmt 1267 err 1 -1 1346 no such table: t1
+stmt 1346 err 1 -1 1425 no such table: t1
+stmt 1425 err 1 -1 1465 no such table: t1
+==== 2.3
+ DELETE FROM t1 WHERE docid%2;
+----
+stmt 0 err 1 -1 30 no such table: t1
+==== 2.5
+ INSERT INTO t1(t1) VALUES('optimize')
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== 3.1
+
+  CREATE VIRTUAL TABLE t2 USING fts4(prefix='1,2,3');
+  INSERT INTO t2 VALUES('On 12 September the wind direction turned and');
+  INSERT INTO t2 VALUES('William''s fleet sailed. A storm blew up and the');
+  INSERT INTO t2 VALUES('fleet was forced to take shelter at');
+  INSERT INTO t2 VALUES('Saint-Valery-sur-Somme and again wait for the wind');
+  INSERT INTO t2 VALUES('to change. On 27 September the Norman fleet');
+  INSERT INTO t2 VALUES('finally set sail, landing in England at Pevensey');
+  INSERT INTO t2 VALUES('Bay (Sussex) on 28 September. William then moved');
+  INSERT INTO t2 VALUES('to Hastings, a few miles to the east, where he');
+  INSERT INTO t2 VALUES('built a prefabricated wooden castle for a base of');
+  INSERT INTO t2 VALUES('operations. From there, he ravaged the hinterland');
+  INSERT INTO t2 VALUES('and waited for Harold''s return from the north.');
+  INSERT INTO t2 VALUES('On 12 September the wind direction turned and');
+  INSERT INTO t2 VALUES('William''s fleet sailed. A storm blew up and the');
+  INSERT INTO t2 VALUES('fleet was forced to take shelter at');
+  INSERT INTO t2 VALUES('Saint-Valery-sur-Somme and again wait for the wind');
+  INSERT INTO t2 VALUES('to change. On 27 September the Norman fleet');
+  INSERT INTO t2 VALUES('finally set sail, landing in England at Pevensey');
+  INSERT INTO t2 VALUES('Bay (Sussex) on 28 September. William then moved');
+  INSERT INTO t2 VALUES('to Hastings, a few miles to the east, where he');
+  INSERT INTO t2 VALUES('built a prefabricated wooden castle for a base of');
+  INSERT INTO t2 VALUES('operations. From there, he ravaged the hinterland');
+  INSERT INTO t2 VALUES('and waited for Harold''s return from the north.');
+----
+stmt 0 ok
+stmt 54 err 1 -1 128 no such table: t2
+stmt 128 err 1 -1 205 no such table: t2
+stmt 205 err 1 -1 269 no such table: t2
+stmt 269 err 1 -1 348 no such table: t2
+stmt 348 err 1 -1 420 no such table: t2
+stmt 420 err 1 -1 497 no such table: t2
+stmt 497 err 1 -1 574 no such table: t2
+stmt 574 err 1 -1 649 no such table: t2
+stmt 649 err 1 -1 727 no such table: t2
+stmt 727 err 1 -1 805 no such table: t2
+stmt 805 err 1 -1 881 no such table: t2
+stmt 881 err 1 -1 955 no such table: t2
+stmt 955 err 1 -1 1032 no such table: t2
+stmt 1032 err 1 -1 1096 no such table: t2
+stmt 1096 err 1 -1 1175 no such table: t2
+stmt 1175 err 1 -1 1247 no such table: t2
+stmt 1247 err 1 -1 1324 no such table: t2
+stmt 1324 err 1 -1 1401 no such table: t2
+stmt 1401 err 1 -1 1476 no such table: t2
+stmt 1476 err 1 -1 1554 no such table: t2
+stmt 1554 err 1 -1 1632 no such table: t2
+stmt 1632 err 1 -1 1708 no such table: t2
+==== 3.3
+ SELECT optimize(t2) FROM t2 LIMIT 1
+----
+stmt 0 err 1 -1 37 no such table: t2
+==== 4.1
+
+  CREATE VIRTUAL TABLE t3 USING fts4(prefix="1,4");
+  INSERT INTO t3 VALUES('one two three');
+  INSERT INTO t3 VALUES('four five six');
+  INSERT INTO t3 VALUES('seven eight nine');
+----
+stmt 0 ok
+stmt 52 err 1 -1 94 no such table: t3
+stmt 94 err 1 -1 136 no such table: t3
+stmt 136 err 1 -1 181 no such table: t3
+==== 4.2
+
+  SELECT * FROM t3 WHERE t3 MATCH 'f*'
+----
+stmt 0 err 1 -1 40 no such table: t3
+==== 4.3
+
+  SELECT * FROM t3 WHERE t3 MATCH 'four*'
+----
+stmt 0 err 1 -1 43 no such table: t3
+==== 4.4
+
+  SELECT * FROM t3 WHERE t3 MATCH 's*'
+----
+stmt 0 err 1 -1 40 no such table: t3
+==== 4.5
+
+  SELECT * FROM t3 WHERE t3 MATCH 'sev*'
+----
+stmt 0 err 1 -1 42 no such table: t3
+==== 4.6
+
+  SELECT * FROM t3 WHERE t3 MATCH 'one*'
+----
+stmt 0 err 1 -1 42 no such table: t3
+==== 5.1
+
+  CREATE VIRTUAL TABLE t4 USING fts4(prefix="abc");
+----
+stmt 0 ok
+==== 5.2
+
+  CREATE VIRTUAL TABLE t4 USING fts4(prefix="");
+----
+stmt 0 ok
+==== 5.3
+
+  CREATE VIRTUAL TABLE t5 USING fts4(prefix="-1");
+----
+stmt 0 ok
+==== 6.1.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4(prefix=0);
+  CREATE VIRTUAL TABLE t2 USING fts4;
+  INSERT INTO t1 VALUES('Twas Mulga Bill, from Eaglehawk, ');
+  INSERT INTO t2 VALUES('Twas Mulga Bill, from Eaglehawk, ');
+----
+stmt 0 ok
+stmt 48 ok
+stmt 86 err 1 -1 148 no such table: t1
+stmt 148 err 1 -1 210 no such table: t2
+==== 6.1.2
+
+  SELECT md5sum(quote(root)) FROM t1_segdir;
+----
+stmt 0 err 1 -1 45 no such table: t1_segdir
+==== 6.2.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4(prefix="1,0,2");
+  CREATE VIRTUAL TABLE t2 USING fts4(prefix="1,2");
+  INSERT INTO t1 VALUES('that caught the cycling craze;');
+  INSERT INTO t2 VALUES('that caught the cycling craze;');
+----
+stmt 0 ok
+stmt 54 ok
+stmt 106 err 1 -1 165 no such table: t1
+stmt 165 err 1 -1 224 no such table: t2
+==== 6.2.2
+
+  SELECT md5sum(quote(root)) FROM t1_segdir;
+----
+stmt 0 err 1 -1 45 no such table: t1_segdir
+==== 6.3.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4(prefix="1,3,2");
+  CREATE VIRTUAL TABLE t2 USING fts4(prefix="1,2");
+  INSERT INTO t1 VALUES('He turned away the good old horse');
+  INSERT INTO t2 VALUES('He turned away the good old horse');
+----
+stmt 0 ok
+stmt 54 ok
+stmt 106 err 1 -1 168 no such table: t1
+stmt 168 err 1 -1 230 no such table: t2
+==== 6.4.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4(prefix="1,600,2");
+  CREATE VIRTUAL TABLE t2 USING fts4(prefix="1,2");
+  INSERT INTO t1 VALUES('that served him many days;');
+  INSERT INTO t2 VALUES('that served him many days;');
+----
+stmt 0 ok
+stmt 56 ok
+stmt 108 err 1 -1 163 no such table: t1
+stmt 163 err 1 -1 218 no such table: t2
+==== 6.4.2
+
+  SELECT md5sum(quote(root)) FROM t1_segdir;
+----
+stmt 0 err 1 -1 45 no such table: t1_segdir
+==== 6.5.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4(prefix="2147483647,2147483648,2147483649");
+  CREATE VIRTUAL TABLE t2 USING fts4(prefix=);
+  INSERT INTO t1 VALUES('He dressed himself in cycling clothes');
+  INSERT INTO t2 VALUES('He dressed himself in cycling clothes');
+----
+stmt 0 ok
+stmt 81 ok
+stmt 128 err 1 -1 194 no such table: t1
+stmt 194 err 1 -1 260 no such table: t2
+==== 6.5.2
+
+  SELECT md5sum(quote(root)) FROM t1_segdir;
+----
+stmt 0 err 1 -1 45 no such table: t1_segdir
+==== 7.0
+
+  CREATE VIRTUAL TABLE t6 USING fts4(x,order=DESC);
+  INSERT INTO t6(docid, x) VALUES(-1,'a b');
+  INSERT INTO t6(docid, x) VALUES(1, 'b');
+----
+stmt 0 ok
+stmt 52 err 1 -1 97 no such table: t6
+stmt 97 err 1 -1 140 no such table: t6
+==== 7.1
+
+  SELECT docid FROM t6 WHERE t6 MATCH '"a* b"';
+----
+stmt 0 err 1 -1 48 no such table: t6
+==== 7.2
+
+  SELECT docid FROM t6 WHERE t6 MATCH 'a*';
+----
+stmt 0 err 1 -1 44 no such table: t6
+==== 7.3
+
+  SELECT docid FROM t6 WHERE t6 MATCH 'a* b';
+----
+stmt 0 err 1 -1 46 no such table: t6

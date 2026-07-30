@@ -1,0 +1,42 @@
+==== 1.0
+
+  PRAGMA page_size = 1024;
+  PRAGMA auto_vacuum = 0;
+
+  CREATE TABLE t1(a PRIMARY KEY, b);
+  INSERT INTO t1 VALUES(1, randomblob(600));
+  INSERT INTO t1 VALUES(2, randomblob(600));
+  INSERT INTO t1 VALUES(3, randomblob(600));
+----
+stmt 0 ok
+stmt 27 ok
+stmt 53 ok
+stmt 91 err 1 -1 136 no such table: t1
+stmt 136 err 1 -1 181 no such table: t1
+stmt 181 err 1 -1 226 no such table: t1
+==== 3.2
+
+  PRAGMA journal_mode=DELETE;
+  PRAGMA cache_size=3;
+  UPDATE t1 SET b=randomblob(1000);
+----
+stmt 0 ok
+stmt 30 ok
+stmt 53 err 1 -1 89 no such table: t1
+==== 4.0
+
+    PRAGMA temp_store = file;
+    PRAGMA cache_size = -1024;
+----
+stmt 0 ok
+stmt 30 ok
+==== 4.2
+
+    CREATE TABLE data(a INTEGER, b BLOB);
+
+    -- Insert 5-6 MB of data.
+    WITH s(i) AS ( SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<75000 )
+    INSERT INTO data SELECT i, hex(randomblob(50)) FROM s;
+----
+stmt 0 ok
+stmt 42 err 1 -1 204 no such table: data

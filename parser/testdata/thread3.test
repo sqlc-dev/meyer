@@ -1,0 +1,12 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  PRAGMA journal_mode = DELETE;
+----
+stmt 0 ok
+stmt 25 ok
+==== thread3-generated
+
+  SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 27 no such table: t1

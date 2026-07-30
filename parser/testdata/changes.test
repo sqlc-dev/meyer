@@ -1,0 +1,15 @@
+==== changes-generated
+
+    INSERT INTO t1 VALUES(-1)
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== changes-generated.dup1
+
+    SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== changes-generated.dup2
+
+    DELETE FROM t1
+----
+stmt 0 err 1 -1 20 no such table: t1

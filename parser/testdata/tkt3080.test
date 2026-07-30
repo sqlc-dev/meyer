@@ -1,0 +1,4 @@
+==== tkt3080.11
+SELECT * FROM t2
+----
+stmt 0 err 1 -1 17 no such table: t2

@@ -1,0 +1,302 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING fts4(matchinfo=fts3);
+  SELECT name FROM sqlite_master WHERE type = 'table';
+----
+stmt 0 ok
+stmt 54 ok
+==== 1.1
+
+  INSERT INTO t1(content) VALUES('I wandered lonely as a cloud');
+  INSERT INTO t1(content) VALUES('That floats on high o''er vales and hills,');
+  INSERT INTO t1(content) VALUES('When all at once I saw a crowd,');
+  INSERT INTO t1(content) VALUES('A host, of golden daffodils,');
+  SELECT mit(matchinfo(t1)) FROM t1 WHERE t1 MATCH 'I';
+----
+stmt 0 err 1 -1 66 no such table: t1
+stmt 66 err 1 -1 146 no such table: t1
+stmt 146 err 1 -1 215 no such table: t1
+stmt 215 err 1 -1 281 no such table: t1
+stmt 281 err 1 -1 337 no such table: t1
+==== 1.2
+
+  CREATE VIRTUAL TABLE t2 USING fts4;
+  INSERT INTO t2 SELECT * FROM t1;
+  SELECT mit(matchinfo(t2)) FROM t2 WHERE t2 MATCH 'I';
+----
+stmt 0 ok
+stmt 38 err 1 -1 73 no such table: t2
+stmt 73 err 1 -1 129 no such table: t2
+==== 2.0
+
+  CREATE VIRTUAL TABLE x1 USING fts4(matchinfo=fs3);
+----
+stmt 0 ok
+==== 2.1
+
+  CREATE VIRTUAL TABLE x2 USING fts4(mtchinfo=fts3);
+----
+stmt 0 ok
+==== 2.2
+
+  CREATE VIRTUAL TABLE x2 USING fts4(matchinfo=fts5);
+----
+stmt 0 ok
+==== 3.1
+
+  CREATE VIRTUAL TABLE t3 USING fts3(mtchinfo=fts3);
+  INSERT INTO t3(mtchinfo) VALUES('Beside the lake, beneath the trees');
+  SELECT mtchinfo FROM t3;
+----
+stmt 0 ok
+stmt 53 err 1 -1 126 no such table: t3
+stmt 126 err 1 -1 153 no such table: t3
+==== 3.2
+
+  CREATE VIRTUAL TABLE xx USING FTS4;
+----
+stmt 0 ok
+==== 3.3
+
+  SELECT * FROM xx WHERE xx MATCH 'abc';
+----
+stmt 0 err 1 -1 41 no such table: xx
+==== 3.4
+
+  SELECT * FROM xx WHERE xx MATCH 'a b c';
+----
+stmt 0 err 1 -1 43 no such table: xx
+==== 4.1.0
+
+  CREATE VIRTUAL TABLE t4 USING fts4(x, y);
+  INSERT INTO t4 VALUES('a b c d e', 'f g h i j');
+  INSERT INTO t4 VALUES('f g h i j', 'a b c d e');
+----
+stmt 0 ok
+stmt 44 err 1 -1 95 no such table: t4
+stmt 95 err 1 -1 146 no such table: t4
+==== 4.2.0
+
+  CREATE VIRTUAL TABLE t5 USING fts4;
+  INSERT INTO t5 VALUES('a a a a a');
+  INSERT INTO t5 VALUES('a b a b a');
+  INSERT INTO t5 VALUES('c b c b c');
+  INSERT INTO t5 VALUES('x x x x x');
+----
+stmt 0 ok
+stmt 38 err 1 -1 76 no such table: t5
+stmt 76 err 1 -1 114 no such table: t5
+stmt 114 err 1 -1 152 no such table: t5
+stmt 152 err 1 -1 190 no such table: t5
+==== 4.4.0.1
+ INSERT INTO t5(t5) VALUES('optimize')
+----
+stmt 0 err 1 -1 39 no such table: t5
+==== 4.4.0.2
+
+    UPDATE t5_segments 
+    SET block = zeroblob(length(block)) 
+    WHERE length(block)>10000;
+----
+stmt 0 err 1 -1 96 no such table: t5_segments
+==== 4.5.0
+
+  CREATE VIRTUAL TABLE t6 USING fts4(a, b, c);
+  INSERT INTO t6 VALUES('a', 'b', 'c');
+----
+stmt 0 ok
+stmt 47 err 1 -1 87 no such table: t6
+==== 5.1
+
+  CREATE VIRTUAL TABLE t7 USING fts3(a, b);
+  INSERT INTO t7 VALUES('u v w', 'x y z');
+
+  CREATE VIRTUAL TABLE t8 USING fts4(a, b, matchinfo=fts3);
+  INSERT INTO t8 VALUES('u v w', 'x y z');
+----
+stmt 0 ok
+stmt 44 err 1 -1 87 no such table: t7
+stmt 87 ok
+stmt 148 err 1 -1 191 no such table: t8
+==== 5.2.1
+ 
+  SELECT matchinfo(t7, 'a') FROM t7 WHERE t7 MATCH 'x y'
+----
+stmt 0 err 1 -1 59 no such table: t7
+==== 5.2.2
+ 
+  SELECT matchinfo(t7, 'l') FROM t7 WHERE t7 MATCH 'x y'
+----
+stmt 0 err 1 -1 59 no such table: t7
+==== 5.2.3
+ 
+  SELECT matchinfo(t7, 'n') FROM t7 WHERE t7 MATCH 'x y'
+----
+stmt 0 err 1 -1 59 no such table: t7
+==== 5.3.1
+ 
+  SELECT matchinfo(t8, 'l') FROM t8 WHERE t8 MATCH 'x y'
+----
+stmt 0 err 1 -1 59 no such table: t8
+==== 6.1
+
+  CREATE VIRTUAL TABLE t9 USING fts4;
+  INSERT INTO t9 VALUES(
+    'this record is used to try to dectect corruption'
+  );
+  SELECT offsets(t9) FROM t9 WHERE t9 MATCH 'to';
+----
+stmt 0 ok
+stmt 38 err 1 -1 123 no such table: t9
+stmt 123 err 1 -1 173 no such table: t9
+==== 6.2
+
+  UPDATE t9_content SET c0content = 'this record is used to'; 
+  SELECT offsets(t9) FROM t9 WHERE t9 MATCH 'to';
+----
+stmt 0 err 1 -1 62 no such table: t9_content
+stmt 62 err 1 -1 113 no such table: t9
+==== 7.1
+
+  CREATE VIRTUAL TABLE t10 USING fts4;
+  INSERT INTO t10 VALUES('first record');
+  INSERT INTO t10 VALUES('second record');
+----
+stmt 0 ok
+stmt 39 err 1 -1 81 no such table: t10
+stmt 81 err 1 -1 124 no such table: t10
+==== 7.2
+
+  SELECT typeof(matchinfo(t10)), length(matchinfo(t10)) FROM t10;
+----
+stmt 0 err 1 -1 66 no such table: t10
+==== 7.3
+
+  SELECT typeof(matchinfo(t10)), length(matchinfo(t10)) FROM t10 WHERE docid=1;
+----
+stmt 0 err 1 -1 80 no such table: t10
+==== 7.4
+
+  SELECT typeof(matchinfo(t10)), length(matchinfo(t10)) 
+  FROM t10 WHERE t10 MATCH 'record'
+----
+stmt 0 err 1 -1 94 no such table: t10
+==== 8.1
+
+  CREATE VIRTUAL TABLE t11 USING fts4;
+  INSERT INTO t11(t11) VALUES('nodesize=24');
+  INSERT INTO t11 VALUES('quitealongstringoftext');
+  INSERT INTO t11 VALUES('anotherquitealongstringoftext');
+  INSERT INTO t11 VALUES('athirdlongstringoftext');
+  INSERT INTO t11 VALUES('andonemoreforgoodluck');
+----
+stmt 0 ok
+stmt 39 err 1 -1 85 no such table: t11
+stmt 85 err 1 -1 137 no such table: t11
+stmt 137 err 1 -1 196 no such table: t11
+stmt 196 err 1 -1 248 no such table: t11
+stmt 248 err 1 -1 299 no such table: t11
+==== 8.3
+
+  SELECT mit(matchinfo(t11, 'nxa')) FROM t11 WHERE t11 MATCH 'a*'
+----
+stmt 0 err 1 -1 67 no such table: t11
+==== 8.4.1.1
+ UPDATE t11_stat SET value = X'0000';
+----
+stmt 0 err 1 -1 37 no such table: t11_stat
+==== 8.5.1.2
+
+  SELECT mit(matchinfo(t11, 'nxa')) FROM t11 WHERE t11 MATCH 'a*'
+----
+stmt 0 err 1 -1 67 no such table: t11
+==== 8.4.2.1
+ UPDATE t11_stat SET value = X'00';
+----
+stmt 0 err 1 -1 35 no such table: t11_stat
+==== 8.5.2.2
+
+  SELECT mit(matchinfo(t11, 'nxa')) FROM t11 WHERE t11 MATCH 'a*'
+----
+stmt 0 err 1 -1 67 no such table: t11
+==== 8.4.3.1
+ UPDATE t11_stat SET value = NULL;
+----
+stmt 0 err 1 -1 34 no such table: t11_stat
+==== 8.5.3.2
+
+  SELECT mit(matchinfo(t11, 'nxa')) FROM t11 WHERE t11 MATCH 'a*'
+----
+stmt 0 err 1 -1 67 no such table: t11
+==== 8.1.dup1
+
+  CREATE VIRTUAL TABLE t12 USING fts4;
+  INSERT INTO t12 VALUES('a b c d');
+  SELECT mit(matchinfo(t12, 'x')) FROM t12 WHERE t12 MATCH 'a NEAR/1 d OR a';
+----
+stmt 0 ok
+stmt 39 err 1 -1 76 no such table: t12
+stmt 76 err 1 -1 154 no such table: t12
+==== 8.2
+
+  INSERT INTO t12 VALUES('a d c d');
+  SELECT mit(matchinfo(t12, 'x')) FROM t12 WHERE t12 MATCH 'a NEAR/1 d OR a';
+----
+stmt 0 err 1 -1 37 no such table: t12
+stmt 37 err 1 -1 115 no such table: t12
+==== 8.3.dup1
+
+  INSERT INTO t12 VALUES('a d d a');
+  SELECT mit(matchinfo(t12, 'x')) FROM t12 WHERE t12 MATCH 'a NEAR/1 d OR a';
+----
+stmt 0 err 1 -1 37 no such table: t12
+stmt 37 err 1 -1 115 no such table: t12
+==== 10.1
+
+  DROP TABLE t10;
+  CREATE VIRTUAL TABLE t10 USING fts4(idx, value);
+  INSERT INTO t10 values (1, 'one'),(2, 'two'),(3, 'three');
+  SELECT docId, t10.*
+    FROM t10
+    JOIN (SELECT 1 AS idx UNION SELECT 2 UNION SELECT 3) AS x
+   WHERE t10 MATCH x.idx
+     AND matchinfo(t10) not null
+   GROUP BY docId
+   ORDER BY 1;
+----
+stmt 0 err 1 -1 18 no such table: t10
+stmt 18 ok
+stmt 69 err 1 -1 130 no such table: t10
+stmt 130 err 1 -1 318 no such table: t10
+==== 11.0
+
+  CREATE VIRTUAL TABLE tt USING fts3(x, y);
+  INSERT INTO tt VALUES('c d a c d d', 'e a g b d a');   -- 1
+  INSERT INTO tt VALUES('c c g a e b', 'c g d g e c');   -- 2
+  INSERT INTO tt VALUES('b e f d e g', 'b a c b c g');   -- 3
+  INSERT INTO tt VALUES('a c f f g d', 'd b f d e g');   -- 4
+  INSERT INTO tt VALUES('g a c f c f', 'd g g b c c');   -- 5
+  INSERT INTO tt VALUES('g a c e b b', 'd b f b g g');   -- 6
+  INSERT INTO tt VALUES('f d a a f c', 'e e a d c f');   -- 7
+  INSERT INTO tt VALUES('a c b b g f', 'a b a e d f');   -- 8
+  INSERT INTO tt VALUES('b a f e c c', 'f d b b a b');   -- 9
+  INSERT INTO tt VALUES('f d c e a c', 'f a f a a f');   -- 10
+----
+stmt 0 ok
+stmt 44 err 1 -1 99 no such table: tt
+stmt 99 err 1 -1 161 no such table: tt
+stmt 161 err 1 -1 223 no such table: tt
+stmt 223 err 1 -1 285 no such table: tt
+stmt 285 err 1 -1 347 no such table: tt
+stmt 347 err 1 -1 409 no such table: tt
+stmt 409 err 1 -1 471 no such table: tt
+stmt 471 err 1 -1 533 no such table: tt
+stmt 533 err 1 -1 595 no such table: tt
+stmt 595 err 1 -1 657 no such table: tt
+==== 12.1
+
+  INSERT INTO tt (rowid, c4, c45) VALUES(1, 'abc', 'abc');
+  SELECT mit(matchinfo(tt, 'b')) FROM tt WHERE tt MATCH 'abc';
+----
+stmt 0 err 1 -1 59 no such table: tt
+stmt 59 err 1 -1 122 no such table: tt

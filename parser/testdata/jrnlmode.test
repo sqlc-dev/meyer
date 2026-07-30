@@ -1,0 +1,334 @@
+==== jrnlmode-1.0
+
+    PRAGMA journal_mode;
+    PRAGMA main.journal_mode;
+    PRAGMA temp.journal_mode;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 55 ok
+==== jrnlmode-1.1
+
+    PRAGMA journal_mode = persist;
+----
+stmt 0 ok
+==== jrnlmode-1.2
+
+    PRAGMA journal_mode;
+    PRAGMA main.journal_mode;
+    PRAGMA temp.journal_mode;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 55 ok
+==== jrnlmode-1.5
+
+    PRAGMA journal_mode;
+    PRAGMA main.journal_mode;
+    PRAGMA temp.journal_mode;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 55 ok
+==== jrnlmode-1.6
+
+    PRAGMA journal_mode = delete;
+----
+stmt 0 ok
+==== jrnlmode-1.7
+
+    PRAGMA journal_mode;
+    PRAGMA main.journal_mode;
+    PRAGMA Temp.journal_mode;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 55 ok
+==== jrnlmode-1.7.1
+
+    PRAGMA journal_mode = truncate;
+----
+stmt 0 ok
+==== jrnlmode-1.7.2
+
+    PRAGMA journal_mode;
+    PRAGMA main.journal_mode;
+    PRAGMA temp.journal_mode;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 55 ok
+==== jrnlmode-1.8
+
+    PRAGMA journal_mode = off;
+    PRAGMA journal_mode = invalid;
+----
+stmt 0 ok
+stmt 31 ok
+==== jrnlmode-1.11
+
+      PRAGMA journal_mode;
+----
+stmt 0 ok
+==== jrnlmode-1.99
+
+      DETACH aux1;
+      DETACH aux2;
+      DETACH aux3;
+----
+stmt 0 ok
+stmt 19 ok
+stmt 38 ok
+==== jrnlmode-2.3
+
+      SELECT * FROM abc;
+----
+stmt 0 err 1 -1 25 no such table: abc
+==== jrnlmode-2.5
+
+      SELECT * FROM def;
+----
+stmt 0 err 1 -1 25 no such table: def
+==== jrnlmode-3.1
+ 
+      CREATE TABLE x(n INTEGER); 
+      ATTACH 'test2.db' AS a; 
+      create table a.x ( n integer ); 
+      insert into a.x values(1); 
+      insert into a.x values (2); 
+      insert into a.x values (3); 
+      insert into a.x values (4);
+----
+stmt 0 ok
+stmt 34 ok
+stmt 65 err 1 86 91 unknown database a
+stmt 104 err 1 -1 138 no such table: a.x
+stmt 138 err 1 -1 173 no such table: a.x
+stmt 173 err 1 -1 208 no such table: a.x
+stmt 208 err 1 -1 243 no such table: a.x
+==== jrnlmode-4.2
+ PRAGMA journal_mode = off
+----
+stmt 0 ok
+==== jrnlmode-4.3
+ INSERT INTO abc VALUES(1, 2, randomblob(2000))
+----
+stmt 0 err 1 -1 48 no such table: abc
+==== jrnlmode-4.4
+ DELETE FROM abc
+----
+stmt 0 err 1 -1 17 no such table: abc
+==== jrnlmode-5.2
+ PRAGMA journal_size_limit
+----
+stmt 0 ok
+==== jrnlmode-5.3
+ 
+      ATTACH 'test2.db' AS aux;
+      PRAGMA aux.journal_mode=persist;
+      PRAGMA aux.journal_size_limit;
+----
+stmt 0 ok
+stmt 33 err 1 47 72 unknown database aux
+stmt 72 err 1 86 109 unknown database aux
+==== jrnlmode-5.4.1
+ PRAGMA aux.journal_size_limit = 999999999999
+----
+stmt 0 err 1 8 46 unknown database aux
+==== jrnlmode-5.4.2
+ PRAGMA aux.journal_size_limit = 10240
+----
+stmt 0 err 1 8 39 unknown database aux
+==== jrnlmode-5.5
+ PRAGMA main.journal_size_limit = 20480
+----
+stmt 0 ok
+==== jrnlmode-5.6
+ PRAGMA journal_size_limit
+----
+stmt 0 ok
+==== jrnlmode-5.7
+ PRAGMA aux.journal_size_limit
+----
+stmt 0 err 1 8 31 unknown database aux
+==== jrnlmode-5.8
+
+      ATTACH 'test3.db' AS aux2;
+      PRAGMA aux2.journal_mode=persist;
+----
+stmt 0 ok
+stmt 33 err 1 47 73 unknown database aux2
+==== jrnlmode-5.9
+
+      CREATE TABLE main.t1(a, b, c);
+      CREATE TABLE aux.t2(a, b, c);
+      CREATE TABLE aux2.t3(a, b, c);
+----
+stmt 0 ok
+stmt 37 err 1 57 64 unknown database aux
+stmt 73 err 1 93 101 unknown database aux2
+==== jrnlmode-5.20
+
+      PRAGMA journal_size_limit = 0;
+      BEGIN;
+      UPDATE t1 SET a = randomblob(1000);
+----
+stmt 0 ok
+stmt 37 ok
+stmt 50 err 1 -1 92 no such table: t1
+==== jrnlmode-6.1
+
+        PRAGMA journal_mode = truncate;
+        CREATE TABLE t4(a, b);
+        BEGIN;
+          INSERT INTO t4 VALUES(1, 2);
+          PRAGMA journal_mode = memory;
+----
+stmt 0 ok
+stmt 40 ok
+stmt 71 ok
+stmt 86 err 1 -1 125 no such table: t4
+stmt 125 ok
+==== jrnlmode-6.3
+
+        COMMIT;
+        SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 16 err 1 -1 42 no such table: t4
+==== jrnlmode-6.7
+
+        COMMIT;
+        SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 16 err 1 -1 42 no such table: t4
+==== jrnlmode-8.1
+ PRAGMA locking_mode=EXCLUSIVE
+----
+stmt 0 ok
+==== jrnlmode-8.2
+ CREATE TABLE t1(x)
+----
+stmt 0 ok
+==== jrnlmode-8.3
+ INSERT INTO t1 VALUES(123)
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== jrnlmode-8.4
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== jrnlmode-8.5
+ PRAGMA journal_mode=PERSIST
+----
+stmt 0 ok
+==== jrnlmode-8.6
+ PRAGMA journal_mode=DELETE
+----
+stmt 0 ok
+==== jrnlmode-8.7
+ PRAGMA journal_mode=TRUNCATE
+----
+stmt 0 ok
+==== jrnlmode-8.8
+ PRAGMA journal_mode=DELETE
+----
+stmt 0 ok
+==== jrnlmode-8.9
+ CREATE TABLE t2(y)
+----
+stmt 0 ok
+==== jrnlmode-8.10
+ INSERT INTO t2 VALUES(456)
+----
+stmt 0 err 1 -1 28 no such table: t2
+==== jrnlmode-8.11
+ SELECT * FROM t1, t2
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== jrnlmode-8.12
+ PRAGMA locking_mode=NORMAL
+----
+stmt 0 ok
+==== jrnlmode-8.13
+ PRAGMA journal_mode=PERSIST
+----
+stmt 0 ok
+==== jrnlmode-8.14
+ PRAGMA journal_mode=TRUNCATE
+----
+stmt 0 ok
+==== jrnlmode-8.15
+ PRAGMA journal_mode=PERSIST
+----
+stmt 0 ok
+==== jrnlmode-8.16
+ PRAGMA journal_mode=DELETE
+----
+stmt 0 ok
+==== jrnlmode-8.17
+ PRAGMA journal_mode=TRUNCATE
+----
+stmt 0 ok
+==== jrnlmode-8.18
+ PRAGMA locking_mode=EXCLUSIVE
+----
+stmt 0 ok
+==== jrnlmode-8.19
+ CREATE TABLE t3(z)
+----
+stmt 0 ok
+==== jrnlmode-8.20
+ BEGIN IMMEDIATE
+----
+stmt 0 ok
+==== jrnlmode-8.21
+ PRAGMA journal_mode=DELETE
+----
+stmt 0 ok
+==== jrnlmode-8.22
+ COMMIT
+----
+stmt 0 ok
+==== jrnlmode-8.23
+ PRAGMA journal_mode=DELETE
+----
+stmt 0 ok
+==== jrnlmode-8.24
+ PRAGMA journal_mode=TRUNCATE
+----
+stmt 0 ok
+==== jrnlmode-8.25
+ PRAGMA locking_mode=NORMAL
+----
+stmt 0 ok
+==== jrnlmode-8.26
+ CREATE TABLE t4(w)
+----
+stmt 0 ok
+==== jrnlmode-8.27
+ BEGIN IMMEDIATE
+----
+stmt 0 ok
+==== jrnlmode-8.28
+ PRAGMA journal_mode=DELETE
+----
+stmt 0 ok
+==== jrnlmode-8.29
+ COMMIT
+----
+stmt 0 ok
+==== jrnlmode-8.30
+ PRAGMA journal_mode=DELETE
+----
+stmt 0 ok
+==== jrnlmode-9.2
+
+  PRAGMA locking_mode = exclusive;
+  CREATE TABLE tx(a);
+  PRAGMA journal_mode = off;
+----
+stmt 0 ok
+stmt 35 ok
+stmt 57 ok

@@ -1,0 +1,42 @@
+==== 100
+
+  ATTACH ':memory:' AS aux;
+  CREATE TABLE main.t1(a,b);
+  CREATE TABLE aux.t2(x,y);
+  INSERT INTO t1 VALUES(1,2);
+  INSERT INTO t2 VALUES(3,4);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 57 err 1 73 80 unknown database aux
+stmt 85 err 1 -1 115 no such table: t1
+stmt 115 err 1 -1 145 no such table: t2
+==== 110
+
+  CREATE VIEW v1 AS SELECT * FROM t1, aux.t2;
+----
+stmt 0 err 1 15 46 view v1 cannot reference objects in database aux
+==== 120
+
+  CREATE VIEW v2 AS WITH v(m,n) AS (SELECT x,y FROM aux.t2) SELECT * FROM t1, v;
+----
+stmt 0 err 1 15 81 view v2 cannot reference objects in database aux
+==== 130
+
+  CREATE VIEW v2 AS WITH v(m,n) AS (SELECT 5,?2) SELECT * FROM t1, v;
+----
+stmt 0 err 1 -1 70 parameters are not allowed in views
+==== 200
+
+  CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN
+     WITH v(m,n) AS (SELECT x,y FROM aux.t2) SELECT * FROM t1, v;
+  END;
+----
+stmt 0 err 1 -1 45 no such table: main.t1
+==== 210
+
+  CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN
+     WITH v(m,n) AS (SELECT 5,?2) SELECT * FROM t1, v;
+  END;
+----
+stmt 0 err 1 -1 45 no such table: main.t1

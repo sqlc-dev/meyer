@@ -1,0 +1,267 @@
+==== minmax2-4.1
+
+      SELECT coalesce(min(x+0),-1), coalesce(max(x+0),-1) FROM
+        (SELECT * FROM t1 UNION SELECT NULL as 'x', NULL as 'y')
+----
+stmt 0 err 1 -1 129 no such table: t1
+==== minmax2-4.2
+
+      SELECT y, coalesce(sum(x),0) FROM
+        (SELECT null AS x, y+1 AS y FROM t1 UNION SELECT * FROM t1)
+      GROUP BY y ORDER BY y;
+----
+stmt 0 err 1 -1 137 no such table: t1
+==== minmax2-4.3
+
+      SELECT y, count(x), count(*) FROM
+        (SELECT null AS x, y+1 AS y FROM t1 UNION SELECT * FROM t1)
+      GROUP BY y ORDER BY y;
+----
+stmt 0 err 1 -1 137 no such table: t1
+==== minmax2-5.1
+
+    CREATE TABLE t3(x INTEGER UNIQUE NOT NULL);
+    SELECT coalesce(min(x),999) FROM t3;
+----
+stmt 0 ok
+stmt 48 err 1 -1 89 no such table: t3
+==== minmax2-5.2
+
+    SELECT coalesce(min(rowid),999) FROM t3;
+----
+stmt 0 err 1 -1 45 no such table: t3
+==== minmax2-5.3
+
+    SELECT coalesce(max(x),999) FROM t3;
+----
+stmt 0 err 1 -1 41 no such table: t3
+==== minmax2-5.4
+
+    SELECT coalesce(max(rowid),999) FROM t3;
+----
+stmt 0 err 1 -1 45 no such table: t3
+==== minmax2-5.5
+
+    SELECT coalesce(max(rowid),999) FROM t3 WHERE rowid<25;
+----
+stmt 0 err 1 -1 60 no such table: t3
+==== minmax2-6.1
+
+    SELECT min(a) FROM t2 LIMIT 1
+----
+stmt 0 err 1 -1 35 no such table: t2
+==== minmax2-6.2
+
+    SELECT max(a) FROM t2 LIMIT 3
+----
+stmt 0 err 1 -1 35 no such table: t2
+==== minmax2-6.3
+
+    SELECT min(a) FROM t2 LIMIT 0,100
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== minmax2-6.4
+
+    SELECT max(a) FROM t2 LIMIT 1,100
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== minmax2-6.5
+
+    SELECT min(x) FROM t3 LIMIT 1
+----
+stmt 0 err 1 -1 35 no such table: t3
+==== minmax2-6.6
+
+    SELECT max(x) FROM t3 LIMIT 0
+----
+stmt 0 err 1 -1 35 no such table: t3
+==== minmax2-6.7
+
+    SELECT max(a) FROM t2 LIMIT 0
+----
+stmt 0 err 1 -1 35 no such table: t2
+==== minmax2-7.1
+
+    SELECT max(x) FROM t1;
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== minmax2-7.2
+
+      SELECT * FROM (SELECT max(x) FROM t1);
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== minmax2-7.3
+
+    SELECT min(x) FROM t1;
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== minmax2-7.4
+
+      SELECT * FROM (SELECT min(x) FROM t1);
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== minmax2-8.1
+
+    CREATE TABLE t4(a TEXT);
+    INSERT INTO t4 VALUES('1234');
+    INSERT INTO t4 VALUES('234');
+    INSERT INTO t4 VALUES('34');
+    SELECT min(a), max(a) FROM t4;
+----
+stmt 0 ok
+stmt 29 err 1 -1 64 no such table: t4
+stmt 64 err 1 -1 98 no such table: t4
+stmt 98 err 1 -1 131 no such table: t4
+stmt 131 err 1 -1 166 no such table: t4
+==== minmax2-8.2
+
+    CREATE TABLE t5(a INTEGER);
+    INSERT INTO t5 VALUES('1234');
+    INSERT INTO t5 VALUES('234');
+    INSERT INTO t5 VALUES('34');
+    SELECT min(a), max(a) FROM t5;
+----
+stmt 0 ok
+stmt 32 err 1 -1 67 no such table: t5
+stmt 67 err 1 -1 101 no such table: t5
+stmt 101 err 1 -1 134 no such table: t5
+stmt 134 err 1 -1 169 no such table: t5
+==== minmax2-9.0
+
+      SELECT max(rowid) FROM t4 UNION SELECT max(rowid) FROM t5
+----
+stmt 0 err 1 -1 65 no such table: t5
+==== minmax2-9.1
+
+      SELECT max(yy) FROM (
+        SELECT max(rowid) AS yy FROM t4 UNION SELECT max(rowid) FROM t5
+      )
+----
+stmt 0 err 1 -1 109 no such table: t5
+==== minmax2-9.2
+
+      SELECT max(yy) FROM (
+        SELECT max(rowid) AS yy FROM t4 EXCEPT SELECT max(rowid) FROM t5
+      )
+----
+stmt 0 err 1 -1 110 no such table: t5
+==== minmax2-10.1
+
+    CREATE TABLE t6(x);
+    INSERT INTO t6 VALUES(1);
+    INSERT INTO t6 VALUES(2);
+    INSERT INTO t6 VALUES(NULL);
+    SELECT coalesce(min(x),-1) FROM t6;
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t6
+stmt 54 err 1 -1 84 no such table: t6
+stmt 84 err 1 -1 117 no such table: t6
+stmt 117 err 1 -1 157 no such table: t6
+==== minmax2-10.2
+
+    SELECT max(x) FROM t6;
+----
+stmt 0 err 1 -1 27 no such table: t6
+==== minmax2-10.3
+
+    CREATE INDEX i6 ON t6(x DESC);
+    SELECT coalesce(min(x),-1) FROM t6;
+----
+stmt 0 err 1 -1 35 no such table: main.t6
+stmt 35 err 1 -1 75 no such table: t6
+==== minmax2-10.4
+
+    SELECT max(x) FROM t6;
+----
+stmt 0 err 1 -1 27 no such table: t6
+==== minmax2-10.5
+
+    DELETE FROM t6 WHERE x NOT NULL;
+    SELECT count(*) FROM t6;
+----
+stmt 0 err 1 -1 37 no such table: t6
+stmt 37 err 1 -1 66 no such table: t6
+==== minmax2-10.6
+
+    SELECT count(x) FROM t6;
+----
+stmt 0 err 1 -1 29 no such table: t6
+==== minmax2-10.7
+
+      SELECT (SELECT min(x) FROM t6), (SELECT max(x) FROM t6);
+----
+stmt 0 err 1 -1 63 no such table: t6
+==== minmax2-10.8
+
+    SELECT min(x), max(x) FROM t6;
+----
+stmt 0 err 1 -1 35 no such table: t6
+==== minmax2-10.9
+
+    INSERT INTO t6 SELECT * FROM t6;
+    INSERT INTO t6 SELECT * FROM t6;
+    INSERT INTO t6 SELECT * FROM t6;
+    INSERT INTO t6 SELECT * FROM t6;
+    INSERT INTO t6 SELECT * FROM t6;
+    INSERT INTO t6 SELECT * FROM t6;
+    INSERT INTO t6 SELECT * FROM t6;
+    INSERT INTO t6 SELECT * FROM t6;
+    INSERT INTO t6 SELECT * FROM t6;
+    INSERT INTO t6 SELECT * FROM t6;
+    SELECT count(*) FROM t6;
+----
+stmt 0 err 1 -1 37 no such table: t6
+stmt 37 err 1 -1 74 no such table: t6
+stmt 74 err 1 -1 111 no such table: t6
+stmt 111 err 1 -1 148 no such table: t6
+stmt 148 err 1 -1 185 no such table: t6
+stmt 185 err 1 -1 222 no such table: t6
+stmt 222 err 1 -1 259 no such table: t6
+stmt 259 err 1 -1 296 no such table: t6
+stmt 296 err 1 -1 333 no such table: t6
+stmt 333 err 1 -1 370 no such table: t6
+stmt 370 err 1 -1 399 no such table: t6
+==== minmax2-10.10
+
+    SELECT count(x) FROM t6;
+----
+stmt 0 err 1 -1 29 no such table: t6
+==== minmax2-10.11
+
+      SELECT (SELECT min(x) FROM t6), (SELECT max(x) FROM t6);
+----
+stmt 0 err 1 -1 63 no such table: t6
+==== minmax2-10.12
+
+    SELECT min(x), max(x) FROM t6;
+----
+stmt 0 err 1 -1 35 no such table: t6
+==== minmax2-11.100
+
+  CREATE TABLE t11(a,b,c);
+  INSERT INTO t11(a,b,c) VALUES(1,10,5),(2,8,11),(3,1,4),(4,20,1),(5,16,4);
+  CREATE INDEX t11bc ON t11(b+c);
+  SELECT max(b+c) FROM t11;
+----
+stmt 0 ok
+stmt 27 err 1 -1 103 no such table: t11
+stmt 103 err 1 -1 137 no such table: main.t11
+stmt 137 err 1 -1 165 no such table: t11
+==== minmax2-11.110
+
+  SELECT a, max(b+c) FROM t11;
+----
+stmt 0 err 1 -1 31 no such table: t11
+==== minmax2-11.120
+
+  SELECT a, min(b+c) FROM t11;
+----
+stmt 0 err 1 -1 31 no such table: t11
+==== minmax2-11.130
+
+  INSERT INTO t11(a,b,c) VALUES(6,NULL,0),(7,0,NULL);
+  SELECT a, min(b+c) FROM t11;
+----
+stmt 0 err 1 -1 54 no such table: t11
+stmt 54 err 1 -1 85 no such table: t11

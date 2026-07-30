@@ -1,0 +1,471 @@
+==== 1.0
+
+  CREATE TABLE t1_a(a INTEGER PRIMARY KEY, b TEXT);
+  CREATE TABLE t1_b(c INTEGER PRIMARY KEY, d TEXT);
+  CREATE TABLE t1_c(e INTEGER PRIMARY KEY, f TEXT);
+
+  INSERT INTO t1_a VALUES(1, 'one'), (4, 'four');
+  INSERT INTO t1_b VALUES(2, 'two'), (5, 'five');
+  INSERT INTO t1_c VALUES(3, 'three'), (6, 'six');
+
+  CREATE VIEW t1 AS 
+    SELECT a, b FROM t1_a   UNION ALL
+    SELECT c, d FROM t1_b   UNION ALL
+    SELECT e, f FROM t1_c;
+
+  CREATE TABLE i1(x);
+  INSERT INTO i1 VALUES(2), (5), (6), (1);
+----
+stmt 0 ok
+stmt 52 ok
+stmt 104 ok
+stmt 156 err 1 -1 207 no such table: t1_a
+stmt 207 err 1 -1 257 no such table: t1_b
+stmt 257 err 1 -1 308 no such table: t1_c
+stmt 308 ok
+stmt 433 ok
+stmt 456 err 1 -1 499 no such table: i1
+==== 1.1
+
+  SELECT a, b FROM (
+    SELECT a, b FROM t1_a   UNION ALL
+    SELECT c, d FROM t1_b   UNION ALL
+    SELECT e, f FROM t1_c
+  ) ORDER BY a
+----
+stmt 0 err 1 -1 139 no such table: t1_c
+==== 1.2
+
+  SELECT a, b FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== 1.3
+
+  SELECT a, b FROM i1, t1 WHERE a=x ORDER BY a
+----
+stmt 0 err 1 -1 48 no such table: i1
+==== 1.10
+
+  CREATE TABLE t0(c0 INT);
+  INSERT INTO t0 VALUES(0);
+  CREATE TABLE t1_a(a INTEGER PRIMARY KEY, b TEXT);
+  INSERT INTO t1_a VALUES(1,'one');
+  CREATE TABLE t1_b(c INTEGER PRIMARY KEY, d TEXT);
+  INSERT INTO t1_b VALUES(2,'two');
+  CREATE VIEW t1 AS SELECT a, b FROM t1_a UNION ALL SELECT c, c FROM t1_b;
+  SELECT * FROM (SELECT t1.a, t1.b AS b, t0.c0 FROM t0, t1);
+----
+stmt 0 ok
+stmt 27 err 1 -1 55 no such table: t0
+stmt 55 ok
+stmt 107 err 1 -1 143 no such table: t1_a
+stmt 143 ok
+stmt 195 err 1 -1 231 no such table: t1_b
+stmt 231 ok
+stmt 306 err 1 -1 367 no such table: t0
+==== 1.11
+
+  SELECT * FROM (SELECT t1.a, t1.b AS b, t0.c0 FROM t0, t1) WHERE b=2;
+----
+stmt 0 err 1 -1 71 no such table: t0
+==== 2.1.0
+
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES(1, 'one');
+  INSERT INTO t1 VALUES(1, 'ONE');
+  INSERT INTO t1 VALUES(2, 'two');
+  INSERT INTO t1 VALUES(2, 'TWO');
+  INSERT INTO t1 VALUES(3, 'three');
+  INSERT INTO t1 VALUES(3, 'THREE');
+----
+stmt 0 ok
+stmt 25 err 1 -1 60 no such table: t1
+stmt 60 err 1 -1 95 no such table: t1
+stmt 95 err 1 -1 130 no such table: t1
+stmt 130 err 1 -1 165 no such table: t1
+stmt 165 err 1 -1 202 no such table: t1
+stmt 202 err 1 -1 239 no such table: t1
+==== 2.1.1
+
+  WITH s(i) AS (
+      SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<3
+  )
+  SELECT * FROM (
+    SELECT 0 AS i UNION ALL SELECT i FROM s UNION ALL SELECT 0
+  ), t1 WHERE x=i;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== 2.1.2
+
+  WITH s(i) AS (
+      SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<3 UNION ALL SELECT 4
+  )
+  SELECT * FROM s, t1 WHERE x=i;
+----
+stmt 0 err 1 -1 126 circular reference: s
+==== 2.2.0
+
+  CREATE TABLE t2_a(k INTEGER PRIMARY KEY, v TEXT);
+  CREATE TABLE t2_b(k INTEGER PRIMARY KEY, v TEXT);
+
+  CREATE VIEW t2 AS 
+    SELECT * FROM t2_a 
+    UNION ALL 
+    SELECT * FROM t2_b;
+
+  CREATE TRIGGER t2_insert INSTEAD OF INSERT ON t2 BEGIN
+    INSERT INTO t2_a SELECT new.k, new.v WHERE (new.k%2)==0;
+    INSERT INTO t2_b SELECT new.k, new.v WHERE (new.k%2)==1;
+  END;
+
+  INSERT INTO t2 VALUES(5, 'v'), (4, 'iv'), (3, 'iii'), (2, 'ii');
+----
+stmt 0 ok
+stmt 52 ok
+stmt 104 ok
+stmt 189 err 1 -1 247 no such table: main.t2
+stmt 376 err 1 -1 444 no such table: t2
+==== 2.2.1
+
+  SELECT * FROM t1, t2 WHERE x=k;
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== 2.2.2
+
+  SELECT * FROM t1 LEFT JOIN t2 ON (x=k);
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== 2.2.3
+
+  SELECT x1.*, x2.* FROM t2 AS x1, t2 AS x2 WHERE x1.k=x2.k+1
+----
+stmt 0 err 1 -1 63 no such table: t2
+==== 2.2.4
+
+  SELECT * FROM t1, t2 WHERE x=k ORDER BY y;
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== 2.2.5
+
+  SELECT * FROM t1, t2 WHERE x=k ORDER BY y||'';
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== 2.2.6
+
+  SELECT * FROM t1, t2 WHERE x=k ORDER BY v
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== 2.2.7
+
+  SELECT * FROM t1, t2 WHERE x=k ORDER BY v||''
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== 2.2.8
+
+  SELECT * FROM t1, t2 WHERE x=k ORDER BY k,v||''
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 2.2.9a
+
+  SELECT * FROM t1, t2 ORDER BY +k
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== 2.2.9b
+
+  SELECT * FROM t1, t2 ORDER BY k
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== 3.0
+
+  CREATE TABLE t1(c INTEGER PRIMARY KEY, d TEXT);
+  INSERT INTO t1 VALUES(1,2);
+  CREATE TABLE t3_a(k INTEGER PRIMARY KEY, v TEXT);
+  INSERT INTO t3_a VALUES(2,'ii');
+  CREATE TABLE t3_b(k INTEGER PRIMARY KEY, v TEXT);
+  CREATE VIEW t3 AS
+    SELECT * FROM t3_a
+    UNION ALL
+    SELECT * FROM t3_b;
+----
+stmt 0 ok
+stmt 50 err 1 -1 80 no such table: t1
+stmt 80 ok
+stmt 132 err 1 -1 167 no such table: t3_a
+stmt 167 ok
+stmt 219 ok
+==== 3.1
+
+  SELECT * FROM t1, t3 ORDER BY k;
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== 4.0
+
+
+  CREATE TABLE t1_a(a INTEGER PRIMARY KEY, b TEXT);
+  INSERT INTO t1_a VALUES(123, 't1_a');
+  CREATE TABLE t1_b(c INTEGER PRIMARY KEY, d TEXT);
+
+  CREATE VIEW t1 AS
+    SELECT a, b FROM t1_a
+    UNION ALL
+    SELECT c, d FROM t1_b;
+
+  CREATE TABLE t3_a(k INTEGER PRIMARY KEY, v TEXT);
+  INSERT INTO t3_a VALUES(456, 't3_a');
+  CREATE TABLE t3_b(k INTEGER PRIMARY KEY, v TEXT);
+
+  CREATE VIEW t3 AS
+    SELECT * FROM t3_a
+    UNION ALL
+    SELECT * FROM t3_b;
+----
+stmt 0 ok
+stmt 53 err 1 -1 93 no such table: t1_a
+stmt 93 ok
+stmt 145 ok
+stmt 233 ok
+stmt 286 err 1 -1 326 no such table: t3_a
+stmt 326 ok
+stmt 378 ok
+==== 4.1
+
+  SELECT * FROM t1, t3 ORDER BY k;
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== 4.2
+
+  SELECT * FROM (SELECT * FROM t1, t3) ORDER BY k;
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 4.3
+
+  SELECT * FROM (SELECT * FROM t1, t3), (
+    SELECT max(a) OVER () FROM t1
+      UNION ALL
+    SELECT min(a) OVER () FROM t1
+  )
+  ORDER BY k;
+----
+stmt 0 err 1 -1 144 no such table: t1
+==== 4.3.dup1
+
+  SELECT * FROM (SELECT * FROM t1, t3), (
+    SELECT group_concat(a) OVER (ORDER BY a), 
+           group_concat(a) OVER (ORDER BY a),
+           group_concat(a) OVER (ORDER BY a),
+           group_concat(a) OVER (ORDER BY a),
+           group_concat(a) OVER (ORDER BY a),
+           group_concat(a) OVER (ORDER BY a),
+           group_concat(a) OVER (ORDER BY a),
+           group_concat(a) OVER (ORDER BY a),
+           group_concat(a) OVER (ORDER BY a)
+    FROM t1
+  )
+  ORDER BY k;
+----
+stmt 0 err 1 -1 486 no such table: t1
+==== 4.3.dup2
+
+  SELECT * FROM (SELECT * FROM t1, t3) AS o, (
+    SELECT * FROM t1 LEFT JOIN t3 ON a=k
+  );
+----
+stmt 0 err 1 -1 93 no such table: t1
+==== 5.1
+
+  CREATE TABLE t1_a(a INTEGER PRIMARY KEY, b TEXT);
+  INSERT INTO t1_a VALUES(1,'one');
+  INSERT INTO t1_a VALUES(0,NULL);
+  CREATE TABLE t1_b(c INTEGER PRIMARY KEY, d TEXT);
+  INSERT INTO t1_b VALUES(2,'two');
+  INSERT INTO t1_b VALUES(5,'five');
+  CREATE TABLE t1_c(e INTEGER PRIMARY KEY, f TEXT);
+  INSERT INTO t1_c VALUES(3,'three');
+  INSERT INTO t1_c VALUES(6,'six');
+  CREATE TABLE t2(k,v);
+  INSERT INTO t2 VALUES(5,'v');
+  INSERT INTO t2 VALUES(4,'iv');
+  INSERT INTO t2 VALUES(3,'iii');
+  INSERT INTO t2 VALUES(2,'ii');
+  CREATE TABLE t3_a(k INTEGER PRIMARY KEY, v TEXT);
+  INSERT INTO t3_a VALUES(2,'ii');
+  INSERT INTO t3_a VALUES(4,'iv');
+  CREATE TABLE t3_b(k INTEG5R PRIMARY KEY, v TEXT);
+  INSERT INTO t3_b VALUES(NULL,'iii');
+  INSERT INTO t3_b VALUES(NULL,'v');
+  CREATE VIEW t1 AS 
+    SELECT a, b FROM t1_a   UNION ALL
+    SELECT c, d FROM t1_b   UNION ALL
+    SELECT e, f FROM t1_c;
+  CREATE VIEW t3 AS 
+      SELECT * FROM t3_a 
+      UNION ALL 
+      SELECT * FROM t3_b;
+  CREATE TRIGGER t3_insert INSTEAD OF INSERT ON t3 BEGIN
+      INSERT INTO t3_a SELECT new.k, new.v WHERE (new.k%2)==0;
+      INSERT INTO t3_b SELECT new.k, new.v WHERE (new.k%2)==1;
+  END;
+----
+stmt 0 ok
+stmt 52 err 1 -1 88 no such table: t1_a
+stmt 88 err 1 -1 123 no such table: t1_a
+stmt 123 ok
+stmt 175 err 1 -1 211 no such table: t1_b
+stmt 211 err 1 -1 248 no such table: t1_b
+stmt 248 ok
+stmt 300 err 1 -1 338 no such table: t1_c
+stmt 338 err 1 -1 374 no such table: t1_c
+stmt 374 ok
+stmt 398 err 1 -1 430 no such table: t2
+stmt 430 err 1 -1 463 no such table: t2
+stmt 463 err 1 -1 497 no such table: t2
+stmt 497 err 1 -1 530 no such table: t2
+stmt 530 ok
+stmt 582 err 1 -1 617 no such table: t3_a
+stmt 617 err 1 -1 652 no such table: t3_a
+stmt 652 ok
+stmt 704 err 1 -1 743 no such table: t3_b
+stmt 743 err 1 -1 780 no such table: t3_b
+stmt 780 ok
+stmt 904 ok
+stmt 994 err 1 -1 1051 no such table: main.t3
+==== 5.10
+
+  SELECT *, '+' FROM t1 LEFT JOIN t2 ON (a NOT IN(SELECT v FROM t1, t3 WHERE a=k)=NOT EXISTS(SELECT 1 FROM t1 LEFT JOIN t3 ON (a=k)));
+----
+stmt 0 err 1 -1 135 no such table: t1
+==== 5.20
+
+  SELECT *, '+' FROM t1 LEFT JOIN t3 ON (a NOT IN(SELECT v FROM t1 LEFT JOIN t2 ON (a=k))=k);
+----
+stmt 0 err 1 -1 94 no such table: t1
+==== 5.30
+
+  SELECT * FROM (t1 NATURAL JOIN pragma_table_xinfo('t1_a') NATURAL JOIN t3) t1
+                NATURAL JOIN t2 NATURAL JOIN t3
+   WHERE rowid ISNULL>0 AND 0%y;
+----
+stmt 0 err 1 -1 161 no such table: t1
+==== 6.0
+
+  CREATE TABLE t1(a,b);
+  INSERT INTO t1 VALUES(1,2);
+  CREATE TABLE t2(a,b);
+  INSERT INTO t2 VALUES(3,4);
+
+  CREATE TABLE t3(a,b);
+  INSERT INTO t3 VALUES(5,6);
+  CREATE TABLE t4(a,b);
+  INSERT INTO t4 VALUES(7,8);
+
+  CREATE TABLE t5(a,b);
+  INSERT INTO t5 VALUES(9,10);
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t1
+stmt 54 ok
+stmt 78 err 1 -1 108 no such table: t2
+stmt 108 ok
+stmt 133 err 1 -1 163 no such table: t3
+stmt 163 ok
+stmt 187 err 1 -1 217 no such table: t4
+stmt 217 ok
+stmt 242 err 1 -1 273 no such table: t5
+==== 6.1
+
+  WITH x(c) AS (
+    SELECT 1000 FROM t1 UNION ALL SELECT 800 FROM t2
+  ),
+  y(d) AS (
+    SELECT  100 FROM t3 UNION ALL SELECT 400 FROM t4
+  )
+  SELECT * FROM t5, x, y;
+----
+stmt 0 err 1 -1 170 no such table: t5
+==== 7.1
+
+  WITH c1(x) AS (VALUES(0) UNION ALL SELECT 100+x FROM c1 WHERE x<100 UNION ALL SELECT 1+x FROM c1 WHERE x<1)
+  SELECT x, y, '|'
+    FROM c1 AS x1, (SELECT x+1 AS y FROM c1 WHERE x<1 UNION ALL SELECT 1+x FROM c1 WHERE 1<x) AS x2
+   ORDER BY x, y;
+----
+stmt 0 ok
+==== 8.1
+
+  CREATE TABLE t0(c0 INT);
+  INSERT INTO t0 VALUES(0);
+  CREATE TABLE t1_a(a INTEGER PRIMARY KEY, b TEXT);
+  INSERT INTO t1_a VALUES(1,'one');
+  INSERT INTO t1_a VALUES(4,'four');
+  CREATE TABLE t1_b(c INTEGER PRIMARY KEY, d TEXT);
+  INSERT INTO t1_b VALUES(2,'two');
+  INSERT INTO t1_b VALUES(5,'five');
+  CREATE TABLE t1_c(e INTEGER PRIMARY KEY, f TEXT);
+  INSERT INTO t1_c VALUES(3,'three');
+  INSERT INTO t1_c VALUES(6,'six');
+  CREATE VIEW v0(c0) AS SELECT CAST(t0.c0 AS INTEGER) FROM t0;
+  CREATE VIEW t1 AS 
+    SELECT a, b FROM t1_a   UNION ALL
+    SELECT c, c FROM t1_b   UNION ALL
+    SELECT e, f FROM t1_c;
+  SELECT t1.a, t1.b, t0.c0 AS c, v0.c0 AS d FROM t0 LEFT JOIN v0 ON v0.c0>'0',t1;
+----
+stmt 0 ok
+stmt 27 err 1 -1 55 no such table: t0
+stmt 55 ok
+stmt 107 err 1 -1 143 no such table: t1_a
+stmt 143 err 1 -1 180 no such table: t1_a
+stmt 180 ok
+stmt 232 err 1 -1 268 no such table: t1_b
+stmt 268 err 1 -1 305 no such table: t1_b
+stmt 305 ok
+stmt 357 err 1 -1 395 no such table: t1_c
+stmt 395 err 1 -1 431 no such table: t1_c
+stmt 431 ok
+stmt 494 ok
+stmt 618 err 1 -1 700 no such table: t0
+==== 8.2
+
+  SELECT * FROM (SELECT t1.a, t1.b, t0.c0 AS c, v0.c0 AS d FROM t0 LEFT JOIN v0 ON v0.c0>'0',t1) WHERE b=2;
+----
+stmt 0 err 1 -1 108 no such table: t0
+==== 8.3
+
+  SELECT * FROM (SELECT t1.a, t1.b, t0.c0 AS c, v0.c0 AS d FROM t0 LEFT JOIN v0 ON v0.c0>'0',t1) WHERE b=2.0;
+----
+stmt 0 err 1 -1 110 no such table: t0
+==== 8.4
+
+  SELECT * FROM (SELECT t1.a, t1.b, t0.c0 AS c, v0.c0 AS d FROM t0 LEFT JOIN v0 ON v0.c0>'0',t1) WHERE b='2';
+----
+stmt 0 err 1 -1 110 no such table: t0
+==== 8.5
+
+  SELECT * FROM (SELECT t1.a, t1.b, t0.c0 AS c, v0.c0 AS d FROM t0 LEFT JOIN v0 ON v0.c0>'0',t1) WHERE b=2;
+----
+stmt 0 err 1 -1 108 no such table: t0
+==== 8.6
+
+  SELECT * FROM (SELECT t1.a, t1.b, t0.c0 AS c, v0.c0 AS d FROM t0 LEFT JOIN v0 ON v0.c0>'0',t1) WHERE b=2.0;
+----
+stmt 0 err 1 -1 110 no such table: t0
+==== 8.7
+
+  SELECT * FROM (SELECT t1.a, t1.b, t0.c0 AS c, v0.c0 AS d FROM t0 LEFT JOIN v0 ON v0.c0>'0',t1) WHERE b='2';
+----
+stmt 0 err 1 -1 110 no such table: t0
+==== 8.8
+
+  SELECT * FROM (SELECT t1.a, t1.b, t0.c0 AS c, v0.c0 AS d FROM t0 LEFT JOIN v0 ON v0.c0>'0',t1) WHERE b=2;
+----
+stmt 0 err 1 -1 108 no such table: t0
+==== 8.9
+
+  SELECT * FROM (SELECT t1.a, t1.b, t0.c0 AS c, v0.c0 AS d FROM t0 LEFT JOIN v0 ON v0.c0>'0',t1) WHERE b=2.0;
+----
+stmt 0 err 1 -1 110 no such table: t0
+==== 8.10
+
+  SELECT * FROM (SELECT t1.a, t1.b, t0.c0 AS c, v0.c0 AS d FROM t0 LEFT JOIN v0 ON v0.c0>'0',t1) WHERE b='2';
+----
+stmt 0 err 1 -1 110 no such table: t0

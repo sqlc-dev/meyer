@@ -1,0 +1,55 @@
+==== index3-1.1
+
+    CREATE TABLE t1(a);
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(1);
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t1
+stmt 54 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 106 no such table: t1
+==== index3-1.2
+
+    BEGIN;
+    CREATE UNIQUE INDEX i1 ON t1(a);
+----
+stmt 0 ok
+stmt 11 err 1 -1 48 no such table: main.t1
+==== index3-2.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a, b, c, d, e, 
+                  PRIMARY KEY('a'), UNIQUE('b' COLLATE nocase DESC));
+  CREATE INDEX t1c ON t1('c');
+  CREATE INDEX t1d ON t1('d' COLLATE binary ASC);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION SELECT x+1 FROM c WHERE x<30)
+    INSERT INTO t1(a,b,c,d,e) 
+      SELECT x, printf('ab%03xxy',x), x, x, x FROM c;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 121 err 1 -1 152 no such table: main.t1
+stmt 152 err 1 -1 202 no such table: main.t1
+stmt 202 err 1 -1 359 no such table: t1
+==== index3-2.2
+
+  SELECT a FROM t1 WHERE b='ab005xy' COLLATE nocase;
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== index3-2.2eqp
+
+  EXPLAIN QUERY PLAN
+  SELECT a FROM t1 WHERE b='ab005xy' COLLATE nocase;
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== index3-2.3
+
+  SELECT name FROM sqlite_master WHERE tbl_name='t1' ORDER BY name
+----
+stmt 0 ok
+==== index3-2.5
+
+  SELECT name FROM sqlite_master WHERE tbl_name LIKE 't2_' ORDER BY name
+----
+stmt 0 ok

@@ -1,0 +1,20 @@
+==== sidedelete-2.0
+
+    CREATE TABLE t1(a PRIMARY KEY, b);
+    CREATE TABLE chng(a PRIMARY KEY, b);
+    SELECT count(*) FROM t1;
+    SELECT count(*) FROM chng;
+----
+stmt 0 ok
+stmt 39 ok
+stmt 80 err 1 -1 109 no such table: t1
+stmt 109 err 1 -1 140 no such table: chng
+==== sidedelete-3.0
+
+     DROP TABLE t1;
+     CREATE TABLE t1(a PRIMARY KEY);
+     SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 ok
+stmt 57 err 1 -1 80 no such table: t1

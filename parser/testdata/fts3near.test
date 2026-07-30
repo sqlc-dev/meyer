@@ -1,0 +1,219 @@
+==== fts3near-1.1
+SELECT docid FROM t1 WHERE content MATCH 'one NEAR/0 three'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== fts3near-1.2
+SELECT docid FROM t1 WHERE content MATCH 'one NEAR/1 two'
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== fts3near-1.3
+SELECT docid FROM t1 WHERE content MATCH 'one NEAR/1 three'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== fts3near-1.4
+SELECT docid FROM t1 WHERE content MATCH 'three NEAR/1 one'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== fts3near-1.5
+SELECT docid FROM t1 WHERE content MATCH '"one two" NEAR/1 five'
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== fts3near-1.6
+SELECT docid FROM t1 WHERE content MATCH '"one two" NEAR/2 five'
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== fts3near-1.7
+SELECT docid FROM t1 WHERE content MATCH 'one NEAR four'
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== fts3near-1.8
+SELECT docid FROM t1 WHERE content MATCH 'four NEAR three'
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== fts3near-1.9
+SELECT docid FROM t1 WHERE content MATCH '"four five" NEAR/0 three'
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== fts3near-1.10
+SELECT docid FROM t1 WHERE content MATCH '"four five" NEAR/2 one'
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== fts3near-1.11
+SELECT docid FROM t1 WHERE content MATCH '"four five" NEAR/1 one'
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== fts3near-1.12
+SELECT docid FROM t1 WHERE content MATCH 'five NEAR/1 "two three"'
+----
+stmt 0 err 1 -1 67 no such table: t1
+==== fts3near-1.13
+SELECT docid FROM t1 WHERE content MATCH 'one NEAR five'
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== fts3near-1.14
+SELECT docid FROM t1 WHERE content MATCH 'four NEAR four'
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== fts3near-1.15
+SELECT docid FROM t1 WHERE content MATCH 'one NEAR two NEAR one'
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== fts3near-1.16
+
+    SELECT docid FROM t1 WHERE content MATCH '"one three" NEAR/0 "four five"'
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== fts3near-1.17
+
+    SELECT docid FROM t1 WHERE content MATCH '"four five" NEAR/0 "one three"'
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== fts3near-2.1
+
+    SELECT offsets(t1) FROM t1 WHERE content MATCH 'A NEAR/0 B'
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== fts3near-2.2
+
+    SELECT offsets(t1) FROM t1 WHERE content MATCH 'B NEAR/0 A'
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== fts3near-2.3
+
+    SELECT offsets(t1) FROM t1 WHERE content MATCH '"C D" NEAR/0 A'
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== fts3near-2.4
+
+    SELECT offsets(t1) FROM t1 WHERE content MATCH 'A NEAR/0 "C D"'
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== fts3near-2.5
+
+    SELECT offsets(t1) FROM t1 WHERE content MATCH 'A NEAR A'
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== fts3near-2.6
+
+    INSERT INTO t1 VALUES('A A A');
+    SELECT offsets(t1) FROM t1 WHERE content MATCH 'A NEAR/2 A';
+----
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 101 no such table: t1
+==== fts3near-2.7
+
+    DELETE FROM t1;
+    INSERT INTO t1 VALUES('A A A A');
+    SELECT offsets(t1) FROM t1 WHERE content MATCH 'A NEAR A NEAR A';
+----
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 58 no such table: t1
+stmt 58 err 1 -1 128 no such table: t1
+==== fts3near-3.1
+SELECT offsets(t1) FROM t1 WHERE content MATCH 'three NEAR/1 one'
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== fts3near-3.2
+SELECT offsets(t1) FROM t1 WHERE content MATCH 'one NEAR/1 three'
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== fts3near-3.3
+SELECT offsets(t1) FROM t1 WHERE content MATCH 'three NEAR/1 two'
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== fts3near-3.4
+SELECT offsets(t1) FROM t1 WHERE content MATCH 'three NEAR/2 two'
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== fts3near-3.5
+SELECT offsets(t1) FROM t1 WHERE content MATCH 'two NEAR/2 three'
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== fts3near-3.6
+
+    SELECT offsets(t1) FROM t1 WHERE content MATCH 'three NEAR/0 "two four"'
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== fts3near-3.7
+
+    SELECT offsets(t1) FROM t1 WHERE content MATCH '"two four" NEAR/0 three'
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== fts3near-4.1
+
+    SELECT snippet(t1) FROM t1 WHERE content MATCH 'specification NEAR supports'
+----
+stmt 0 err 1 -1 82 no such table: t1
+==== fts3near-5.1
+
+    SELECT docid FROM t1 WHERE content MATCH 'specification attach'
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== fts3near-5.2
+
+    SELECT docid FROM t1 WHERE content MATCH 'specification NEAR attach'
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== fts3near-5.3
+
+    SELECT docid FROM t1 WHERE content MATCH 'specification NEAR/18 attach'
+----
+stmt 0 err 1 -1 77 no such table: t1
+==== fts3near-5.4
+
+    SELECT docid FROM t1 WHERE content MATCH 'specification NEAR/19 attach'
+----
+stmt 0 err 1 -1 77 no such table: t1
+==== fts3near-5.5
+
+    SELECT docid FROM t1 WHERE content MATCH 'specification NEAR/000018 attach'
+----
+stmt 0 err 1 -1 81 no such table: t1
+==== fts3near-5.6
+
+    SELECT docid FROM t1 WHERE content MATCH 'specification NEAR/000019 attach'
+----
+stmt 0 err 1 -1 81 no such table: t1
+==== fts3near-6.1
+
+    SELECT docid FROM t1 WHERE content MATCH 'abbrev zygosis'
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== fts3near-6.2
+
+    SELECT docid FROM t1 WHERE content MATCH 'abbrev NEAR zygosis'
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== fts3near-6.3
+
+    SELECT docid FROM t1 WHERE content MATCH 'abbrev NEAR/100 zygosis'
+----
+stmt 0 err 1 -1 72 no such table: t1
+==== fts3near-6.4
+
+    SELECT docid FROM t1 WHERE content MATCH 'abbrev NEAR/1000 zygosis'
+----
+stmt 0 err 1 -1 73 no such table: t1
+==== fts3near-6.5
+
+    SELECT docid FROM t1 WHERE content MATCH 'abbrev NEAR/10000 zygosis'
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== fts3near-7.1
+
+  CREATE VIRTUAL TABLE x USING fts4(y,z);
+  INSERT INTO x VALUES('aaa bbb ccc ddd', 'bbb ddd aaa ccc');
+  SELECT * FROM x where y MATCH 'bbb NEAR/6 aaa';
+----
+stmt 0 ok
+stmt 42 err 1 -1 104 no such table: x
+stmt 104 err 1 -1 154 no such table: x
+==== fts3near-7.2
+
+  CREATE VIRTUAL TABLE t2 USING fts4(a, b);
+  INSERT INTO t2 VALUES('A B C', 'A D E');
+  SELECT * FROM t2 where t2 MATCH 'a:A NEAR E'
+----
+stmt 0 ok
+stmt 44 err 1 -1 87 no such table: t2
+stmt 87 err 1 -1 135 no such table: t2

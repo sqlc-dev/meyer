@@ -1,0 +1,46 @@
+==== upfromfault-generated
+
+    CREATE TABLE log(t TEXT);
+
+    INSERT INTO t1 VALUES(1, 'i',   'one');
+    INSERT INTO t1 VALUES(2, 'ii',  'two');
+    INSERT INTO t1 VALUES(3, 'iii', 'three');
+    INSERT INTO t1 VALUES(4, 'iv',  'four');
+----
+stmt 0 ok
+stmt 30 err 1 -1 75 no such table: t1
+stmt 75 err 1 -1 119 no such table: t1
+stmt 119 err 1 -1 165 no such table: t1
+stmt 165 err 1 -1 210 no such table: t1
+==== upfromfault-generated.dup1
+
+      CREATE TRIGGER tr1 BEFORE UPDATE ON t1 BEGIN
+        INSERT INTO log VALUES(old.z || '->' || new.z);
+      END;
+      CREATE TRIGGER tr2 AFTER UPDATE ON t1 BEGIN
+        INSERT INTO log VALUES(old.y || '->' || new.y);
+      END;
+----
+stmt 0 err 1 -1 51 no such table: main.t1
+stmt 118 err 1 -1 168 no such table: main.t1
+==== 2.0
+
+  CREATE TABLE t1(a, b, c);
+  CREATE TABLE t2(x, y, z);
+----
+stmt 0 ok
+stmt 28 ok
+==== 2.2
+
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    UPDATE t1 SET a=x FROM t2 WHERE c=z;
+  END;
+
+  INSERT INTO t2 VALUES(1, 1, 1);
+  INSERT INTO t2 VALUES(2, 2, 2);
+  INSERT INTO t2 VALUES(3, 3, 3);
+----
+stmt 0 err 1 -1 46 no such table: main.t1
+stmt 94 err 1 -1 129 no such table: t2
+stmt 129 err 1 -1 163 no such table: t2
+stmt 163 err 1 -1 197 no such table: t2

@@ -1,0 +1,7 @@
+==== pcache2-2.2
+
+  PRAGMA page_size = 4096;
+  CREATE TABLE t1(x);
+----
+stmt 0 ok
+stmt 27 ok

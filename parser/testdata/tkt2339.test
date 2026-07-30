@@ -1,0 +1,78 @@
+==== tkt2339.1
+
+    create table t1(num int);
+    insert into t1 values (1);
+    insert into t1 values (2);
+    insert into t1 values (3);
+    insert into t1 values (4);
+    
+    create table t2(num int);
+    insert into t2 values (11);
+    insert into t2 values (12);
+    insert into t2 values (13);
+    insert into t2 values (14);
+    
+    SELECT * FROM (SELECT * FROM t1 ORDER BY num DESC LIMIT 2)
+    UNION
+    SELECT * FROM (SELECT * FROM t2 ORDER BY num DESC LIMIT 2)
+----
+stmt 0 ok
+stmt 30 err 1 -1 61 no such table: t1
+stmt 61 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 123 no such table: t1
+stmt 123 err 1 -1 154 no such table: t1
+stmt 154 ok
+stmt 189 err 1 -1 221 no such table: t2
+stmt 221 err 1 -1 253 no such table: t2
+stmt 253 err 1 -1 285 no such table: t2
+stmt 285 err 1 -1 317 no such table: t2
+stmt 317 err 1 -1 459 no such table: t2
+==== tkt2339.2
+
+    SELECT * FROM (SELECT * FROM t1 ORDER BY num DESC LIMIT 2)
+    UNION ALL
+    SELECT * FROM (SELECT * FROM t2 ORDER BY num DESC LIMIT 2)
+----
+stmt 0 err 1 -1 141 no such table: t2
+==== tkt2339.4
+
+    SELECT * FROM (SELECT * FROM t1 ORDER BY num DESC LIMIT 2)
+    UNION ALL
+    SELECT * FROM (SELECT * FROM t2 ORDER BY num DESC)
+----
+stmt 0 err 1 -1 133 no such table: t2
+==== tkt2339.5
+
+    SELECT * FROM (SELECT * FROM t1 ORDER BY num DESC LIMIT 2)
+    UNION
+    SELECT * FROM (SELECT * FROM t2 ORDER BY num DESC)
+----
+stmt 0 err 1 -1 129 no such table: t2
+==== tkt2339.6
+
+    SELECT * FROM (SELECT * FROM t1 ORDER BY num DESC LIMIT 2)
+    EXCEPT
+    SELECT * FROM (SELECT * FROM t2 ORDER BY num DESC)
+----
+stmt 0 err 1 -1 130 no such table: t2
+==== tkt2339.7
+
+    SELECT * FROM (SELECT * FROM t1 LIMIT 2)
+    UNION
+    SELECT * FROM (SELECT * FROM t2 ORDER BY num DESC LIMIT 2)
+----
+stmt 0 err 1 -1 119 no such table: t2
+==== tkt2339.8
+
+    SELECT * FROM (SELECT * FROM t1 LIMIT 2)
+    UNION
+    SELECT * FROM (SELECT * FROM t2 LIMIT 2)
+----
+stmt 0 err 1 -1 101 no such table: t2
+==== tkt2339.9
+
+    SELECT * FROM (SELECT * FROM t1 ORDER BY num DESC LIMIT 2)
+    UNION
+    SELECT * FROM (SELECT * FROM t2 LIMIT 2)
+----
+stmt 0 err 1 -1 119 no such table: t2

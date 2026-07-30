@@ -1,0 +1,64 @@
+==== fts3ab-1.1
+SELECT rowid FROM t1 WHERE english MATCH 'one'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== fts3ab-1.2
+SELECT rowid FROM t1 WHERE spanish MATCH 'one'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== fts3ab-1.3
+SELECT rowid FROM t1 WHERE german MATCH 'one'
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== fts3ab-1.4
+SELECT rowid FROM t1 WHERE t1 MATCH 'one'
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== fts3ab-1.5
+SELECT rowid FROM t1 WHERE t1 MATCH 'one dos drei'
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== fts3ab-1.6
+SELECT english, spanish, german FROM t1 WHERE rowid=1
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== fts3ab-1.7
+SELECT rowid FROM t1 WHERE t1 MATCH '"one un"'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== fts3ab-4.1
+SELECT rowid FROM t4 WHERE t4 MATCH 'norm:one'
+----
+stmt 0 err 1 -1 47 no such table: t4
+==== fts3ab-4.2
+SELECT rowid FROM t4 WHERE norm MATCH 'one'
+----
+stmt 0 err 1 -1 44 no such table: t4
+==== fts3ab-4.3
+SELECT rowid FROM t4 WHERE t4 MATCH 'one'
+----
+stmt 0 err 1 -1 42 no such table: t4
+==== fts3ab-4.4
+SELECT rowid FROM t4 WHERE t4 MATCH 'plusone:one'
+----
+stmt 0 err 1 -1 50 no such table: t4
+==== fts3ab-4.5
+SELECT rowid FROM t4 WHERE plusone MATCH 'one'
+----
+stmt 0 err 1 -1 47 no such table: t4
+==== fts3ab-4.6
+SELECT rowid FROM t4 WHERE t4 MATCH 'norm:one plusone:two'
+----
+stmt 0 err 1 -1 59 no such table: t4
+==== fts3ab-4.7
+SELECT rowid FROM t4 WHERE t4 MATCH 'norm:one two'
+----
+stmt 0 err 1 -1 51 no such table: t4
+==== fts3ab-4.8
+SELECT rowid FROM t4 WHERE t4 MATCH 'plusone:two norm:one'
+----
+stmt 0 err 1 -1 59 no such table: t4
+==== fts3ab-4.9
+SELECT rowid FROM t4 WHERE t4 MATCH 'two norm:one'
+----
+stmt 0 err 1 -1 51 no such table: t4

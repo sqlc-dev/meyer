@@ -1,0 +1,4 @@
+==== win32nolock-1.3
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1

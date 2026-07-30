@@ -1,0 +1,513 @@
+==== joinF-1
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 147 no such table: t1
+==== joinF-2
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 195 no such table: t1
+==== joinF-3
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-4
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-5
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 147 no such table: t1
+==== joinF-6
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 195 no such table: t1
+==== joinF-7
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-8
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-9
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 145 no such table: t1
+==== joinF-10
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinF-11
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-12
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-13
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 147 no such table: t1
+==== joinF-14
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 195 no such table: t1
+==== joinF-15
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-16
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-17
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 147 no such table: t1
+==== joinF-18
+
+  SELECT *
+  FROM t1 INNER JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 195 no such table: t1
+==== joinF-19
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-20
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-21
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 145 no such table: t1
+==== joinF-22
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinF-23
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-24
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-25
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 145 no such table: t1
+==== joinF-26
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinF-27
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 144 no such table: t1
+==== joinF-28
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinF-29
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 145 no such table: t1
+==== joinF-30
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinF-31
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-32
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-33
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 145 no such table: t1
+==== joinF-34
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinF-35
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-36
+
+  SELECT *
+  FROM t1 LEFT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-37
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 147 no such table: t1
+==== joinF-38
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 195 no such table: t1
+==== joinF-39
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-40
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-41
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 147 no such table: t1
+==== joinF-42
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  INNER JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 195 no such table: t1
+==== joinF-43
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-44
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-45
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 145 no such table: t1
+==== joinF-46
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinF-47
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-48
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  LEFT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-49
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 147 no such table: t1
+==== joinF-50
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  INNER JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 195 no such table: t1
+==== joinF-51
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 146 no such table: t1
+==== joinF-52
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  LEFT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 194 no such table: t1
+==== joinF-53
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 147 no such table: t1
+==== joinF-54
+
+  SELECT *
+  FROM t1 RIGHT JOIN t2 ON true
+  RIGHT JOIN t3 ON t2.y IS NOT NULL
+  RIGHT JOIN t4 ON true
+  WHERE (t3.z!=400 AND t3.z!=500 AND t3.z!=600)
+  ORDER BY coalesce(t1.x,t2.y,t3.z,t4.w,0);
+----
+stmt 0 err 1 -1 195 no such table: t1

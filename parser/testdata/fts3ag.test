@@ -1,0 +1,52 @@
+==== fts3ag-1.1
+SELECT rowid FROM t1 WHERE t1 MATCH 'something'
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== fts3ag-1.2
+SELECT rowid FROM t1 WHERE t1 MATCH '-this something'
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== fts3ag-1.3
+SELECT rowid FROM t1 WHERE t1 MATCH 'this -something'
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== fts3ag-1.4
+SELECT rowid FROM t1 WHERE t1 MATCH '"this something"'
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== fts3ag-1.5
+SELECT rowid FROM t1 WHERE t1 MATCH '"something is"'
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== fts3ag-1.6
+SELECT rowid FROM t1 WHERE t1 MATCH 'something OR this'
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== fts3ag-1.7
+SELECT rowid FROM t1 WHERE t1 MATCH 'this OR something'
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== fts3ag-1.8
+SELECT rowid FROM t1 WHERE t1 MATCH 'something this'
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== fts3ag-1.9
+SELECT rowid FROM t1 WHERE t1 MATCH 'this something'
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== fts3ag-1.10
+SELECT rowid FROM t1 WHERE t1 MATCH '-this -something'
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== fts3ag-1.11
+SELECT rowid FROM t1 WHERE t1 MATCH 'this OR also'
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== fts3ag-1.12
+SELECT rowid FROM t1 WHERE t1 MATCH 'also OR this'
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== fts3ag-1.13
+SELECT rowid FROM t1 WHERE t1 MATCH 'something OR nothing'
+----
+stmt 0 err 1 -1 59 no such table: t1

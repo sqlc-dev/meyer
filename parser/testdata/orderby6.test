@@ -1,0 +1,120 @@
+==== orderby6-generated
+
+    SELECT b,a,c FROM t1 ORDER BY b,a,c;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== orderby6-generated.dup1
+
+    SELECT b,a,c FROM t1 ORDER BY b,c DESC,a;
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== orderby6-generated.dup2
+
+    SELECT b,a,c FROM t1 ORDER BY b DESC,c,a;
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== orderby6-generated.dup3
+
+    SELECT b,a,c FROM t1 ORDER BY b DESC,a,c;
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== orderby6-generated.dup4
+
+    SELECT a FROM t1 ORDER BY b, a LIMIT 10 OFFSET 20;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== orderby6-generated.dup5
+
+    SELECT a FROM t1 ORDER BY +b, a LIMIT 10 OFFSET 20;
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== orderby6-generated.dup6
+
+    SELECT a FROM t1 ORDER BY b DESC, a LIMIT 10 OFFSET 20;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== orderby6-generated.dup7
+
+    SELECT a FROM t1 ORDER BY +b DESC, a LIMIT 10 OFFSET 20;
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== orderby6-generated.dup8
+
+    SELECT a FROM t1 ORDER BY b, a DESC LIMIT 10 OFFSET 45;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== orderby6-generated.dup9
+
+    SELECT a FROM t1 ORDER BY +b, a DESC LIMIT 10 OFFSET 45;
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== orderby6-generated.dup10
+
+    SELECT a FROM t1 ORDER BY b DESC, a LIMIT 10 OFFSET 45;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== orderby6-generated.dup11
+
+    SELECT a FROM t1 ORDER BY +b DESC, a LIMIT 10 OFFSET 45;
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== orderby6-generated.dup12
+
+    SELECT a FROM t2 ORDER BY b,c,d,e,f;
+----
+stmt 0 err 1 -1 41 no such table: t2
+==== orderby6-generated.dup13
+
+    SELECT a FROM t2 ORDER BY b,c,d,e,+f;
+----
+stmt 0 err 1 -1 42 no such table: t2
+==== orderby6-generated.dup14
+
+    SELECT a FROM t2 ORDER BY b,c,d,+e,+f;
+----
+stmt 0 err 1 -1 43 no such table: t2
+==== orderby6-generated.dup15
+
+    SELECT a FROM t2 ORDER BY b,c,+d,+e,+f;
+----
+stmt 0 err 1 -1 44 no such table: t2
+==== orderby6-generated.dup16
+
+    SELECT a FROM t2 ORDER BY b,+c,+d,+e,+f;
+----
+stmt 0 err 1 -1 45 no such table: t2
+==== orderby6-generated.dup17
+
+    SELECT a FROM t2 ORDER BY b,c,d,e,f DESC;
+----
+stmt 0 err 1 -1 46 no such table: t2
+==== orderby6-generated.dup18
+
+    SELECT a FROM t2 ORDER BY b,c,d,e DESC,f;
+----
+stmt 0 err 1 -1 46 no such table: t2
+==== orderby6-generated.dup19
+
+    SELECT a FROM t2 ORDER BY b,c,d DESC,e,f;
+----
+stmt 0 err 1 -1 46 no such table: t2
+==== orderby6-generated.dup20
+
+    SELECT a FROM t2 ORDER BY b,c DESC,d,e,f;
+----
+stmt 0 err 1 -1 46 no such table: t2
+==== orderby6-generated.dup21
+
+    SELECT a FROM t2 ORDER BY b DESC,c,d,e,f;
+----
+stmt 0 err 1 -1 46 no such table: t2
+==== orderby6-generated.dup22
+
+    SELECT a FROM t2 ORDER BY b DESC,c DESC,d,e,f LIMIT 31;
+----
+stmt 0 err 1 -1 60 no such table: t2
+==== orderby6-generated.dup23
+
+    SELECT a FROM t2 ORDER BY b,c,d,e,f DESC LIMIT 8 OFFSET 7;
+----
+stmt 0 err 1 -1 63 no such table: t2

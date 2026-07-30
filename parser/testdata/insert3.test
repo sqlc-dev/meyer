@@ -1,0 +1,172 @@
+==== insert3-1.0
+
+    CREATE TABLE t1(a,b);
+    CREATE TABLE log(x UNIQUE, y);
+    CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN
+      UPDATE log SET y=y+1 WHERE x=new.a;
+      INSERT OR IGNORE INTO log VALUES(new.a, 1);
+    END;
+    INSERT INTO t1 VALUES('hello','world');
+    INSERT INTO t1 VALUES(5,10);
+    SELECT * FROM log ORDER BY x;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 61 err 1 -1 108 no such table: main.t1
+stmt 209 err 1 -1 253 no such table: t1
+stmt 253 err 1 -1 286 no such table: t1
+stmt 286 err 1 -1 320 no such table: log
+==== insert3-1.1
+
+    INSERT INTO t1 SELECT a, b+10 FROM t1;
+    SELECT * FROM log ORDER BY x;
+----
+stmt 0 err 1 -1 43 no such table: t1
+stmt 43 err 1 -1 77 no such table: log
+==== insert3-1.2
+
+    CREATE TABLE log2(x PRIMARY KEY,y);
+    CREATE TRIGGER r2 BEFORE INSERT ON t1 BEGIN
+      UPDATE log2 SET y=y+1 WHERE x=new.b;
+      INSERT OR IGNORE INTO log2 VALUES(new.b,1);
+    END;
+    INSERT INTO t1 VALUES(453,'hi');
+    SELECT * FROM log ORDER BY x;
+----
+stmt 0 ok
+stmt 40 err 1 -1 88 no such table: main.t1
+stmt 190 err 1 -1 227 no such table: t1
+stmt 227 err 1 -1 261 no such table: log
+==== insert3-1.3
+
+    SELECT * FROM log2 ORDER BY x;
+----
+stmt 0 err 1 -1 35 no such table: log2
+==== insert3-1.4.1
+
+      INSERT INTO t1 SELECT * FROM t1;
+      SELECT 'a:', x, y FROM log UNION ALL 
+          SELECT 'b:', x, y FROM log2 ORDER BY x;
+----
+stmt 0 err 1 -1 39 no such table: t1
+stmt 39 err 1 -1 133 no such table: log2
+==== insert3-1.4.2
+
+      SELECT 'a:', x, y FROM log UNION ALL 
+          SELECT 'b:', x, y FROM log2 ORDER BY x, y;
+----
+stmt 0 err 1 -1 97 no such table: log2
+==== insert3-1.5
+
+      INSERT INTO t1(a) VALUES('xyz');
+      SELECT * FROM log ORDER BY x;
+----
+stmt 0 err 1 -1 39 no such table: t1
+stmt 39 err 1 -1 75 no such table: log
+==== insert3-2.1
+
+    CREATE TABLE t2(
+      a INTEGER PRIMARY KEY,
+      b DEFAULT 'b',
+      c DEFAULT 'c'
+    );
+    CREATE TABLE t2dup(a,b,c);
+    CREATE TRIGGER t2r1 BEFORE INSERT ON t2 BEGIN
+      INSERT INTO t2dup(a,b,c) VALUES(new.a,new.b,new.c);
+    END;
+    INSERT INTO t2(a) VALUES(123);
+    INSERT INTO t2(b) VALUES(234);
+    INSERT INTO t2(c) VALUES(345);
+    SELECT * FROM t2dup;
+----
+stmt 0 ok
+stmt 98 ok
+stmt 129 err 1 -1 179 no such table: main.t2
+stmt 246 err 1 -1 281 no such table: t2
+stmt 281 err 1 -1 316 no such table: t2
+stmt 316 err 1 -1 351 no such table: t2
+stmt 351 err 1 -1 376 no such table: t2dup
+==== insert3-2.2
+
+    DELETE FROM t2dup;
+    INSERT INTO t2(a) SELECT 1 FROM t1 LIMIT 1;
+    INSERT INTO t2(b) SELECT 987 FROM t1 LIMIT 1;
+    INSERT INTO t2(c) SELECT 876 FROM t1 LIMIT 1;
+    SELECT * FROM t2dup;
+----
+stmt 0 err 1 -1 23 no such table: t2dup
+stmt 23 err 1 -1 71 no such table: t2
+stmt 71 err 1 -1 121 no such table: t2
+stmt 121 err 1 -1 171 no such table: t2
+stmt 171 err 1 -1 196 no such table: t2dup
+==== insert3-3.1
+
+    CREATE TABLE t3(a,b,c);
+    CREATE TRIGGER t3r1 BEFORE INSERT on t3 WHEN nosuchcol BEGIN
+      SELECT 'illegal WHEN clause';
+    END;
+----
+stmt 0 ok
+stmt 28 err 1 -1 93 no such table: main.t3
+==== insert3-3.2
+
+    INSERT INTO t3 VALUES(1,2,3)
+----
+stmt 0 err 1 -1 34 no such table: t3
+==== insert3-3.3
+
+    CREATE TABLE t4(a,b,c);
+    CREATE TRIGGER t4r1 AFTER INSERT on t4 WHEN nosuchcol BEGIN
+      SELECT 'illegal WHEN clause';
+    END;
+----
+stmt 0 ok
+stmt 28 err 1 -1 92 no such table: main.t4
+==== insert3-3.4
+
+    INSERT INTO t4 VALUES(1,2,3)
+----
+stmt 0 err 1 -1 34 no such table: t4
+==== insert3-3.5
+
+    CREATE TABLE t5(
+      a INTEGER PRIMARY KEY,
+      b DEFAULT 'xyz'
+    );
+    INSERT INTO t5 DEFAULT VALUES;
+    SELECT * FROM t5;
+----
+stmt 0 ok
+stmt 79 err 1 -1 114 no such table: t5
+stmt 114 err 1 -1 136 no such table: t5
+==== insert3-3.6
+
+    INSERT INTO t5 DEFAULT VALUES;
+    SELECT * FROM t5;
+----
+stmt 0 err 1 -1 35 no such table: t5
+stmt 35 err 1 -1 57 no such table: t5
+==== insert3-3.7
+
+      CREATE TABLE t6(x,y DEFAULT 4.3, z DEFAULT x'6869');
+      INSERT INTO t6 DEFAULT VALUES;
+      SELECT * FROM t6;
+----
+stmt 0 ok
+stmt 59 err 1 -1 96 no such table: t6
+stmt 96 err 1 -1 120 no such table: t6
+==== insert3-4.2
+
+    PRAGMA cache_size = 10;
+    BEGIN;
+      UPDATE t1 SET a = randstr(10,10) WHERE (rowid%4)==0;
+      DELETE FROM t1 WHERE rowid%2;
+      INSERT INTO t1 SELECT randstr(10,400), randstr(10,400), c FROM t1;
+    COMMIT;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 39 err 1 -1 98 no such table: t1
+stmt 98 err 1 -1 134 no such table: t1
+stmt 134 err 1 -1 207 no such table: t1
+stmt 207 ok

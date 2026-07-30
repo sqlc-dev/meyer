@@ -1,0 +1,140 @@
+==== zeroblob-1.2
+
+    SELECT length(d) FROM t1
+----
+stmt 0 err 1 -1 30 no such table: t1
+==== zeroblob-1.4
+
+    SELECT length(c), length(d) FROM t1
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== zeroblob-1.6
+
+    SELECT length(c), length(d) FROM t1
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== zeroblob-1.8
+
+    SELECT length(b), length(d) FROM t1 WHERE a=5
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== zeroblob-2.1
+
+    SELECT a FROM t1 WHERE b=zeroblob(10000)
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== zeroblob-2.2
+
+    CREATE INDEX i1_1 ON t1(b);
+    SELECT a FROM t1 WHERE b=zeroblob(10000);
+----
+stmt 0 err 1 -1 32 no such table: main.t1
+stmt 32 err 1 -1 78 no such table: t1
+==== zeroblob-3.1
+
+      SELECT count(DISTINCT a) FROM (
+        SELECT x'00000000000000000000' AS a
+        UNION ALL
+        SELECT zeroblob(10) AS a
+      )
+----
+stmt 0 ok
+==== zeroblob-4.1
+
+      SELECT hex(zeroblob(2) || x'61')
+----
+stmt 0 ok
+==== zeroblob-5.1
+
+    SELECT CAST (zeroblob(100) AS REAL);
+----
+stmt 0 ok
+==== zeroblob-5.2
+
+    SELECT CAST (zeroblob(100) AS INTEGER);
+----
+stmt 0 ok
+==== zeroblob-5.3
+
+    SELECT CAST (zeroblob(100) AS TEXT);
+----
+stmt 0 ok
+==== zeroblob-5.4
+
+    SELECT CAST(zeroblob(100) AS BLOB);
+----
+stmt 0 ok
+==== zeroblob-6.1.1
+select zeroblob(-1)
+----
+stmt 0 ok
+==== zeroblob-6.1.2
+select zeroblob(-10)
+----
+stmt 0 ok
+==== zeroblob-6.1.3
+select zeroblob(-100)
+----
+stmt 0 ok
+==== zeroblob-6.2
+select length(zeroblob(-1))
+----
+stmt 0 ok
+==== zeroblob-6.3
+select zeroblob(-1)|1
+----
+stmt 0 ok
+==== zeroblob-6.4
+select length(zeroblob(2147483648))
+----
+stmt 0 ok
+==== zeroblob-6.5
+select zeroblob(2147483648)
+----
+stmt 0 ok
+==== zeroblob-6.6
+select hex(zeroblob(-1))
+----
+stmt 0 ok
+==== zeroblob-6.7
+select typeof(zeroblob(-1))
+----
+stmt 0 ok
+==== 11.0
+ 
+  SELECT length(zeroblob(-1444444444444444));
+----
+stmt 0 ok
+==== 11.1
+ 
+  SELECT zeroblob(5000 * 1024 * 1024);
+----
+stmt 0 ok
+==== 11.2
+ 
+  SELECT quote(zeroblob(5000 * 1024 * 1024));
+----
+stmt 0 ok
+==== 11.3
+ 
+  SELECT quote(zeroblob(-1444444444444444));
+----
+stmt 0 ok
+==== 11.4
+
+  SELECT quote(test_zeroblob(-1));
+----
+stmt 0 err 1 16 35 no such function: test_zeroblob
+==== 13.100
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a,b,c);
+  CREATE INDEX t1bbc ON t1(b, b+c);
+  INSERT INTO t1(a,b,c) VALUES(1,zeroblob(8),3);
+  SELECT a, quote(b), length(b), c FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 53 err 1 -1 89 no such table: main.t1
+stmt 89 err 1 -1 138 no such table: t1
+stmt 138 err 1 -1 182 no such table: t1

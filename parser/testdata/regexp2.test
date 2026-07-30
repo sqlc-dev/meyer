@@ -1,0 +1,140 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c);
+  CREATE TABLE x1(x, y, z);
+  CREATE TABLE x2(x, y, z);
+
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO x1 VALUES(
+        new.a REGEXP 'abc',
+        new.b REGEXP 'abc',
+        new.c REGEXP 'abc'
+    );
+  END;
+
+  CREATE TRIGGER tr2 AFTER INSERT ON t1 BEGIN
+    INSERT INTO x2 VALUES(
+        new.a REGEXP 'def',
+        new.b REGEXP 'def',
+        new.c REGEXP 'def'
+    );
+  END;
+
+  INSERT INTO t1 VALUES('abc', 'def', 'abc');
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 56 ok
+stmt 84 err 1 -1 131 no such table: main.t1
+stmt 255 err 1 -1 302 no such table: main.t1
+stmt 426 err 1 -1 473 no such table: t1
+stmt 473 err 1 -1 493 no such table: t1
+==== 1.1
+ SELECT * FROM x1
+----
+stmt 0 err 1 -1 18 no such table: x1
+==== 1.2
+ SELECT * FROM x2
+----
+stmt 0 err 1 -1 18 no such table: x2
+==== 2.0
+
+  CREATE TABLE t2(a, b);
+  CREATE TABLE t3(c, d);
+  CREATE TABLE t4(e, f);
+
+  CREATE TRIGGER t2_tr1 AFTER UPDATE ON t2 BEGIN
+    UPDATE t3 SET d = new.b WHERE c = old.a;
+  END;
+
+  CREATE TRIGGER t3_tr1 AFTER UPDATE ON t3 BEGIN
+    UPDATE t4 SET f = new.d WHERE e = old.c AND new.d REGEXP 'a.*';
+  END;
+
+  CREATE TRIGGER t4_tr1 AFTER UPDATE ON t4 BEGIN
+    SELECT CASE WHEN new.f REGEXP '.*y.*' THEN error() ELSE 1 END;
+  END;
+
+  INSERT INTO t2 VALUES(1, 'a_x_1');
+  INSERT INTO t2 VALUES(2, 'a_y_1');
+
+  INSERT INTO t3 VALUES(1, 'b1');
+  INSERT INTO t3 VALUES(2, 'b2');
+
+  INSERT INTO t4 VALUES(1, 'b1');
+  INSERT INTO t4 VALUES(2, 'b2');
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 ok
+stmt 75 err 1 -1 125 no such table: main.t2
+stmt 177 err 1 -1 227 no such table: main.t3
+stmt 302 err 1 -1 352 no such table: main.t4
+stmt 426 err 1 -1 464 no such table: t2
+stmt 464 err 1 -1 501 no such table: t2
+stmt 501 err 1 -1 536 no such table: t3
+stmt 536 err 1 -1 570 no such table: t3
+stmt 570 err 1 -1 605 no such table: t4
+stmt 605 err 1 -1 639 no such table: t4
+==== 2.1
+
+  UPDATE t2 SET a=a+1 WHERE b REGEXP 'a.*' AND b REGEXP '.*1';
+----
+stmt 0 err 1 -1 63 no such table: t2
+==== 2.2
+
+  UPDATE t2 SET b = 'a_abc_1';
+----
+stmt 0 err 1 -1 31 no such table: t2
+==== 2.3
+
+  SELECT * FROM t2;
+  SELECT * FROM t3;
+  SELECT * FROM t4;
+----
+stmt 0 err 1 -1 20 no such table: t2
+stmt 20 err 1 -1 40 no such table: t3
+stmt 40 err 1 -1 60 no such table: t4
+==== 3.0
+
+  CREATE TABLE t5(a);
+  CREATE TABLE t6(x);
+
+  CREATE TRIGGER t5tr AFTER DELETE ON t5 BEGIN
+    DELETE FROM t6 WHERE t6.x REGEXP old.a;
+  END;
+
+  INSERT INTO t5 VALUES ('^a.*'), ('^b.*'), ('^c.*');
+  INSERT INTO t6 VALUES ('eab'), ('abc'), ('bcd'), ('cde'), ('dea');
+
+  DELETE FROM t5;
+  SELECT * FROM t6;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 92 no such table: main.t5
+stmt 143 err 1 -1 198 no such table: t5
+stmt 198 err 1 -1 267 no such table: t6
+stmt 267 err 1 -1 286 no such table: t5
+stmt 286 err 1 -1 306 no such table: t6
+==== 5.0
+
+  SELECT 'abc' REGEXP 'a{1,999}bc';
+----
+stmt 0 err 1 16 36 no such function: REGEXP
+==== 5.1
+
+  SELECT 'abc' REGEXP 'a{1,25000}bc';
+----
+stmt 0 err 1 16 38 no such function: REGEXP
+==== 5.2
+
+  SELECT 'abc' REGEXP 'a{999}bc';
+----
+stmt 0 err 1 16 34 no such function: REGEXP
+==== 5.3
+
+  SELECT 'abc' REGEXP 'a{25000}bc';
+----
+stmt 0 err 1 16 36 no such function: REGEXP

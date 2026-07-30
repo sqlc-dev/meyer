@@ -1,0 +1,60 @@
+==== enc3-1.1
+
+      PRAGMA encoding=utf16le;
+      PRAGMA encoding;
+----
+stmt 0 ok
+stmt 31 ok
+==== enc3-1.2
+
+    CREATE TABLE t1(x,y);
+    INSERT INTO t1 VALUES('abc''123',5);
+    SELECT * FROM t1
+----
+stmt 0 ok
+stmt 26 err 1 -1 67 no such table: t1
+stmt 67 err 1 -1 89 no such table: t1
+==== enc3-1.3
+
+    SELECT quote(x) || ' ' || quote(y) FROM t1
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== enc3-1.4
+
+      DELETE FROM t1;
+      INSERT INTO t1 VALUES(x'616263646566',NULL);
+      SELECT * FROM t1
+----
+stmt 0 err 1 -1 22 no such table: t1
+stmt 22 err 1 -1 73 no such table: t1
+stmt 73 err 1 -1 97 no such table: t1
+==== enc3-1.5
+
+      SELECT quote(x) || ' ' || quote(y) FROM t1
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== enc3-2.1
+
+      PRAGMA encoding
+----
+stmt 0 ok
+==== enc3-2.2
+
+      CREATE TABLE t2(a);
+      INSERT INTO t2 VALUES(x'61006200630064006500');
+      SELECT CAST(a AS text) FROM t2 WHERE CAST(a AS text) LIKE 'abc%';
+----
+stmt 0 ok
+stmt 26 err 1 -1 80 no such table: t2
+stmt 80 err 1 -1 152 no such table: t2
+==== enc3-2.3
+
+      SELECT CAST(x'61006200630064006500' AS text);
+----
+stmt 0 ok
+==== enc3-2.4
+
+      SELECT rowid FROM t2
+       WHERE CAST(a AS text) LIKE CAST(x'610062002500' AS text);
+----
+stmt 0 err 1 -1 92 no such table: t2

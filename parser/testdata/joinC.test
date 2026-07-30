@@ -1,0 +1,3328 @@
+==== joinC-1
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-2
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-3
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-4
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-5
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-6
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-7
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-8
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-9
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-10
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-11
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-12
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-13
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-14
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-15
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-16
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-17
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-18
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-19
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-20
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-21
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-22
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-23
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-24
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-25
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-26
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-27
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-28
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-29
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-30
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-31
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-32
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-33
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-34
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-35
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-36
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-37
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-38
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-39
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-40
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-41
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-42
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-43
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-44
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-45
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-46
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-47
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-48
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-49
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-50
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-51
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-52
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-53
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-54
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-55
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-56
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-57
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-58
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-59
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-60
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-61
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-62
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-63
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-64
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 INNER JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-65
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-66
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-67
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-68
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-69
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-70
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-71
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-72
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-73
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-74
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-75
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-76
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-77
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-78
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-79
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-80
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-81
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-82
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-83
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-84
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-85
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-86
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-87
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-88
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-89
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-90
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-91
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-92
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-93
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-94
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-95
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-96
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-97
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-98
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-99
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-100
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-101
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-102
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-103
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-104
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-105
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-106
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-107
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-108
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-109
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-110
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-111
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-112
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-113
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-114
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-115
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-116
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-117
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-118
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-119
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-120
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-121
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-122
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-123
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-124
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-125
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-126
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-127
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-128
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 LEFT JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-129
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-130
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-131
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-132
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-133
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-134
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-135
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-136
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-137
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-138
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-139
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-140
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-141
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-142
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-143
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-144
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-145
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-146
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-147
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-148
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-149
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-150
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-151
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-152
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-153
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-154
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-155
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-156
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-157
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-158
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-159
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-160
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-161
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-162
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-163
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-164
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-165
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-166
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-167
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-168
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-169
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-170
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-171
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 193 no such table: t1
+==== joinC-172
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-173
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-174
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-175
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-176
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-177
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-178
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-179
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-180
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-181
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-182
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-183
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-184
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-185
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-186
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-187
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-188
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-189
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-190
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-191
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-192
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 RIGHT JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-193
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-194
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-195
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-196
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-197
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-198
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-199
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-200
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-201
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-202
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-203
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-204
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-205
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-206
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-207
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-208
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 INNER JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-209
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-210
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-211
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-212
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-213
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-214
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-215
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-216
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-217
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-218
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-219
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-220
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-221
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-222
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-223
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-224
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 LEFT JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-225
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-226
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-227
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-228
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-229
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-230
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-231
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-232
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-233
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-234
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-235
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 192 no such table: t1
+==== joinC-236
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-237
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-238
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-239
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-240
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 RIGHT JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-241
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-242
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-243
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-244
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 INNER JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-245
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-246
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-247
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-248
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 LEFT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-249
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-250
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-251
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 191 no such table: t1
+==== joinC-252
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 RIGHT JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-253
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 INNER JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-254
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 LEFT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1
+==== joinC-255
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 RIGHT JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 190 no such table: t1
+==== joinC-256
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1 FULL JOIN (
+  t2 FULL JOIN (
+  t3 FULL JOIN (
+  t4 FULL JOIN t5 USING(a)
+  ) USING(a)
+  ) USING(a)
+  ) USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 189 no such table: t1

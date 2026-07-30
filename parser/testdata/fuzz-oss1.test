@@ -1,0 +1,5 @@
+==== fuzz-oss1-detach
+
+  DETACH x IS #1;
+----
+stmt 0 err 1 -1 18 near "#1": syntax error

@@ -1,0 +1,40 @@
+==== func5-1.1
+
+  PRAGMA encoding=UTF16le;
+  CREATE TABLE t1(x,a,b,c);
+  INSERT INTO t1 VALUES(1,'ab','cd',1);
+  INSERT INTO t1 VALUES(2,'gh','ef',5);
+  INSERT INTO t1 VALUES(3,'pqr','fuzzy',99);
+  INSERT INTO t1 VALUES(4,'abcdefg','xy',22);
+  INSERT INTO t1 VALUES(5,'shoe','mayer',2953);
+  SELECT x FROM t1 WHERE c=instr('abcdefg',b) OR a='abcdefg' ORDER BY +x;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 55 err 1 -1 95 no such table: t1
+stmt 95 err 1 -1 135 no such table: t1
+stmt 135 err 1 -1 180 no such table: t1
+stmt 180 err 1 -1 226 no such table: t1
+stmt 226 err 1 -1 274 no such table: t1
+stmt 274 err 1 -1 348 no such table: t1
+==== func5-1.2
+
+  SELECT x FROM t1 WHERE a='abcdefg' OR c=instr('abcdefg',b) ORDER BY +x;
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== func5-2.1
+
+  CREATE TABLE t2(x,y);
+  INSERT INTO t2 VALUES(1,2),(3,4),(5,6),(7,8);
+  SELECT x, y FROM t2 WHERE x+5=5+x ORDER BY +x;
+----
+stmt 0 ok
+stmt 24 err 1 -1 72 no such table: t2
+stmt 72 err 1 -1 121 no such table: t2
+==== func5-2.2
+
+  SELECT x, y FROM t2
+   WHERE x+counter1('hello')=counter1('hello')+x
+   ORDER BY +x;
+----
+stmt 0 err 1 -1 87 no such table: t2

@@ -1,0 +1,80 @@
+==== date-6.20
+
+  SELECT datetime('2000-05-29 14:16:00','localtime');
+----
+stmt 0 ok
+==== date-6.25.1
+
+  SELECT datetime('2000-10-29 12:00Z','utc','utc');
+----
+stmt 0 ok
+==== date-6.25.2
+
+  SELECT datetime('2000-10-29 12:00 +00:00','utc','utc');
+----
+stmt 0 ok
+==== date-6.25.3
+
+  SELECT datetime('2000-10-29 12:00+00:00','utc','utc');
+----
+stmt 0 ok
+==== date-6.25.4
+
+  SELECT datetime('2000-10-29 12:00:00+00:00','utc','utc');
+----
+stmt 0 ok
+==== date-6.25.5
+
+  SELECT datetime('2000-10-29 12:00 -00:00','utc','utc');
+----
+stmt 0 ok
+==== date-6.25.6
+
+  SELECT datetime('2000-10-29 12:00-00:00','utc','utc');
+----
+stmt 0 ok
+==== date-6.25.7
+
+  SELECT datetime('2000-10-29 12:00:00-00:00','utc','utc');
+----
+stmt 0 ok
+==== date-6.26
+
+  SELECT datetime('2000-10-29 12:00:00+05:00');
+----
+stmt 0 ok
+==== date-6.27
+
+  SELECT datetime('2000-10-29 12:00:00+05:00', 'utc');
+----
+stmt 0 ok
+==== date-6.28
+
+  SELECT datetime('2000-10-29 12:00:00Z', 'localtime');
+----
+stmt 0 ok
+==== date-6.29
+
+  SELECT datetime('2000-10-29 12:00:00Z', 'utc', 'localtime');
+----
+stmt 0 ok
+==== date-6.30
+
+  SELECT datetime('2000-10-29 12:00:00Z', 'utc', 'localtime', 'utc');
+----
+stmt 0 ok
+==== date-6.31
+
+  SELECT datetime('2000-10-29 12:00:00Z', 'utc','localtime','utc','localtime');
+----
+stmt 0 ok
+==== date-6.32
+
+  SELECT datetime('2000-10-29 12:00:00Z', 'localtime','localtime');
+----
+stmt 0 ok
+==== date-13.1
+
+    SELECT strftime('%Y-%m-%d %H:%M:%f', julianday('2006-09-24T10:50:26.047'))
+----
+stmt 0 ok

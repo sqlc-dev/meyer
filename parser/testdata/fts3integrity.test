@@ -1,0 +1,21 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING fts3(x);
+  INSERT INTO t1 VALUES('first row');
+  INSERT INTO t1 VALUES('second row');
+
+  CREATE TABLE t2(x PRIMARY KEY);
+  INSERT INTO t2 VALUES('first row');
+  INSERT INTO t2 VALUES('second row');
+----
+stmt 0 ok
+stmt 41 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 118 no such table: t1
+stmt 118 ok
+stmt 153 err 1 -1 191 no such table: t2
+stmt 191 err 1 -1 230 no such table: t2
+==== 1.2
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok

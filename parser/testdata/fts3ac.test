@@ -1,0 +1,160 @@
+==== fts3ac-1.2
+
+    SELECT rowid FROM email WHERE email MATCH 'mark'
+----
+stmt 0 err 1 -1 54 no such table: email
+==== fts3ac-1.3
+
+    SELECT rowid FROM email WHERE email MATCH 'susan'
+----
+stmt 0 err 1 -1 55 no such table: email
+==== fts3ac-1.4
+
+    SELECT rowid FROM email WHERE email MATCH 'mark susan'
+----
+stmt 0 err 1 -1 60 no such table: email
+==== fts3ac-1.5
+
+    SELECT rowid FROM email WHERE email MATCH 'susan mark'
+----
+stmt 0 err 1 -1 60 no such table: email
+==== fts3ac-1.6
+
+    SELECT rowid FROM email WHERE email MATCH '"mark susan"'
+----
+stmt 0 err 1 -1 62 no such table: email
+==== fts3ac-1.7
+
+    SELECT rowid FROM email WHERE email MATCH 'mark -susan'
+----
+stmt 0 err 1 -1 61 no such table: email
+==== fts3ac-1.8
+
+    SELECT rowid FROM email WHERE email MATCH '-mark susan'
+----
+stmt 0 err 1 -1 61 no such table: email
+==== fts3ac-1.9
+
+    SELECT rowid FROM email WHERE email MATCH 'mark OR susan'
+----
+stmt 0 err 1 -1 63 no such table: email
+==== fts3ac-2.1
+
+    SELECT rowid, offsets(email) FROM email
+     WHERE email MATCH 'gas reminder'
+----
+stmt 0 err 1 -1 83 no such table: email
+==== fts3ac-2.2
+
+    SELECT rowid, offsets(email) FROM email
+     WHERE email MATCH 'subject:gas reminder'
+----
+stmt 0 err 1 -1 91 no such table: email
+==== fts3ac-2.3
+
+    SELECT rowid, offsets(email) FROM email
+     WHERE email MATCH 'body:gas reminder'
+----
+stmt 0 err 1 -1 88 no such table: email
+==== fts3ac-2.4
+
+    SELECT rowid, offsets(email) FROM email
+     WHERE subject MATCH 'gas reminder'
+----
+stmt 0 err 1 -1 85 no such table: email
+==== fts3ac-2.5
+
+    SELECT rowid, offsets(email) FROM email
+     WHERE body MATCH 'gas reminder'
+----
+stmt 0 err 1 -1 82 no such table: email
+==== fts3ac-3.1
+
+    SELECT rowid, offsets(email) FROM email
+     WHERE body MATCH 'child product' AND +rowid=32
+----
+stmt 0 err 1 -1 97 no such table: email
+==== fts3ac-3.2
+
+    SELECT rowid, offsets(email) FROM email
+     WHERE body MATCH '"child product"'
+----
+stmt 0 err 1 -1 85 no such table: email
+==== fts3ac-4.1
+
+    SELECT snippet(email) FROM email
+     WHERE email MATCH 'subject:gas reminder'
+----
+stmt 0 err 1 -1 84 no such table: email
+==== fts3ac-4.2
+
+    SELECT snippet(email) FROM email
+     WHERE email MATCH 'christmas candlelight'
+----
+stmt 0 err 1 -1 85 no such table: email
+==== fts3ac-4.3
+
+    SELECT snippet(email) FROM email
+     WHERE email MATCH 'deal sheet potential reuse'
+----
+stmt 0 err 1 -1 90 no such table: email
+==== fts3ac-4.4
+
+    SELECT snippet(email,'<<<','>>>',' ') FROM email
+     WHERE email MATCH 'deal sheet potential reuse'
+----
+stmt 0 err 1 -1 106 no such table: email
+==== fts3ac-4.5
+
+    SELECT snippet(email,'<<<','>>>',' ') FROM email
+     WHERE email MATCH 'first things'
+----
+stmt 0 err 1 -1 92 no such table: email
+==== fts3ac-4.6
+
+    SELECT snippet(email) FROM email
+     WHERE email MATCH 'chris is here'
+----
+stmt 0 err 1 -1 77 no such table: email
+==== fts3ac-4.7
+
+    SELECT snippet(email) FROM email
+     WHERE email MATCH '"pursuant to"'
+----
+stmt 0 err 1 -1 77 no such table: email
+==== fts3ac-4.8
+
+    SELECT snippet(email) FROM email
+     WHERE email MATCH 'ancillary load davis'
+----
+stmt 0 err 1 -1 84 no such table: email
+==== fts3ac-5.1
+
+    SELECT snippet(email) FROM email
+     WHERE email MATCH 'questar enron OR com'
+----
+stmt 0 err 1 -1 84 no such table: email
+==== fts3ac-5.2
+
+    SELECT snippet(email) FROM email
+     WHERE email MATCH 'enron OR com questar'
+----
+stmt 0 err 1 -1 84 no such table: email
+==== fts3ac-6.1
+
+    CREATE VIRTUAL TABLE ft USING fts3(one, two);
+    INSERT INTO ft VALUES('', 'foo');
+    INSERT INTO ft VALUES('foo', 'foo');
+    SELECT offsets(ft) FROM ft WHERE ft MATCH 'foo';
+----
+stmt 0 ok
+stmt 50 err 1 -1 88 no such table: ft
+stmt 88 err 1 -1 129 no such table: ft
+stmt 129 err 1 -1 182 no such table: ft
+==== fts3ac-6.2
+
+    DELETE FROM ft WHERE one = 'foo';
+    SELECT offsets(ft) FROM ft WHERE ft MATCH 'foo';
+----
+stmt 0 err 1 -1 38 no such table: ft
+stmt 38 err 1 -1 91 no such table: ft

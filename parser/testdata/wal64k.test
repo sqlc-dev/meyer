@@ -1,0 +1,23 @@
+==== 1.0
+ 
+  PRAGMA journal_mode = WAL;
+  CREATE TABLE t1(x);
+  CREATE INDEX i1 ON t1(x);
+----
+stmt 0 ok
+stmt 30 ok
+stmt 52 err 1 -1 80 no such table: main.t1
+==== 2.1
+
+  PRAGMA page_size=512;
+  PRAGMA journal_mode=WAL;
+  CREATE TABLE t1(a,b);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<8200)
+  INSERT INTO t1(a,b) SELECT x, zeroblob(300) FROM c;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 24 ok
+stmt 51 ok
+stmt 75 err 1 -1 207 no such table: t1
+stmt 207 ok

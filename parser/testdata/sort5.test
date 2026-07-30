@@ -1,0 +1,14 @@
+==== 1.0
+
+  PRAGMA mmap_size = 10000000;
+  PRAGMA cache_size = 10;
+  CREATE TABLE t1(a, b);
+----
+stmt 0 ok
+stmt 31 ok
+stmt 57 ok
+==== 1.2
+
+  CREATE INDEX i1 ON t1(b);
+----
+stmt 0 err 1 -1 28 no such table: main.t1

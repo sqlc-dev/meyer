@@ -1,0 +1,110 @@
+==== backup-1.1
+
+    BEGIN;
+    CREATE TABLE t1(a, b);
+    CREATE INDEX i1 ON t1(a, b);
+    INSERT INTO t1 VALUES(1, randstr(1000,1000));
+    INSERT INTO t1 VALUES(2, randstr(1000,1000));
+    INSERT INTO t1 VALUES(3, randstr(1000,1000));
+    INSERT INTO t1 VALUES(4, randstr(1000,1000));
+    INSERT INTO t1 VALUES(5, randstr(1000,1000));
+    COMMIT;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 38 err 1 -1 71 no such table: main.t1
+stmt 71 err 1 -1 121 no such table: t1
+stmt 121 err 1 -1 171 no such table: t1
+stmt 171 err 1 -1 221 no such table: t1
+stmt 221 err 1 -1 271 no such table: t1
+stmt 271 err 1 -1 321 no such table: t1
+stmt 321 ok
+==== backup-generated
+
+      PRAGMA cache_size = 10;
+      BEGIN;
+      INSERT INTO t1 SELECT '', randstr(1000,1000) FROM t1;
+      INSERT INTO t1 SELECT '', randstr(1000,1000) FROM t1;
+      INSERT INTO t1 SELECT '', randstr(1000,1000) FROM t1;
+      INSERT INTO t1 SELECT '', randstr(1000,1000) FROM t1;
+      COMMIT;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 43 err 1 -1 103 no such table: t1
+stmt 103 err 1 -1 163 no such table: t1
+stmt 163 err 1 -1 223 no such table: t1
+stmt 223 err 1 -1 283 no such table: t1
+stmt 283 ok
+==== backup-generated.dup1
+ UPDATE t1 SET b = randstr(1000,1000)
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== backup-generated.dup2
+ UPDATE t1 SET b = randstr(1000,1000)
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== backup-generated.dup3
+
+      PRAGMA auto_vacuum = incremental;
+      BEGIN;
+      CREATE TABLE t1(a, b);
+      CREATE INDEX i1 ON t1(a, b);
+      INSERT INTO t1 VALUES(1, randstr(1000,1000));
+      INSERT INTO t1 VALUES(2, randstr(1000,1000));
+      INSERT INTO t1 VALUES(3, randstr(1000,1000));
+      INSERT INTO t1 VALUES(4, randstr(1000,1000));
+      INSERT INTO t1 VALUES(5, randstr(1000,1000));
+      COMMIT;
+----
+stmt 0 ok
+stmt 40 ok
+stmt 53 ok
+stmt 82 err 1 -1 117 no such table: main.t1
+stmt 117 err 1 -1 169 no such table: t1
+stmt 169 err 1 -1 221 no such table: t1
+stmt 221 err 1 -1 273 no such table: t1
+stmt 273 err 1 -1 325 no such table: t1
+stmt 325 err 1 -1 377 no such table: t1
+stmt 377 ok
+==== backup-7.2.1
+ 
+    BEGIN;
+    INSERT INTO t1 VALUES(1, 4);
+----
+stmt 0 ok
+stmt 12 err 1 -1 45 no such table: t1
+==== backup-8.9
+ PRAGMA lock_status
+----
+stmt 0 ok
+==== backup-10.1.1
+
+      BEGIN;
+      CREATE TABLE t1(a, b);
+      INSERT INTO t1 VALUES(1, randstr(1000,1000));
+      INSERT INTO t1 VALUES(2, randstr(1000,1000));
+      INSERT INTO t1 VALUES(3, randstr(1000,1000));
+      INSERT INTO t1 VALUES(4, randstr(1000,1000));
+      INSERT INTO t1 VALUES(5, randstr(1000,1000));
+      CREATE INDEX i1 ON t1(a, b);
+      COMMIT;
+----
+stmt 0 ok
+stmt 13 ok
+stmt 42 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 146 no such table: t1
+stmt 146 err 1 -1 198 no such table: t1
+stmt 198 err 1 -1 250 no such table: t1
+stmt 250 err 1 -1 302 no such table: t1
+stmt 302 err 1 -1 337 no such table: main.t1
+stmt 337 ok
+==== backup-10.1.3
+
+      UPDATE t1 SET b = randstr(500,500);
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== backup-generated.dup4
+ UPDATE t1 SET b = randomblob(200) WHERE a IN (1, 250)
+----
+stmt 0 err 1 -1 55 no such table: t1

@@ -1,0 +1,10 @@
+==== tkt3346-2.1
+
+    CREATE TABLE t2(a);
+    INSERT INTO t2 VALUES(1);
+    
+    SELECT * FROM (SELECT * FROM t1 WHERE 1=x.a) AS x;
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t2
+stmt 54 err 1 -1 114 no such table: t1

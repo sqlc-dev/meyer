@@ -1,0 +1,17 @@
+==== capi3d-4.1
+
+  CREATE TABLE t4(x,y);
+  BEGIN;
+----
+stmt 0 ok
+stmt 24 ok
+==== capi3d-4.2.3
+
+  VACUUM
+----
+stmt 0 ok
+==== capi3d-4.2.5
+
+  VACUUM
+----
+stmt 0 ok

@@ -1,0 +1,125 @@
+==== func3-5.1
+
+  SELECT likelihood(9223372036854775807, 0.5);
+----
+stmt 0 ok
+==== func3-5.2
+
+  SELECT likelihood(-9223372036854775808, 0.5);
+----
+stmt 0 ok
+==== func3-5.3
+
+  SELECT likelihood(14.125, 0.5);
+----
+stmt 0 ok
+==== func3-5.4
+
+  SELECT likelihood(NULL, 0.5);
+----
+stmt 0 ok
+==== func3-5.5
+
+  SELECT likelihood('test-string', 0.5);
+----
+stmt 0 ok
+==== func3-5.6
+
+  SELECT quote(likelihood(x'010203000405', 0.5));
+----
+stmt 0 ok
+==== func3-5.7
+
+  SELECT likelihood(123, 1.0), likelihood(456, 0.0);
+----
+stmt 0 ok
+==== func3-5.8
+
+    SELECT likelihood(123, 1.000001);
+----
+stmt 0 err 1 12 38 second argument to likelihood() must be a constant between 0.0 and 1.0
+==== func3-5.9
+
+    SELECT likelihood(123, -0.000001);
+----
+stmt 0 err 1 12 39 second argument to likelihood() must be a constant between 0.0 and 1.0
+==== func3-5.10
+
+    SELECT likelihood(123, 0.5+0.3);
+----
+stmt 0 err 1 12 37 second argument to likelihood() must be a constant between 0.0 and 1.0
+==== func3-5.30
+
+  SELECT unlikely(9223372036854775807);
+----
+stmt 0 ok
+==== func3-5.31
+
+  SELECT unlikely(-9223372036854775808);
+----
+stmt 0 ok
+==== func3-5.32
+
+  SELECT unlikely(14.125);
+----
+stmt 0 ok
+==== func3-5.33
+
+  SELECT unlikely(NULL);
+----
+stmt 0 ok
+==== func3-5.34
+
+  SELECT unlikely('test-string');
+----
+stmt 0 ok
+==== func3-5.35
+
+  SELECT quote(unlikely(x'010203000405'));
+----
+stmt 0 ok
+==== func3-5.40
+
+  SELECT likely(CAST(1 AS INT))=='1';
+----
+stmt 0 ok
+==== func3-5.41
+
+  SELECT unlikely(CAST(1 AS INT))=='1';
+----
+stmt 0 ok
+==== func3-5.41.dup1
+
+  SELECT likelihood(CAST(1 AS INT),0.5)=='1';
+----
+stmt 0 ok
+==== func3-5.50
+
+  SELECT likely(9223372036854775807);
+----
+stmt 0 ok
+==== func3-5.51
+
+  SELECT likely(-9223372036854775808);
+----
+stmt 0 ok
+==== func3-5.52
+
+  SELECT likely(14.125);
+----
+stmt 0 ok
+==== func3-5.53
+
+  SELECT likely(NULL);
+----
+stmt 0 ok
+==== func3-5.54
+
+  SELECT likely('test-string');
+----
+stmt 0 ok
+==== func3-5.55
+
+  SELECT quote(likely(x'010203000405'));
+----
+stmt 0 ok

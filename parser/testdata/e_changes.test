@@ -1,0 +1,308 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(x, y, PRIMARY KEY(x, y)) WITHOUT ROWID;
+  CREATE INDEX i1 ON t1(a);
+  CREATE INDEX i2 ON t2(y);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 83 err 1 -1 111 no such table: main.t1
+stmt 111 err 1 -1 139 no such table: main.t2
+==== e_changes-generated
+
+    INSERT INTO t1 VALUES('a', 0), ('b', 0), ('c', 0), (0, 11);
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== e_changes-generated.dup1
+
+    BEGIN;
+      INSERT INTO t1 VALUES('a', 0), ('b', 0), ('c', 0), (0, 11);
+----
+stmt 0 ok
+stmt 11 err 1 -1 77 no such table: t1
+==== 3.1.0
+
+  CREATE TABLE log(x);
+  CREATE TABLE p1(one PRIMARY KEY, two);
+
+  CREATE TRIGGER tr_ai AFTER INSERT ON p1 BEGIN
+    INSERT INTO log VALUES('insert');
+  END;
+  CREATE TRIGGER tr_bd BEFORE DELETE ON p1 BEGIN
+    INSERT INTO log VALUES('delete');
+  END;
+  CREATE TRIGGER tr_au AFTER UPDATE ON p1 BEGIN
+    INSERT INTO log VALUES('update');
+  END;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 64 err 1 -1 113 no such table: main.p1
+stmt 158 err 1 -1 207 no such table: main.p1
+stmt 252 err 1 -1 300 no such table: main.p1
+==== 3.1.4
+
+  -- None of the inserts on table log were counted.
+  SELECT count(*) FROM log
+----
+stmt 0 err 1 -1 80 no such table: log
+==== 3.2.0
+
+  DELETE FROM p1;
+  INSERT INTO p1 VALUES('a', 'A'), ('b', 'B'), ('c', 'C');
+
+  CREATE TABLE c1(a, b, FOREIGN KEY(a) REFERENCES p1 ON DELETE SET NULL);
+  CREATE TABLE c2(a, b, FOREIGN KEY(a) REFERENCES p1 ON DELETE SET DEFAULT);
+  CREATE TABLE c3(a, b, FOREIGN KEY(a) REFERENCES p1 ON DELETE CASCADE);
+  INSERT INTO c1 VALUES('a', 'aaa');
+  INSERT INTO c2 VALUES('b', 'bbb');
+  INSERT INTO c3 VALUES('c', 'ccc');
+
+  INSERT INTO p1 VALUES('d', 'D'), ('e', 'E'), ('f', 'F');
+  CREATE TABLE c4(a, b, FOREIGN KEY(a) REFERENCES p1 ON UPDATE SET NULL);
+  CREATE TABLE c5(a, b, FOREIGN KEY(a) REFERENCES p1 ON UPDATE SET DEFAULT);
+  CREATE TABLE c6(a, b, FOREIGN KEY(a) REFERENCES p1 ON UPDATE CASCADE);
+  INSERT INTO c4 VALUES('d', 'aaa');
+  INSERT INTO c5 VALUES('e', 'bbb');
+  INSERT INTO c6 VALUES('f', 'ccc');
+
+  PRAGMA foreign_keys = ON;
+----
+stmt 0 err 1 -1 18 no such table: p1
+stmt 18 err 1 -1 77 no such table: p1
+stmt 77 ok
+stmt 152 ok
+stmt 229 ok
+stmt 302 err 1 -1 339 no such table: c1
+stmt 339 err 1 -1 376 no such table: c2
+stmt 376 err 1 -1 413 no such table: c3
+stmt 413 err 1 -1 473 no such table: p1
+stmt 473 ok
+stmt 547 ok
+stmt 624 ok
+stmt 697 err 1 -1 734 no such table: c4
+stmt 734 err 1 -1 771 no such table: c5
+stmt 771 err 1 -1 808 no such table: c6
+stmt 808 ok
+==== 3.2.4
+ 
+  SELECT * FROM c1;
+  SELECT * FROM c2;
+  SELECT * FROM c3;
+----
+stmt 0 err 1 -1 21 no such table: c1
+stmt 21 err 1 -1 41 no such table: c2
+stmt 41 err 1 -1 61 no such table: c3
+==== 3.2.8
+ 
+  SELECT * FROM c4;
+  SELECT * FROM c5;
+  SELECT * FROM c6;
+----
+stmt 0 err 1 -1 21 no such table: c4
+stmt 21 err 1 -1 41 no such table: c5
+stmt 41 err 1 -1 61 no such table: c6
+==== 3.3.0
+
+  CREATE TABLE r1(a UNIQUE, b UNIQUE);
+  INSERT INTO r1 VALUES('i', 'i');
+  INSERT INTO r1 VALUES('ii', 'ii');
+  INSERT INTO r1 VALUES('iii', 'iii');
+  INSERT INTO r1 VALUES('iv', 'iv');
+  INSERT INTO r1 VALUES('v', 'v');
+  INSERT INTO r1 VALUES('vi', 'vi');
+  INSERT INTO r1 VALUES('vii', 'vii');
+----
+stmt 0 ok
+stmt 39 err 1 -1 74 no such table: r1
+stmt 74 err 1 -1 111 no such table: r1
+stmt 111 err 1 -1 150 no such table: r1
+stmt 150 err 1 -1 187 no such table: r1
+stmt 187 err 1 -1 222 no such table: r1
+stmt 222 err 1 -1 259 no such table: r1
+stmt 259 err 1 -1 298 no such table: r1
+==== 3.3.5
+ 
+  SELECT * FROM r1 ORDER BY a;
+----
+stmt 0 err 1 -1 32 no such table: r1
+==== 4.1
+
+  CREATE TABLE log(log);
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(3, 4);
+  INSERT INTO t1 VALUES(5, 6);
+
+  CREATE VIEW v1 AS SELECT * FROM t1;
+  CREATE TRIGGER v1_i INSTEAD OF INSERT ON v1 BEGIN
+    INSERT INTO log VALUES('insert');
+  END;
+  CREATE TRIGGER v1_u INSTEAD OF UPDATE ON v1 BEGIN
+    INSERT INTO log VALUES('update'), ('update');
+  END;
+  CREATE TRIGGER v1_d INSTEAD OF DELETE ON v1 BEGIN
+    INSERT INTO log VALUES('delete'), ('delete'), ('delete');
+  END;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 81 no such table: t1
+stmt 81 err 1 -1 112 no such table: t1
+stmt 112 err 1 -1 143 no such table: t1
+stmt 143 ok
+stmt 182 err 1 -1 234 no such table: main.v1
+stmt 279 err 1 -1 331 no such table: main.v1
+stmt 388 err 1 -1 440 no such table: main.v1
+==== 5.1.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  CREATE TABLE t2(x);
+  INSERT INTO t1 VALUES(1, NULL);
+  INSERT INTO t1 VALUES(2, NULL);
+  INSERT INTO t1 VALUES(3, NULL);
+  CREATE TRIGGER AFTER UPDATE ON t1 BEGIN
+    INSERT INTO t2 VALUES('a'), ('b'), ('c');
+    SELECT my_changes('trigger');
+  END;
+----
+stmt 0 ok
+stmt 45 ok
+stmt 67 err 1 -1 101 no such table: t1
+stmt 101 err 1 -1 135 no such table: t1
+stmt 135 err 1 -1 169 no such table: t1
+stmt 169 err 1 -1 211 no such table: main.t1
+==== 5.1.1
+
+  INSERT INTO t2 VALUES('a'), ('b');
+  UPDATE t1 SET b = my_changes('update');
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 37 no such table: t2
+stmt 37 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 99 no such table: t1
+==== 5.2.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE log(x);
+  INSERT INTO t1 VALUES(1, 0);
+  INSERT INTO t1 VALUES(2, 0);
+  INSERT INTO t1 VALUES(3, 0);
+  CREATE TRIGGER t1_a_u AFTER UPDATE ON t1 BEGIN
+    INSERT INTO log VALUES(old.b || ' -> ' || new.b || ' c = ' || changes() );
+  END;
+  CREATE TABLE t2(a);
+  INSERT INTO t2 VALUES(1), (2), (3);
+  UPDATE t1 SET b = changes();
+----
+stmt 0 ok
+stmt 25 ok
+stmt 48 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 110 no such table: t1
+stmt 110 err 1 -1 141 no such table: t1
+stmt 141 err 1 -1 190 no such table: main.t1
+stmt 276 ok
+stmt 298 err 1 -1 336 no such table: t2
+stmt 336 err 1 -1 367 no such table: t1
+==== 5.2.1
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 5.2.2
+
+  SELECT * FROM log;
+----
+stmt 0 err 1 -1 21 no such table: log
+==== 6.0
+
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(a, b);
+  CREATE TABLE t3(a, b);
+  CREATE TABLE log(x);
+
+  CREATE TRIGGER t1_i BEFORE INSERT ON t1 BEGIN
+    INSERT INTO t2 VALUES(new.a, new.b), (new.a, new.b);
+    INSERT INTO log VALUES('t2->' || changes());
+  END;
+
+  CREATE TRIGGER t2_i AFTER INSERT ON t2 BEGIN
+    INSERT INTO t3 VALUES(new.a, new.b), (new.a, new.b), (new.a, new.b);
+    INSERT INTO log VALUES('t3->' || changes());
+  END;
+
+  CREATE TRIGGER t1_u AFTER UPDATE ON t1 BEGIN
+    UPDATE t2 SET b=new.b WHERE a=old.a;
+    INSERT INTO log VALUES('t2->' || changes());
+  END;
+
+  CREATE TRIGGER t2_u BEFORE UPDATE ON t2 BEGIN
+    UPDATE t3 SET b=new.b WHERE a=old.a;
+    INSERT INTO log VALUES('t3->' || changes());
+  END;
+
+  CREATE TRIGGER t1_d AFTER DELETE ON t1 BEGIN
+    DELETE FROM t2 WHERE a=old.a AND b=old.b;
+    INSERT INTO log VALUES('t2->' || changes());
+  END;
+
+  CREATE TRIGGER t2_d BEFORE DELETE ON t2 BEGIN
+    DELETE FROM t3 WHERE a=old.a AND b=old.b;
+    INSERT INTO log VALUES('t3->' || changes());
+  END;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 51 ok
+stmt 76 ok
+stmt 99 err 1 -1 148 no such table: main.t1
+stmt 261 err 1 -1 309 no such table: main.t2
+stmt 438 err 1 -1 486 no such table: main.t1
+stmt 583 err 1 -1 632 no such table: main.t2
+stmt 729 err 1 -1 777 no such table: main.t1
+stmt 879 err 1 -1 928 no such table: main.t2
+==== 7.1
+
+  CREATE TABLE q1(t);
+  CREATE TABLE q2(u, v);
+  CREATE TABLE q3(w);
+
+  CREATE TRIGGER q2_insert BEFORE INSERT ON q2 BEGIN
+
+    /* changes() returns value from previous I/U/D in callers context */
+    INSERT INTO q1 VALUES('1:' || changes());
+
+    /* changes() returns value of previous I/U/D in this context */
+    INSERT INTO q3 VALUES(changes()), (2), (3);
+    INSERT INTO q1 VALUES('2:' || changes());
+    INSERT INTO q3 VALUES(changes() + 3), (changes()+4);
+    SELECT 'this does not affect things!';
+    INSERT INTO q1 VALUES('3:' || changes());
+    UPDATE q3 SET w = w+10 WHERE w%2;
+    INSERT INTO q1 VALUES('4:' || changes());
+    DELETE FROM q3;
+    INSERT INTO q1 VALUES('5:' || changes());
+  END;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 47 ok
+stmt 69 err 1 -1 123 no such table: main.q2
+==== 7.2
+
+  INSERT INTO q2 VALUES('x', 'y');
+  SELECT * FROM q1;
+----
+stmt 0 err 1 -1 35 no such table: q2
+stmt 35 err 1 -1 55 no such table: q1
+==== 7.3
+
+  DELETE FROM q1;
+  INSERT INTO q2 VALUES('x', 'y');
+  SELECT * FROM q1;
+----
+stmt 0 err 1 -1 18 no such table: q1
+stmt 18 err 1 -1 53 no such table: q2
+stmt 53 err 1 -1 73 no such table: q1

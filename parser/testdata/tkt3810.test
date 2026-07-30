@@ -1,0 +1,21 @@
+==== tkt3810-1.1
+
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(123);
+    SELECT * FROM t1;
+    CREATE TABLE t2(y);
+    CREATE TABLE t3(z);
+----
+stmt 0 ok
+stmt 24 err 1 -1 56 no such table: t1
+stmt 56 err 1 -1 78 no such table: t1
+stmt 78 ok
+stmt 102 ok
+==== tkt3810-4
+SELECT name FROM temp.sqlite_master ORDER BY name
+----
+stmt 0 ok
+==== tkt3810-5
+DROP TRIGGER r1
+----
+stmt 0 err 1 -1 16 no such trigger: r1

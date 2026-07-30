@@ -1,0 +1,256 @@
+==== lastinsert-1.1
+
+        create table t1 (k integer primary key);
+        insert into t1 values (1);
+        insert into t1 values (NULL);
+        insert into t1 values (NULL);
+        select last_insert_rowid();
+----
+stmt 0 ok
+stmt 49 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 122 no such table: t1
+stmt 122 err 1 -1 160 no such table: t1
+stmt 160 ok
+==== lastinsert-1.1w
+
+        create table t1w (k integer primary key) WITHOUT ROWID;
+        insert into t1w values (123456);
+        select last_insert_rowid(); -- returns 3 from above.
+----
+stmt 0 ok
+stmt 64 err 1 -1 105 no such table: t1w
+stmt 105 ok
+==== lastinsert-1.2
+
+        update t1 set k=4 where k=2;
+        select last_insert_rowid();
+----
+stmt 0 err 1 -1 37 no such table: t1
+stmt 37 ok
+==== lastinsert-1.3
+
+        delete from t1 where k=4;
+        select last_insert_rowid();
+----
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 ok
+==== lastinsert-1.4.1
+
+        create table t2 (k integer primary key, val1, val2, val3);
+        select last_insert_rowid();
+----
+stmt 0 ok
+stmt 67 ok
+==== lastinsert-1.4.2
+
+        create view v as select * from t1;
+        select last_insert_rowid();
+----
+stmt 0 ok
+stmt 43 ok
+==== lastinsert-2.1
+
+        delete from t2;
+        create trigger r1 after insert on t1 for each row begin
+            insert into t2 values (NEW.k*2, last_insert_rowid(), NULL, NULL);
+            update t2 set k=k+10, val2=100+last_insert_rowid();
+            update t2 set val3=1000+last_insert_rowid();
+        end;
+        insert into t1 values (13);
+        select last_insert_rowid();
+----
+stmt 0 err 1 -1 24 no such table: t2
+stmt 24 err 1 -1 88 no such table: main.t1
+stmt 300 err 1 -1 336 no such table: t1
+stmt 336 ok
+==== lastinsert-2.2
+
+        select val1 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-2.3
+
+        select val2 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-2.4
+
+        select val3 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-3.1
+
+        delete from t2;
+        drop trigger r1;
+        create trigger r1 after update on t1 for each row begin
+            insert into t2 values (NEW.k*2, last_insert_rowid(), NULL, NULL);
+            update t2 set k=k+10, val2=100+last_insert_rowid();
+            update t2 set val3=1000+last_insert_rowid();
+        end;
+        update t1 set k=14 where k=3;
+        select last_insert_rowid();
+----
+stmt 0 err 1 -1 24 no such table: t2
+stmt 24 err 1 -1 49 no such trigger: r1
+stmt 49 err 1 -1 113 no such table: main.t1
+stmt 325 err 1 -1 363 no such table: t1
+stmt 363 ok
+==== lastinsert-3.2
+
+        select val1 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-3.3
+
+        select val2 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-3.4
+
+        select val3 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-4.1
+
+        delete from t2;
+        drop trigger r1;
+        create trigger r1 instead of insert on v for each row begin
+            insert into t2 values (NEW.k*2, last_insert_rowid(), NULL, NULL);
+            update t2 set k=k+10, val2=100+last_insert_rowid();
+            update t2 set val3=1000+last_insert_rowid();
+        end;
+        insert into v values (15);
+        select last_insert_rowid();
+----
+stmt 0 err 1 -1 24 no such table: t2
+stmt 24 err 1 -1 49 no such trigger: r1
+stmt 49 err 1 -1 117 no such table: main.v
+stmt 329 err 1 -1 364 no such table: v
+stmt 364 ok
+==== lastinsert-4.2
+
+        select val1 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-4.3
+
+        select val2 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-4.4
+
+        select val3 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-5.2
+
+        select val1 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-5.3
+
+        select val2 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-5.4
+
+        select val3 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-6.1
+
+        delete from t2;
+        drop trigger r1;
+        create trigger r1 instead of update on v for each row begin
+            insert into t2 values (NEW.k*2, last_insert_rowid(), NULL, NULL);
+            update t2 set k=k+10, val2=100+last_insert_rowid();
+            update t2 set val3=1000+last_insert_rowid();
+        end;
+        update v set k=16 where k=14;
+        select last_insert_rowid();
+----
+stmt 0 err 1 -1 24 no such table: t2
+stmt 24 err 1 -1 49 no such trigger: r1
+stmt 49 err 1 -1 117 no such table: main.v
+stmt 329 err 1 -1 367 no such table: v
+stmt 367 ok
+==== lastinsert-6.2
+
+        select val1 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-6.3
+
+        select val2 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-6.4
+
+        select val3 from t2;
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== lastinsert-7.1
+
+        drop table t1; drop table t2; drop trigger r1;
+        create temp table t1 (k integer primary key);
+        create temp table t2 (k integer primary key);
+        create temp view v1 as select * from t1;
+        create temp view v2 as select * from t2;
+        create temp table rid (k integer primary key, rin, rout);
+        insert into rid values (1, NULL, NULL);
+        insert into rid values (2, NULL, NULL);
+        create temp trigger r1 instead of insert on v1 for each row begin
+            update rid set rin=last_insert_rowid() where k=1;
+            insert into t1 values (100+NEW.k);
+            insert into v2 values (100+last_insert_rowid());
+            update rid set rout=last_insert_rowid() where k=1;
+        end;
+        create temp trigger r2 instead of insert on v2 for each row begin
+            update rid set rin=last_insert_rowid() where k=2;
+            insert into t2 values (1000+NEW.k);
+            update rid set rout=last_insert_rowid() where k=2;
+        end;
+        insert into t1 values (77);
+        select last_insert_rowid();
+----
+stmt 0 err 1 -1 23 no such table: t1
+stmt 23 err 1 -1 38 no such table: t2
+stmt 38 err 1 -1 55 no such trigger: r1
+stmt 55 ok
+stmt 109 ok
+stmt 163 ok
+stmt 212 ok
+stmt 261 ok
+stmt 327 err 1 -1 375 no such table: rid
+stmt 375 err 1 -1 423 no such table: rid
+stmt 423 err 1 -1 497 no such table: v1
+stmt 743 err 1 -1 817 no such table: v2
+stmt 1003 err 1 -1 1039 no such table: t1
+stmt 1039 ok
+==== lastinsert-7.2
+
+        insert into v1 values (5);
+        select last_insert_rowid();
+----
+stmt 0 err 1 -1 35 no such table: v1
+stmt 35 ok
+==== lastinsert-7.3
+
+        select rin from rid where k=1;
+----
+stmt 0 err 1 -1 39 no such table: rid
+==== lastinsert-7.4
+
+        select rout from rid where k=1;
+----
+stmt 0 err 1 -1 40 no such table: rid
+==== lastinsert-7.5
+
+        select rin from rid where k=2;
+----
+stmt 0 err 1 -1 39 no such table: rid
+==== lastinsert-7.6
+
+        select rout from rid where k=2;
+----
+stmt 0 err 1 -1 40 no such table: rid

@@ -1,0 +1,27 @@
+==== 100
+
+  CREATE TABLE t1(filename, tablename, istart, iend);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<99)
+  INSERT INTO t1 SELECT printf('test%03d.db',x),'t2',x*1000,x*1000+999 FROM c;
+  CREATE VIRTUAL TABLE temp.v1 USING swarmvtab(
+    'SELECT * FROM t1', 'create_database'
+  );
+----
+stmt 0 ok
+stmt 54 err 1 -1 209 no such table: t1
+stmt 209 ok
+==== 110
+
+  SELECT b FROM v1 WHERE a=3875;
+----
+stmt 0 err 1 -1 33 no such table: v1
+==== 130
+
+  SELECT b FROM v1 WHERE a BETWEEN 3999 AND 4000 ORDER BY a;
+----
+stmt 0 err 1 -1 61 no such table: v1
+==== 150
+
+  SELECT b FROM v1 WHERE a>=99998;
+----
+stmt 0 err 1 -1 35 no such table: v1

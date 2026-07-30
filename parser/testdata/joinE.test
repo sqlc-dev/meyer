@@ -1,0 +1,252 @@
+==== joinE-1
+
+  SELECT a, b
+  FROM t1 INNER JOIN t2 ON true
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== joinE-2
+
+  SELECT a, b
+  FROM t1 INNER JOIN t2 ON true WHERE a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 90 no such table: t1
+==== joinE-3
+
+  SELECT a, b
+  FROM t1 INNER JOIN t2 ON a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== joinE-4
+
+  SELECT a, b
+  FROM t1 INNER JOIN t2 ON true WHERE b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 90 no such table: t1
+==== joinE-5
+
+  SELECT a, b
+  FROM t1 INNER JOIN t2 ON b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== joinE-6
+
+  SELECT a, b
+  FROM t1 LEFT JOIN t2 ON true
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 73 no such table: t1
+==== joinE-7
+
+  SELECT a, b
+  FROM t1 LEFT JOIN t2 ON true WHERE a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 89 no such table: t1
+==== joinE-8
+
+  SELECT a, b
+  FROM t1 LEFT JOIN t2 ON a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== joinE-9
+
+  SELECT a, b
+  FROM t1 LEFT JOIN t2 ON true WHERE b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 89 no such table: t1
+==== joinE-10
+
+  SELECT a, b
+  FROM t1 LEFT JOIN t2 ON b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== joinE-11
+
+  SELECT a, b
+  FROM t1 RIGHT JOIN t2 ON true
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== joinE-12
+
+  SELECT a, b
+  FROM t1 RIGHT JOIN t2 ON true WHERE a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 90 no such table: t1
+==== joinE-13
+
+  SELECT a, b
+  FROM t1 RIGHT JOIN t2 ON a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== joinE-14
+
+  SELECT a, b
+  FROM t1 RIGHT JOIN t2 ON true WHERE b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 90 no such table: t1
+==== joinE-15
+
+  SELECT a, b
+  FROM t1 RIGHT JOIN t2 ON b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== joinE-16
+
+  SELECT a, b
+  FROM t1 FULL JOIN t2 ON true
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 73 no such table: t1
+==== joinE-17
+
+  SELECT a, b
+  FROM t1 FULL JOIN t2 ON true WHERE a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 89 no such table: t1
+==== joinE-19
+
+  SELECT a, b
+  FROM t1 FULL JOIN t2 ON true WHERE b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 89 no such table: t1
+==== joinE-21
+
+  SELECT a, b
+  FROM t1 INNER JOIN t2 ON true
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== joinE-22
+
+  SELECT a, b
+  FROM t1 INNER JOIN t2 ON true WHERE a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 90 no such table: t1
+==== joinE-23
+
+  SELECT a, b
+  FROM t1 INNER JOIN t2 ON a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== joinE-24
+
+  SELECT a, b
+  FROM t1 INNER JOIN t2 ON true WHERE b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 90 no such table: t1
+==== joinE-25
+
+  SELECT a, b
+  FROM t1 INNER JOIN t2 ON b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== joinE-26
+
+  SELECT a, b
+  FROM t1 LEFT JOIN t2 ON true
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 73 no such table: t1
+==== joinE-27
+
+  SELECT a, b
+  FROM t1 LEFT JOIN t2 ON true WHERE a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 89 no such table: t1
+==== joinE-28
+
+  SELECT a, b
+  FROM t1 LEFT JOIN t2 ON a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== joinE-29
+
+  SELECT a, b
+  FROM t1 LEFT JOIN t2 ON true WHERE b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 89 no such table: t1
+==== joinE-30
+
+  SELECT a, b
+  FROM t1 LEFT JOIN t2 ON b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== joinE-31
+
+  SELECT a, b
+  FROM t1 RIGHT JOIN t2 ON true
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== joinE-32
+
+  SELECT a, b
+  FROM t1 RIGHT JOIN t2 ON true WHERE a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 90 no such table: t1
+==== joinE-33
+
+  SELECT a, b
+  FROM t1 RIGHT JOIN t2 ON a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== joinE-34
+
+  SELECT a, b
+  FROM t1 RIGHT JOIN t2 ON true WHERE b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 90 no such table: t1
+==== joinE-35
+
+  SELECT a, b
+  FROM t1 RIGHT JOIN t2 ON b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== joinE-36
+
+  SELECT a, b
+  FROM t1 FULL JOIN t2 ON true
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 73 no such table: t1
+==== joinE-37
+
+  SELECT a, b
+  FROM t1 FULL JOIN t2 ON true WHERE a IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 89 no such table: t1
+==== joinE-39
+
+  SELECT a, b
+  FROM t1 FULL JOIN t2 ON true WHERE b IS NULL
+  ORDER BY coalesce(a,b,3);
+----
+stmt 0 err 1 -1 89 no such table: t1

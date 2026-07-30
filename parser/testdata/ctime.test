@@ -1,0 +1,105 @@
+==== ctime-1.1.1
+
+    PRAGMA compile_options();
+----
+stmt 0 err 1 28 29 near ")": syntax error
+==== ctime-1.1.2
+
+    PRAGMA compile_options(NULL);
+----
+stmt 0 err 1 28 32 near "NULL": syntax error
+==== ctime-1.1.3
+
+    PRAGMA compile_options *;
+----
+stmt 0 err 1 28 29 near "*": syntax error
+==== ctime-1.4.1
+
+    SELECT sqlite_compileoption_used('SQLITE_THREADSAFE');
+----
+stmt 0 ok
+==== ctime-1.4.2
+
+    SELECT sqlite_compileoption_used('THREADSAFE');
+----
+stmt 0 ok
+==== ctime-1.4.3
+
+    SELECT sqlite_compileoption_used("THREADSAFE");
+----
+stmt 0 ok
+==== ctime-1.6
+
+    SELECT sqlite_compileoption_used('THREADSAFE=');
+----
+stmt 0 ok
+==== ctime-1.7.1
+
+    SELECT sqlite_compileoption_used('SQLITE_OMIT_COMPILEOPTION_DIAGS');
+----
+stmt 0 ok
+==== ctime-1.7.2
+
+    SELECT sqlite_compileoption_used('OMIT_COMPILEOPTION_DIAGS');
+----
+stmt 0 ok
+==== ctime-2.1.1
+
+    SELECT sqlite_compileoption_used();
+----
+stmt 0 err 1 12 40 wrong number of arguments to function sqlite_compileoption_used()
+==== ctime-2.1.2
+
+    SELECT sqlite_compileoption_used(NULL);
+----
+stmt 0 ok
+==== ctime-2.1.3
+
+    SELECT sqlite_compileoption_used("");
+----
+stmt 0 ok
+==== ctime-2.1.4
+
+    SELECT sqlite_compileoption_used('');
+----
+stmt 0 ok
+==== ctime-2.1.5
+
+    SELECT sqlite_compileoption_used(foo);
+----
+stmt 0 err 1 38 43 no such column: foo
+==== ctime-2.1.6
+
+    SELECT sqlite_compileoption_used('THREADSAFE', 0);
+----
+stmt 0 err 1 12 55 wrong number of arguments to function sqlite_compileoption_used()
+==== ctime-2.1.7
+
+    SELECT sqlite_compileoption_used(0);
+----
+stmt 0 ok
+==== ctime-2.1.8
+
+    SELECT sqlite_compileoption_used('0');
+----
+stmt 0 ok
+==== ctime-2.1.9
+
+    SELECT sqlite_compileoption_used(1.0);
+----
+stmt 0 ok
+==== ctime-2.2.1
+
+    SELECT sqlite_compileoption_get();
+----
+stmt 0 err 1 12 39 wrong number of arguments to function sqlite_compileoption_get()
+==== ctime-2.2.2
+
+    SELECT sqlite_compileoption_get(0, 0);
+----
+stmt 0 err 1 12 43 wrong number of arguments to function sqlite_compileoption_get()
+==== ctime-2.3
+
+    SELECT sqlite_compileoption_used(sqlite_compileoption_get(0));
+----
+stmt 0 ok

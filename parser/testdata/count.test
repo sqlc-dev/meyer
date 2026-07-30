@@ -1,0 +1,162 @@
+==== count-generated
+
+      INSERT INTO t1 VALUES(1, 2);
+      INSERT INTO t1 VALUES(3, 4);
+      SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 35 no such table: t1
+stmt 35 err 1 -1 70 no such table: t1
+stmt 70 err 1 -1 101 no such table: t1
+==== count-generated.dup1
+
+      INSERT INTO t1 SELECT * FROM t1;          --   4
+      INSERT INTO t1 SELECT * FROM t1;          --   8
+      INSERT INTO t1 SELECT * FROM t1;          --  16
+      INSERT INTO t1 SELECT * FROM t1;          --  32
+      INSERT INTO t1 SELECT * FROM t1;          --  64
+      INSERT INTO t1 SELECT * FROM t1;          -- 128
+      INSERT INTO t1 SELECT * FROM t1;          -- 256
+      SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 39 no such table: t1
+stmt 39 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 149 no such table: t1
+stmt 149 err 1 -1 204 no such table: t1
+stmt 204 err 1 -1 259 no such table: t1
+stmt 259 err 1 -1 314 no such table: t1
+stmt 314 err 1 -1 369 no such table: t1
+stmt 369 err 1 -1 416 no such table: t1
+==== count-generated.dup2
+
+      INSERT INTO t1 SELECT * FROM t1;          --  512
+      INSERT INTO t1 SELECT * FROM t1;          -- 1024
+      INSERT INTO t1 SELECT * FROM t1;          -- 2048
+      INSERT INTO t1 SELECT * FROM t1;          -- 4096
+      SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 39 no such table: t1
+stmt 39 err 1 -1 95 no such table: t1
+stmt 95 err 1 -1 151 no such table: t1
+stmt 151 err 1 -1 207 no such table: t1
+stmt 207 err 1 -1 255 no such table: t1
+==== count-generated.dup3
+
+      BEGIN;
+      INSERT INTO t1 SELECT * FROM t1;          --  8192
+      INSERT INTO t1 SELECT * FROM t1;          -- 16384
+      INSERT INTO t1 SELECT * FROM t1;          -- 32768
+      INSERT INTO t1 SELECT * FROM t1;          -- 65536
+      COMMIT;
+      SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 13 err 1 -1 52 no such table: t1
+stmt 52 err 1 -1 109 no such table: t1
+stmt 109 err 1 -1 166 no such table: t1
+stmt 166 err 1 -1 223 no such table: t1
+stmt 223 ok
+stmt 255 err 1 -1 286 no such table: t1
+==== count-2.2
+SELECT count(DISTINCT *) FROM t2
+----
+stmt 0 err 1 22 23 near "*": syntax error
+==== count-2.6
+SELECT count(DISTINCT) FROM t2
+----
+stmt 0 err 1 -1 31 no such table: t2
+==== count-2.9a
+
+  SELECT count(*) FROM t2 HAVING count(*)>1;
+----
+stmt 0 err 1 -1 45 no such table: t2
+==== count-2.9b
+
+  SELECT count(*) FROM t2 HAVING count(*)<10;
+----
+stmt 0 err 1 -1 46 no such table: t2
+==== count-3.1
+
+    CREATE TABLE t3(a, b);
+    SELECT a FROM (SELECT count(*) AS a FROM t3) WHERE a==0;
+----
+stmt 0 ok
+stmt 27 err 1 -1 88 no such table: t3
+==== count-3.2
+
+    SELECT a FROM (SELECT count(*) AS a FROM t3) WHERE a==1;
+----
+stmt 0 err 1 -1 61 no such table: t3
+==== count-4.1
+
+    CREATE TABLE t4(a, b);
+    INSERT INTO t4 VALUES('a', 'b');
+    CREATE INDEX t4i1 ON t4(b, a);
+    SELECT count(*) FROM t4;
+----
+stmt 0 ok
+stmt 27 err 1 -1 64 no such table: t4
+stmt 64 err 1 -1 99 no such table: main.t4
+stmt 99 err 1 -1 128 no such table: t4
+==== count-4.2
+
+    CREATE INDEX t4i2 ON t4(b);
+    SELECT count(*) FROM t4;
+----
+stmt 0 err 1 -1 32 no such table: main.t4
+stmt 32 err 1 -1 61 no such table: t4
+==== count-4.3
+
+    DROP INDEX t4i1;
+    CREATE INDEX t4i1 ON t4(b, a);
+    SELECT count(*) FROM t4;
+----
+stmt 0 err 1 -1 21 no such index: t4i1
+stmt 21 err 1 -1 56 no such table: main.t4
+stmt 56 err 1 -1 85 no such table: t4
+==== count-5.1
+
+  CREATE TABLE t5(a TEXT PRIMARY KEY, b VARCHAR(50)) WITHOUT ROWID;
+  INSERT INTO t5 VALUES('bison','jazz');
+  SELECT count(*) FROM t5;
+----
+stmt 0 ok
+stmt 68 err 1 -1 109 no such table: t5
+stmt 109 err 1 -1 136 no such table: t5
+==== count-6.1
+
+  CREATE TABLE t6(x);
+  SELECT count(DISTINCT) FROM t6 GROUP BY x;
+----
+stmt 0 ok
+stmt 22 err 1 -1 67 no such table: t6
+==== count-7.1
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b INT, c VARCHAR(1000));
+  CREATE INDEX t1b ON t1(b);
+  INSERT INTO t1(a,b,c) values(1,2,'count.test cases for NOT INDEXED');
+  ANALYZE;
+  UPDATE sqlite_stat1 SET stat='1000000 10' WHERE idx='t1b';
+  ANALYZE sqlite_master;
+----
+stmt 0 ok
+stmt 66 err 1 -1 95 no such table: main.t1
+stmt 95 err 1 -1 167 no such table: t1
+stmt 167 ok
+stmt 178 err 1 -1 239 no such table: sqlite_stat1
+stmt 239 ok
+==== count-8.0
+
+  CREATE TABLE t7(a INT,b TEXT,c BLOB,d REAL);
+  CREATE TABLE t8(a INT,b TEXT,c BLOB,d REAL);
+  CREATE INDEX t8a ON t8(a);
+----
+stmt 0 ok
+stmt 47 ok
+stmt 94 err 1 -1 123 no such table: main.t8
+==== count-8.1
+
+  SELECT * FROM t8 WHERE (a, b) IN (
+      SELECT count(t8.b), count(*) FROM t7 AS ra0 ORDER BY count(*)
+  ) AND t8.b=0;
+----
+stmt 0 err 1 -1 121 no such table: t8

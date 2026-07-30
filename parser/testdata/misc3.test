@@ -1,0 +1,233 @@
+==== misc3-2.1
+SELECT 2e-25*0.5e25
+----
+stmt 0 ok
+==== misc3-2.2
+SELECT 2.0e-25*000000.500000000000000000000000000000e+00025
+----
+stmt 0 ok
+==== misc3-2.3
+SELECT 000000000002e-0000000025*0.5e25
+----
+stmt 0 ok
+==== misc3-2.4
+SELECT 2e-25*0.5e250
+----
+stmt 0 ok
+==== misc3-2.5
+SELECT format('%.15e',2.0e-250*0.5e25)
+----
+stmt 0 ok
+==== misc3-2.6
+SELECT '-2.0e-127' * '-0.5e27'
+----
+stmt 0 ok
+==== misc3-2.7
+SELECT '+2.0e-127' * '-0.5e27'
+----
+stmt 0 ok
+==== misc3-2.8
+SELECT 2.0e-27 * '+0.5e+127'
+----
+stmt 0 ok
+==== misc3-2.9
+SELECT 2.0e-27 * '+0.000005e+132'
+----
+stmt 0 ok
+==== misc3-3.2
+
+    CREATE TABLE t2(a INT UNIQUE);
+----
+stmt 0 ok
+==== misc3-3.3
+
+    INSERT INTO t2 VALUES(2147483648);
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== misc3-3.4
+
+    INSERT INTO t2 VALUES(-2147483649);
+----
+stmt 0 err 1 -1 40 no such table: t2
+==== misc3-3.5
+
+    INSERT INTO t2 VALUES(+2147483649);
+----
+stmt 0 err 1 -1 40 no such table: t2
+==== misc3-3.6
+
+    INSERT INTO t2 VALUES(+2147483647);
+    INSERT INTO t2 VALUES(-2147483648);
+    INSERT INTO t2 VALUES(-2147483647);
+    INSERT INTO t2 VALUES(2147483646);
+    SELECT * FROM t2 ORDER BY a;
+----
+stmt 0 err 1 -1 40 no such table: t2
+stmt 40 err 1 -1 80 no such table: t2
+stmt 80 err 1 -1 120 no such table: t2
+stmt 120 err 1 -1 159 no such table: t2
+stmt 159 err 1 -1 192 no such table: t2
+==== misc3-3.7
+
+    SELECT * FROM t2 WHERE a>=-2147483648 ORDER BY a;
+----
+stmt 0 err 1 -1 54 no such table: t2
+==== misc3-3.8
+
+    SELECT * FROM t2 WHERE a>-2147483648 ORDER BY a;
+----
+stmt 0 err 1 -1 53 no such table: t2
+==== misc3-3.9
+
+    SELECT * FROM t2 WHERE a>-2147483649 ORDER BY a;
+----
+stmt 0 err 1 -1 53 no such table: t2
+==== misc3-3.10
+
+    SELECT * FROM t2 WHERE a>=0 AND a<2147483649 ORDER BY a DESC;
+----
+stmt 0 err 1 -1 66 no such table: t2
+==== misc3-3.11
+
+    SELECT * FROM t2 WHERE a>=0 AND a<=2147483648 ORDER BY a DESC;
+----
+stmt 0 err 1 -1 67 no such table: t2
+==== misc3-3.12
+
+    SELECT * FROM t2 WHERE a>=0 AND a<2147483648 ORDER BY a DESC;
+----
+stmt 0 err 1 -1 66 no such table: t2
+==== misc3-3.13
+
+    SELECT * FROM t2 WHERE a>=0 AND a<=2147483647 ORDER BY a DESC;
+----
+stmt 0 err 1 -1 67 no such table: t2
+==== misc3-3.14
+
+    SELECT * FROM t2 WHERE a>=0 AND a<2147483647 ORDER BY a DESC;
+----
+stmt 0 err 1 -1 66 no such table: t2
+==== misc3-4.1
+
+    CREATE TABLE t3(a INTEGER PRIMARY KEY, b);
+    INSERT INTO t3(b) VALUES('abc');
+    INSERT INTO t3(b) VALUES('xyz');
+    INSERT INTO t3(b) VALUES(NULL);
+    INSERT INTO t3(b) VALUES(NULL);
+    INSERT INTO t3(b) SELECT b||'d' FROM t3;
+    INSERT INTO t3(b) SELECT b||'e' FROM t3;
+    INSERT INTO t3(b) SELECT b||'f' FROM t3;
+    INSERT INTO t3(b) SELECT b||'g' FROM t3;
+    INSERT INTO t3(b) SELECT b||'h' FROM t3;
+    SELECT count(a), count(b) FROM t3;
+----
+stmt 0 ok
+stmt 47 err 1 -1 84 no such table: t3
+stmt 84 err 1 -1 121 no such table: t3
+stmt 121 err 1 -1 157 no such table: t3
+stmt 157 err 1 -1 193 no such table: t3
+stmt 193 err 1 -1 238 no such table: t3
+stmt 238 err 1 -1 283 no such table: t3
+stmt 283 err 1 -1 328 no such table: t3
+stmt 328 err 1 -1 373 no such table: t3
+stmt 373 err 1 -1 418 no such table: t3
+stmt 418 err 1 -1 457 no such table: t3
+==== misc3-4.2
+
+      SELECT count(a) FROM t3 WHERE b IN (SELECT b FROM t3);
+----
+stmt 0 err 1 -1 61 no such table: t3
+==== misc3-4.3
+
+      SELECT count(a) FROM t3 WHERE b IN (SELECT b FROM t3 ORDER BY a+1);
+----
+stmt 0 err 1 -1 74 no such table: t3
+==== misc3-5.1
+
+      CREATE TABLE x1 (b, c);
+      INSERT INTO x1 VALUES('dog',3);
+      INSERT INTO x1 VALUES('cat',1);
+      INSERT INTO x1 VALUES('dog',4);
+      CREATE TABLE x2 (c, e);
+      INSERT INTO x2 VALUES(1,'one');
+      INSERT INTO x2 VALUES(2,'two');
+      INSERT INTO x2 VALUES(3,'three');
+      INSERT INTO x2 VALUES(4,'four');
+      SELECT x2.c AS c, e, b FROM x2 LEFT JOIN
+         (SELECT b, max(c)+0 AS c FROM x1 GROUP BY b)
+         USING(c);
+----
+stmt 0 ok
+stmt 30 err 1 -1 68 no such table: x1
+stmt 68 err 1 -1 106 no such table: x1
+stmt 106 err 1 -1 144 no such table: x1
+stmt 144 ok
+stmt 174 err 1 -1 212 no such table: x2
+stmt 212 err 1 -1 250 no such table: x2
+stmt 250 err 1 -1 290 no such table: x2
+stmt 290 err 1 -1 329 no such table: x2
+stmt 329 err 1 -1 449 no such table: x2
+==== misc3-5.2
+
+      SELECT * FROM (
+        SELECT x2.c AS c, e, b FROM x2 LEFT JOIN
+           (SELECT b, max(c)+0 AS c FROM x1 GROUP BY b)
+           USING(c)
+      );
+----
+stmt 0 err 1 -1 156 no such table: x2
+==== misc3-7.1
+
+    BEGIN;
+    CREATE TABLE y1(a);
+    CREATE TABLE y2(b);
+    CREATE TABLE y3(c);
+    CREATE TRIGGER r1 AFTER DELETE ON y1 FOR EACH ROW BEGIN
+      INSERT INTO y3(c) SELECT b FROM y2 ORDER BY b LIMIT 1;
+    END;
+    INSERT INTO y1 VALUES(1);
+    INSERT INTO y1 VALUES(2);
+    INSERT INTO y1 SELECT a+2 FROM y1;
+    INSERT INTO y1 SELECT a+4 FROM y1;
+    INSERT INTO y1 SELECT a+8 FROM y1;
+    INSERT INTO y1 SELECT a+16 FROM y1;
+    INSERT INTO y2 SELECT a FROM y1;
+    COMMIT;
+    SELECT count(*) FROM y1;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 35 ok
+stmt 59 ok
+stmt 83 err 1 -1 143 no such table: main.y1
+stmt 213 err 1 -1 243 no such table: y1
+stmt 243 err 1 -1 273 no such table: y1
+stmt 273 err 1 -1 312 no such table: y1
+stmt 312 err 1 -1 351 no such table: y1
+stmt 351 err 1 -1 390 no such table: y1
+stmt 390 err 1 -1 430 no such table: y1
+stmt 430 err 1 -1 467 no such table: y2
+stmt 467 ok
+stmt 479 err 1 -1 508 no such table: y1
+==== misc3-7.2
+
+    DELETE FROM y1;
+    SELECT count(*) FROM y1;
+----
+stmt 0 err 1 -1 20 no such table: y1
+stmt 20 err 1 -1 49 no such table: y1
+==== misc3-7.3
+
+    SELECT count(*) FROM y3;
+----
+stmt 0 err 1 -1 29 no such table: y3
+==== misc-8.1
+
+      SELECT count(CASE WHEN b IN ('abc','xyz') THEN 'x' END) FROM t3
+----
+stmt 0 err 1 -1 71 no such table: t3
+==== misc-8.2
+
+      SELECT count(*) FROM t3 WHERE 1+(b IN ('abc','xyz'))==2
+----
+stmt 0 err 1 -1 63 no such table: t3

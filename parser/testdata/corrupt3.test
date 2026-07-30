@@ -1,0 +1,15 @@
+==== corrupt3-1.8
+
+    PRAGMA integrity_check
+----
+stmt 0 ok
+==== corrupt3-1.10
+
+    PRAGMA integrity_check
+----
+stmt 0 ok
+==== corrupt3-1.12
+
+    PRAGMA integrity_check
+----
+stmt 0 ok

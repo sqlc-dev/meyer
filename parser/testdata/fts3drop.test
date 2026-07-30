@@ -1,0 +1,51 @@
+==== 1.1
+
+  CREATE VIRTUAL TABLE f1 USING fts3;
+  INSERT INTO f1 VALUES('a b c');
+----
+stmt 0 ok
+stmt 38 err 1 -1 72 no such table: f1
+==== 1.2
+
+  BEGIN;
+    INSERT INTO f1 VALUES('d e f');
+    SAVEPOINT one;
+      INSERT INTO f1 VALUES('g h i');
+      DROP TABLE f1;
+    ROLLBACK TO one;
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 err 1 -1 45 no such table: f1
+stmt 45 ok
+stmt 64 err 1 -1 102 no such table: f1
+stmt 102 err 1 -1 123 no such table: f1
+stmt 123 ok
+stmt 144 ok
+==== 1.3
+
+  SELECT * FROM f1;
+----
+stmt 0 err 1 -1 20 no such table: f1
+==== 1.4
+
+  BEGIN;
+    INSERT INTO f1 VALUES('g h i');
+    SAVEPOINT one;
+      INSERT INTO f1 VALUES('j k l');
+      DROP TABLE f1;
+    RELEASE one;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 -1 45 no such table: f1
+stmt 45 ok
+stmt 64 err 1 -1 102 no such table: f1
+stmt 102 err 1 -1 123 no such table: f1
+stmt 123 ok
+stmt 140 ok
+==== 1.5
+
+  SELECT * FROM f1;
+----
+stmt 0 err 1 -1 20 no such table: f1

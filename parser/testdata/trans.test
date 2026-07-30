@@ -1,0 +1,525 @@
+==== trans-1.0
+
+    CREATE TABLE one(a int PRIMARY KEY, b text);
+    INSERT INTO one VALUES(1,'one');
+    INSERT INTO one VALUES(2,'two');
+    INSERT INTO one VALUES(3,'three');
+    SELECT b FROM one ORDER BY a;
+----
+stmt 0 ok
+stmt 49 err 1 -1 86 no such table: one
+stmt 86 err 1 -1 123 no such table: one
+stmt 123 err 1 -1 162 no such table: one
+stmt 162 err 1 -1 196 no such table: one
+==== trans-1.1
+
+    CREATE TABLE two(a int PRIMARY KEY, b text);
+    INSERT INTO two VALUES(1,'I');
+    INSERT INTO two VALUES(5,'V');
+    INSERT INTO two VALUES(10,'X');
+    SELECT b FROM two ORDER BY a;
+----
+stmt 0 ok
+stmt 49 err 1 -1 84 no such table: two
+stmt 84 err 1 -1 119 no such table: two
+stmt 119 err 1 -1 155 no such table: two
+stmt 155 err 1 -1 189 no such table: two
+==== trans-2.10
+
+    BEGIN;
+    SELECT a FROM one ORDER BY a;
+    SELECT a FROM two ORDER BY a;
+    END;
+----
+stmt 0 ok
+stmt 11 err 1 -1 45 no such table: one
+stmt 45 err 1 -1 79 no such table: two
+stmt 79 ok
+==== trans-3.1
+
+    BEGIN;
+    UPDATE one SET a = 0 WHERE 0;
+    SELECT a FROM one ORDER BY a;
+----
+stmt 0 ok
+stmt 11 err 1 -1 45 no such table: one
+stmt 45 err 1 -1 79 no such table: one
+==== trans-3.4
+
+    INSERT INTO one VALUES(4,'four');
+----
+stmt 0 err 1 -1 38 no such table: one
+==== trans-3.7
+
+    INSERT INTO two VALUES(4,'IV');
+----
+stmt 0 err 1 -1 36 no such table: two
+==== trans-3.10
+END TRANSACTION
+----
+stmt 0 ok
+==== trans-5.1
+SELECT name FROM sqlite_master WHERE type='table' ORDER BY name
+----
+stmt 0 ok
+==== trans-5.4
+SELECT a,b FROM one ORDER BY b
+----
+stmt 0 err 1 -1 31 no such table: one
+==== trans-5.8
+
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name
+----
+stmt 0 ok
+==== trans-5.9
+
+    BEGIN TRANSACTION;
+    CREATE TABLE t1(a int, b int, c int);
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 65 ok
+==== trans-5.10
+
+    CREATE INDEX i1 ON t1(a);
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 err 1 -1 30 no such table: main.t1
+stmt 30 ok
+==== trans-5.11
+
+    COMMIT;
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 ok
+stmt 12 ok
+==== trans-5.12
+
+    BEGIN TRANSACTION;
+    CREATE TABLE t2(a int, b int, c int);
+    CREATE INDEX i2a ON t2(a);
+    CREATE INDEX i2b ON t2(b);
+    DROP TABLE t1;
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 65 err 1 -1 96 no such table: main.t2
+stmt 96 err 1 -1 127 no such table: main.t2
+stmt 127 err 1 -1 146 no such table: t1
+stmt 146 ok
+==== trans-5.13
+
+    ROLLBACK;
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 ok
+stmt 14 ok
+==== trans-5.14
+
+    BEGIN TRANSACTION;
+    DROP INDEX i1;
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 ok
+stmt 23 err 1 -1 42 no such index: i1
+stmt 42 ok
+==== trans-5.15
+
+    ROLLBACK;
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 ok
+stmt 14 ok
+==== trans-5.16
+
+    BEGIN TRANSACTION;
+    DROP INDEX i1;
+    CREATE TABLE t2(x int, y int, z int);
+    CREATE INDEX i2x ON t2(x);
+    CREATE INDEX i2y ON t2(y);
+    INSERT INTO t2 VALUES(1,2,3);
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 ok
+stmt 23 err 1 -1 42 no such index: i1
+stmt 42 ok
+stmt 84 err 1 -1 115 no such table: main.t2
+stmt 115 err 1 -1 146 no such table: main.t2
+stmt 146 err 1 -1 180 no such table: t2
+stmt 180 ok
+==== trans-5.17
+
+    COMMIT;
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 ok
+stmt 12 ok
+==== trans-5.18
+
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== trans-5.19
+
+    SELECT x FROM t2 WHERE y=2;
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== trans-5.20
+
+    BEGIN TRANSACTION;
+    DROP TABLE t1;
+    DROP TABLE t2;
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 ok
+stmt 23 err 1 -1 42 no such table: t1
+stmt 42 err 1 -1 61 no such table: t2
+stmt 61 ok
+==== trans-5.22
+
+    ROLLBACK;
+    SELECT name fROM sqlite_master 
+    WHERE type='table' OR type='index'
+    ORDER BY name;
+----
+stmt 0 ok
+stmt 14 ok
+==== trans-5.23
+
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== trans-6.7
+
+    COMMIT;
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 12 err 1 -1 34 no such table: t1
+==== trans-6.16
+
+    COMMIT;
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 12 err 1 -1 34 no such table: t1
+==== trans-6.20
+
+    CREATE TABLE t1(a integer primary key,b,c);
+    INSERT INTO t1 VALUES(1,-2,-3);
+    INSERT INTO t1 VALUES(4,-5,-6);
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 48 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 120 no such table: t1
+stmt 120 err 1 -1 142 no such table: t1
+==== trans-6.21
+
+    CREATE INDEX i1 ON t1(b);
+    SELECT * FROM t1 WHERE b<1;
+----
+stmt 0 err 1 -1 30 no such table: main.t1
+stmt 30 err 1 -1 62 no such table: t1
+==== trans-6.22
+
+    BEGIN TRANSACTION;
+    DROP INDEX i1;
+    SELECT * FROM t1 WHERE b<1;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 23 err 1 -1 42 no such index: i1
+stmt 42 err 1 -1 74 no such table: t1
+stmt 74 ok
+==== trans-6.23
+
+    SELECT * FROM t1 WHERE b<1;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== trans-6.24
+
+    BEGIN TRANSACTION;
+    DROP TABLE t1;
+    ROLLBACK;
+    SELECT * FROM t1 WHERE b<1;
+----
+stmt 0 ok
+stmt 23 err 1 -1 42 no such table: t1
+stmt 42 ok
+stmt 56 err 1 -1 88 no such table: t1
+==== trans-6.25
+
+    BEGIN TRANSACTION;
+    DROP INDEX i1;
+    CREATE INDEX i1 ON t1(c);
+    SELECT * FROM t1 WHERE b<1;
+----
+stmt 0 ok
+stmt 23 err 1 -1 42 no such index: i1
+stmt 42 err 1 -1 72 no such table: main.t1
+stmt 72 err 1 -1 104 no such table: t1
+==== trans-6.26
+
+    SELECT * FROM t1 WHERE c<1;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== trans-6.27
+
+    ROLLBACK;
+    SELECT * FROM t1 WHERE b<1;
+----
+stmt 0 ok
+stmt 14 err 1 -1 46 no such table: t1
+==== trans-6.28
+
+    SELECT * FROM t1 WHERE c<1;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== trans-6.30
+
+    BEGIN TRANSACTION;
+    DROP TABLE t1;
+    CREATE TABLE t1(a int unique,b,c);
+    COMMIT;
+    INSERT INTO t1 VALUES(1,-2,-3);
+    INSERT INTO t1 VALUES(4,-5,-6);
+    SELECT * FROM t1 ORDER BY a;
+----
+stmt 0 ok
+stmt 23 err 1 -1 42 no such table: t1
+stmt 42 ok
+stmt 81 ok
+stmt 93 err 1 -1 129 no such table: t1
+stmt 129 err 1 -1 165 no such table: t1
+stmt 165 err 1 -1 198 no such table: t1
+==== trans-6.31
+
+    CREATE INDEX i1 ON t1(b);
+    SELECT * FROM t1 WHERE b<1;
+----
+stmt 0 err 1 -1 30 no such table: main.t1
+stmt 30 err 1 -1 62 no such table: t1
+==== trans-6.32
+
+    BEGIN TRANSACTION;
+    DROP INDEX i1;
+    SELECT * FROM t1 WHERE b<1;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 23 err 1 -1 42 no such index: i1
+stmt 42 err 1 -1 74 no such table: t1
+stmt 74 ok
+==== trans-6.33
+
+    SELECT * FROM t1 WHERE b<1;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== trans-6.34
+
+    BEGIN TRANSACTION;
+    DROP TABLE t1;
+    ROLLBACK;
+    SELECT * FROM t1 WHERE b<1;
+----
+stmt 0 ok
+stmt 23 err 1 -1 42 no such table: t1
+stmt 42 ok
+stmt 56 err 1 -1 88 no such table: t1
+==== trans-6.35
+
+    BEGIN TRANSACTION;
+    DROP INDEX i1;
+    CREATE INDEX i1 ON t1(c);
+    SELECT * FROM t1 WHERE b<1;
+----
+stmt 0 ok
+stmt 23 err 1 -1 42 no such index: i1
+stmt 42 err 1 -1 72 no such table: main.t1
+stmt 72 err 1 -1 104 no such table: t1
+==== trans-6.36
+
+    SELECT * FROM t1 WHERE c<1;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== trans-6.37
+
+    DROP INDEX i1;
+    SELECT * FROM t1 WHERE c<1;
+----
+stmt 0 err 1 -1 19 no such index: i1
+stmt 19 err 1 -1 51 no such table: t1
+==== trans-6.38
+
+    ROLLBACK;
+    SELECT * FROM t1 WHERE b<1;
+----
+stmt 0 ok
+stmt 14 err 1 -1 46 no such table: t1
+==== trans-6.39
+
+    SELECT * FROM t1 WHERE c<1;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== trans-7.2
+SELECT md5sum(x,y,z) FROM t2
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== trans-7.2.1
+SELECT md5sum(type,name,tbl_name,rootpage,sql) FROM sqlite_master
+----
+stmt 0 err 1 7 66 no such function: md5sum
+==== trans-7.3
+
+    BEGIN;
+    DELETE FROM t2;
+    ROLLBACK;
+    SELECT md5sum(x,y,z) FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 31 no such table: t2
+stmt 31 ok
+stmt 45 err 1 -1 79 no such table: t2
+==== trans-7.4
+
+    BEGIN;
+    INSERT INTO t2 SELECT * FROM t2;
+    ROLLBACK;
+    SELECT md5sum(x,y,z) FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 48 no such table: t2
+stmt 48 ok
+stmt 62 err 1 -1 96 no such table: t2
+==== trans-7.5
+
+    BEGIN;
+    DELETE FROM t2;
+    ROLLBACK;
+    SELECT md5sum(x,y,z) FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 31 no such table: t2
+stmt 31 ok
+stmt 45 err 1 -1 79 no such table: t2
+==== trans-7.6
+
+    BEGIN;
+    INSERT INTO t2 SELECT * FROM t2;
+    ROLLBACK;
+    SELECT md5sum(x,y,z) FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 48 no such table: t2
+stmt 48 ok
+stmt 62 err 1 -1 96 no such table: t2
+==== trans-7.7
+
+    BEGIN;
+    CREATE TABLE t3 AS SELECT * FROM t2;
+    INSERT INTO t2 SELECT * FROM t3;
+    ROLLBACK;
+    SELECT md5sum(x,y,z) FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 52 no such table: t2
+stmt 52 err 1 -1 89 no such table: t2
+stmt 89 ok
+stmt 103 err 1 -1 137 no such table: t2
+==== trans-7.8
+SELECT md5sum(type,name,tbl_name,rootpage,sql) FROM sqlite_master
+----
+stmt 0 err 1 7 66 no such function: md5sum
+==== trans-7.9
+
+      BEGIN;
+      CREATE TEMP TABLE t3 AS SELECT * FROM t2;
+      INSERT INTO t2 SELECT * FROM t3;
+      ROLLBACK;
+      SELECT md5sum(x,y,z) FROM t2;
+----
+stmt 0 ok
+stmt 13 err 1 -1 61 no such table: t2
+stmt 61 err 1 -1 100 no such table: t2
+stmt 100 ok
+stmt 116 err 1 -1 152 no such table: t2
+==== trans-7.10
+SELECT md5sum(type,name,tbl_name,rootpage,sql) FROM sqlite_master
+----
+stmt 0 err 1 7 66 no such function: md5sum
+==== trans-7.11
+
+      BEGIN;
+      CREATE TEMP TABLE t3 AS SELECT * FROM t2;
+      INSERT INTO t2 SELECT * FROM t3;
+      DROP INDEX i2x;
+      DROP INDEX i2y;
+      CREATE INDEX i3a ON t3(x);
+      ROLLBACK;
+      SELECT md5sum(x,y,z) FROM t2;
+----
+stmt 0 ok
+stmt 13 err 1 -1 61 no such table: t2
+stmt 61 err 1 -1 100 no such table: t2
+stmt 100 err 1 -1 122 no such index: i2x
+stmt 122 err 1 -1 144 no such index: i2y
+stmt 144 err 1 -1 177 no such table: main.t3
+stmt 177 ok
+stmt 193 err 1 -1 229 no such table: t2
+==== trans-7.12
+SELECT md5sum(type,name,tbl_name,rootpage,sql) FROM sqlite_master
+----
+stmt 0 err 1 7 66 no such function: md5sum
+==== trans-7.13
+
+      BEGIN;
+      DROP TABLE t2;
+      ROLLBACK;
+      SELECT md5sum(x,y,z) FROM t2;
+----
+stmt 0 ok
+stmt 13 err 1 -1 34 no such table: t2
+stmt 34 ok
+stmt 50 err 1 -1 86 no such table: t2
+==== trans-7.14
+SELECT md5sum(type,name,tbl_name,rootpage,sql) FROM sqlite_master
+----
+stmt 0 err 1 7 66 no such function: md5sum
+==== trans-8.2
+SELECT md5sum(type,name,tbl_name,rootpage,sql) FROM sqlite_master
+----
+stmt 0 err 1 7 66 no such function: md5sum
+==== trans-8.5
+SELECT md5sum(type,name,tbl_name,rootpage,sql) FROM sqlite_master
+----
+stmt 0 err 1 7 66 no such function: md5sum
+==== trans-generated
+
+         INSERT INTO t3 SELECT randstr(10,400) FROM t3 WHERE random()%10==0;
+----
+stmt 0 err 1 -1 77 no such table: t3

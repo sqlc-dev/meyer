@@ -1,0 +1,334 @@
+==== 1.0
+
+  CREATE TABLE t1(a TEXT, b, c);
+  CREATE INDEX i1 ON t1(b, c) WHERE a='abc';
+  INSERT INTO t1 VALUES('abc', 1, 2);
+----
+stmt 0 ok
+stmt 33 err 1 -1 78 no such table: main.t1
+stmt 78 err 1 -1 116 no such table: t1
+==== 1.1
+
+  SELECT * FROM t1 WHERE a='abc'
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== 1.3
+
+  CREATE INDEX i2 ON t1(b, c) WHERE a=5;
+  INSERT INTO t1 VALUES(5, 4, 3);
+
+  SELECT a, typeof(a), b, c FROM t1 WHERE a=5;
+----
+stmt 0 err 1 -1 41 no such table: main.t1
+stmt 41 err 1 -1 75 no such table: t1
+stmt 75 err 1 -1 123 no such table: t1
+==== 1.4
+
+  CREATE TABLE t2(x);
+  INSERT INTO t2 VALUES('v');
+----
+stmt 0 ok
+stmt 22 err 1 -1 52 no such table: t2
+==== 1.5
+
+  SELECT x, a, b, c FROM t2 LEFT JOIN t1 ON (a=5 AND b=x)
+----
+stmt 0 err 1 -1 59 no such table: t2
+==== 1.6
+
+  SELECT x, a, b, c FROM t2 RIGHT JOIN t1 ON (t1.a=5 AND t1.b=t2.x)
+----
+stmt 0 err 1 -1 69 no such table: t2
+==== 2.0
+
+  CREATE TABLE x1(a TEXT, b, c);
+  INSERT INTO x1 VALUES('2', 'two', 'ii');
+  INSERT INTO x1 VALUES('2.0', 'twopointoh', 'ii.0');
+
+  CREATE TABLE x2(a NUMERIC, b, c);
+  INSERT INTO x2 VALUES('2', 'two', 'ii');
+  INSERT INTO x2 VALUES('2.0', 'twopointoh', 'ii.0');
+
+  CREATE TABLE x3(a REAL, b, c);
+  INSERT INTO x3 VALUES('2', 'two', 'ii');
+  INSERT INTO x3 VALUES('2.0', 'twopointoh', 'ii.0');
+----
+stmt 0 ok
+stmt 33 err 1 -1 76 no such table: x1
+stmt 76 err 1 -1 130 no such table: x1
+stmt 130 ok
+stmt 167 err 1 -1 210 no such table: x2
+stmt 210 err 1 -1 264 no such table: x2
+stmt 264 ok
+stmt 298 err 1 -1 341 no such table: x3
+stmt 341 err 1 -1 395 no such table: x3
+==== indexA-generated
+
+    SELECT *, typeof(a) FROM x1 WHERE a=2
+----
+stmt 0 err 1 -1 43 no such table: x1
+==== indexA-generated.dup1
+
+    SELECT *, typeof(a) FROM x1 WHERE a=2.0
+----
+stmt 0 err 1 -1 45 no such table: x1
+==== indexA-generated.dup2
+
+    SELECT *, typeof(a) FROM x1 WHERE a='2'
+----
+stmt 0 err 1 -1 45 no such table: x1
+==== indexA-generated.dup3
+
+    SELECT *, typeof(a) FROM x1 WHERE a='2.0'
+----
+stmt 0 err 1 -1 47 no such table: x1
+==== indexA-generated.dup4
+
+    SELECT *, typeof(a) FROM x2 WHERE a=2
+----
+stmt 0 err 1 -1 43 no such table: x2
+==== indexA-generated.dup5
+
+    SELECT *, typeof(a) FROM x2 WHERE a=2.0
+----
+stmt 0 err 1 -1 45 no such table: x2
+==== indexA-generated.dup6
+
+    SELECT *, typeof(a) FROM x2 WHERE a='2'
+----
+stmt 0 err 1 -1 45 no such table: x2
+==== indexA-generated.dup7
+
+    SELECT *, typeof(a) FROM x2 WHERE a='2.0'
+----
+stmt 0 err 1 -1 47 no such table: x2
+==== indexA-generated.dup8
+
+    SELECT *, typeof(a) FROM x3 WHERE a=2
+----
+stmt 0 err 1 -1 43 no such table: x3
+==== indexA-generated.dup9
+
+    SELECT *, typeof(a) FROM x3 WHERE a=2.0
+----
+stmt 0 err 1 -1 45 no such table: x3
+==== indexA-generated.dup10
+
+    SELECT *, typeof(a) FROM x3 WHERE a='2'
+----
+stmt 0 err 1 -1 45 no such table: x3
+==== indexA-generated.dup11
+
+    SELECT *, typeof(a) FROM x3 WHERE a='2.0'
+----
+stmt 0 err 1 -1 47 no such table: x3
+==== 3.0
+
+  CREATE TABLE x1(a TEXT, d PRIMARY KEY, b, c) WITHOUT ROWID;
+  INSERT INTO x1 VALUES('2', 1, 'two', 'ii');
+  INSERT INTO x1 VALUES('2.0', 2, 'twopointoh', 'ii.0');
+
+  CREATE TABLE x2(a NUMERIC, b, c, d PRIMARY KEY) WITHOUT ROWID;
+  INSERT INTO x2 VALUES('2', 'two', 'ii', 1);
+  INSERT INTO x2 VALUES('2.0', 'twopointoh', 'ii.0', 2);
+
+  CREATE TABLE x3(d PRIMARY KEY, a REAL, b, c) WITHOUT ROWID;
+  INSERT INTO x3 VALUES(34, '2', 'two', 'ii');
+  INSERT INTO x3 VALUES(35, '2.0', 'twopointoh', 'ii.0');
+----
+stmt 0 ok
+stmt 62 err 1 -1 108 no such table: x1
+stmt 108 err 1 -1 165 no such table: x1
+stmt 165 ok
+stmt 231 err 1 -1 277 no such table: x2
+stmt 277 err 1 -1 334 no such table: x2
+stmt 334 ok
+stmt 397 err 1 -1 444 no such table: x3
+stmt 444 err 1 -1 502 no such table: x3
+==== indexA-generated.dup12
+
+    SELECT a, b, c, typeof(a) FROM x1 WHERE a=2
+----
+stmt 0 err 1 -1 49 no such table: x1
+==== indexA-generated.dup13
+
+    SELECT a, b, c, typeof(a) FROM x1 WHERE a=2.0
+----
+stmt 0 err 1 -1 51 no such table: x1
+==== indexA-generated.dup14
+
+    SELECT a, b, c, typeof(a) FROM x1 WHERE a='2'
+----
+stmt 0 err 1 -1 51 no such table: x1
+==== indexA-generated.dup15
+
+    SELECT a, b, c, typeof(a) FROM x1 WHERE a='2.0'
+----
+stmt 0 err 1 -1 53 no such table: x1
+==== indexA-generated.dup16
+
+    SELECT a, b, c, typeof(a) FROM x2 WHERE a=2
+----
+stmt 0 err 1 -1 49 no such table: x2
+==== indexA-generated.dup17
+
+    SELECT a, b, c, typeof(a) FROM x2 WHERE a=2.0
+----
+stmt 0 err 1 -1 51 no such table: x2
+==== indexA-generated.dup18
+
+    SELECT a, b, c, typeof(a) FROM x2 WHERE a='2'
+----
+stmt 0 err 1 -1 51 no such table: x2
+==== indexA-generated.dup19
+
+    SELECT a, b, c, typeof(a) FROM x2 WHERE a='2.0'
+----
+stmt 0 err 1 -1 53 no such table: x2
+==== indexA-generated.dup20
+
+    SELECT a, b, c, typeof(a) FROM x3 WHERE a=2
+----
+stmt 0 err 1 -1 49 no such table: x3
+==== indexA-generated.dup21
+
+    SELECT a, b, c, typeof(a) FROM x3 WHERE a=2.0
+----
+stmt 0 err 1 -1 51 no such table: x3
+==== indexA-generated.dup22
+
+    SELECT a, b, c, typeof(a) FROM x3 WHERE a='2'
+----
+stmt 0 err 1 -1 51 no such table: x3
+==== indexA-generated.dup23
+
+    SELECT a, b, c, typeof(a) FROM x3 WHERE a='2.0'
+----
+stmt 0 err 1 -1 53 no such table: x3
+==== 4.0
+
+  CREATE TABLE t2(a INTEGER, b TEXT);
+  INSERT INTO t2 VALUES(1, 'two');
+  INSERT INTO t2 VALUES(2, 'two');
+  INSERT INTO t2 VALUES(3, 'two');
+  INSERT INTO t2 VALUES(1, 'three');
+  INSERT INTO t2 VALUES(2, 'three');
+  INSERT INTO t2 VALUES(3, 'three');
+
+  CREATE INDEX t2a_two ON t2(a) WHERE b='two';
+----
+stmt 0 ok
+stmt 38 err 1 -1 73 no such table: t2
+stmt 73 err 1 -1 108 no such table: t2
+stmt 108 err 1 -1 143 no such table: t2
+stmt 143 err 1 -1 180 no such table: t2
+stmt 180 err 1 -1 217 no such table: t2
+stmt 217 err 1 -1 254 no such table: t2
+stmt 254 err 1 -1 302 no such table: main.t2
+==== 4.1.1
+
+  SELECT sum(a), b FROM t2 WHERE b='two'
+----
+stmt 0 err 1 -1 42 no such table: t2
+==== 5.0
+
+  CREATE TABLE t1(a INTEGER PRIMQRY KEY, b, c);
+----
+stmt 0 ok
+==== 5.1
+
+  CREATE INDEX ex1 ON t1(c) WHERE b IS 'abc' COLLATE g;
+----
+stmt 0 err 1 -1 56 no such table: main.t1
+==== 5.2
+
+  CREATE INDEX ex1 ON t1(c) WHERE b IS 'abc' COLLATE xyz;
+----
+stmt 0 err 1 -1 58 no such table: main.t1
+==== 5.3
+
+  SELECT * FROM t1
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 6.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b, c);
+  CREATE TABLE t2(x INTEGER PRIMARY KEY, y INTEGER, z INTEGER);
+  INSERT INTO t1 VALUES(1, 1, 1);
+  INSERT INTO t1 VALUES(2, 1, 2);
+  INSERT INTO t2 VALUES(1, 5, 1);
+  INSERT INTO t2 VALUES(2, 5, 2);
+
+  CREATE INDEX t2z ON t2(z) WHERE y=5;
+----
+stmt 0 ok
+stmt 48 ok
+stmt 112 err 1 -1 146 no such table: t1
+stmt 146 err 1 -1 180 no such table: t1
+stmt 180 err 1 -1 214 no such table: t2
+stmt 214 err 1 -1 248 no such table: t2
+stmt 248 err 1 -1 288 no such table: main.t2
+==== 6.1
+
+  ANALYZE;
+  UPDATE sqlite_stat1 SET stat = '50 1' WHERE idx='t2z';
+  UPDATE sqlite_stat1 SET stat = '50' WHERE tbl='t2' AND idx IS NULL;
+  UPDATE sqlite_stat1 SET stat = '5000' WHERE tbl='t1' AND idx IS NULL;
+  ANALYZE sqlite_schema;
+----
+stmt 0 ok
+stmt 11 err 1 -1 68 no such table: sqlite_stat1
+stmt 68 err 1 -1 138 no such table: sqlite_stat1
+stmt 138 err 1 -1 210 no such table: sqlite_stat1
+stmt 210 ok
+==== 6.2
+
+  SELECT * FROM t1, t2 WHERE b=1 AND z=c AND y=5;
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 6.4
+
+  SELECT * FROM t1 LEFT JOIN t2 ON (y=5) WHERE b=1 AND z IS c;
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== 6.6
+
+  CREATE INDEX t2yz ON t2(y, z) WHERE y=5;
+----
+stmt 0 err 1 -1 43 no such table: main.t2
+==== 6.7
+
+  SELECT * FROM t1 LEFT JOIN t2 ON (y=5) WHERE b=1 AND z IS c;
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== 7.0
+
+  CREATE TABLE t1(i INTEGER PRIMARY KEY, b TEXT, c TEXT);
+  CREATE INDEX i1 ON t1(c) WHERE b='abc' AND i=5;
+  INSERT INTO t1 VALUES(5, 'abc', 'xyz');
+  SELECT * FROM t1 INDEXED BY i1 WHERE b='abc' AND i=5 ORDER BY c;
+----
+stmt 0 ok
+stmt 58 err 1 -1 108 no such table: main.t1
+stmt 108 err 1 -1 150 no such table: t1
+stmt 150 err 1 -1 217 no such table: t1
+==== 8.0
+
+  CREATE TABLE t1(a, b, c);
+  CREATE INDEX ex2 ON t1(a, 4);
+  CREATE INDEX ex1 ON t1(a) WHERE 4=b;
+  INSERT INTO t1 VALUES(1, 4, 1);
+  INSERT INTO t1 VALUES(1, 5, 1);
+  INSERT INTO t1 VALUES(2, 4, 2);
+----
+stmt 0 ok
+stmt 28 err 1 -1 60 no such table: main.t1
+stmt 60 err 1 -1 99 no such table: main.t1
+stmt 99 err 1 -1 133 no such table: t1
+stmt 133 err 1 -1 167 no such table: t1
+stmt 167 err 1 -1 201 no such table: t1
+==== 8.1
+
+  SELECT * FROM t1 WHERE b=4;
+----
+stmt 0 err 1 -1 30 no such table: t1

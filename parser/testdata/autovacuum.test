@@ -1,0 +1,269 @@
+==== autovacuum-1.1
+
+    PRAGMA auto_vacuum = 1;
+    CREATE TABLE av1(a);
+    CREATE INDEX av1_idx ON av1(a);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 53 err 1 -1 89 no such table: main.av1
+==== autovacuum-generated
+
+        pragma integrity_check
+----
+stmt 0 ok
+==== autovacuum-generated.dup1
+
+          pragma integrity_check
+----
+stmt 0 ok
+==== autovacuum-generated.dup2
+
+        select a from av1 order by rowid
+----
+stmt 0 err 1 -1 42 no such table: av1
+==== autovacuum-2.1.1
+
+    DROP TABLE av1;
+----
+stmt 0 err 1 -1 20 no such table: av1
+==== autovacuum-2.2.1
+
+    CREATE TABLE av1(x);
+    SELECT rootpage FROM sqlite_master ORDER BY rootpage;
+----
+stmt 0 ok
+stmt 25 ok
+==== autovacuum-2.2.3
+
+    CREATE TABLE av2(x);
+    SELECT rootpage FROM sqlite_master ORDER BY rootpage;
+----
+stmt 0 ok
+stmt 25 ok
+==== autovacuum-2.2.5
+
+    CREATE TABLE av3(x);
+    SELECT rootpage FROM sqlite_master ORDER BY rootpage;
+----
+stmt 0 ok
+stmt 25 ok
+==== autovacuum-2.2.7
+
+    CREATE TABLE av4(x);
+    SELECT rootpage FROM sqlite_master ORDER BY rootpage;
+----
+stmt 0 ok
+stmt 25 ok
+==== autovacuum-2.2.9
+
+    select * from av1
+----
+stmt 0 err 1 -1 23 no such table: av1
+==== autovacuum-2.3.2
+
+    DROP TABLE av2;
+    SELECT rootpage FROM sqlite_master ORDER BY rootpage;
+----
+stmt 0 err 1 -1 20 no such table: av2
+stmt 20 ok
+==== autovacuum-2.3.4
+
+    SELECT x FROM av3;
+----
+stmt 0 err 1 -1 23 no such table: av3
+==== autovacuum-2.3.5
+
+    SELECT x FROM av4;
+----
+stmt 0 err 1 -1 23 no such table: av4
+==== autovacuum-2.4.3
+
+    SELECT rootpage FROM sqlite_master ORDER by rootpage
+----
+stmt 0 ok
+==== autovacuum-2.5.1
+
+    CREATE TABLE av1(a PRIMARY KEY, b, c);
+    INSERT INTO av1 VALUES('av1 a', 'av1 b', 'av1 c');
+
+    CREATE TABLE av2(a PRIMARY KEY, b, c);
+    CREATE INDEX av2_i1 ON av2(b);
+    CREATE INDEX av2_i2 ON av2(c);
+    INSERT INTO av2 VALUES('av2 a', 'av2 b', 'av2 c');
+
+    CREATE TABLE av3(a PRIMARY KEY, b, c);
+    CREATE INDEX av3_i1 ON av3(b);
+    INSERT INTO av3 VALUES('av3 a', 'av3 b', 'av3 c');
+
+    CREATE TABLE av4(a, b, c);
+    CREATE INDEX av4_i1 ON av4(a);
+    CREATE INDEX av4_i2 ON av4(b);
+    CREATE INDEX av4_i3 ON av4(c);
+    CREATE INDEX av4_i4 ON av4(a, b, c);
+    INSERT INTO av4 VALUES('av4 a', 'av4 b', 'av4 c');
+----
+stmt 0 ok
+stmt 43 err 1 -1 98 no such table: av1
+stmt 98 ok
+stmt 142 err 1 -1 177 no such table: main.av2
+stmt 177 err 1 -1 212 no such table: main.av2
+stmt 212 err 1 -1 267 no such table: av2
+stmt 267 ok
+stmt 311 err 1 -1 346 no such table: main.av3
+stmt 346 err 1 -1 401 no such table: av3
+stmt 401 ok
+stmt 433 err 1 -1 468 no such table: main.av4
+stmt 468 err 1 -1 503 no such table: main.av4
+stmt 503 err 1 -1 538 no such table: main.av4
+stmt 538 err 1 -1 579 no such table: main.av4
+stmt 579 err 1 -1 634 no such table: av4
+==== autovacuum-2.5.2
+
+    SELECT name, rootpage FROM sqlite_master;
+----
+stmt 0 ok
+==== autovacuum-2.5.2.1
+
+    SELECT * FROM av1 WHERE a = 'av1 a';
+----
+stmt 0 err 1 -1 41 no such table: av1
+==== autovacuum-2.5.2.2
+
+    SELECT * FROM av2 WHERE a = 'av2 a' AND b = 'av2 b' AND c = 'av2 c'
+----
+stmt 0 err 1 -1 73 no such table: av2
+==== autovacuum-2.5.2.3
+
+    SELECT * FROM av3 WHERE a = 'av3 a' AND b = 'av3 b';
+----
+stmt 0 err 1 -1 57 no such table: av3
+==== autovacuum-2.5.2.4
+
+    SELECT * FROM av4 WHERE a = 'av4 a' AND b = 'av4 b' AND c = 'av4 c';
+----
+stmt 0 err 1 -1 73 no such table: av4
+==== autovacuum-2.5.3
+
+    DROP TABLE av3;
+    SELECT name, rootpage FROM sqlite_master;
+----
+stmt 0 err 1 -1 20 no such table: av3
+stmt 20 ok
+==== autovacuum-2.5.3.1
+
+    SELECT * FROM av1 WHERE a = 'av1 a';
+----
+stmt 0 err 1 -1 41 no such table: av1
+==== autovacuum-2.5.3.2
+
+    SELECT * FROM av2 WHERE a = 'av2 a' AND b = 'av2 b' AND c = 'av2 c'
+----
+stmt 0 err 1 -1 73 no such table: av2
+==== autovacuum-2.5.3.3
+
+    SELECT * FROM av4 WHERE a = 'av4 a' AND b = 'av4 b' AND c = 'av4 c';
+----
+stmt 0 err 1 -1 73 no such table: av4
+==== autovacuum-2.5.4
+
+    DROP TABLE av1;
+    SELECT name, rootpage FROM sqlite_master;
+----
+stmt 0 err 1 -1 20 no such table: av1
+stmt 20 ok
+==== autovacuum-2.5.4.2
+
+    SELECT * FROM av2 WHERE a = 'av2 a' AND b = 'av2 b' AND c = 'av2 c'
+----
+stmt 0 err 1 -1 73 no such table: av2
+==== autovacuum-2.5.4.4
+
+    SELECT * FROM av4 WHERE a = 'av4 a' AND b = 'av4 b' AND c = 'av4 c';
+----
+stmt 0 err 1 -1 73 no such table: av4
+==== autovacuum-2.5.5
+
+    DROP TABLE av4;
+    SELECT name, rootpage FROM sqlite_master;
+----
+stmt 0 err 1 -1 20 no such table: av4
+stmt 20 ok
+==== autovacuum-2.5.5.2
+
+    SELECT * FROM av2 WHERE a = 'av2 a' AND b = 'av2 b' AND c = 'av2 c'
+----
+stmt 0 err 1 -1 73 no such table: av2
+==== autovacuum-3.1
+
+    PRAGMA auto_vacuum;
+----
+stmt 0 ok
+==== autovacuum-3.3
+
+    PRAGMA auto_vacuum = 0;
+    PRAGMA auto_vacuum;
+----
+stmt 0 ok
+stmt 28 ok
+==== autovacuum-3.5
+
+    CREATE TABLE av1(x);
+    PRAGMA auto_vacuum;
+----
+stmt 0 ok
+stmt 25 ok
+==== autovacuum-3.6
+
+    PRAGMA auto_vacuum = 1;
+    PRAGMA auto_vacuum;
+----
+stmt 0 ok
+stmt 28 ok
+==== autovacuum-4.2
+
+    CREATE UNIQUE INDEX av1_i ON av1(a);
+----
+stmt 0 err 1 -1 41 no such table: main.av1
+==== autovacuum-4.3
+
+    SELECT sum(a) FROM av1;
+----
+stmt 0 err 1 -1 28 no such table: av1
+==== autovacuum-4.4
+
+    COMMIT;
+----
+stmt 0 ok
+==== autovacuum-9.1
+
+    DROP TABLE t1;
+    DROP TABLE t2;
+    DROP TABLE t3;
+    DROP TABLE t4;
+    DROP TABLE t5;
+    PRAGMA page_count;
+----
+stmt 0 err 1 -1 19 no such table: t1
+stmt 19 err 1 -1 38 no such table: t2
+stmt 38 err 1 -1 57 no such table: t3
+stmt 57 err 1 -1 76 no such table: t4
+stmt 76 err 1 -1 95 no such table: t5
+stmt 95 ok
+==== autovacuum-9.4
+ INSERT INTO t1 SELECT NULL, randstr(50,50) FROM t1
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== autovacuum-10.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  INSERT INTO t1 VALUES(25, randomblob(104));
+  REPLACE INTO t1 VALUES(25, randomblob(1117));
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 62 err 1 -1 108 no such table: t1
+stmt 108 err 1 -1 156 no such table: t1
+stmt 156 ok

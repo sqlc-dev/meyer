@@ -1,0 +1,113 @@
+==== snapshot-generated
+
+    CREATE TABLE t1(a, b);
+    INSERT INTO t1 VALUES(1, 2);
+    INSERT INTO t1 VALUES(3, 4);
+----
+stmt 0 ok
+stmt 27 err 1 -1 60 no such table: t1
+stmt 60 err 1 -1 93 no such table: t1
+==== snapshot-generated.dup1
+
+    BEGIN;
+      SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 11 err 1 -1 35 no such table: t1
+==== snapshot-generated.dup2
+
+      INSERT INTO t1 VALUES('x','y')
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== snapshot-generated.dup3
+
+    CREATE TABLE t2(x, y);
+    INSERT INTO t2 VALUES('a', 'b');
+    INSERT INTO t2 VALUES('c', 'd');
+    BEGIN;
+      SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 27 err 1 -1 64 no such table: t2
+stmt 64 err 1 -1 101 no such table: t2
+stmt 101 ok
+stmt 112 err 1 -1 136 no such table: t2
+==== snapshot-generated.dup4
+
+      BEGIN;
+        SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 13 err 1 -1 39 no such table: t2
+==== snapshot-generated.dup5
+
+    PRAGMA journal_mode = wal;
+    CREATE TABLE t3(i, j);
+    INSERT INTO t3 VALUES('o', 't');
+    INSERT INTO t3 VALUES('t', 'f');
+    BEGIN;
+      SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 31 ok
+stmt 58 err 1 -1 95 no such table: t3
+stmt 95 err 1 -1 132 no such table: t3
+stmt 132 ok
+stmt 143 err 1 -1 167 no such table: t3
+==== snapshot-generated.dup6
+
+      INSERT INTO t3 VALUES('s', 'e');
+      INSERT INTO t3 VALUES('n', 't');
+      BEGIN;
+        SELECT * FROM t3;
+----
+stmt 0 err 1 -1 39 no such table: t3
+stmt 39 err 1 -1 78 no such table: t3
+stmt 78 ok
+stmt 91 err 1 -1 117 no such table: t3
+==== snapshot-generated.dup7
+
+    PRAGMA journal_mode = wal;
+    CREATE TABLE x1(x, xx, xxx);
+    INSERT INTO x1 VALUES('z', 'zz', 'zzz');
+    BEGIN;
+      SELECT * FROM x1;
+----
+stmt 0 ok
+stmt 31 ok
+stmt 64 err 1 -1 109 no such table: x1
+stmt 109 ok
+stmt 120 err 1 -1 144 no such table: x1
+==== snapshot-generated.dup8
+
+    PRAGMA journal_mode = wal;
+    CREATE TABLE x1(x, xx, xxx);
+    INSERT INTO x1 VALUES('z', 'zz', 'zzz');
+    BEGIN;
+      PRAGMA user_version;
+----
+stmt 0 ok
+stmt 31 ok
+stmt 64 err 1 -1 109 no such table: x1
+stmt 109 ok
+stmt 120 ok
+==== snapshot-generated.dup9
+
+    PRAGMA journal_mode = wal;
+    CREATE TABLE t1(x);
+----
+stmt 0 ok
+stmt 31 ok
+==== snapshot-generated.dup10
+
+    INSERT INTO t1 VALUES(11);
+    INSERT INTO t1 VALUES(12);
+    INSERT INTO t1 VALUES(13);
+    BEGIN; 
+      PRAGMA application_id;
+----
+stmt 0 err 1 -1 31 no such table: t1
+stmt 31 err 1 -1 62 no such table: t1
+stmt 62 err 1 -1 93 no such table: t1
+stmt 93 ok
+stmt 104 ok

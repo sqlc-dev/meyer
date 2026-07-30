@@ -1,0 +1,163 @@
+==== 3.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA synchronous = NORMAL;
+  PRAGMA journal_mode = WAL;
+  PRAGMA cache_size = 1;
+
+  CREATE TABLE t1 (i INTEGER PRIMARY KEY, b BLOB, t TEXT);
+  PRAGMA wal_checkpoint;
+  INSERT INTO t1 VALUES(1, randomblob(2048), 'one');
+----
+stmt 0 ok
+stmt 26 ok
+stmt 57 ok
+stmt 86 ok
+stmt 111 ok
+stmt 171 ok
+stmt 196 err 1 -1 249 no such table: t1
+==== 3.1
+
+  BEGIN;
+    INSERT INTO t1 VALUES(2, randomblob(2048), 'two');
+    SAVEPOINT one;
+    INSERT INTO t1 VALUES(3, randomblob(2048), 'three');
+    INSERT INTO t1 VALUES(4, randomblob(2048), 'four');
+    INSERT INTO t1 VALUES(5, randomblob(2048), 'five');
+    INSERT INTO t1 VALUES(6, randomblob(2048), 'six');
+    INSERT INTO t1 VALUES(7, randomblob(2048), 'seven');
+
+    UPDATE t1 SET b=randomblob(2048) WHERE i=5;
+    UPDATE t1 SET b=randomblob(2048) WHERE i=6;
+    UPDATE t1 SET b=randomblob(2048) WHERE i=7;
+    ROLLBACK TO one;
+    INSERT INTO t1 VALUES(8, NULL, 'eight');
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 err 1 -1 64 no such table: t1
+stmt 64 ok
+stmt 83 err 1 -1 140 no such table: t1
+stmt 140 err 1 -1 196 no such table: t1
+stmt 196 err 1 -1 252 no such table: t1
+stmt 252 err 1 -1 307 no such table: t1
+stmt 307 err 1 -1 364 no such table: t1
+stmt 364 err 1 -1 413 no such table: t1
+stmt 413 err 1 -1 461 no such table: t1
+stmt 461 err 1 -1 509 no such table: t1
+stmt 509 ok
+stmt 530 err 1 -1 575 no such table: t1
+stmt 575 ok
+==== 3.2
+
+  SELECT i, t FROM t1
+----
+stmt 0 err 1 -1 23 no such table: t1
+==== 4.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA synchronous = NORMAL;
+  PRAGMA journal_mode = WAL;
+  PRAGMA cache_size = 1;
+
+  CREATE TABLE t1 (i INTEGER PRIMARY KEY, b BLOB, t TEXT);
+  PRAGMA wal_checkpoint;
+  INSERT INTO t1 VALUES(1, randomblob(2048), 'one');
+----
+stmt 0 ok
+stmt 26 ok
+stmt 57 ok
+stmt 86 ok
+stmt 111 ok
+stmt 171 ok
+stmt 196 err 1 -1 249 no such table: t1
+==== 4.1.1
+
+  SAVEPOINT one;
+    INSERT INTO t1 VALUES(2, randomblob(2048), 'two');
+    INSERT INTO t1 VALUES(3, randomblob(2048), 'three');
+    INSERT INTO t1 VALUES(4, randomblob(2048), 'four');
+    INSERT INTO t1 VALUES(5, randomblob(2048), 'five');
+    INSERT INTO t1 VALUES(6, randomblob(2048), 'six');
+    INSERT INTO t1 VALUES(7, randomblob(2048), 'seven');
+
+    UPDATE t1 SET b=randomblob(2048) WHERE i=5;
+    UPDATE t1 SET b=randomblob(2048) WHERE i=6;
+    UPDATE t1 SET b=randomblob(2048) WHERE i=7;
+----
+stmt 0 ok
+stmt 17 err 1 -1 72 no such table: t1
+stmt 72 err 1 -1 129 no such table: t1
+stmt 129 err 1 -1 185 no such table: t1
+stmt 185 err 1 -1 241 no such table: t1
+stmt 241 err 1 -1 296 no such table: t1
+stmt 296 err 1 -1 353 no such table: t1
+stmt 353 err 1 -1 402 no such table: t1
+stmt 402 err 1 -1 450 no such table: t1
+stmt 450 err 1 -1 498 no such table: t1
+==== 4.1.2
+
+    ROLLBACK TO one;
+    INSERT INTO t1 VALUES(8, NULL, 'eight');
+  RELEASE one;
+----
+stmt 0 ok
+stmt 21 err 1 -1 66 no such table: t1
+stmt 66 ok
+==== 4.2
+
+  SELECT i, t FROM t1
+----
+stmt 0 err 1 -1 23 no such table: t1
+==== 5.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA synchronous = NORMAL;
+  PRAGMA journal_mode = WAL;
+  PRAGMA cache_size = 1;
+
+  CREATE TABLE t1 (i INTEGER PRIMARY KEY, b BLOB, t TEXT);
+  INSERT INTO t1 VALUES(1, randomblob(2048), 'one');
+  INSERT INTO t1 VALUES(2, randomblob(2048), 'two');
+  INSERT INTO t1 VALUES(3, randomblob(2048), 'three');
+  PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 57 ok
+stmt 86 ok
+stmt 111 ok
+stmt 171 err 1 -1 224 no such table: t1
+stmt 224 err 1 -1 277 no such table: t1
+stmt 277 err 1 -1 332 no such table: t1
+stmt 332 ok
+==== 5.1
+
+  BEGIN;
+    SELECT count(*) FROM t1;
+    SAVEPOINT one;
+    INSERT INTO t1 VALUES(4, randomblob(2048), 'four');
+    INSERT INTO t1 VALUES(5, randomblob(2048), 'five');
+    INSERT INTO t1 VALUES(6, randomblob(2048), 'six');
+    INSERT INTO t1 VALUES(7, randomblob(2048), 'seven');
+    ROLLBACK TO one;
+    INSERT INTO t1 VALUES(8, randomblob(2048), 'eight');
+    INSERT INTO t1 VALUES(9, randomblob(2048), 'nine');
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 err 1 -1 38 no such table: t1
+stmt 38 ok
+stmt 57 err 1 -1 113 no such table: t1
+stmt 113 err 1 -1 169 no such table: t1
+stmt 169 err 1 -1 224 no such table: t1
+stmt 224 err 1 -1 281 no such table: t1
+stmt 281 ok
+stmt 302 err 1 -1 359 no such table: t1
+stmt 359 err 1 -1 415 no such table: t1
+stmt 415 ok
+==== 5.3
+
+  SELECT i, t FROM t1
+----
+stmt 0 err 1 -1 23 no such table: t1

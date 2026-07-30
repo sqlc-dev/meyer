@@ -1,0 +1,63 @@
+==== interrupt-1.1
+
+    CREATE TABLE t1(a,b);
+    SELECT name FROM sqlite_master;
+----
+stmt 0 ok
+stmt 26 ok
+==== interrupt-1.3
+
+    SELECT name FROM sqlite_master;
+----
+stmt 0 ok
+==== interrrupt-2.1
+
+    BEGIN;
+    CREATE TABLE t1(a,b);
+    INSERT INTO t1 VALUES(1,randstr(300,400));
+    INSERT INTO t1 SELECT a+1, randstr(300,400) FROM t1;
+    INSERT INTO t1 SELECT a+2, a || '-' || b FROM t1;
+    INSERT INTO t1 SELECT a+4, a || '-' || b FROM t1;
+    INSERT INTO t1 SELECT a+8, a || '-' || b FROM t1;
+    INSERT INTO t1 SELECT a+16, a || '-' || b FROM t1;
+    INSERT INTO t1 SELECT a+32, a || '-' || b FROM t1;
+    COMMIT;
+    UPDATE t1 SET b=substr(b,-5,5);
+    SELECT count(*) from t1;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 37 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 141 no such table: t1
+stmt 141 err 1 -1 195 no such table: t1
+stmt 195 err 1 -1 249 no such table: t1
+stmt 249 err 1 -1 303 no such table: t1
+stmt 303 err 1 -1 358 no such table: t1
+stmt 358 err 1 -1 413 no such table: t1
+stmt 413 ok
+stmt 425 err 1 -1 461 no such table: t1
+stmt 461 err 1 -1 490 no such table: t1
+==== interrupt-2.3
+
+    SELECT md5sum(a || b) FROM t1;
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== interrupt-generated
+
+        BEGIN;
+        CREATE TEMP TABLE t2(x,y);
+        SELECT name FROM sqlite_temp_master;
+----
+stmt 0 ok
+stmt 15 ok
+stmt 50 ok
+==== interrupt-generated.dup1
+
+        SELECT name FROM temp.sqlite_master;
+----
+stmt 0 ok
+==== interrupt-generated.dup2
+
+        ROLLBACK
+----
+stmt 0 ok

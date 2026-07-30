@@ -1,0 +1,67 @@
+==== 1.1
+
+  CREATE TABLE t1(a,b,c,d);
+  CREATE INDEX t1x ON t1(a,b);
+  INSERT INTO t1(a,b,c,d) VALUES(1,2,0,0),(3,4,0,0),(5,6,0,0);
+  CREATE TABLE t2(w,x,y,z);
+  CREATE INDEX t2x ON t2(w,x);
+  INSERT INTO t2(w,x,y,z) VALUES(1,2,11,22),(8,9,88,99),(3,5,33,55),(5,6,55,66);
+
+  SELECT *,'|' FROM t1 ORDER BY a;
+----
+stmt 0 ok
+stmt 28 err 1 -1 59 no such table: main.t1
+stmt 59 err 1 -1 122 no such table: t1
+stmt 122 ok
+stmt 150 err 1 -1 181 no such table: main.t2
+stmt 181 err 1 -1 262 no such table: t2
+stmt 262 err 1 -1 298 no such table: t1
+==== 1.2
+
+  UPDATE t1 SET (c,d) = (SELECT y,z FROM t2 WHERE (w,x)=(a,b));
+  SELECT *,'|' FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 64 no such table: t1
+stmt 64 err 1 -1 99 no such table: t1
+==== 1.3
+
+  UPDATE t1 SET (c,d) = (SELECT y,z FROM t2 WHERE w=a);
+  SELECT *,'|' FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 56 no such table: t1
+stmt 56 err 1 -1 91 no such table: t1
+==== 1.4
+
+  UPDATE t1 SET (c) = 99 WHERE a=3;
+  SELECT *,'|' FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 71 no such table: t1
+==== 1.5
+
+  UPDATE t1 SET b = 8, (c,d) = (SELECT 123,456) WHERE a=3;
+  SELECT *,'|' FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 59 no such table: t1
+stmt 59 err 1 -1 94 no such table: t1
+==== 2.1
+
+  UPDATE t1 SET (c,d) = (SELECT x,y,z FROM t2 WHERE w=a);
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 2.2
+
+  UPDATE t1 SET (b,c,d) = (SELECT x,y FROM t2 WHERE w=a);
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 3.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a,b);
+  INSERT INTO t1 VALUES(1,2);
+  UPDATE t1 SET (a,a,a,b)=(SELECT 99,100);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 51 err 1 -1 81 no such table: t1
+stmt 81 err 1 -1 124 no such table: t1

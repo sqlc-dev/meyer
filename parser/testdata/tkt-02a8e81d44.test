@@ -1,0 +1,15 @@
+==== tkt-02a838-1.1
+
+    CREATE TABLE t1(a);
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(2);
+    INSERT INTO t1 VALUES(4);
+    INSERT INTO t1 VALUES(5);
+    SELECT * FROM (SELECT a FROM t1 LIMIT 1) UNION ALL SELECT 3;
+----
+stmt 0 ok
+stmt 24 err 1 -1 54 no such table: t1
+stmt 54 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 114 no such table: t1
+stmt 114 err 1 -1 144 no such table: t1
+stmt 144 err 1 -1 209 no such table: t1

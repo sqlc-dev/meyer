@@ -1,0 +1,138 @@
+==== json104-100
+
+  SELECT json_patch('{
+       "a": "b",
+       "c": {
+         "d": "e",
+         "f": "g"
+       }
+     }','{
+       "a":"z",
+       "c": {
+         "f": null
+       }
+     }');
+----
+stmt 0 ok
+==== json104-101
+
+  SELECT json_patch('{
+       "a": "b",
+       "c": {
+         "d": "e",
+         "f": "g"
+       }
+     }','{
+       a:"z",
+       c: {
+         f: null
+       }
+     }');
+----
+stmt 0 ok
+==== json104-102
+
+  SELECT json_patch('{
+       a: "b",
+       c: {
+         d: "e",
+         f: "g"
+       }
+     }','{
+       "a":"z",
+       "c": {
+         "f": null
+       }
+     }');
+----
+stmt 0 ok
+==== json104-103
+
+  SELECT json_patch('{
+       a: "b",
+       c: {
+         d: "e",
+         f: "g"
+       }
+     }','{
+       a:"z",
+       c: {
+         f: null
+       }
+     }');
+----
+stmt 0 ok
+==== json104-220
+
+  SELECT json_patch('{}','{"a":{"bb":{"ccc":null}}}');
+----
+stmt 0 ok
+==== json104-300
+
+  SELECT json_patch('{"a":"b"}','{"a":"c"}');
+----
+stmt 0 ok
+==== json104-300a
+
+  SELECT coalesce(json_patch(null,'{"a":"c"}'), 'real-null');
+----
+stmt 0 ok
+==== json104-301
+
+  SELECT json_patch('{"a":"b"}','{"b":"c"}');
+----
+stmt 0 ok
+==== json104-302
+
+  SELECT json_patch('{"a":"b"}','{"a":null}');
+----
+stmt 0 ok
+==== json104-303
+
+  SELECT json_patch('{"a":"b","b":"c"}','{"a":null}');
+----
+stmt 0 ok
+==== json104-306
+
+  SELECT json_patch('{"a":{"b":"c"}}','{"a":{"b":"d","c":null}}');
+----
+stmt 0 ok
+==== json104-310
+
+  SELECT json_patch('{"a":"foo"}','null');
+----
+stmt 0 ok
+==== json104-310a
+
+  SELECT coalesce(json_patch('{"a":"foo"}',null), 'real-null');
+----
+stmt 0 ok
+==== json104-311
+
+  SELECT json_patch('{"a":"foo"}','"bar"');
+----
+stmt 0 ok
+==== json104-312
+
+  SELECT json_patch('{"e":null}','{"a":1}');
+----
+stmt 0 ok
+==== json104-314
+
+  SELECT json_patch('{}','{"a":{"bb":{"ccc":null}}}');
+----
+stmt 0 ok
+==== json104-320
+
+  SELECT json_patch('{"x":{"one":1}}','{"x":{"two":2},"x":"three"}');
+----
+stmt 0 ok
+==== 401
+
+  CREATE TABLE obj(x);
+  INSERT INTO obj VALUES('{"a":1,"b":2}');
+  SELECT * FROM obj;
+----
+stmt 0 ok
+stmt 23 err 1 -1 66 no such table: obj
+stmt 66 err 1 -1 87 no such table: obj

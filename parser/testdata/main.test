@@ -1,0 +1,100 @@
+==== main-3.2.6
+select x'4869'
+----
+stmt 0 ok
+==== main-3.2.7
+select x'48695'
+----
+stmt 0 err 1 7 7 unrecognized token: "x'48695'"
+==== main-3.2.8
+select x'486x'
+----
+stmt 0 err 1 7 7 unrecognized token: "x'486x'"
+==== main-3.2.16
+select cast(3.14e+4 AS integer)
+----
+stmt 0 ok
+==== main-3.2.17
+select cast(3.14e+04 AS integer)
+----
+stmt 0 ok
+==== main-3.2.18
+select cast(3.14e+004 AS integer)
+----
+stmt 0 ok
+==== main-3.2.19
+select cast(3.14e4 AS integer)
+----
+stmt 0 ok
+==== main-3.2.20
+select cast(3.14e04 AS integer)
+----
+stmt 0 ok
+==== main-3.2.21
+select cast(3.14e004 AS integer)
+----
+stmt 0 ok
+==== main-3.2.16.dup1
+select cast(3.14E+4 AS integer)
+----
+stmt 0 ok
+==== main-3.2.17.dup1
+select cast(3.14E+04 AS integer)
+----
+stmt 0 ok
+==== main-3.2.18.dup1
+select cast(3.14E+004 AS integer)
+----
+stmt 0 ok
+==== main-3.2.19.dup1
+select cast(3.14E4 AS integer)
+----
+stmt 0 ok
+==== main-3.2.20.dup1
+select cast(3.14E04 AS integer)
+----
+stmt 0 ok
+==== main-3.2.21.dup1
+select cast(3.14E004 AS integer)
+----
+stmt 0 ok
+==== main-3.2.22
+select cast(3.14e-4 * 1e8 AS integer)
+----
+stmt 0 ok
+==== main-3.2.23
+select cast(3.14E-04 * 1E08 AS integer)
+----
+stmt 0 ok
+==== main-3.2.24
+select cast(3.14e-004 * 01.0E+8 AS integer)
+----
+stmt 0 ok
+==== main-3.2.25
+select 123/*abc
+----
+stmt 0 ok
+==== main-3.2.26
+select 123/***abc
+----
+stmt 0 ok
+==== main-3.2.27
+select 123/*/*2
+----
+stmt 0 ok
+==== main-3.2.28
+select 123/**/*2
+----
+stmt 0 ok
+==== main-3.2.29
+select 123/
+----
+stmt 0 err 1 -1 12 incomplete input
+==== main-3.2.30
+select 123--5
+----
+stmt 0 ok
+==== main-3.6
+SELECT 'abc' + #9
+----
+stmt 0 err 1 -1 18 near "#9": syntax error

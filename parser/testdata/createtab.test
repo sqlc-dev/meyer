@@ -1,0 +1,32 @@
+==== createtab-generated
+
+      CREATE TABLE t2(a,b);
+      INSERT INTO t2 VALUES(1,2);
+      SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 28 err 1 -1 62 no such table: t2
+stmt 62 err 1 -1 86 no such table: t2
+==== createtab-generated.dup1
+
+      CREATE TABLE t3(a,b);
+      INSERT INTO t3 VALUES(4,5);
+      SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 28 err 1 -1 62 no such table: t3
+stmt 62 err 1 -1 86 no such table: t3
+==== createtab-generated.dup2
+
+      CREATE TABLE t4(a,b);
+      INSERT INTO t4 VALUES('abc','xyz');
+      SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 28 err 1 -1 70 no such table: t4
+stmt 70 err 1 -1 94 no such table: t4
+==== createtab-generated.dup3
+
+      SELECT name FROM sqlite_master WHERE type='table' ORDER BY 1
+----
+stmt 0 ok

@@ -1,0 +1,1019 @@
+==== func4-1.1
+
+  SELECT tointeger(NULL);
+----
+stmt 0 err 1 10 26 no such function: tointeger
+==== func4-1.2
+
+  SELECT tointeger('');
+----
+stmt 0 err 1 10 24 no such function: tointeger
+==== func4-1.3
+
+  SELECT tointeger('   ');
+----
+stmt 0 err 1 10 27 no such function: tointeger
+==== func4-1.4
+
+  SELECT tointeger('1234');
+----
+stmt 0 err 1 10 28 no such function: tointeger
+==== func4-1.5
+
+  SELECT tointeger('   1234');
+----
+stmt 0 err 1 10 31 no such function: tointeger
+==== func4-1.6
+
+  SELECT tointeger('bad');
+----
+stmt 0 err 1 10 27 no such function: tointeger
+==== func4-1.7
+
+  SELECT tointeger('0xBAD');
+----
+stmt 0 err 1 10 29 no such function: tointeger
+==== func4-1.8
+
+  SELECT tointeger('123BAD');
+----
+stmt 0 err 1 10 30 no such function: tointeger
+==== func4-1.9
+
+  SELECT tointeger('0x123BAD');
+----
+stmt 0 err 1 10 32 no such function: tointeger
+==== func4-1.10
+
+  SELECT tointeger('123NO');
+----
+stmt 0 err 1 10 29 no such function: tointeger
+==== func4-1.11
+
+  SELECT tointeger('0x123NO');
+----
+stmt 0 err 1 10 31 no such function: tointeger
+==== func4-1.12
+
+  SELECT tointeger('-0x1');
+----
+stmt 0 err 1 10 28 no such function: tointeger
+==== func4-1.13
+
+  SELECT tointeger('-0x0');
+----
+stmt 0 err 1 10 28 no such function: tointeger
+==== func4-1.14
+
+  SELECT tointeger('0x0');
+----
+stmt 0 err 1 10 27 no such function: tointeger
+==== func4-1.15
+
+  SELECT tointeger('0x1');
+----
+stmt 0 err 1 10 27 no such function: tointeger
+==== func4-1.16
+
+  SELECT tointeger(-1);
+----
+stmt 0 err 1 10 24 no such function: tointeger
+==== func4-1.17
+
+  SELECT tointeger(-0);
+----
+stmt 0 err 1 10 24 no such function: tointeger
+==== func4-1.18
+
+  SELECT tointeger(0);
+----
+stmt 0 err 1 10 23 no such function: tointeger
+==== func4-1.19
+
+  SELECT tointeger(1);
+----
+stmt 0 err 1 10 23 no such function: tointeger
+==== func4-1.20
+
+  SELECT tointeger(-1.79769313486232e308 - 1);
+----
+stmt 0 err 1 10 47 no such function: tointeger
+==== func4-1.21
+
+  SELECT tointeger(-1.79769313486232e308);
+----
+stmt 0 err 1 10 43 no such function: tointeger
+==== func4-1.22
+
+  SELECT tointeger(-1.79769313486232e308 + 1);
+----
+stmt 0 err 1 10 47 no such function: tointeger
+==== func4-1.23
+
+  SELECT tointeger(-9223372036854775808 - 1);
+----
+stmt 0 err 1 10 46 no such function: tointeger
+==== func4-1.24
+
+  SELECT tointeger(-9223372036854775808);
+----
+stmt 0 err 1 10 42 no such function: tointeger
+==== func4-1.25
+
+  SELECT tointeger(-9223372036854775808 + 1);
+----
+stmt 0 err 1 10 46 no such function: tointeger
+==== func4-1.26
+
+  SELECT tointeger(-9223372036854775807 - 1);
+----
+stmt 0 err 1 10 46 no such function: tointeger
+==== func4-1.27
+
+  SELECT tointeger(-9223372036854775807);
+----
+stmt 0 err 1 10 42 no such function: tointeger
+==== func4-1.28
+
+  SELECT tointeger(-9223372036854775807 + 1);
+----
+stmt 0 err 1 10 46 no such function: tointeger
+==== func4-1.29
+
+  SELECT tointeger(-2147483648 - 1);
+----
+stmt 0 err 1 10 37 no such function: tointeger
+==== func4-1.30
+
+  SELECT tointeger(-2147483648);
+----
+stmt 0 err 1 10 33 no such function: tointeger
+==== func4-1.31
+
+  SELECT tointeger(-2147483648 + 1);
+----
+stmt 0 err 1 10 37 no such function: tointeger
+==== func4-1.32
+
+  SELECT tointeger(2147483647 - 1);
+----
+stmt 0 err 1 10 36 no such function: tointeger
+==== func4-1.33
+
+  SELECT tointeger(2147483647);
+----
+stmt 0 err 1 10 32 no such function: tointeger
+==== func4-1.34
+
+  SELECT tointeger(2147483647 + 1);
+----
+stmt 0 err 1 10 36 no such function: tointeger
+==== func4-1.35
+
+  SELECT tointeger(9223372036854775807 - 1);
+----
+stmt 0 err 1 10 45 no such function: tointeger
+==== func4-1.36
+
+  SELECT tointeger(9223372036854775807);
+----
+stmt 0 err 1 10 41 no such function: tointeger
+==== func4-1.37
+
+    SELECT tointeger(9223372036854775807 + 1);
+----
+stmt 0 err 1 12 47 no such function: tointeger
+==== func4-1.38
+
+  SELECT tointeger(1.79769313486232e308 - 1);
+----
+stmt 0 err 1 10 46 no such function: tointeger
+==== func4-1.39
+
+  SELECT tointeger(1.79769313486232e308);
+----
+stmt 0 err 1 10 42 no such function: tointeger
+==== func4-1.40
+
+  SELECT tointeger(1.79769313486232e308 + 1);
+----
+stmt 0 err 1 10 46 no such function: tointeger
+==== func4-1.41
+
+  SELECT tointeger(4503599627370496 - 1);
+----
+stmt 0 err 1 10 42 no such function: tointeger
+==== func4-1.42
+
+  SELECT tointeger(4503599627370496);
+----
+stmt 0 err 1 10 38 no such function: tointeger
+==== func4-1.43
+
+  SELECT tointeger(4503599627370496 + 1);
+----
+stmt 0 err 1 10 42 no such function: tointeger
+==== func4-1.44
+
+  SELECT tointeger(9007199254740992 - 1);
+----
+stmt 0 err 1 10 42 no such function: tointeger
+==== func4-1.45
+
+  SELECT tointeger(9007199254740992);
+----
+stmt 0 err 1 10 38 no such function: tointeger
+==== func4-1.46
+
+  SELECT tointeger(9007199254740992 + 1);
+----
+stmt 0 err 1 10 42 no such function: tointeger
+==== func4-1.47
+
+  SELECT tointeger(9223372036854775807 - 1);
+----
+stmt 0 err 1 10 45 no such function: tointeger
+==== func4-1.48
+
+  SELECT tointeger(9223372036854775807);
+----
+stmt 0 err 1 10 41 no such function: tointeger
+==== func4-1.49
+
+    SELECT tointeger(9223372036854775807 + 1);
+----
+stmt 0 err 1 12 47 no such function: tointeger
+==== func4-1.50
+
+    SELECT tointeger(9223372036854775808 - 1);
+----
+stmt 0 err 1 12 47 no such function: tointeger
+==== func4-1.51
+
+    SELECT tointeger(9223372036854775808);
+----
+stmt 0 err 1 12 43 no such function: tointeger
+==== func4-1.52
+
+    SELECT tointeger(9223372036854775808 + 1);
+----
+stmt 0 err 1 12 47 no such function: tointeger
+==== func4-1.53
+
+  SELECT tointeger(18446744073709551616 - 1);
+----
+stmt 0 err 1 10 46 no such function: tointeger
+==== func4-1.54
+
+  SELECT tointeger(18446744073709551616);
+----
+stmt 0 err 1 10 42 no such function: tointeger
+==== func4-1.55
+
+  SELECT tointeger(18446744073709551616 + 1);
+----
+stmt 0 err 1 10 46 no such function: tointeger
+==== func4-2.1
+
+    SELECT toreal(NULL);
+----
+stmt 0 err 1 12 25 no such function: toreal
+==== func4-2.2
+
+    SELECT toreal('');
+----
+stmt 0 err 1 12 23 no such function: toreal
+==== func4-2.3
+
+    SELECT toreal('   ');
+----
+stmt 0 err 1 12 26 no such function: toreal
+==== func4-2.4
+
+    SELECT toreal('1234');
+----
+stmt 0 err 1 12 27 no such function: toreal
+==== func4-2.5
+
+    SELECT toreal('   1234');
+----
+stmt 0 err 1 12 30 no such function: toreal
+==== func4-2.6
+
+    SELECT toreal('bad');
+----
+stmt 0 err 1 12 26 no such function: toreal
+==== func4-2.7
+
+    SELECT toreal('0xBAD');
+----
+stmt 0 err 1 12 28 no such function: toreal
+==== func4-2.8
+
+    SELECT toreal('123BAD');
+----
+stmt 0 err 1 12 29 no such function: toreal
+==== func4-2.9
+
+    SELECT toreal('0x123BAD');
+----
+stmt 0 err 1 12 31 no such function: toreal
+==== func4-2.10
+
+    SELECT toreal('123NO');
+----
+stmt 0 err 1 12 28 no such function: toreal
+==== func4-2.11
+
+    SELECT toreal('0x123NO');
+----
+stmt 0 err 1 12 30 no such function: toreal
+==== func4-2.12
+
+    SELECT toreal('-0x1');
+----
+stmt 0 err 1 12 27 no such function: toreal
+==== func4-2.13
+
+    SELECT toreal('-0x0');
+----
+stmt 0 err 1 12 27 no such function: toreal
+==== func4-2.14
+
+    SELECT toreal('0x0');
+----
+stmt 0 err 1 12 26 no such function: toreal
+==== func4-2.15
+
+    SELECT toreal('0x1');
+----
+stmt 0 err 1 12 26 no such function: toreal
+==== func4-2.16
+
+    SELECT toreal(-1);
+----
+stmt 0 err 1 12 23 no such function: toreal
+==== func4-2.17
+
+    SELECT toreal(-0);
+----
+stmt 0 err 1 12 23 no such function: toreal
+==== func4-2.18
+
+    SELECT toreal(0);
+----
+stmt 0 err 1 12 22 no such function: toreal
+==== func4-2.19
+
+    SELECT toreal(1);
+----
+stmt 0 err 1 12 22 no such function: toreal
+==== func4-2.20
+
+    SELECT toreal(-1.79769313486232e308 - 1);
+----
+stmt 0 err 1 12 46 no such function: toreal
+==== func4-2.21
+
+    SELECT toreal(-1.79769313486232e308);
+----
+stmt 0 err 1 12 42 no such function: toreal
+==== func4-2.22
+
+    SELECT toreal(-1.79769313486232e308 + 1);
+----
+stmt 0 err 1 12 46 no such function: toreal
+==== func4-2.23
+
+    SELECT toreal(-9223372036854775808 - 1);
+----
+stmt 0 err 1 12 45 no such function: toreal
+==== func4-2.24
+
+    SELECT toreal(-9223372036854775808);
+----
+stmt 0 err 1 12 41 no such function: toreal
+==== func4-2.25
+
+      SELECT toreal(-9223372036854775808 + 1);
+----
+stmt 0 err 1 14 47 no such function: toreal
+==== func4-2.26
+
+    SELECT toreal(-9223372036854775807 - 1);
+----
+stmt 0 err 1 12 45 no such function: toreal
+==== func4-2.27
+
+      SELECT toreal(-9223372036854775807);
+----
+stmt 0 err 1 14 43 no such function: toreal
+==== func4-2.28
+
+      SELECT toreal(-9223372036854775807 + 1);
+----
+stmt 0 err 1 14 47 no such function: toreal
+==== func4-2.29
+
+    SELECT toreal(-2147483648 - 1);
+----
+stmt 0 err 1 12 36 no such function: toreal
+==== func4-2.30
+
+    SELECT toreal(-2147483648);
+----
+stmt 0 err 1 12 32 no such function: toreal
+==== func4-2.31
+
+    SELECT toreal(-2147483648 + 1);
+----
+stmt 0 err 1 12 36 no such function: toreal
+==== func4-2.32
+
+    SELECT toreal(2147483647 - 1);
+----
+stmt 0 err 1 12 35 no such function: toreal
+==== func4-2.33
+
+    SELECT toreal(2147483647);
+----
+stmt 0 err 1 12 31 no such function: toreal
+==== func4-2.34
+
+    SELECT toreal(2147483647 + 1);
+----
+stmt 0 err 1 12 35 no such function: toreal
+==== func4-2.35
+
+      SELECT toreal(9223372036854775807 - 1);
+----
+stmt 0 err 1 14 46 no such function: toreal
+==== func4-2.36
+
+        SELECT toreal(9223372036854775807);
+----
+stmt 0 err 1 16 44 no such function: toreal
+==== func4-2.37
+
+    SELECT toreal(9223372036854775807 + 1);
+----
+stmt 0 err 1 12 44 no such function: toreal
+==== func4-2.38
+
+    SELECT toreal(1.79769313486232e308 - 1);
+----
+stmt 0 err 1 12 45 no such function: toreal
+==== func4-2.39
+
+    SELECT toreal(1.79769313486232e308);
+----
+stmt 0 err 1 12 41 no such function: toreal
+==== func4-2.40
+
+    SELECT toreal(1.79769313486232e308 + 1);
+----
+stmt 0 err 1 12 45 no such function: toreal
+==== func4-2.41
+
+    SELECT toreal(4503599627370496 - 1);
+----
+stmt 0 err 1 12 41 no such function: toreal
+==== func4-2.42
+
+    SELECT toreal(4503599627370496);
+----
+stmt 0 err 1 12 37 no such function: toreal
+==== func4-2.43
+
+    SELECT toreal(4503599627370496 + 1);
+----
+stmt 0 err 1 12 41 no such function: toreal
+==== func4-2.44
+
+    SELECT toreal(9007199254740992 - 1);
+----
+stmt 0 err 1 12 41 no such function: toreal
+==== func4-2.45
+
+    SELECT toreal(9007199254740992);
+----
+stmt 0 err 1 12 37 no such function: toreal
+==== func4-2.46
+
+      SELECT toreal(9007199254740992 + 1);
+----
+stmt 0 err 1 14 43 no such function: toreal
+==== func4-2.46.dup1
+
+      SELECT toreal(9007199254740992 + 1);
+----
+stmt 0 err 1 14 43 no such function: toreal
+==== func4-2.47
+
+    SELECT toreal(9007199254740992 + 2);
+----
+stmt 0 err 1 12 41 no such function: toreal
+==== func4-2.48
+
+    SELECT toreal(tointeger(9223372036854775808) - 1);
+----
+stmt 0 err 1 12 55 no such function: toreal
+==== func4-2.49
+
+      SELECT toreal(tointeger(9223372036854775808));
+----
+stmt 0 err 1 21 53 no such function: tointeger
+==== func4-2.50
+
+      SELECT toreal(tointeger(9223372036854775808) + 1);
+----
+stmt 0 err 1 14 57 no such function: toreal
+==== func4-2.51
+
+    SELECT toreal(tointeger(18446744073709551616) - 1);
+----
+stmt 0 err 1 12 56 no such function: toreal
+==== func4-2.52
+
+    SELECT toreal(tointeger(18446744073709551616));
+----
+stmt 0 err 1 19 52 no such function: tointeger
+==== func4-2.53
+
+    SELECT toreal(tointeger(18446744073709551616) + 1);
+----
+stmt 0 err 1 12 56 no such function: toreal
+==== func4-3.1
+
+    CREATE TABLE t1(
+      x INTEGER CHECK(tointeger(x) IS NOT NULL)
+    );
+----
+stmt 0 err 1 44 76 no such function: tointeger
+==== func4-3.2
+
+      INSERT INTO t1 (x) VALUES (NULL);
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== func4-3.3
+
+      INSERT INTO t1 (x) VALUES (NULL);
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== func4-3.4
+
+      INSERT INTO t1 (x) VALUES ('');
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== func4-3.5
+
+      INSERT INTO t1 (x) VALUES ('bad');
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== func4-3.6
+
+      INSERT INTO t1 (x) VALUES ('1234bad');
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== func4-3.7
+
+      INSERT INTO t1 (x) VALUES ('1234.56bad');
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== func4-3.8
+
+      INSERT INTO t1 (x) VALUES (1234);
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== func4-3.9
+
+      INSERT INTO t1 (x) VALUES (1234.56);
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== func4-3.10
+
+      INSERT INTO t1 (x) VALUES ('1234');
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== func4-3.11
+
+      INSERT INTO t1 (x) VALUES ('1234.56');
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== func4-3.12
+
+      INSERT INTO t1 (x) VALUES (ZEROBLOB(4));
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== func4-3.13
+
+      INSERT INTO t1 (x) VALUES (X'');
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== func4-3.14
+
+      INSERT INTO t1 (x) VALUES (X'1234');
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== func4-3.15
+
+      INSERT INTO t1 (x) VALUES (X'12345678');
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== func4-3.16
+
+      INSERT INTO t1 (x) VALUES ('1234.00');
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== func4-3.17
+
+      INSERT INTO t1 (x) VALUES (1234.00);
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== func4-3.18
+
+      INSERT INTO t1 (x) VALUES ('-9223372036854775809');
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== func4-3.19
+
+        INSERT INTO t1 (x) VALUES (9223372036854775808);
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== func4-3.20
+
+    SELECT x FROM t1 WHERE x>0 ORDER BY x;
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== func4-4.1
+
+      CREATE TABLE t2(
+        x REAL CHECK(toreal(x) IS NOT NULL)
+      );
+----
+stmt 0 err 1 45 76 no such function: toreal
+==== func4-4.2
+
+        INSERT INTO t2 (x) VALUES (NULL);
+----
+stmt 0 err 1 -1 42 no such table: t2
+==== func4-4.3
+
+        INSERT INTO t2 (x) VALUES (NULL);
+----
+stmt 0 err 1 -1 42 no such table: t2
+==== func4-4.4
+
+        INSERT INTO t2 (x) VALUES ('');
+----
+stmt 0 err 1 -1 40 no such table: t2
+==== func4-4.5
+
+        INSERT INTO t2 (x) VALUES ('bad');
+----
+stmt 0 err 1 -1 43 no such table: t2
+==== func4-4.6
+
+        INSERT INTO t2 (x) VALUES ('1234bad');
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== func4-4.7
+
+        INSERT INTO t2 (x) VALUES ('1234.56bad');
+----
+stmt 0 err 1 -1 50 no such table: t2
+==== func4-4.8
+
+        INSERT INTO t2 (x) VALUES (1234);
+----
+stmt 0 err 1 -1 42 no such table: t2
+==== func4-4.9
+
+        INSERT INTO t2 (x) VALUES (1234.56);
+----
+stmt 0 err 1 -1 45 no such table: t2
+==== func4-4.10
+
+        INSERT INTO t2 (x) VALUES ('1234');
+----
+stmt 0 err 1 -1 44 no such table: t2
+==== func4-4.11
+
+        INSERT INTO t2 (x) VALUES ('1234.56');
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== func4-4.12
+
+        INSERT INTO t2 (x) VALUES (ZEROBLOB(4));
+----
+stmt 0 err 1 -1 49 no such table: t2
+==== func4-4.13
+
+        INSERT INTO t2 (x) VALUES (X'');
+----
+stmt 0 err 1 -1 41 no such table: t2
+==== func4-4.14
+
+        INSERT INTO t2 (x) VALUES (X'1234');
+----
+stmt 0 err 1 -1 45 no such table: t2
+==== func4-4.15
+
+        INSERT INTO t2 (x) VALUES (X'12345678');
+----
+stmt 0 err 1 -1 49 no such table: t2
+==== func4-4.16
+
+      SELECT x FROM t2 ORDER BY x;
+----
+stmt 0 err 1 -1 35 no such table: t2
+==== func4-5.1
+
+    SELECT tointeger(toreal('1234'));
+----
+stmt 0 err 1 22 38 no such function: toreal
+==== func4-5.2
+
+    SELECT tointeger(toreal(-1));
+----
+stmt 0 err 1 22 34 no such function: toreal
+==== func4-5.3
+
+    SELECT tointeger(toreal(-0));
+----
+stmt 0 err 1 22 34 no such function: toreal
+==== func4-5.4
+
+    SELECT tointeger(toreal(0));
+----
+stmt 0 err 1 22 33 no such function: toreal
+==== func4-5.5
+
+    SELECT tointeger(toreal(1));
+----
+stmt 0 err 1 22 33 no such function: toreal
+==== func4-5.6
+
+    SELECT tointeger(toreal(-9223372036854775808 - 1));
+----
+stmt 0 err 1 22 56 no such function: toreal
+==== func4-5.7
+
+    SELECT tointeger(toreal(-9223372036854775808));
+----
+stmt 0 err 1 22 52 no such function: toreal
+==== func4-5.8
+
+      SELECT tointeger(toreal(-9223372036854775808 + 1));
+----
+stmt 0 err 1 24 58 no such function: toreal
+==== func4-5.9
+
+    SELECT tointeger(toreal(-2147483648 - 1));
+----
+stmt 0 err 1 22 47 no such function: toreal
+==== func4-5.10
+
+    SELECT tointeger(toreal(-2147483648));
+----
+stmt 0 err 1 22 43 no such function: toreal
+==== func4-5.11
+
+    SELECT tointeger(toreal(-2147483648 + 1));
+----
+stmt 0 err 1 22 47 no such function: toreal
+==== func4-5.12
+
+    SELECT tointeger(toreal(2147483647 - 1));
+----
+stmt 0 err 1 22 46 no such function: toreal
+==== func4-5.13
+
+    SELECT tointeger(toreal(2147483647));
+----
+stmt 0 err 1 22 42 no such function: toreal
+==== func4-5.14
+
+    SELECT tointeger(toreal(2147483647 + 1));
+----
+stmt 0 err 1 22 46 no such function: toreal
+==== func4-5.15
+
+    SELECT tointeger(toreal(9223372036854775807 - 1));
+----
+stmt 0 err 1 22 55 no such function: toreal
+==== func4-5.16
+
+      SELECT tointeger(toreal(9223372036854775807));
+----
+stmt 0 err 1 24 53 no such function: toreal
+==== func4-5.17
+
+      SELECT tointeger(toreal(9223372036854775807 + 1));
+----
+stmt 0 err 1 24 57 no such function: toreal
+==== func4-5.18
+
+    SELECT tointeger(toreal(4503599627370496 - 1));
+----
+stmt 0 err 1 22 52 no such function: toreal
+==== func4-5.19
+
+    SELECT tointeger(toreal(4503599627370496));
+----
+stmt 0 err 1 22 48 no such function: toreal
+==== func4-5.20
+
+    SELECT tointeger(toreal(4503599627370496 + 1));
+----
+stmt 0 err 1 22 52 no such function: toreal
+==== func4-5.21
+
+    SELECT tointeger(toreal(9007199254740992 - 1));
+----
+stmt 0 err 1 22 52 no such function: toreal
+==== func4-5.22
+
+    SELECT tointeger(toreal(9007199254740992));
+----
+stmt 0 err 1 22 48 no such function: toreal
+==== func4-5.23
+
+      SELECT tointeger(toreal(9007199254740992 + 1));
+----
+stmt 0 err 1 24 54 no such function: toreal
+==== func4-5.23.dup1
+
+      SELECT tointeger(toreal(9007199254740992 + 1));
+----
+stmt 0 err 1 24 54 no such function: toreal
+==== func4-5.24
+
+    SELECT tointeger(toreal(9007199254740992 + 2));
+----
+stmt 0 err 1 22 52 no such function: toreal
+==== func4-5.25
+
+      SELECT tointeger(toreal(9223372036854775808 - 1));
+----
+stmt 0 err 1 24 57 no such function: toreal
+==== func4-5.26
+
+      SELECT tointeger(toreal(9223372036854775808));
+----
+stmt 0 err 1 24 53 no such function: toreal
+==== func4-5.27
+
+      SELECT tointeger(toreal(9223372036854775808 + 1));
+----
+stmt 0 err 1 24 57 no such function: toreal
+==== func4-5.28
+
+    SELECT tointeger(toreal(18446744073709551616 - 1));
+----
+stmt 0 err 1 22 56 no such function: toreal
+==== func4-5.29
+
+    SELECT tointeger(toreal(18446744073709551616));
+----
+stmt 0 err 1 22 52 no such function: toreal
+==== func4-5.30
+
+    SELECT tointeger(toreal(18446744073709551616 + 1));
+----
+stmt 0 err 1 22 56 no such function: toreal
+==== func4-6.2.1
+
+  SELECT tointeger(x'0102030405060708');
+----
+stmt 0 err 1 10 41 no such function: tointeger
+==== func4-6.2.2
+
+  SELECT tointeger(x'0807060504030201');
+----
+stmt 0 err 1 10 41 no such function: tointeger
+==== func4-6.3.1
+
+    SELECT toreal(x'ffefffffffffffff');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.2
+
+    SELECT toreal(x'8010000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.3
+
+    SELECT toreal(x'c000000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.4
+
+    SELECT toreal(x'bff0000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.5
+
+    SELECT toreal(x'8000000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.6
+
+    SELECT toreal(x'0000000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.7
+
+    SELECT toreal(x'3ff0000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.8
+
+    SELECT toreal(x'4000000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.9
+
+    SELECT toreal(x'0010000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.10
+
+    SELECT toreal(x'7fefffffffffffff');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.11
+
+    SELECT toreal(x'8000000000000001');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.12
+
+    SELECT toreal(x'800fffffffffffff');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.13
+
+    SELECT toreal(x'0000000000000001');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.14
+
+    SELECT toreal(x'000fffffffffffff');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.15
+
+    SELECT toreal(x'fff0000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.16
+
+    SELECT toreal(x'7ff0000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.17
+
+    SELECT toreal(x'fff8000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.18
+
+    SELECT toreal(x'fff0000000000001');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.19
+
+    SELECT toreal(x'fff7ffffffffffff');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.20
+
+    SELECT toreal(x'7ff0000000000001');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.21
+
+    SELECT toreal(x'7ff7ffffffffffff');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.22
+
+    SELECT toreal(x'fff8000000000001');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.23
+
+    SELECT toreal(x'ffffffffffffffff');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.24
+
+    SELECT toreal(x'7ff8000000000000');
+----
+stmt 0 err 1 12 40 no such function: toreal
+==== func4-6.3.25
+
+    SELECT toreal(x'7fffffffffffffff');
+----
+stmt 0 err 1 12 40 no such function: toreal

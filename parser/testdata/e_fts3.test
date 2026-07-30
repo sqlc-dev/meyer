@@ -1,0 +1,8 @@
+==== e_fts3-4.4
+ SELECT optimize(t4) FROM t4 LIMIT 1
+----
+stmt 0 err 1 -1 37 no such table: t4
+==== e_fts3-4.5
+ SELECT optimize(t4) FROM t4 LIMIT 1
+----
+stmt 0 err 1 -1 37 no such table: t4

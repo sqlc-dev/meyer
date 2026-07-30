@@ -1,0 +1,247 @@
+==== laststmtchanges-1.1
+
+        create table t0 (x);
+        insert into t0 values (1);
+        insert into t0 values (1);
+        insert into t0 values (2);
+        insert into t0 values (2);
+        insert into t0 values (1);
+        insert into t0 values (1);
+        insert into t0 values (1);
+        insert into t0 values (2);
+        select changes(), total_changes();
+----
+stmt 0 ok
+stmt 29 err 1 -1 64 no such table: t0
+stmt 64 err 1 -1 99 no such table: t0
+stmt 99 err 1 -1 134 no such table: t0
+stmt 134 err 1 -1 169 no such table: t0
+stmt 169 err 1 -1 204 no such table: t0
+stmt 204 err 1 -1 239 no such table: t0
+stmt 239 err 1 -1 274 no such table: t0
+stmt 274 err 1 -1 309 no such table: t0
+stmt 309 ok
+==== laststmtchanges-1.2
+
+        update t0 set x=3 where x=1;
+        select changes(), total_changes();
+----
+stmt 0 err 1 -1 37 no such table: t0
+stmt 37 ok
+==== laststmtchanges-1.4
+
+        update t0 set x=77 where x=88;
+        select changes();
+----
+stmt 0 err 1 -1 39 no such table: t0
+stmt 39 ok
+==== laststmtchanges-1.5
+
+        delete from t0 where x=2;
+        select changes();
+----
+stmt 0 err 1 -1 34 no such table: t0
+stmt 34 ok
+==== laststmtchanges-2.2
+
+        select v1 from t2;
+----
+stmt 0 err 1 -1 27 no such table: t2
+==== laststmtchanges-2.3
+
+        select v2 from t2;
+----
+stmt 0 err 1 -1 27 no such table: t2
+==== laststmtchanges-3.1
+
+        drop trigger r1;
+        delete from t2; delete from t2;
+        create trigger r1 after update on t1 for each row begin
+            insert into t2 values (NULL, changes(), NULL);
+            delete from t0 where oid=1 or oid=2;
+            update t2 set v2=changes();
+        end;
+        update t1 set k=k;
+        select changes();
+----
+stmt 0 err 1 -1 25 no such trigger: r1
+stmt 25 err 1 -1 49 no such table: t2
+stmt 49 err 1 -1 65 no such table: t2
+stmt 65 err 1 -1 129 no such table: main.t1
+stmt 290 err 1 -1 317 no such table: t1
+stmt 317 ok
+==== laststmtchanges-3.2
+
+        select v1 from t2;
+----
+stmt 0 err 1 -1 27 no such table: t2
+==== laststmtchanges-3.3
+
+        select v2 from t2;
+----
+stmt 0 err 1 -1 27 no such table: t2
+==== laststmtchanges-4.1
+
+        drop trigger r1;
+        delete from t2; delete from t2;
+        create trigger r1 before delete on t1 for each row begin
+            insert into t2 values (NULL, changes(), NULL);
+            insert into t0 values (5);
+            update t2 set v2=changes();
+        end;
+        delete from t1;
+        select changes();
+----
+stmt 0 err 1 -1 25 no such trigger: r1
+stmt 25 err 1 -1 49 no such table: t2
+stmt 49 err 1 -1 65 no such table: t2
+stmt 65 err 1 -1 130 no such table: main.t1
+stmt 281 err 1 -1 305 no such table: t1
+stmt 305 ok
+==== laststmtchanges-4.2
+
+        select v1 from t2;
+----
+stmt 0 err 1 -1 27 no such table: t2
+==== laststmtchanges-4.3
+
+        select v2 from t2;
+----
+stmt 0 err 1 -1 27 no such table: t2
+==== laststmtchanges-5.1
+
+        drop table t0; drop table t1; drop table t2;
+        create temp table t0(x);
+        create temp table t1 (k integer primary key);
+        create temp table t2 (k integer primary key);
+        create temp view v1 as select * from t1;
+        create temp view v2 as select * from t2;
+        create temp table n1 (k integer primary key, n);
+        create temp table n2 (k integer primary key, n);
+        insert into t0 values (1);
+        insert into t0 values (2);
+        insert into t0 values (1);
+        insert into t0 values (1);
+        insert into t0 values (1);
+        insert into t0 values (2);
+        insert into t0 values (2);
+        insert into t0 values (1);
+        create temp trigger r1 instead of insert on v1 for each row begin
+            insert into n1 values (NULL, changes());
+            update t0 set x=x*10 where x=1;
+            insert into n1 values (NULL, changes());
+            insert into t1 values (NEW.k);
+            insert into n1 values (NULL, changes());
+            update t0 set x=x*10 where x=0;
+            insert into v2 values (100+NEW.k);
+            insert into n1 values (NULL, changes());
+        end;
+        create temp trigger r2 instead of insert on v2 for each row begin
+            insert into n2 values (NULL, changes());
+            insert into t2 values (1000+NEW.k);
+            insert into n2 values (NULL, changes());
+            update t0 set x=x*100 where x=0;
+            insert into n2 values (NULL, changes());
+            delete from t0 where x=2;
+            insert into n2 values (NULL, changes());
+        end;
+        insert into t1 values (77);
+        select changes();
+----
+stmt 0 err 1 -1 23 no such table: t0
+stmt 23 err 1 -1 38 no such table: t1
+stmt 38 err 1 -1 53 no such table: t2
+stmt 53 ok
+stmt 86 ok
+stmt 140 ok
+stmt 194 ok
+stmt 243 ok
+stmt 292 ok
+stmt 349 ok
+stmt 406 err 1 -1 441 no such table: t0
+stmt 441 err 1 -1 476 no such table: t0
+stmt 476 err 1 -1 511 no such table: t0
+stmt 511 err 1 -1 546 no such table: t0
+stmt 546 err 1 -1 581 no such table: t0
+stmt 581 err 1 -1 616 no such table: t0
+stmt 616 err 1 -1 651 no such table: t0
+stmt 651 err 1 -1 686 no such table: t0
+stmt 686 err 1 -1 760 no such table: v1
+stmt 1163 err 1 -1 1237 no such table: v2
+stmt 1593 err 1 -1 1629 no such table: t1
+stmt 1629 ok
+==== laststmtchanges-5.2
+
+        delete from t1 where k=88;
+        select changes();
+----
+stmt 0 err 1 -1 35 no such table: t1
+stmt 35 ok
+==== laststmtchanges-5.3
+
+        insert into v1 values (5);
+        select changes();
+----
+stmt 0 err 1 -1 35 no such table: v1
+stmt 35 ok
+==== laststmtchanges-5.4
+
+        select n from n1;
+----
+stmt 0 err 1 -1 26 no such table: n1
+==== laststmtchanges-5.5
+
+        select n from n2;
+----
+stmt 0 err 1 -1 26 no such table: n2
+==== laststmtchanges-6.1
+
+    CREATE TABLE t3(a, b, c);
+    INSERT INTO t3 VALUES(1, 2, 3);
+    INSERT INTO t3 VALUES(4, 5, 6);
+----
+stmt 0 ok
+stmt 30 err 1 -1 66 no such table: t3
+stmt 66 err 1 -1 102 no such table: t3
+==== laststmtchanges-6.2
+
+    BEGIN;
+    DELETE FROM t3;
+    SELECT changes();
+----
+stmt 0 ok
+stmt 11 err 1 -1 31 no such table: t3
+stmt 31 ok
+==== laststmtchanges-6.3
+
+    ROLLBACK;
+    BEGIN;
+    DELETE FROM t3 WHERE a IS NOT NULL;
+    SELECT changes();
+----
+stmt 0 ok
+stmt 14 ok
+stmt 25 err 1 -1 65 no such table: t3
+stmt 65 ok
+==== laststmtchanges-6.4
+
+    ROLLBACK;
+    CREATE INDEX t3_i1 ON t3(a);
+    BEGIN;
+    DELETE FROM t3;
+    SELECT changes();
+----
+stmt 0 ok
+stmt 14 err 1 -1 47 no such table: main.t3
+stmt 47 ok
+stmt 58 err 1 -1 78 no such table: t3
+stmt 78 ok
+==== laststmtchanges-6.6
+
+    SELECT total_changes();
+    DELETE FROM t3;
+    SELECT total_changes();
+----
+stmt 0 ok
+stmt 28 err 1 -1 48 no such table: t3
+stmt 48 ok

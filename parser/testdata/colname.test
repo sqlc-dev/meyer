@@ -1,0 +1,61 @@
+==== colname-9.300
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1(aaa INT);
+  INSERT INTO t1(aaa) VALUES(123);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 82 err 1 -1 117 no such table: t1
+==== colname-9.320
+
+    CREATE TABLE t2 AS SELECT BBb FROM (SELECT aaa AS Bbb FROM t1);
+    SELECT name FROM pragma_table_info('t2');
+----
+stmt 0 err 1 -1 68 no such table: t1
+stmt 68 ok
+==== colname-9.330
+ -- added 2019-08-10 to invalidate
+  DROP TABLE IF EXISTS t1;      -- a couple assert()s that were
+  CREATE TABLE t1(a);           -- added by ticket 3b44500725
+  INSERT INTO t1 VALUES(17),(2),(99),(-3),(7);
+  SELECT (SELECT avg(a) UNION SELECT min(a) OVER()) FROM t1;
+----
+stmt 0 ok
+stmt 61 ok
+stmt 120 err 1 -1 207 no such table: t1
+stmt 207 err 1 -1 268 no such table: t1
+==== colname-9.400
+
+  CREATE TABLE t4 AS SELECT #0;
+----
+stmt 0 err 1 29 32 near "#0": syntax error
+==== colname-9.410
+
+  CREATE TABLE t5 AS SELECT RAISE(abort,a);
+----
+stmt 0 err 1 41 44 no such column: a
+==== colname-10.100
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1("with space" TEXT);
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t2 AS SELECT "with space" FROM t1;
+  PRAGMA table_info(t2);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 65 ok
+stmt 92 err 1 -1 142 no such table: t1
+stmt 142 ok
+==== colname-10.110
+
+  DROP TABLE IF EXISTS t3;
+  CREATE TABLE t3 AS SELECT "with space" FROM t1 GROUP BY 1;
+  PRAGMA table_info(t3);
+----
+stmt 0 ok
+stmt 27 err 1 -1 88 no such table: t1
+stmt 88 ok

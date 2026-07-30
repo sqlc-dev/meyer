@@ -1,0 +1,12 @@
+==== fts3_malloc-4.0
+ DELETE FROM ft WHERE docid>=32
+----
+stmt 0 err 1 -1 32 no such table: ft
+==== fts3_malloc-4.2
+ SELECT a FROM ft
+----
+stmt 0 err 1 -1 18 no such table: ft
+==== fts3_malloc-5.2
+ CREATE VIRTUAL TABLE ft8 USING fts3(x, tokenize porter)
+----
+stmt 0 ok

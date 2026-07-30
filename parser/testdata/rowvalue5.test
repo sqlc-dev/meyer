@@ -1,0 +1,5 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE x1 USING tcl(vtab_command);
+----
+stmt 0 ok

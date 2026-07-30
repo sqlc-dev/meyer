@@ -1,0 +1,23 @@
+==== 4.1
+
+  CREATE TABLE t2(a INTEGER PRIMARY KEY, b);
+  INSERT INTO t2 VALUES(456, '0123456789');
+----
+stmt 0 ok
+stmt 45 err 1 -1 89 no such table: t2
+==== 4.3
+
+  DROP TABLE t2
+----
+stmt 0 err 1 -1 17 no such table: t2
+==== 5.1
+
+  CREATE TABLE t2(a INTEGER PRIMARY KEY, b);
+  INSERT INTO t2 VALUES(1000, 'abcdefghijklmnopqrstuvwxyz');
+  INSERT INTO t2 VALUES(2000, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+  INSERT INTO t2 VALUES(3000, 'abcdefghijklmnopqrstuvwxyz');
+----
+stmt 0 ok
+stmt 45 err 1 -1 106 no such table: t2
+stmt 106 err 1 -1 167 no such table: t2
+stmt 167 err 1 -1 228 no such table: t2

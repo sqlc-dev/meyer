@@ -1,0 +1,19 @@
+==== tkt-9d68c88-1.1
+
+    PRAGMA page_size = 1024;
+    PRAGMA auto_vacuum = 2;
+    CREATE TABLE t3(x);
+    CREATE TABLE t4(x);
+    CREATE TABLE t5(x);
+    INSERT INTO t5 VALUES(randomblob(1500));
+    CREATE TABLE t7(x);
+    CREATE TABLE t8(x);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 57 ok
+stmt 81 ok
+stmt 105 ok
+stmt 129 err 1 -1 174 no such table: t5
+stmt 174 ok
+stmt 198 ok

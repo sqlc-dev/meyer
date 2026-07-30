@@ -1,0 +1,37 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, 'f');
+  INSERT INTO t1 VALUES(2, 'e');
+  INSERT INTO t1 VALUES(3, 'd');
+  INSERT INTO t1 VALUES(4, 'c');
+  INSERT INTO t1 VALUES(5, 'b');
+  INSERT INTO t1 VALUES(6, 'a');
+
+  CREATE VIEW v1 AS SELECT a,b FROM t1;
+  CREATE TABLE log(op, a);
+
+  CREATE TRIGGER v1del INSTEAD OF DELETE ON v1 BEGIN
+    INSERT INTO log VALUES('delete', old.a);
+  END;
+
+  CREATE TRIGGER v1upd INSTEAD OF UPDATE ON v1 BEGIN
+    INSERT INTO log VALUES('update', old.a);
+  END;
+----
+stmt 0 ok
+stmt 25 err 1 -1 58 no such table: t1
+stmt 58 err 1 -1 91 no such table: t1
+stmt 91 err 1 -1 124 no such table: t1
+stmt 124 err 1 -1 157 no such table: t1
+stmt 157 err 1 -1 190 no such table: t1
+stmt 190 err 1 -1 223 no such table: t1
+stmt 223 ok
+stmt 264 ok
+stmt 291 err 1 -1 345 no such table: main.v1
+stmt 397 err 1 -1 451 no such table: main.v1
+==== 2.1.0
+
+  CREATE TABLE t2(a, b, c, PRIMARY KEY(a, b)) WITHOUT ROWID;
+----
+stmt 0 ok

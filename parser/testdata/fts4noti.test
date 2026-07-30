@@ -1,0 +1,255 @@
+==== 1.0
+
+  CREATE TABLE cc(a, b, c);
+----
+stmt 0 ok
+==== 1.x
+ SELECT name FROM sqlite_master
+----
+stmt 0 ok
+==== fts4noti-generated
+
+    INSERT INTO t1(docid,a,b,c) VALUES(1, 'one two', 'three four', 'five six');
+    INSERT INTO t1(docid,a,b,c) VALUES(2, 'three four', 'five six', 'one two');
+----
+stmt 0 err 1 -1 80 no such table: t1
+stmt 80 err 1 -1 160 no such table: t1
+==== fts4noti-generated.dup1
+ SELECT docid FROM t1 WHERE t1 MATCH 'one'
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== fts4noti-generated.dup2
+ SELECT docid FROM t1 WHERE t1 MATCH 'three'
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== fts4noti-generated.dup3
+ SELECT docid FROM t1 WHERE t1 MATCH 'five'
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== fts4noti-generated.dup4
+ INSERT INTO t1(t1) VALUES('optimize')
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== fts4noti-generated.dup5
+ SELECT docid FROM t1 WHERE t1 MATCH 'one'
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== fts4noti-generated.dup6
+ SELECT docid FROM t1 WHERE t1 MATCH 'three'
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== fts4noti-generated.dup7
+ SELECT docid FROM t1 WHERE t1 MATCH 'five'
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== fts4noti-generated.dup8
+ INSERT INTO t1(t1) VALUES('rebuild')
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== fts4noti-generated.dup9
+ SELECT docid FROM t1 WHERE t1 MATCH 'one'
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== fts4noti-generated.dup10
+ SELECT docid FROM t1 WHERE t1 MATCH 'three'
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== fts4noti-generated.dup11
+ SELECT docid FROM t1 WHERE t1 MATCH 'five'
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== fts4noti-generated.dup12
+ 
+      SELECT a,b,c FROM t1 WHERE docid=1
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== fts4noti-generated.dup13
+ 
+      SELECT a,b,c FROM t1 WHERE docid=2
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== 2.x
+ DROP TABLE t1
+----
+stmt 0 err 1 -1 15 no such table: t1
+==== 3.1
+
+  CREATE VIRTUAL TABLE t2 USING fts4(x, y, notindexed=x);
+----
+stmt 0 ok
+==== 3.3
+ SELECT x FROM t2 WHERE t2 MATCH '2'
+----
+stmt 0 err 1 -1 37 no such table: t2
+==== 3.4
+ SELECT x FROM t2 WHERE t2 MATCH '1'
+----
+stmt 0 err 1 -1 37 no such table: t2
+==== 3.5
+ SELECT x FROM t2 WHERE t2 MATCH 'x'
+----
+stmt 0 err 1 -1 37 no such table: t2
+==== 3.6
+ SELECT x FROM t2 WHERE t2 MATCH 'x 1'
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== 3.x
+ DROP TABLE t2
+----
+stmt 0 err 1 -1 15 no such table: t2
+==== 4.1
+
+  CREATE VIRTUAL TABLE t2 USING fts4(poi, addr, notindexed=poi);
+  INSERT INTO t2 VALUES(114, 'x x x');
+  INSERT INTO t2 VALUES(X'1234', 'y y y');
+  INSERT INTO t2 VALUES(NULL, 'z z z');
+  INSERT INTO t2 VALUES(113.2, 'w w w');
+  INSERT INTO t2 VALUES('poi', 'v v v');
+----
+stmt 0 ok
+stmt 65 err 1 -1 104 no such table: t2
+stmt 104 err 1 -1 147 no such table: t2
+stmt 147 err 1 -1 187 no such table: t2
+stmt 187 err 1 -1 228 no such table: t2
+stmt 228 err 1 -1 269 no such table: t2
+==== 4.2
+ SELECT typeof(poi) FROM t2 WHERE t2 MATCH 'x'
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 4.3
+ SELECT typeof(poi) FROM t2 WHERE t2 MATCH 'y'
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 4.4
+ SELECT typeof(poi) FROM t2 WHERE t2 MATCH 'z'
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 4.5
+ SELECT typeof(poi) FROM t2 WHERE t2 MATCH 'w'
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 4.6
+ SELECT typeof(poi) FROM t2 WHERE t2 MATCH 'v'
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 4.x
+ DROP TABLE t2
+----
+stmt 0 err 1 -1 15 no such table: t2
+==== 5.1
+
+  CREATE VIRTUAL TABLE t2 USING fts4(
+      notindexed="three", one, two, three, notindexed="one",
+  );
+  INSERT INTO t2 VALUES('a', 'b', 'c');
+  INSERT INTO t2 VALUES('c', 'a', 'b');
+  INSERT INTO t2 VALUES('b', 'c', 'a');
+----
+stmt 0 ok
+stmt 104 err 1 -1 144 no such table: t2
+stmt 144 err 1 -1 184 no such table: t2
+stmt 184 err 1 -1 224 no such table: t2
+==== 5.2
+ SELECT docid FROM t2 WHERE t2 MATCH 'a'
+----
+stmt 0 err 1 -1 41 no such table: t2
+==== 5.3
+ SELECT docid FROM t2 WHERE t2 MATCH 'b'
+----
+stmt 0 err 1 -1 41 no such table: t2
+==== 5.4
+ SELECT docid FROM t2 WHERE t2 MATCH 'c'
+----
+stmt 0 err 1 -1 41 no such table: t2
+==== 5.x
+ DROP TABLE t2
+----
+stmt 0 err 1 -1 15 no such table: t2
+==== 6.1.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4(
+    poiCategory, poiCategoryId, notindexed=poiCategoryId
+  );
+  INSERT INTO t1(poiCategory, poiCategoryId) values ('Restaurant', 6021);
+----
+stmt 0 ok
+stmt 100 err 1 -1 174 no such table: t1
+==== 6.1.2
+
+  SELECT * FROM t1 WHERE t1 MATCH 'restaurant';
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== 6.1.3
+
+  SELECT * FROM t1 WHERE t1 MATCH 're*';
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== 6.1.4
+
+  SELECT * FROM t1 WHERE t1 MATCH '6021';
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== 6.1.5
+
+  SELECT * FROM t1 WHERE t1 MATCH '60*';
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== 6.2.1
+
+  DROP TABLE t1;
+  CREATE VIRTUAL TABLE t1 USING fts4(
+    poiCategory, poiCategoryId, notindexed=poiCategory
+  );
+  INSERT INTO t1(poiCategory, poiCategoryId) values ('Restaurant', 6021);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 115 err 1 -1 189 no such table: t1
+==== 6.2.2
+
+  SELECT * FROM t1 WHERE t1 MATCH 'restaurant';
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== 6.2.3
+
+  SELECT * FROM t1 WHERE t1 MATCH 're*';
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== 6.2.4
+
+  SELECT * FROM t1 WHERE t1 MATCH '6021';
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== 6.2.5
+
+  SELECT * FROM t1 WHERE t1 MATCH '60*';
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== 6.3.1
+
+  DROP TABLE t1;
+  CREATE VIRTUAL TABLE t1 USING fts4(abc, ab, a, notindexed=abc);
+  CREATE VIRTUAL TABLE t2 USING fts4(a, ab, abc, notindexed=abc);
+
+  INSERT INTO t1 VALUES('no', 'yes', 'yep');
+  INSERT INTO t2 VALUES('yep', 'yes', 'no');
+
+  SELECT count(*) FROM t1 WHERE t1 MATCH 'no';
+  SELECT count(*) FROM t1 WHERE t1 MATCH 'yes';
+  SELECT count(*) FROM t1 WHERE t1 MATCH 'yep';
+
+  SELECT count(*) FROM t2 WHERE t2 MATCH 'no';
+  SELECT count(*) FROM t2 WHERE t2 MATCH 'yes';
+  SELECT count(*) FROM t2 WHERE t2 MATCH 'yep';
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 83 ok
+stmt 149 err 1 -1 195 no such table: t1
+stmt 195 err 1 -1 240 no such table: t2
+stmt 240 err 1 -1 288 no such table: t1
+stmt 288 err 1 -1 336 no such table: t1
+stmt 336 err 1 -1 384 no such table: t1
+stmt 384 err 1 -1 432 no such table: t2
+stmt 432 err 1 -1 480 no such table: t2
+stmt 480 err 1 -1 528 no such table: t2

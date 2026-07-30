@@ -1,0 +1,23 @@
+==== 1.0
+
+  CREATE TABLE t6(a, b TEXT);
+  CREATE INDEX i6 ON t6(b, a);
+  CREATE VIRTUAL TABLE e6 USING echo(t6);
+----
+stmt 0 ok
+stmt 30 err 1 -1 61 no such table: main.t6
+stmt 61 ok
+==== 2.0
+
+  CREATE VIRTUAL TABLE vars USING tclvar;
+  SELECT name, arrayname, value FROM vars WHERE name = 'xyz';
+----
+stmt 0 ok
+stmt 42 err 1 -1 104 no such table: vars
+==== 3.0
+
+    SELECT name FROM fsdir WHERE dir = '.' AND name = 'test.db';
+    SELECT name FROM fsdir WHERE dir = '.' AND name = '.'
+----
+stmt 0 err 1 -1 65 no such table: fsdir
+stmt 65 err 1 -1 124 no such table: fsdir

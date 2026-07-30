@@ -1,0 +1,30 @@
+==== vtabD-1.1
+
+    PRAGMA encoding = 'utf16';
+
+    CREATE TABLE r1(field);
+    CREATE TABLE r2(col PRIMARY KEY, descr);
+
+    INSERT INTO r1 VALUES('abcd');
+    INSERT INTO r2 VALUES('abcd', 'A nice description');
+    INSERT INTO r2 VALUES('efgh', 'Another description');
+
+    CREATE VIRTUAL TABLE t1 USING echo(r1);
+    CREATE VIRTUAL TABLE t2 USING echo(r2);
+----
+stmt 0 ok
+stmt 31 ok
+stmt 60 ok
+stmt 105 err 1 -1 141 no such table: r1
+stmt 141 err 1 -1 198 no such table: r2
+stmt 198 err 1 -1 256 no such table: r2
+stmt 256 ok
+stmt 301 ok
+==== vtabD-1.2
+
+    select
+      t1.field as Field,
+      t2.descr as Descr
+    from t1 inner join t2 on t1.field = t2.col order by t1.field
+----
+stmt 0 err 1 -1 126 no such table: t1

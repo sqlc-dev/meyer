@@ -1,0 +1,36 @@
+==== 3.1
+
+  PRAGMA auto_vacuum = 2;
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES(randomblob(500), randomblob(500));
+  INSERT INTO t1 SELECT randomblob(500), randomblob(500) FROM t1;
+  INSERT INTO t1 SELECT randomblob(500), randomblob(500) FROM t1;
+  INSERT INTO t1 SELECT randomblob(500), randomblob(500) FROM t1;
+  INSERT INTO t1 SELECT randomblob(500), randomblob(500) FROM t1;
+  INSERT INTO t1 SELECT randomblob(500), randomblob(500) FROM t1;
+  INSERT INTO t1 SELECT randomblob(500), randomblob(500) FROM t1;
+  INSERT INTO t1 SELECT randomblob(500), randomblob(500) FROM t1;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 51 err 1 -1 110 no such table: t1
+stmt 110 err 1 -1 176 no such table: t1
+stmt 176 err 1 -1 242 no such table: t1
+stmt 242 err 1 -1 308 no such table: t1
+stmt 308 err 1 -1 374 no such table: t1
+stmt 374 err 1 -1 440 no such table: t1
+stmt 440 err 1 -1 506 no such table: t1
+stmt 506 err 1 -1 572 no such table: t1
+==== 3.3
+
+  BEGIN;
+    DELETE FROM t1 WHERE 1;
+    PRAGMA incremental_vacuum;
+----
+stmt 0 ok
+stmt 9 err 1 -1 37 no such table: t1
+stmt 37 ok
+==== 3.5
+ COMMIT
+----
+stmt 0 ok

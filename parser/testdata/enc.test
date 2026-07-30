@@ -1,0 +1,85 @@
+==== enc-11.1
+
+    CREATE TABLE ab(a COLLATE test_collate, b);
+    INSERT INTO ab VALUES(CAST (X'C388' AS TEXT), X'888800');
+    INSERT INTO ab VALUES(CAST (X'C0808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808080808388' AS TEXT), X'888800');
+    CREATE INDEX ab_i ON ab(a, b);
+----
+stmt 0 err 1 -1 44 no such collation sequence: test_collate
+stmt 48 err 1 -1 110 no such table: ab
+stmt 110 err 1 -1 278 no such table: ab
+stmt 278 err 1 -1 313 no such table: main.ab
+==== enc-12.0
+
+  PRAGMA encoding = 'utf-8';
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES('a', 'b', 'c');
+  ATTACH 'test.db3' AS aux;
+  CREATE TABLE aux.t3(x, y, z);
+  INSERT INTO t3 VALUES('xxx', 'yyy', 'zzz');
+  PRAGMA encoding;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 57 err 1 -1 97 no such table: t1
+stmt 97 ok
+stmt 125 err 1 141 148 unknown database aux
+stmt 157 err 1 -1 203 no such table: t3
+stmt 203 ok
+==== enc-12.3
+
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 20 no such table: t2
+==== enc-12.4
+
+  SELECT * FROM t3;
+  PRAGMA encoding = 'UTF-16le';
+  SELECT * FROM t3;
+----
+stmt 0 err 1 -1 20 no such table: t3
+stmt 20 ok
+stmt 52 err 1 -1 72 no such table: t3
+==== enc-12.5
+
+  PRAGMA encoding = 'UTF-16le';
+  PRAGMA encoding;
+----
+stmt 0 ok
+stmt 32 ok
+==== enc-12.6
+
+  PRAGMA encoding = 'UTF-8';
+  CREATE TEMP TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES('xxx', 'yyy', 'zzz');
+----
+stmt 0 ok
+stmt 29 ok
+stmt 62 err 1 -1 108 no such table: t1
+==== enc-12.8
+
+  SELECT * FROM t2;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t2
+stmt 20 err 1 -1 40 no such table: t1
+==== enc-12.9
+
+  CREATE TEMP TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES('xxx', 'yyy', 'zzz');
+----
+stmt 0 ok
+stmt 33 err 1 -1 79 no such table: t1
+==== enc-12.10
+
+  SELECT * FROM t2;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t2
+stmt 20 err 1 -1 40 no such table: t1
+==== enc-13.2
+
+    WITH t1(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM t1 WHERE x<3)
+    SELECT rtreecheck('t3') FROM t1;
+----
+stmt 0 err 1 81 106 no such function: rtreecheck

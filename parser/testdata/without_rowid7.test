@@ -1,0 +1,68 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b COLLATE nocase, PRIMARY KEY(a, a, b)) WITHOUT ROWID;
+----
+stmt 0 ok
+==== 1.1
+
+  INSERT INTO t1 VALUES(1, 'one'), (1, 'ONE');
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 2.0
+
+  CREATE TABLE t2(a, b, PRIMARY KEY(a COLLATE nocase, a)) WITHOUT ROWID;
+----
+stmt 0 ok
+==== 2.1
+
+  INSERT INTO t2 VALUES(1, 'one');
+  SELECT b FROM t2;
+----
+stmt 0 err 1 -1 35 no such table: t2
+stmt 35 err 1 -1 55 no such table: t2
+==== 2.2a
+
+  PRAGMA index_info(t2);
+----
+stmt 0 ok
+==== 2.3a
+
+  PRAGMA index_xinfo(t2);
+----
+stmt 0 ok
+==== 2.4
+
+  CREATE TABLE t3(a, b, PRIMARY KEY(a COLLATE nocase, a));
+  PRAGMA index_info(t3);
+----
+stmt 0 ok
+stmt 59 ok
+==== 3.0
+
+  CREATE TABLE t1(
+      a PRIMARY KEY COLLATE mysort, b COLLATE mysort2
+  ) WITHOUT ROWID;
+  INSERT INTO t1 VALUES(1, 2);
+----
+stmt 0 err 1 -1 55 no such collation sequence: mysort
+stmt 92 err 1 -1 123 no such table: t1
+==== 3.1.1
+
+  SELECT * FROM t1 WHERE a=1;
+----
+stmt 0 err 1 -1 30 no such table: t1
+==== 3.2.1
+
+  CREATE UNIQUE INDEX i1 ON t1(b);
+----
+stmt 0 err 1 -1 35 no such table: main.t1
+==== 3.3.1
+
+  CREATE UNIQUE INDEX i1 ON t1(1);
+----
+stmt 0 err 1 -1 35 no such table: main.t1
+==== 3.6
+
+  SELECT * FROM t1 WHERE a=1;
+----
+stmt 0 err 1 -1 30 no such table: t1

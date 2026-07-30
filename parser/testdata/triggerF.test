@@ -1,0 +1,30 @@
+==== triggerF-generated
+
+    PRAGMA recursive_triggers = on;
+    CREATE TABLE t1(a INT PRIMARY KEY, b) WITHOUT ROWID;
+    CREATE TABLE log(t);
+----
+stmt 0 ok
+stmt 36 ok
+stmt 93 ok
+==== triggerF-generated.dup1
+
+    INSERT INTO t1 VALUES(1, 'one');
+    INSERT INTO t1 VALUES(2, 'two');
+    INSERT INTO t1 VALUES(3, 'three');
+
+    DELETE FROM t1 WHERE a=1;
+    INSERT OR REPLACE INTO t1 VALUES(2, 'three');
+    UPDATE OR REPLACE t1 SET a=3 WHERE a=2;
+----
+stmt 0 err 1 -1 37 no such table: t1
+stmt 37 err 1 -1 74 no such table: t1
+stmt 74 err 1 -1 113 no such table: t1
+stmt 113 err 1 -1 144 no such table: t1
+stmt 144 err 1 -1 194 no such table: t1
+stmt 194 err 1 -1 238 no such table: t1
+==== triggerF-generated.dup2
+
+    SELECT * FROM log ORDER BY rowid;
+----
+stmt 0 err 1 -1 38 no such table: log

@@ -1,0 +1,40 @@
+==== walcrash-generated
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walcrash-generated.dup1
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walcrash-generated.dup2
+ PRAGMA main.integrity_check
+----
+stmt 0 ok
+==== walcrash-generated.dup3
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walcrash-generated.dup4
+ PRAGMA main.integrity_check
+----
+stmt 0 ok
+==== walcrash-generated.dup5
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walcrash-generated.dup6
+ PRAGMA main.integrity_check
+----
+stmt 0 ok
+==== walcrash-generated.dup7
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walcrash-generated.dup8
+ PRAGMA main.integrity_check
+----
+stmt 0 ok
+==== walcrash-generated.dup9
+ PRAGMA main.journal_mode
+----
+stmt 0 ok

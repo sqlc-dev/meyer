@@ -1,0 +1,2999 @@
+==== fuzzer1-1.1
+
+  CREATE VIRTUAL TABLE f USING fuzzer;
+----
+stmt 0 ok
+==== fuzzer1-1.2
+
+  CREATE VIRTUAL TABLE f USING fuzzer(one, two);
+----
+stmt 0 ok
+==== fuzzer1-1.3
+
+  CREATE VIRTUAL TABLE f USING fuzzer(nosuchtable);
+----
+stmt 0 ok
+==== fuzzer1-1.4
+
+  CREATE TEMP TABLE nosuchtable(a, b, c, d);
+  CREATE VIRTUAL TABLE f USING fuzzer(nosuchtable);
+----
+stmt 0 ok
+stmt 45 ok
+==== fuzzer1-1.5
+
+  DROP TABLE temp.nosuchtable;
+  CREATE TABLE nosuchtable(a, b, c, d);
+  CREATE VIRTUAL TABLE temp.f USING fuzzer(nosuchtable);
+----
+stmt 0 err 1 -1 31 no such table: temp.nosuchtable
+stmt 31 ok
+stmt 71 ok
+==== fuzzer1-1.6
+
+  DROP TABLE IF EXISTS f_rules;
+  CREATE TABLE f_rules(a, b, c);
+  CREATE VIRTUAL TABLE f USING fuzzer(f_rules);
+----
+stmt 0 ok
+stmt 32 ok
+stmt 65 ok
+==== fuzzer1-1.7
+
+  DROP TABLE IF EXISTS f_rules;
+  CREATE TABLE f_rules(a, b, c, d, e);
+  CREATE VIRTUAL TABLE f USING fuzzer(f_rules);
+----
+stmt 0 ok
+stmt 32 ok
+stmt 71 ok
+==== fuzzer1-2.1
+
+  CREATE TABLE f1_rules(ruleset DEFAULT 0, cfrom, cto, cost);
+  INSERT INTO f1_rules(cfrom, cto, cost) VALUES('e','a',1);
+  INSERT INTO f1_rules(cfrom, cto, cost) VALUES('a','e',10);
+  INSERT INTO f1_rules(cfrom, cto, cost) VALUES('e','o',100);
+
+  CREATE VIRTUAL TABLE f1 USING fuzzer(f1_rules);
+----
+stmt 0 ok
+stmt 62 err 1 -1 122 no such table: f1_rules
+stmt 122 err 1 -1 183 no such table: f1_rules
+stmt 183 err 1 -1 245 no such table: f1_rules
+stmt 245 ok
+==== fuzzer1-2.1.dup1
+
+    SELECT word, distance FROM f1 WHERE word MATCH 'abcde'
+----
+stmt 0 err 1 -1 60 no such table: f1
+==== fuzzer1-2.4
+
+  INSERT INTO f1_rules(ruleset, cfrom, cto, cost) VALUES(1,'b','x',1);
+  INSERT INTO f1_rules(ruleset, cfrom, cto, cost) VALUES(1,'d','y',10);
+  INSERT INTO f1_rules(ruleset, cfrom, cto, cost) VALUES(1,'y','z',100);
+
+  DROP TABLE f1;
+  CREATE VIRTUAL TABLE f1 USING fuzzer(f1_rules);
+----
+stmt 0 err 1 -1 71 no such table: f1_rules
+stmt 71 err 1 -1 143 no such table: f1_rules
+stmt 143 err 1 -1 216 no such table: f1_rules
+stmt 216 err 1 -1 234 no such table: f1
+stmt 234 ok
+==== fuzzer1-2.5
+
+  SELECT word, distance FROM f1 WHERE word MATCH 'abcde'
+----
+stmt 0 err 1 -1 58 no such table: f1
+==== fuzzer1-2.6
+
+  SELECT word, distance FROM f1 WHERE word MATCH 'abcde' AND ruleset=0
+----
+stmt 0 err 1 -1 72 no such table: f1
+==== fuzzer1-2.7
+
+  SELECT word, distance FROM f1 WHERE word MATCH 'abcde' AND ruleset=1
+----
+stmt 0 err 1 -1 72 no such table: f1
+==== fuzzer1-1.14
+INSERT INTO f1 VALUES(1)
+----
+stmt 0 err 1 -1 25 no such table: f1
+==== fuzzer1-1.15
+DELETE FROM f1
+----
+stmt 0 err 1 -1 15 no such table: f1
+==== fuzzer1-1.16
+UPDATE f1 SET rowid=rowid+10000
+----
+stmt 0 err 1 -1 32 no such table: f1
+==== fuzzer1-2.0
+
+    -- costs based on English letter frequencies
+    CREATE TEMP TABLE f2_rules(ruleset DEFAULT 0, cFrom, cTo, cost);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('a','e',24);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('a','o',47);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('a','u',50);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('e','a',23);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('e','i',33);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('e','o',37);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('i','e',33);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('i','y',33);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('o','a',41);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('o','e',46);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('o','u',57);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('u','o',58);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('y','i',33);
+
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('t','th',70);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('th','t',66);
+ 
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('a','',84);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','b',106);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('b','',106);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','c',94);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('c','',94);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','d',89);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('d','',89);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','e',83);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('e','',83);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','f',97);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('f','',97);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','g',99);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('g','',99);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','h',86);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('h','',86);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','i',85);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('i','',85);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','j',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('j','',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','k',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('k','',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','l',89);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('l','',89);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','m',96);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('m','',96);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','n',85);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('n','',85);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','o',85);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('o','',85);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','p',100);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('p','',100);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','q',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('q','',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','r',86);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('r','',86);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','s',86);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('s','',86);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','t',84);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('t','',84);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','u',94);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('u','',94);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','v',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('v','',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','w',96);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('w','',96);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','x',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('x','',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','y',100);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('y','',100);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('','z',120);
+    INSERT INTO f2_rules(cFrom,cTo,cost) VALUES('z','',120);
+    INSERT INTO f2_rules(ruleset,cFrom,cTo,cost)
+      SELECT 1, cFrom, cTo, 100 FROM f2_rules WHERE ruleset=0;
+    INSERT INTO f2_rules(ruleset,cFrom,cTo,cost)
+      SELECT 2, cFrom, cTo, 200-cost FROM f2_rules WHERE ruleset=0;
+    INSERT INTO f2_rules(ruleset,cFrom,cTo,cost)
+      SELECT 3, cFrom, cTo, cost FROM f2_rules WHERE ruleset=0;
+    INSERT INTO f2_rules(ruleset,cFrom,cTo,cost)
+      VALUES(3, 'mallard','duck',50),
+            (3, 'duck', 'mallard', 50),
+            (3, 'rock', 'stone', 50),
+            (3, 'stone', 'rock', 50);
+
+
+    CREATE VIRTUAL TABLE temp.f2 USING fuzzer(f2_rules);
+
+    -- Street names for the 28269 ZIPCODE.
+    --
+    CREATE TEMP TABLE streetname(n TEXT UNIQUE);
+    INSERT INTO streetname VALUES('abbotsinch');
+    INSERT INTO streetname VALUES('abbottsgate');
+    INSERT INTO streetname VALUES('abbywood');
+    INSERT INTO streetname VALUES('abner');
+    INSERT INTO streetname VALUES('acacia ridge');
+    INSERT INTO streetname VALUES('acorn creek');
+    INSERT INTO streetname VALUES('acorn forest');
+    INSERT INTO streetname VALUES('adel');
+    INSERT INTO streetname VALUES('ainslie');
+    INSERT INTO streetname VALUES('airways');
+    INSERT INTO streetname VALUES('alabaster');
+    INSERT INTO streetname VALUES('alba');
+    INSERT INTO streetname VALUES('albertine');
+    INSERT INTO streetname VALUES('alden glen');
+    INSERT INTO streetname VALUES('alderson');
+    INSERT INTO streetname VALUES('allen');
+    INSERT INTO streetname VALUES('allen a brown');
+    INSERT INTO streetname VALUES('allness glen');
+    INSERT INTO streetname VALUES('aloysia');
+    INSERT INTO streetname VALUES('alpine');
+    INSERT INTO streetname VALUES('alwyn');
+    INSERT INTO streetname VALUES('amaranthus');
+    INSERT INTO streetname VALUES('amber glen');
+    INSERT INTO streetname VALUES('amber leigh way');
+    INSERT INTO streetname VALUES('amber meadows');
+    INSERT INTO streetname VALUES('amberway');
+    INSERT INTO streetname VALUES('ame');
+    INSERT INTO streetname VALUES('amesbury hill');
+    INSERT INTO streetname VALUES('anderson');
+    INSERT INTO streetname VALUES('andrew thomas');
+    INSERT INTO streetname VALUES('anduin falls');
+    INSERT INTO streetname VALUES('ankeny');
+    INSERT INTO streetname VALUES('annandale');
+    INSERT INTO streetname VALUES('annbick');
+    INSERT INTO streetname VALUES('antelope');
+    INSERT INTO streetname VALUES('anzack');
+    INSERT INTO streetname VALUES('apple glen');
+    INSERT INTO streetname VALUES('applevalley');
+    INSERT INTO streetname VALUES('appley mead');
+    INSERT INTO streetname VALUES('aragorn');
+    INSERT INTO streetname VALUES('arbor creek');
+    INSERT INTO streetname VALUES('arbor day');
+    INSERT INTO streetname VALUES('arbor meadows');
+    INSERT INTO streetname VALUES('arbor spring');
+    INSERT INTO streetname VALUES('arborview');
+    INSERT INTO streetname VALUES('arklow');
+    INSERT INTO streetname VALUES('armitage');
+    INSERT INTO streetname VALUES('arvin');
+    INSERT INTO streetname VALUES('ash cove');
+    INSERT INTO streetname VALUES('ashford leigh');
+    INSERT INTO streetname VALUES('ashmont');
+    INSERT INTO streetname VALUES('atlas');
+    INSERT INTO streetname VALUES('atwater');
+    INSERT INTO streetname VALUES('auburn hill');
+    INSERT INTO streetname VALUES('aulton link');
+    INSERT INTO streetname VALUES('austin dekota');
+    INSERT INTO streetname VALUES('austin knoll');
+    INSERT INTO streetname VALUES('auten');
+    INSERT INTO streetname VALUES('autumn harvest');
+    INSERT INTO streetname VALUES('autumn oak');
+    INSERT INTO streetname VALUES('autumn ridge');
+    INSERT INTO streetname VALUES('avalon forest');
+    INSERT INTO streetname VALUES('avalon loop');
+    INSERT INTO streetname VALUES('avon farm');
+    INSERT INTO streetname VALUES('avonhurst');
+    INSERT INTO streetname VALUES('avonlea');
+    INSERT INTO streetname VALUES('aynrand');
+    INSERT INTO streetname VALUES('azure valley');
+    INSERT INTO streetname VALUES('baberton');
+    INSERT INTO streetname VALUES('baffin');
+    INSERT INTO streetname VALUES('baggins');
+    INSERT INTO streetname VALUES('balata');
+    INSERT INTO streetname VALUES('ballantray');
+    INSERT INTO streetname VALUES('ballston');
+    INSERT INTO streetname VALUES('balsam tree');
+    INSERT INTO streetname VALUES('bambi');
+    INSERT INTO streetname VALUES('banwell');
+    INSERT INTO streetname VALUES('barbee');
+    INSERT INTO streetname VALUES('barefoot forest');
+    INSERT INTO streetname VALUES('barnview');
+    INSERT INTO streetname VALUES('baroda');
+    INSERT INTO streetname VALUES('barson');
+    INSERT INTO streetname VALUES('baskerville');
+    INSERT INTO streetname VALUES('battle creek');
+    INSERT INTO streetname VALUES('baucom');
+    INSERT INTO streetname VALUES('bay pines');
+    INSERT INTO streetname VALUES('beaker');
+    INSERT INTO streetname VALUES('beard');
+    INSERT INTO streetname VALUES('beardsley');
+    INSERT INTO streetname VALUES('bearoak');
+    INSERT INTO streetname VALUES('beauvista');
+    INSERT INTO streetname VALUES('beaver creek');
+    INSERT INTO streetname VALUES('beaver hollow');
+    INSERT INTO streetname VALUES('bedlington');
+    INSERT INTO streetname VALUES('beech cove');
+    INSERT INTO streetname VALUES('beech crest');
+    INSERT INTO streetname VALUES('beith');
+    INSERT INTO streetname VALUES('bell glen');
+    INSERT INTO streetname VALUES('bellmore');
+    INSERT INTO streetname VALUES('bells mill');
+    INSERT INTO streetname VALUES('bellville');
+    INSERT INTO streetname VALUES('belmar place');
+    INSERT INTO streetname VALUES('bembridge');
+    INSERT INTO streetname VALUES('bennett neely');
+    INSERT INTO streetname VALUES('bentgrass run');
+    INSERT INTO streetname VALUES('benthaven');
+    INSERT INTO streetname VALUES('bernardy');
+    INSERT INTO streetname VALUES('bernbrook shadow');
+    INSERT INTO streetname VALUES('berrybrook');
+    INSERT INTO streetname VALUES('berrybush');
+    INSERT INTO streetname VALUES('berwick');
+    INSERT INTO streetname VALUES('betterton');
+    INSERT INTO streetname VALUES('bickham');
+    INSERT INTO streetname VALUES('billingham');
+    INSERT INTO streetname VALUES('birchcroft');
+    INSERT INTO streetname VALUES('birchstone');
+    INSERT INTO streetname VALUES('birdwell');
+    INSERT INTO streetname VALUES('bisaner');
+    INSERT INTO streetname VALUES('bitterbush');
+    INSERT INTO streetname VALUES('bitterroot');
+    INSERT INTO streetname VALUES('black fox');
+    INSERT INTO streetname VALUES('black maple');
+    INSERT INTO streetname VALUES('black trail');
+    INSERT INTO streetname VALUES('blackbird');
+    INSERT INTO streetname VALUES('blake a dare');
+    INSERT INTO streetname VALUES('blasdell');
+    INSERT INTO streetname VALUES('blue aster');
+    INSERT INTO streetname VALUES('blue finch');
+    INSERT INTO streetname VALUES('blue lilac');
+    INSERT INTO streetname VALUES('blue sky');
+    INSERT INTO streetname VALUES('blue tick');
+    INSERT INTO streetname VALUES('bob beatty');
+    INSERT INTO streetname VALUES('bobcat');
+    INSERT INTO streetname VALUES('bolton');
+    INSERT INTO streetname VALUES('boomerang');
+    INSERT INTO streetname VALUES('boulder');
+    INSERT INTO streetname VALUES('boxer');
+    INSERT INTO streetname VALUES('boxmeer');
+    INSERT INTO streetname VALUES('brachnell view');
+    INSERT INTO streetname VALUES('bradford lake');
+    INSERT INTO streetname VALUES('bradwell');
+    INSERT INTO streetname VALUES('brady');
+    INSERT INTO streetname VALUES('braids bend');
+    INSERT INTO streetname VALUES('bralers');
+    INSERT INTO streetname VALUES('brandie glen');
+    INSERT INTO streetname VALUES('brandy ridge');
+    INSERT INTO streetname VALUES('brandybuck');
+    INSERT INTO streetname VALUES('branthurst');
+    INSERT INTO streetname VALUES('brassy creek');
+    INSERT INTO streetname VALUES('brathay');
+    INSERT INTO streetname VALUES('brawer farm');
+    INSERT INTO streetname VALUES('breezy morn');
+    INSERT INTO streetname VALUES('brenda');
+    INSERT INTO streetname VALUES('brenly');
+    INSERT INTO streetname VALUES('brenock');
+    INSERT INTO streetname VALUES('brianwood');
+    INSERT INTO streetname VALUES('briar rose');
+    INSERT INTO streetname VALUES('briarcrest');
+    INSERT INTO streetname VALUES('briarthorne');
+    INSERT INTO streetname VALUES('brick dust');
+    INSERT INTO streetname VALUES('bridgepath');
+    INSERT INTO streetname VALUES('bridle ridge');
+    INSERT INTO streetname VALUES('briggs');
+    INSERT INTO streetname VALUES('brightleaf');
+    INSERT INTO streetname VALUES('brigstock');
+    INSERT INTO streetname VALUES('broad ridge');
+    INSERT INTO streetname VALUES('brock');
+    INSERT INTO streetname VALUES('brockhampton');
+    INSERT INTO streetname VALUES('broken pine');
+    INSERT INTO streetname VALUES('brompton');
+    INSERT INTO streetname VALUES('brook falls');
+    INSERT INTO streetname VALUES('brookings');
+    INSERT INTO streetname VALUES('browne');
+    INSERT INTO streetname VALUES('brownes creek');
+    INSERT INTO streetname VALUES('brownes ferry');
+    INSERT INTO streetname VALUES('brownestone view');
+    INSERT INTO streetname VALUES('brumit');
+    INSERT INTO streetname VALUES('bryn athyn');
+    INSERT INTO streetname VALUES('buck');
+    INSERT INTO streetname VALUES('bucklebury');
+    INSERT INTO streetname VALUES('buckminister');
+    INSERT INTO streetname VALUES('buckspring');
+    INSERT INTO streetname VALUES('burch');
+    INSERT INTO streetname VALUES('burch shire');
+    INSERT INTO streetname VALUES('burkston');
+    INSERT INTO streetname VALUES('burmith');
+    INSERT INTO streetname VALUES('burnaby');
+    INSERT INTO streetname VALUES('butterfly');
+    INSERT INTO streetname VALUES('cabin creek');
+    INSERT INTO streetname VALUES('cairns mill');
+    INSERT INTO streetname VALUES('callender');
+    INSERT INTO streetname VALUES('cambellton');
+    INSERT INTO streetname VALUES('cambridge bay');
+    INSERT INTO streetname VALUES('canary');
+    INSERT INTO streetname VALUES('canbury');
+    INSERT INTO streetname VALUES('candle leaf');
+    INSERT INTO streetname VALUES('canipe');
+    INSERT INTO streetname VALUES('canipe farm');
+    INSERT INTO streetname VALUES('cannon');
+    INSERT INTO streetname VALUES('canopy');
+    INSERT INTO streetname VALUES('canso');
+    INSERT INTO streetname VALUES('canterbrook');
+    INSERT INTO streetname VALUES('cardinal glen');
+    INSERT INTO streetname VALUES('cardinal point');
+    INSERT INTO streetname VALUES('cardinals nest');
+    INSERT INTO streetname VALUES('carlota');
+    INSERT INTO streetname VALUES('carmathen');
+    INSERT INTO streetname VALUES('carver');
+    INSERT INTO streetname VALUES('carver pond');
+    INSERT INTO streetname VALUES('casa loma');
+    INSERT INTO streetname VALUES('caselton');
+    INSERT INTO streetname VALUES('castello');
+    INSERT INTO streetname VALUES('castle ridge');
+    INSERT INTO streetname VALUES('castleglen');
+    INSERT INTO streetname VALUES('castlemaine');
+    INSERT INTO streetname VALUES('cavett');
+    INSERT INTO streetname VALUES('caymus');
+    INSERT INTO streetname VALUES('cedardale ridge');
+    INSERT INTO streetname VALUES('cedarhurst');
+    INSERT INTO streetname VALUES('cemkey way');
+    INSERT INTO streetname VALUES('cerise');
+    INSERT INTO streetname VALUES('chaceview');
+    INSERT INTO streetname VALUES('chadsworth');
+    INSERT INTO streetname VALUES('chadwell');
+    INSERT INTO streetname VALUES('champions crest');
+    INSERT INTO streetname VALUES('chandler haven');
+    INSERT INTO streetname VALUES('chapel crossing');
+    INSERT INTO streetname VALUES('chapel ridge');
+    INSERT INTO streetname VALUES('charles crawford');
+    INSERT INTO streetname VALUES('charminster');
+    INSERT INTO streetname VALUES('chasewind');
+    INSERT INTO streetname VALUES('chavel');
+    INSERT INTO streetname VALUES('chelsea jade');
+    INSERT INTO streetname VALUES('chestnut knoll');
+    INSERT INTO streetname VALUES('cheviot');
+    INSERT INTO streetname VALUES('chickadee');
+    INSERT INTO streetname VALUES('chidley');
+    INSERT INTO streetname VALUES('chimney ridge');
+    INSERT INTO streetname VALUES('chimney springs');
+    INSERT INTO streetname VALUES('chinaberry');
+    INSERT INTO streetname VALUES('chinemist');
+    INSERT INTO streetname VALUES('chinquapin');
+    INSERT INTO streetname VALUES('chiswell');
+    INSERT INTO streetname VALUES('christenbury');
+    INSERT INTO streetname VALUES('christenbury hills');
+    INSERT INTO streetname VALUES('churchill');
+    INSERT INTO streetname VALUES('cindy');
+    INSERT INTO streetname VALUES('cinnamon teal');
+    INSERT INTO streetname VALUES('citadel');
+    INSERT INTO streetname VALUES('clare olivia');
+    INSERT INTO streetname VALUES('clarke creek');
+    INSERT INTO streetname VALUES('clarke ridge');
+    INSERT INTO streetname VALUES('clear day');
+    INSERT INTO streetname VALUES('clear stream');
+    INSERT INTO streetname VALUES('cleve brown');
+    INSERT INTO streetname VALUES('cliff cameron');
+    INSERT INTO streetname VALUES('cliffvale');
+    INSERT INTO streetname VALUES('cloverside');
+    INSERT INTO streetname VALUES('clymer');
+    INSERT INTO streetname VALUES('coatbridge');
+    INSERT INTO streetname VALUES('cobble glen');
+    INSERT INTO streetname VALUES('cochran farm');
+    INSERT INTO streetname VALUES('cochrane');
+    INSERT INTO streetname VALUES('coleridge');
+    INSERT INTO streetname VALUES('coleshire');
+    INSERT INTO streetname VALUES('collins');
+    INSERT INTO streetname VALUES('colvard');
+    INSERT INTO streetname VALUES('colvard park');
+    INSERT INTO streetname VALUES('condor');
+    INSERT INTO streetname VALUES('conner ridge');
+    INSERT INTO streetname VALUES('connery');
+    INSERT INTO streetname VALUES('cooper run');
+    INSERT INTO streetname VALUES('coopers ridge');
+    INSERT INTO streetname VALUES('copper hill');
+    INSERT INTO streetname VALUES('coppermine');
+    INSERT INTO streetname VALUES('cornelia');
+    INSERT INTO streetname VALUES('corner');
+    INSERT INTO streetname VALUES('cornerstone');
+    INSERT INTO streetname VALUES('cottage oaks');
+    INSERT INTO streetname VALUES('cougar');
+    INSERT INTO streetname VALUES('coves end');
+    INSERT INTO streetname VALUES('cragland');
+    INSERT INTO streetname VALUES('crail');
+    INSERT INTO streetname VALUES('cranberry nook');
+    INSERT INTO streetname VALUES('crawford brook');
+    INSERT INTO streetname VALUES('crayton');
+    INSERT INTO streetname VALUES('creek breeze');
+    INSERT INTO streetname VALUES('crescent ridge');
+    INSERT INTO streetname VALUES('crescent view');
+    INSERT INTO streetname VALUES('cresta');
+    INSERT INTO streetname VALUES('crestfield');
+    INSERT INTO streetname VALUES('crestland');
+    INSERT INTO streetname VALUES('crestwick');
+    INSERT INTO streetname VALUES('crisfield');
+    INSERT INTO streetname VALUES('crisp wood');
+    INSERT INTO streetname VALUES('croft haven');
+    INSERT INTO streetname VALUES('crofton springs');
+    INSERT INTO streetname VALUES('cross');
+    INSERT INTO streetname VALUES('crosspoint center');
+    INSERT INTO streetname VALUES('crownvista');
+    INSERT INTO streetname VALUES('crystal arms');
+    INSERT INTO streetname VALUES('crystal crest');
+    INSERT INTO streetname VALUES('crystal leaf');
+    INSERT INTO streetname VALUES('cunningham park');
+    INSERT INTO streetname VALUES('cypress pond');
+    INSERT INTO streetname VALUES('daffodil');
+    INSERT INTO streetname VALUES('daisyfield');
+    INSERT INTO streetname VALUES('dalecrest');
+    INSERT INTO streetname VALUES('dannelly park');
+    INSERT INTO streetname VALUES('daphne');
+    INSERT INTO streetname VALUES('daria');
+    INSERT INTO streetname VALUES('dartmouth');
+    INSERT INTO streetname VALUES('datha');
+    INSERT INTO streetname VALUES('david cox');
+    INSERT INTO streetname VALUES('davis');
+    INSERT INTO streetname VALUES('davis crossing');
+    INSERT INTO streetname VALUES('davis lake');
+    INSERT INTO streetname VALUES('davis ridge');
+    INSERT INTO streetname VALUES('dawnmist');
+    INSERT INTO streetname VALUES('daybreak');
+    INSERT INTO streetname VALUES('dearmon');
+    INSERT INTO streetname VALUES('dearview');
+    INSERT INTO streetname VALUES('deaton hill');
+    INSERT INTO streetname VALUES('deer cross');
+    INSERT INTO streetname VALUES('deerton');
+    INSERT INTO streetname VALUES('degrasse');
+    INSERT INTO streetname VALUES('delamere');
+    INSERT INTO streetname VALUES('dellfield');
+    INSERT INTO streetname VALUES('dellinger');
+    INSERT INTO streetname VALUES('demington');
+    INSERT INTO streetname VALUES('denmeade');
+    INSERT INTO streetname VALUES('derita');
+    INSERT INTO streetname VALUES('derita woods');
+    INSERT INTO streetname VALUES('deruyter');
+    INSERT INTO streetname VALUES('dervish');
+    INSERT INTO streetname VALUES('devas');
+    INSERT INTO streetname VALUES('devon croft');
+    INSERT INTO streetname VALUES('devonbridge');
+    INSERT INTO streetname VALUES('devongate');
+    INSERT INTO streetname VALUES('devonhill');
+    INSERT INTO streetname VALUES('dewmorn');
+    INSERT INTO streetname VALUES('distribution center');
+    INSERT INTO streetname VALUES('dominion crest');
+    INSERT INTO streetname VALUES('dominion green');
+    INSERT INTO streetname VALUES('dominion village');
+    INSERT INTO streetname VALUES('dorshire');
+    INSERT INTO streetname VALUES('double creek crossing');
+    INSERT INTO streetname VALUES('dow');
+    INSERT INTO streetname VALUES('downfield wood');
+    INSERT INTO streetname VALUES('downing creek');
+    INSERT INTO streetname VALUES('driscol');
+    INSERT INTO streetname VALUES('driwood');
+    INSERT INTO streetname VALUES('dry brook');
+    INSERT INTO streetname VALUES('dumont');
+    INSERT INTO streetname VALUES('dunblane');
+    INSERT INTO streetname VALUES('dunfield');
+    INSERT INTO streetname VALUES('dunoon');
+    INSERT INTO streetname VALUES('dunslow');
+    INSERT INTO streetname VALUES('dunstaff');
+    INSERT INTO streetname VALUES('durham');
+    INSERT INTO streetname VALUES('durston');
+    INSERT INTO streetname VALUES('dusty cedar');
+    INSERT INTO streetname VALUES('dusty trail');
+    INSERT INTO streetname VALUES('dutchess');
+    INSERT INTO streetname VALUES('duxford');
+    INSERT INTO streetname VALUES('eagle creek');
+    INSERT INTO streetname VALUES('eagles field');
+    INSERT INTO streetname VALUES('eargle');
+    INSERT INTO streetname VALUES('earlswood');
+    INSERT INTO streetname VALUES('early mist');
+    INSERT INTO streetname VALUES('earthenware');
+    INSERT INTO streetname VALUES('eastfield park');
+    INSERT INTO streetname VALUES('eastfield village');
+    INSERT INTO streetname VALUES('easy');
+    INSERT INTO streetname VALUES('eben');
+    INSERT INTO streetname VALUES('edgepine');
+    INSERT INTO streetname VALUES('edgewier');
+    INSERT INTO streetname VALUES('edinburgh');
+    INSERT INTO streetname VALUES('edinmeadow');
+    INSERT INTO streetname VALUES('edmonton');
+    INSERT INTO streetname VALUES('edwin jones');
+    INSERT INTO streetname VALUES('elberon');
+    INSERT INTO streetname VALUES('elderslie');
+    INSERT INTO streetname VALUES('elementary view');
+    INSERT INTO streetname VALUES('elendil');
+    INSERT INTO streetname VALUES('elizabeth');
+    INSERT INTO streetname VALUES('elm cove');
+    INSERT INTO streetname VALUES('elrond');
+    INSERT INTO streetname VALUES('elsenham');
+    INSERT INTO streetname VALUES('elven');
+    INSERT INTO streetname VALUES('emma lynn');
+    INSERT INTO streetname VALUES('english setter');
+    INSERT INTO streetname VALUES('enoch');
+    INSERT INTO streetname VALUES('equipment');
+    INSERT INTO streetname VALUES('ernest russell');
+    INSERT INTO streetname VALUES('ernie');
+    INSERT INTO streetname VALUES('esmeralda');
+    INSERT INTO streetname VALUES('evergreen hollow');
+    INSERT INTO streetname VALUES('eversfield');
+    INSERT INTO streetname VALUES('ewen');
+    INSERT INTO streetname VALUES('ewert cut');
+    INSERT INTO streetname VALUES('exbury');
+    INSERT INTO streetname VALUES('fair grounds park');
+    INSERT INTO streetname VALUES('fairbourne');
+    INSERT INTO streetname VALUES('fairchase');
+    INSERT INTO streetname VALUES('faircreek');
+    INSERT INTO streetname VALUES('fairglen');
+    INSERT INTO streetname VALUES('fairlea');
+    INSERT INTO streetname VALUES('fairmead');
+    INSERT INTO streetname VALUES('fairmeadows');
+    INSERT INTO streetname VALUES('fairstone');
+    INSERT INTO streetname VALUES('fairvista');
+    INSERT INTO streetname VALUES('fairway point');
+    INSERT INTO streetname VALUES('falconcrest');
+    INSERT INTO streetname VALUES('falls ridge');
+    INSERT INTO streetname VALUES('falmouth');
+    INSERT INTO streetname VALUES('far west');
+    INSERT INTO streetname VALUES('farlow');
+    INSERT INTO streetname VALUES('farris wheel');
+    INSERT INTO streetname VALUES('fawndale');
+    INSERT INTO streetname VALUES('feather bend');
+    INSERT INTO streetname VALUES('fernledge');
+    INSERT INTO streetname VALUES('fernmoss');
+    INSERT INTO streetname VALUES('ferrell commons');
+    INSERT INTO streetname VALUES('fieldstone');
+    INSERT INTO streetname VALUES('fillian');
+    INSERT INTO streetname VALUES('fincher');
+    INSERT INTO streetname VALUES('foggy meadow');
+    INSERT INTO streetname VALUES('fordyce');
+    INSERT INTO streetname VALUES('forest grove');
+    INSERT INTO streetname VALUES('forest path');
+    INSERT INTO streetname VALUES('forestridge commons');
+    INSERT INTO streetname VALUES('forestrock');
+    INSERT INTO streetname VALUES('fortunes ridge');
+    INSERT INTO streetname VALUES('founders club');
+    INSERT INTO streetname VALUES('fountaingrass');
+    INSERT INTO streetname VALUES('fox chase');
+    INSERT INTO streetname VALUES('fox glen');
+    INSERT INTO streetname VALUES('fox hill');
+    INSERT INTO streetname VALUES('fox point');
+    INSERT INTO streetname VALUES('fox trot');
+    INSERT INTO streetname VALUES('foxbriar');
+    INSERT INTO streetname VALUES('frank little');
+    INSERT INTO streetname VALUES('franzia');
+    INSERT INTO streetname VALUES('french woods');
+    INSERT INTO streetname VALUES('frostmoor');
+    INSERT INTO streetname VALUES('frye');
+    INSERT INTO streetname VALUES('furlong');
+    INSERT INTO streetname VALUES('galena view');
+    INSERT INTO streetname VALUES('gallery pointe');
+    INSERT INTO streetname VALUES('gammon');
+    INSERT INTO streetname VALUES('garden grove');
+    INSERT INTO streetname VALUES('gardendale');
+    INSERT INTO streetname VALUES('garganey');
+    INSERT INTO streetname VALUES('garnet field');
+    INSERT INTO streetname VALUES('garrison');
+    INSERT INTO streetname VALUES('garvin');
+    INSERT INTO streetname VALUES('garvis');
+    INSERT INTO streetname VALUES('gaskill');
+    INSERT INTO streetname VALUES('gemstone');
+    INSERT INTO streetname VALUES('gibbon');
+    INSERT INTO streetname VALUES('gibbon terrace');
+    INSERT INTO streetname VALUES('gibbons link');
+    INSERT INTO streetname VALUES('gillman');
+    INSERT INTO streetname VALUES('gladwood');
+    INSERT INTO streetname VALUES('gladwyne');
+    INSERT INTO streetname VALUES('glamorgan');
+    INSERT INTO streetname VALUES('glaze');
+    INSERT INTO streetname VALUES('glen brook');
+    INSERT INTO streetname VALUES('glen cove');
+    INSERT INTO streetname VALUES('glen hope');
+    INSERT INTO streetname VALUES('glen manor');
+    INSERT INTO streetname VALUES('glen olden');
+    INSERT INTO streetname VALUES('glencairn');
+    INSERT INTO streetname VALUES('glendock');
+    INSERT INTO streetname VALUES('glenolden');
+    INSERT INTO streetname VALUES('glenover');
+    INSERT INTO streetname VALUES('glenshire');
+    INSERT INTO streetname VALUES('glenstone');
+    INSERT INTO streetname VALUES('gold dust');
+    INSERT INTO streetname VALUES('golden pond');
+    INSERT INTO streetname VALUES('goldenblush');
+    INSERT INTO streetname VALUES('goldenfield');
+    INSERT INTO streetname VALUES('goose landing');
+    INSERT INTO streetname VALUES('gorham gate');
+    INSERT INTO streetname VALUES('grabill');
+    INSERT INTO streetname VALUES('graburns ford');
+    INSERT INTO streetname VALUES('graham');
+    INSERT INTO streetname VALUES('grahamson');
+    INSERT INTO streetname VALUES('granard');
+    INSERT INTO streetname VALUES('grand teton');
+    INSERT INTO streetname VALUES('grande heights');
+    INSERT INTO streetname VALUES('grandeur');
+    INSERT INTO streetname VALUES('granite creek');
+    INSERT INTO streetname VALUES('grasset');
+    INSERT INTO streetname VALUES('graypark');
+    INSERT INTO streetname VALUES('grays ridge');
+    INSERT INTO streetname VALUES('great bear');
+    INSERT INTO streetname VALUES('green clover');
+    INSERT INTO streetname VALUES('green hedge');
+    INSERT INTO streetname VALUES('green meadow');
+    INSERT INTO streetname VALUES('green pasture');
+    INSERT INTO streetname VALUES('greene');
+    INSERT INTO streetname VALUES('greenloch');
+    INSERT INTO streetname VALUES('greenock ridge');
+    INSERT INTO streetname VALUES('greenware');
+    INSERT INTO streetname VALUES('greenway village');
+    INSERT INTO streetname VALUES('grenelefe village');
+    INSERT INTO streetname VALUES('grey dogwood');
+    INSERT INTO streetname VALUES('greyhound');
+    INSERT INTO streetname VALUES('greylock ridge');
+    INSERT INTO streetname VALUES('grosbeak');
+    INSERT INTO streetname VALUES('grove');
+    INSERT INTO streetname VALUES('groveton');
+    INSERT INTO streetname VALUES('groveview');
+    INSERT INTO streetname VALUES('hackberry creek');
+    INSERT INTO streetname VALUES('hackberry grove');
+    INSERT INTO streetname VALUES('hackett');
+    INSERT INTO streetname VALUES('haddington');
+    INSERT INTO streetname VALUES('hagler');
+    INSERT INTO streetname VALUES('halcott');
+    INSERT INTO streetname VALUES('half dome');
+    INSERT INTO streetname VALUES('hallam');
+    INSERT INTO streetname VALUES('hamilton russell');
+    INSERT INTO streetname VALUES('hampton place');
+    INSERT INTO streetname VALUES('hankins');
+    INSERT INTO streetname VALUES('harburn forest');
+    INSERT INTO streetname VALUES('harringham');
+    INSERT INTO streetname VALUES('harrington woods');
+    INSERT INTO streetname VALUES('harris corners');
+    INSERT INTO streetname VALUES('harris cove');
+    INSERT INTO streetname VALUES('harris glen');
+    INSERT INTO streetname VALUES('harris hill');
+    INSERT INTO streetname VALUES('harris oak');
+    INSERT INTO streetname VALUES('harris pointe');
+    INSERT INTO streetname VALUES('harris pond');
+    INSERT INTO streetname VALUES('harris ridge');
+    INSERT INTO streetname VALUES('harris technology');
+    INSERT INTO streetname VALUES('harris woods');
+    INSERT INTO streetname VALUES('hartfield downs');
+    INSERT INTO streetname VALUES('hattie little');
+    INSERT INTO streetname VALUES('hatwynn');
+    INSERT INTO streetname VALUES('hawkins');
+    INSERT INTO streetname VALUES('hawksnest');
+    INSERT INTO streetname VALUES('haybridge');
+    INSERT INTO streetname VALUES('hayden');
+    INSERT INTO streetname VALUES('hazelcroft');
+    INSERT INTO streetname VALUES('hazlitt');
+    INSERT INTO streetname VALUES('hazy valley');
+    INSERT INTO streetname VALUES('hearst');
+    INSERT INTO streetname VALUES('heathcrest');
+    INSERT INTO streetname VALUES('heathcroft');
+    INSERT INTO streetname VALUES('hedge maple');
+    INSERT INTO streetname VALUES('hedgecrest');
+    INSERT INTO streetname VALUES('hedingham');
+    INSERT INTO streetname VALUES('heman');
+    INSERT INTO streetname VALUES('henderson');
+    INSERT INTO streetname VALUES('henderson oaks');
+    INSERT INTO streetname VALUES('henderson valley');
+    INSERT INTO streetname VALUES('hendry');
+    INSERT INTO streetname VALUES('heritage hills');
+    INSERT INTO streetname VALUES('heritage woods');
+    INSERT INTO streetname VALUES('heron cove');
+    INSERT INTO streetname VALUES('heron glen');
+    INSERT INTO streetname VALUES('hewitt');
+    INSERT INTO streetname VALUES('hey rock');
+    INSERT INTO streetname VALUES('heysham');
+    INSERT INTO streetname VALUES('hickory cove');
+    INSERT INTO streetname VALUES('hidden meadow');
+    INSERT INTO streetname VALUES('high glen');
+    INSERT INTO streetname VALUES('high laurel');
+    INSERT INTO streetname VALUES('high valley');
+    INSERT INTO streetname VALUES('highcroft');
+    INSERT INTO streetname VALUES('highland');
+    INSERT INTO streetname VALUES('highland commons');
+    INSERT INTO streetname VALUES('highland creek');
+    INSERT INTO streetname VALUES('highland glen');
+    INSERT INTO streetname VALUES('highland park');
+    INSERT INTO streetname VALUES('highlander');
+    INSERT INTO streetname VALUES('highstream');
+    INSERT INTO streetname VALUES('hilltop');
+    INSERT INTO streetname VALUES('hobbitshire');
+    INSERT INTO streetname VALUES('hoffman');
+    INSERT INTO streetname VALUES('hogans way');
+    INSERT INTO streetname VALUES('holbert');
+    INSERT INTO streetname VALUES('hollow ridge');
+    INSERT INTO streetname VALUES('holly vista');
+    INSERT INTO streetname VALUES('hollywood');
+    INSERT INTO streetname VALUES('hoover');
+    INSERT INTO streetname VALUES('hopkins');
+    INSERT INTO streetname VALUES('horace mann');
+    INSERT INTO streetname VALUES('hornbeam');
+    INSERT INTO streetname VALUES('horse pasture');
+    INSERT INTO streetname VALUES('hosta');
+    INSERT INTO streetname VALUES('howard');
+    INSERT INTO streetname VALUES('hubbard');
+    INSERT INTO streetname VALUES('hubbard falls');
+    INSERT INTO streetname VALUES('hubbard woods');
+    INSERT INTO streetname VALUES('hucks');
+    INSERT INTO streetname VALUES('hunters creek');
+    INSERT INTO streetname VALUES('hunters pointe');
+    INSERT INTO streetname VALUES('hunters spring');
+    INSERT INTO streetname VALUES('hunters whip');
+    INSERT INTO streetname VALUES('huntmeadow');
+    INSERT INTO streetname VALUES('hutchison mcdonald');
+    INSERT INTO streetname VALUES('ingleton');
+    INSERT INTO streetname VALUES('insdale');
+    INSERT INTO streetname VALUES('interstate 85 service');
+    INSERT INTO streetname VALUES('iola');
+    INSERT INTO streetname VALUES('iredell');
+    INSERT INTO streetname VALUES('iron brigade');
+    INSERT INTO streetname VALUES('irwin valley');
+    INSERT INTO streetname VALUES('irwin wood');
+    INSERT INTO streetname VALUES('ivy brook');
+    INSERT INTO streetname VALUES('ivy ridge');
+    INSERT INTO streetname VALUES('jack russell');
+    INSERT INTO streetname VALUES('jackson');
+    INSERT INTO streetname VALUES('jacob martin');
+    INSERT INTO streetname VALUES('jamison');
+    INSERT INTO streetname VALUES('jane');
+    INSERT INTO streetname VALUES('jaspar crest');
+    INSERT INTO streetname VALUES('jessica');
+    INSERT INTO streetname VALUES('jimmy oehler');
+    INSERT INTO streetname VALUES('jocelyn');
+    INSERT INTO streetname VALUES('johnston mill');
+    INSERT INTO streetname VALUES('johnston oehler');
+    INSERT INTO streetname VALUES('judal');
+    INSERT INTO streetname VALUES('junipeous');
+    INSERT INTO streetname VALUES('juniper');
+    INSERT INTO streetname VALUES('juniperus');
+    INSERT INTO streetname VALUES('kalispell');
+    INSERT INTO streetname VALUES('karylsturn');
+    INSERT INTO streetname VALUES('katelyn');
+    INSERT INTO streetname VALUES('kayron');
+    INSERT INTO streetname VALUES('keaton');
+    INSERT INTO streetname VALUES('keble');
+    INSERT INTO streetname VALUES('keels');
+    INSERT INTO streetname VALUES('keith');
+    INSERT INTO streetname VALUES('keithwood');
+    INSERT INTO streetname VALUES('kelden walker');
+    INSERT INTO streetname VALUES('kelsey emma');
+    INSERT INTO streetname VALUES('kendrick');
+    INSERT INTO streetname VALUES('kenmont');
+    INSERT INTO streetname VALUES('kennerly cove');
+    INSERT INTO streetname VALUES('kenninghall');
+    INSERT INTO streetname VALUES('kent village');
+    INSERT INTO streetname VALUES('kestral ridge');
+    INSERT INTO streetname VALUES('kestrel');
+    INSERT INTO streetname VALUES('kilmartin');
+    INSERT INTO streetname VALUES('kilty');
+    INSERT INTO streetname VALUES('kinglet');
+    INSERT INTO streetname VALUES('kingsland');
+    INSERT INTO streetname VALUES('kingsnorth');
+    INSERT INTO streetname VALUES('kinsmore');
+    INSERT INTO streetname VALUES('kirkgard');
+    INSERT INTO streetname VALUES('kirkmont');
+    INSERT INTO streetname VALUES('knightsgate');
+    INSERT INTO streetname VALUES('kobuk');
+    INSERT INTO streetname VALUES('kotlik');
+    INSERT INTO streetname VALUES('kotz');
+    INSERT INTO streetname VALUES('kyndall walk');
+    INSERT INTO streetname VALUES('laborde');
+    INSERT INTO streetname VALUES('lady bank');
+    INSERT INTO streetname VALUES('lagrande');
+    INSERT INTO streetname VALUES('lake');
+    INSERT INTO streetname VALUES('lakeridge commons');
+    INSERT INTO streetname VALUES('lakeview');
+    INSERT INTO streetname VALUES('lakewood edge');
+    INSERT INTO streetname VALUES('lakota');
+    INSERT INTO streetname VALUES('lambrook');
+    INSERT INTO streetname VALUES('lampkin');
+    INSERT INTO streetname VALUES('lampkin park');
+    INSERT INTO streetname VALUES('langham');
+    INSERT INTO streetname VALUES('lanzerac manor');
+    INSERT INTO streetname VALUES('larkmead forest');
+    INSERT INTO streetname VALUES('lattice');
+    INSERT INTO streetname VALUES('laurel crest');
+    INSERT INTO streetname VALUES('laurel ridge');
+    INSERT INTO streetname VALUES('laurel run');
+    INSERT INTO streetname VALUES('laurenfield');
+    INSERT INTO streetname VALUES('laveta');
+    INSERT INTO streetname VALUES('lazy day');
+    INSERT INTO streetname VALUES('leawood run');
+    INSERT INTO streetname VALUES('lee marie');
+    INSERT INTO streetname VALUES('legacy lake');
+    INSERT INTO streetname VALUES('legacy park');
+    INSERT INTO streetname VALUES('legato');
+    INSERT INTO streetname VALUES('legolas');
+    INSERT INTO streetname VALUES('leigh glen');
+    INSERT INTO streetname VALUES('lence');
+    INSERT INTO streetname VALUES('lenox hill');
+    INSERT INTO streetname VALUES('leonine');
+    INSERT INTO streetname VALUES('leslie');
+    INSERT INTO streetname VALUES('lester hill');
+    INSERT INTO streetname VALUES('levisey');
+    INSERT INTO streetname VALUES('liberty bell');
+    INSERT INTO streetname VALUES('linden berry');
+    INSERT INTO streetname VALUES('lisbon');
+    INSERT INTO streetname VALUES('little stoney');
+    INSERT INTO streetname VALUES('livengood');
+    INSERT INTO streetname VALUES('lochway');
+    INSERT INTO streetname VALUES('lockman');
+    INSERT INTO streetname VALUES('loganville');
+    INSERT INTO streetname VALUES('lone tree');
+    INSERT INTO streetname VALUES('long creek park');
+    INSERT INTO streetname VALUES('long forest');
+    INSERT INTO streetname VALUES('looking glass');
+    INSERT INTO streetname VALUES('lookout point');
+    INSERT INTO streetname VALUES('lowen');
+    INSERT INTO streetname VALUES('lusby');
+    INSERT INTO streetname VALUES('lyleton');
+    INSERT INTO streetname VALUES('lynn lee');
+    INSERT INTO streetname VALUES('lynnewood glen');
+    INSERT INTO streetname VALUES('machrie');
+    INSERT INTO streetname VALUES('mackinac');
+    INSERT INTO streetname VALUES('maddox');
+    INSERT INTO streetname VALUES('madison park');
+    INSERT INTO streetname VALUES('mallard');
+    INSERT INTO streetname VALUES('mallard cove');
+    INSERT INTO streetname VALUES('mallard forest');
+    INSERT INTO streetname VALUES('mallard grove');
+    INSERT INTO streetname VALUES('mallard hill');
+    INSERT INTO streetname VALUES('mallard park');
+    INSERT INTO streetname VALUES('mallard ridge');
+    INSERT INTO streetname VALUES('mallard view');
+    INSERT INTO streetname VALUES('manbey');
+    INSERT INTO streetname VALUES('manning');
+    INSERT INTO streetname VALUES('mantario');
+    INSERT INTO streetname VALUES('maple');
+    INSERT INTO streetname VALUES('maple cove');
+    INSERT INTO streetname VALUES('maple park');
+    INSERT INTO streetname VALUES('marathon hill');
+    INSERT INTO streetname VALUES('marbury');
+    INSERT INTO streetname VALUES('marett');
+    INSERT INTO streetname VALUES('marigold');
+    INSERT INTO streetname VALUES('marionwood');
+    INSERT INTO streetname VALUES('marshbank');
+    INSERT INTO streetname VALUES('mason');
+    INSERT INTO streetname VALUES('mayapple');
+    INSERT INTO streetname VALUES('maylandia');
+    INSERT INTO streetname VALUES('mayspring');
+    INSERT INTO streetname VALUES('mcadam');
+    INSERT INTO streetname VALUES('mcchesney');
+    INSERT INTO streetname VALUES('mccurdy');
+    INSERT INTO streetname VALUES('mcgrath');
+    INSERT INTO streetname VALUES('mckendree');
+    INSERT INTO streetname VALUES('mclaughlin');
+    INSERT INTO streetname VALUES('mctaggart');
+    INSERT INTO streetname VALUES('meadow green');
+    INSERT INTO streetname VALUES('meadow knoll');
+    INSERT INTO streetname VALUES('meadow post');
+    INSERT INTO streetname VALUES('meadowmont');
+    INSERT INTO streetname VALUES('meadowmont view');
+    INSERT INTO streetname VALUES('meadowview hills');
+    INSERT INTO streetname VALUES('melshire');
+    INSERT INTO streetname VALUES('melstrand');
+    INSERT INTO streetname VALUES('mentone');
+    INSERT INTO streetname VALUES('meridale crossing');
+    INSERT INTO streetname VALUES('merion hills');
+    INSERT INTO streetname VALUES('merlot');
+    INSERT INTO streetname VALUES('mersham');
+    INSERT INTO streetname VALUES('metromont');
+    INSERT INTO streetname VALUES('metromont industrial');
+    INSERT INTO streetname VALUES('michaw');
+    INSERT INTO streetname VALUES('milhaven');
+    INSERT INTO streetname VALUES('milhof');
+    INSERT INTO streetname VALUES('millstream ridge');
+    INSERT INTO streetname VALUES('mineral ridge');
+    INSERT INTO streetname VALUES('mint thistle');
+    INSERT INTO streetname VALUES('mintleaf');
+    INSERT INTO streetname VALUES('mintvale');
+    INSERT INTO streetname VALUES('misty');
+    INSERT INTO streetname VALUES('misty arbor');
+    INSERT INTO streetname VALUES('misty creek');
+    INSERT INTO streetname VALUES('misty oaks');
+    INSERT INTO streetname VALUES('misty wood');
+    INSERT INTO streetname VALUES('mitzi deborah');
+    INSERT INTO streetname VALUES('mobile');
+    INSERT INTO streetname VALUES('molly elizabeth');
+    INSERT INTO streetname VALUES('monmouth');
+    INSERT INTO streetname VALUES('montrose');
+    INSERT INTO streetname VALUES('moonlight');
+    INSERT INTO streetname VALUES('moose');
+    INSERT INTO streetname VALUES('morning dew');
+    INSERT INTO streetname VALUES('morningsong');
+    INSERT INTO streetname VALUES('morningview');
+    INSERT INTO streetname VALUES('morsey');
+    INSERT INTO streetname VALUES('moss glen');
+    INSERT INTO streetname VALUES('mossy bank');
+    INSERT INTO streetname VALUES('motor sport');
+    INSERT INTO streetname VALUES('mountain laurel');
+    INSERT INTO streetname VALUES('mourning dove');
+    INSERT INTO streetname VALUES('mozart');
+    INSERT INTO streetname VALUES('munsing');
+    INSERT INTO streetname VALUES('murray');
+    INSERT INTO streetname VALUES('nathan');
+    INSERT INTO streetname VALUES('netherhall');
+    INSERT INTO streetname VALUES('netherton');
+    INSERT INTO streetname VALUES('neuhoff');
+    INSERT INTO streetname VALUES('nevin');
+    INSERT INTO streetname VALUES('nevin brook');
+    INSERT INTO streetname VALUES('nevin glen');
+    INSERT INTO streetname VALUES('nevin place');
+    INSERT INTO streetname VALUES('new england');
+    INSERT INTO streetname VALUES('new house');
+    INSERT INTO streetname VALUES('newbary');
+    INSERT INTO streetname VALUES('newchurch');
+    INSERT INTO streetname VALUES('newfane');
+    INSERT INTO streetname VALUES('newgard');
+    INSERT INTO streetname VALUES('nicholas');
+    INSERT INTO streetname VALUES('nicole');
+    INSERT INTO streetname VALUES('nobility');
+    INSERT INTO streetname VALUES('norcroft');
+    INSERT INTO streetname VALUES('northridge');
+    INSERT INTO streetname VALUES('northside');
+    INSERT INTO streetname VALUES('northwoods business');
+    INSERT INTO streetname VALUES('norway');
+    INSERT INTO streetname VALUES('nottinghill');
+    INSERT INTO streetname VALUES('numenore');
+    INSERT INTO streetname VALUES('nyewood');
+    INSERT INTO streetname VALUES('oak');
+    INSERT INTO streetname VALUES('oak cove');
+    INSERT INTO streetname VALUES('oak pasture');
+    INSERT INTO streetname VALUES('oakburn');
+    INSERT INTO streetname VALUES('oakwinds');
+    INSERT INTO streetname VALUES('oakwood');
+    INSERT INTO streetname VALUES('obrien');
+    INSERT INTO streetname VALUES('ocala');
+    INSERT INTO streetname VALUES('old bridge');
+    INSERT INTO streetname VALUES('old fox');
+    INSERT INTO streetname VALUES('old potters');
+    INSERT INTO streetname VALUES('old statesville');
+    INSERT INTO streetname VALUES('old steine');
+    INSERT INTO streetname VALUES('old stoney creek');
+    INSERT INTO streetname VALUES('old sugar creek');
+    INSERT INTO streetname VALUES('old timber');
+    INSERT INTO streetname VALUES('old wagon');
+    INSERT INTO streetname VALUES('old willow');
+    INSERT INTO streetname VALUES('oldenway');
+    INSERT INTO streetname VALUES('oneida');
+    INSERT INTO streetname VALUES('ontario');
+    INSERT INTO streetname VALUES('oriole');
+    INSERT INTO streetname VALUES('orofino');
+    INSERT INTO streetname VALUES('orr');
+    INSERT INTO streetname VALUES('osage');
+    INSERT INTO streetname VALUES('osceola');
+    INSERT INTO streetname VALUES('osprey knoll');
+    INSERT INTO streetname VALUES('oxford hill');
+    INSERT INTO streetname VALUES('painted fern');
+    INSERT INTO streetname VALUES('painted pony');
+    INSERT INTO streetname VALUES('paisley');
+    INSERT INTO streetname VALUES('pale moss');
+    INSERT INTO streetname VALUES('palladium');
+    INSERT INTO streetname VALUES('palmutum');
+    INSERT INTO streetname VALUES('palustris');
+    INSERT INTO streetname VALUES('panglemont');
+    INSERT INTO streetname VALUES('panther');
+    INSERT INTO streetname VALUES('panthersville');
+    INSERT INTO streetname VALUES('paper whites');
+    INSERT INTO streetname VALUES('park');
+    INSERT INTO streetname VALUES('parker green');
+    INSERT INTO streetname VALUES('parkhouse');
+    INSERT INTO streetname VALUES('passour ridge');
+    INSERT INTO streetname VALUES('pasture view');
+    INSERT INTO streetname VALUES('patricia ann');
+    INSERT INTO streetname VALUES('patton');
+    INSERT INTO streetname VALUES('patton ridge');
+    INSERT INTO streetname VALUES('pawpaw');
+    INSERT INTO streetname VALUES('peach');
+    INSERT INTO streetname VALUES('peakwood');
+    INSERT INTO streetname VALUES('pebble creek');
+    INSERT INTO streetname VALUES('pecan cove');
+    INSERT INTO streetname VALUES('pedigree');
+    INSERT INTO streetname VALUES('pelorus');
+    INSERT INTO streetname VALUES('penmore');
+    INSERT INTO streetname VALUES('pensfold');
+    INSERT INTO streetname VALUES('pepperstone');
+    INSERT INTO streetname VALUES('peregrine');
+    INSERT INTO streetname VALUES('periwinkle');
+    INSERT INTO streetname VALUES('perkins');
+    INSERT INTO streetname VALUES('pete brown');
+    INSERT INTO streetname VALUES('phillips');
+    INSERT INTO streetname VALUES('pickway');
+    INSERT INTO streetname VALUES('piercy woods');
+    INSERT INTO streetname VALUES('pierpoint');
+    INSERT INTO streetname VALUES('pine');
+    INSERT INTO streetname VALUES('pine branch');
+    INSERT INTO streetname VALUES('pine meadow');
+    INSERT INTO streetname VALUES('pineleaf');
+    INSERT INTO streetname VALUES('pinewood');
+    INSERT INTO streetname VALUES('pintail');
+    INSERT INTO streetname VALUES('pipestone');
+    INSERT INTO streetname VALUES('placer maple');
+    INSERT INTO streetname VALUES('plover');
+    INSERT INTO streetname VALUES('plum');
+    INSERT INTO streetname VALUES('po box');
+    INSERT INTO streetname VALUES('pochard');
+    INSERT INTO streetname VALUES('pointview');
+    INSERT INTO streetname VALUES('polk and white');
+    INSERT INTO streetname VALUES('pond valley');
+    INSERT INTO streetname VALUES('pondridge');
+    INSERT INTO streetname VALUES('pope farm');
+    INSERT INTO streetname VALUES('poplar grove');
+    INSERT INTO streetname VALUES('poplar springs');
+    INSERT INTO streetname VALUES('portola');
+    INSERT INTO streetname VALUES('potters glen');
+    INSERT INTO streetname VALUES('powatan');
+    INSERT INTO streetname VALUES('prairie valley');
+    INSERT INTO streetname VALUES('prescott');
+    INSERT INTO streetname VALUES('presmann');
+    INSERT INTO streetname VALUES('prestigious');
+    INSERT INTO streetname VALUES('princess');
+    INSERT INTO streetname VALUES('prosperity');
+    INSERT INTO streetname VALUES('prosperity church');
+    INSERT INTO streetname VALUES('prosperity commons');
+    INSERT INTO streetname VALUES('prosperity park');
+    INSERT INTO streetname VALUES('prosperity point');
+    INSERT INTO streetname VALUES('prosperity ridge');
+    INSERT INTO streetname VALUES('prosperity view');
+    INSERT INTO streetname VALUES('purple finch');
+    INSERT INTO streetname VALUES('quail');
+    INSERT INTO streetname VALUES('queensbury');
+    INSERT INTO streetname VALUES('quinn');
+    INSERT INTO streetname VALUES('racine');
+    INSERT INTO streetname VALUES('radbourne');
+    INSERT INTO streetname VALUES('raddington');
+    INSERT INTO streetname VALUES('raku');
+    INSERT INTO streetname VALUES('rancliffe');
+    INSERT INTO streetname VALUES('ravencrest');
+    INSERT INTO streetname VALUES('reames');
+    INSERT INTO streetname VALUES('rebecca run');
+    INSERT INTO streetname VALUES('red bluff');
+    INSERT INTO streetname VALUES('red clay');
+    INSERT INTO streetname VALUES('red clover');
+    INSERT INTO streetname VALUES('red rose');
+    INSERT INTO streetname VALUES('red shed');
+    INSERT INTO streetname VALUES('red tail');
+    INSERT INTO streetname VALUES('redbridge');
+    INSERT INTO streetname VALUES('redstart');
+    INSERT INTO streetname VALUES('redstone view');
+    INSERT INTO streetname VALUES('reedmont');
+    INSERT INTO streetname VALUES('reeves');
+    INSERT INTO streetname VALUES('regal');
+    INSERT INTO streetname VALUES('reinbeck');
+    INSERT INTO streetname VALUES('retriever');
+    INSERT INTO streetname VALUES('ribbonwalk');
+    INSERT INTO streetname VALUES('richardson park');
+    INSERT INTO streetname VALUES('richfield');
+    INSERT INTO streetname VALUES('riddings');
+    INSERT INTO streetname VALUES('ridge');
+    INSERT INTO streetname VALUES('ridge cliff');
+    INSERT INTO streetname VALUES('ridge path');
+    INSERT INTO streetname VALUES('ridge peak');
+    INSERT INTO streetname VALUES('ridgefield');
+    INSERT INTO streetname VALUES('ridgeline');
+    INSERT INTO streetname VALUES('ridgeview commons');
+    INSERT INTO streetname VALUES('riley');
+    INSERT INTO streetname VALUES('riley woods');
+    INSERT INTO streetname VALUES('rillet');
+    INSERT INTO streetname VALUES('rindle');
+    INSERT INTO streetname VALUES('rivendell');
+    INSERT INTO streetname VALUES('robin');
+    INSERT INTO streetname VALUES('robins nest');
+    INSERT INTO streetname VALUES('robur');
+    INSERT INTO streetname VALUES('robyns glen');
+    INSERT INTO streetname VALUES('rock stream');
+    INSERT INTO streetname VALUES('rockwell');
+    INSERT INTO streetname VALUES('rockwell church');
+    INSERT INTO streetname VALUES('rocky brook');
+    INSERT INTO streetname VALUES('rocky ford club');
+    INSERT INTO streetname VALUES('rotary');
+    INSERT INTO streetname VALUES('rouda');
+    INSERT INTO streetname VALUES('royal bluff');
+    INSERT INTO streetname VALUES('royal celadon');
+    INSERT INTO streetname VALUES('rubin lura');
+    INSERT INTO streetname VALUES('runswyck');
+    INSERT INTO streetname VALUES('ruth ferrell');
+    INSERT INTO streetname VALUES('ruth polk');
+    INSERT INTO streetname VALUES('ryan jay');
+    INSERT INTO streetname VALUES('sackett');
+    INSERT INTO streetname VALUES('saddle pace');
+    INSERT INTO streetname VALUES('saddle run');
+    INSERT INTO streetname VALUES('saddle trail');
+    INSERT INTO streetname VALUES('saguaro');
+    INSERT INTO streetname VALUES('saint audrey');
+    INSERT INTO streetname VALUES('saint bernard');
+    INSERT INTO streetname VALUES('saint frances');
+    INSERT INTO streetname VALUES('sam roper');
+    INSERT INTO streetname VALUES('samara');
+    INSERT INTO streetname VALUES('sanders creek');
+    INSERT INTO streetname VALUES('saquache');
+    INSERT INTO streetname VALUES('sarnia');
+    INSERT INTO streetname VALUES('savannah springs');
+    INSERT INTO streetname VALUES('sawgrass ridge');
+    INSERT INTO streetname VALUES('saxonbury');
+    INSERT INTO streetname VALUES('scotch moss');
+    INSERT INTO streetname VALUES('seasons');
+    INSERT INTO streetname VALUES('serenity');
+    INSERT INTO streetname VALUES('seths');
+    INSERT INTO streetname VALUES('shadow lawn');
+    INSERT INTO streetname VALUES('shadow oaks');
+    INSERT INTO streetname VALUES('shadow pine');
+    INSERT INTO streetname VALUES('shadyside');
+    INSERT INTO streetname VALUES('shallow oak');
+    INSERT INTO streetname VALUES('shelley');
+    INSERT INTO streetname VALUES('shining oak');
+    INSERT INTO streetname VALUES('ship');
+    INSERT INTO streetname VALUES('shore haven');
+    INSERT INTO streetname VALUES('shuman');
+    INSERT INTO streetname VALUES('sidney');
+    INSERT INTO streetname VALUES('silver birch');
+    INSERT INTO streetname VALUES('silvermere');
+    INSERT INTO streetname VALUES('simonton');
+    INSERT INTO streetname VALUES('singing hills');
+    INSERT INTO streetname VALUES('singing oak');
+    INSERT INTO streetname VALUES('sipes');
+    INSERT INTO streetname VALUES('six point');
+    INSERT INTO streetname VALUES('skycrest');
+    INSERT INTO streetname VALUES('skyline');
+    INSERT INTO streetname VALUES('small');
+    INSERT INTO streetname VALUES('smith corners');
+    INSERT INTO streetname VALUES('smithwood');
+    INSERT INTO streetname VALUES('snow hill');
+    INSERT INTO streetname VALUES('soapstone');
+    INSERT INTO streetname VALUES('sobeck');
+    INSERT INTO streetname VALUES('socata');
+    INSERT INTO streetname VALUES('solace');
+    INSERT INTO streetname VALUES('solway');
+    INSERT INTO streetname VALUES('song sparrow');
+    INSERT INTO streetname VALUES('sorrento');
+    INSERT INTO streetname VALUES('spector');
+    INSERT INTO streetname VALUES('spin drift');
+    INSERT INTO streetname VALUES('spring crest');
+    INSERT INTO streetname VALUES('spring lee');
+    INSERT INTO streetname VALUES('spring park');
+    INSERT INTO streetname VALUES('spring terrace');
+    INSERT INTO streetname VALUES('spring trace');
+    INSERT INTO streetname VALUES('springhaven');
+    INSERT INTO streetname VALUES('squirrel trail');
+    INSERT INTO streetname VALUES('stardust');
+    INSERT INTO streetname VALUES('stargaze');
+    INSERT INTO streetname VALUES('starita');
+    INSERT INTO streetname VALUES('starmount');
+    INSERT INTO streetname VALUES('statesville');
+    INSERT INTO streetname VALUES('steed');
+    INSERT INTO streetname VALUES('steelewood');
+    INSERT INTO streetname VALUES('steepleglen');
+    INSERT INTO streetname VALUES('stephens farm');
+    INSERT INTO streetname VALUES('stewarton');
+    INSERT INTO streetname VALUES('stone park');
+    INSERT INTO streetname VALUES('stonebrook');
+    INSERT INTO streetname VALUES('stonefield');
+    INSERT INTO streetname VALUES('stoneglen');
+    INSERT INTO streetname VALUES('stonemarsh');
+    INSERT INTO streetname VALUES('stoney garden');
+    INSERT INTO streetname VALUES('stoney run');
+    INSERT INTO streetname VALUES('stoney valley');
+    INSERT INTO streetname VALUES('stoneykirk');
+    INSERT INTO streetname VALUES('stream bank');
+    INSERT INTO streetname VALUES('stream ridge');
+    INSERT INTO streetname VALUES('suburban');
+    INSERT INTO streetname VALUES('suffield');
+    INSERT INTO streetname VALUES('sugar creek');
+    INSERT INTO streetname VALUES('sugarberry');
+    INSERT INTO streetname VALUES('sugarstone');
+    INSERT INTO streetname VALUES('summer creek');
+    INSERT INTO streetname VALUES('summer valley');
+    INSERT INTO streetname VALUES('summercrest');
+    INSERT INTO streetname VALUES('summercroft');
+    INSERT INTO streetname VALUES('summerford');
+    INSERT INTO streetname VALUES('summergold');
+    INSERT INTO streetname VALUES('sunbeam');
+    INSERT INTO streetname VALUES('sunbridge');
+    INSERT INTO streetname VALUES('sunpath');
+    INSERT INTO streetname VALUES('sunset');
+    INSERT INTO streetname VALUES('sunset ridge');
+    INSERT INTO streetname VALUES('sunstone');
+    INSERT INTO streetname VALUES('suntrace');
+    INSERT INTO streetname VALUES('sunwalk');
+    INSERT INTO streetname VALUES('sutters hill');
+    INSERT INTO streetname VALUES('suttonview');
+    INSERT INTO streetname VALUES('swallow tail');
+    INSERT INTO streetname VALUES('swanston');
+    INSERT INTO streetname VALUES('sweet grove');
+    INSERT INTO streetname VALUES('sweet rose');
+    INSERT INTO streetname VALUES('sweetbriar ridge');
+    INSERT INTO streetname VALUES('sweetfield');
+    INSERT INTO streetname VALUES('sydney overlook');
+    INSERT INTO streetname VALUES('sylvan');
+    INSERT INTO streetname VALUES('symphony woods');
+    INSERT INTO streetname VALUES('tallia');
+    INSERT INTO streetname VALUES('tallu');
+    INSERT INTO streetname VALUES('talwyn');
+    INSERT INTO streetname VALUES('tanager');
+    INSERT INTO streetname VALUES('tanager park');
+    INSERT INTO streetname VALUES('tangley');
+    INSERT INTO streetname VALUES('taranasay');
+    INSERT INTO streetname VALUES('tarby');
+    INSERT INTO streetname VALUES('tarland');
+    INSERT INTO streetname VALUES('tarpway');
+    INSERT INTO streetname VALUES('tauten');
+    INSERT INTO streetname VALUES('taymouth');
+    INSERT INTO streetname VALUES('ten trees');
+    INSERT INTO streetname VALUES('terrace view');
+    INSERT INTO streetname VALUES('terrier');
+    INSERT INTO streetname VALUES('tesh');
+    INSERT INTO streetname VALUES('teton');
+    INSERT INTO streetname VALUES('tewkesbury');
+    INSERT INTO streetname VALUES('thelema');
+    INSERT INTO streetname VALUES('thistle bloom');
+    INSERT INTO streetname VALUES('thistledown');
+    INSERT INTO streetname VALUES('thomas ridge');
+    INSERT INTO streetname VALUES('thornbrook');
+    INSERT INTO streetname VALUES('tifton grass');
+    INSERT INTO streetname VALUES('tigerton');
+    INSERT INTO streetname VALUES('tomsie efird');
+    INSERT INTO streetname VALUES('tor');
+    INSERT INTO streetname VALUES('torphin');
+    INSERT INTO streetname VALUES('torrence');
+    INSERT INTO streetname VALUES('towering pine');
+    INSERT INTO streetname VALUES('towhee');
+    INSERT INTO streetname VALUES('toxaway');
+    INSERT INTO streetname VALUES('tracy glenn');
+    INSERT INTO streetname VALUES('tradition view');
+    INSERT INTO streetname VALUES('trailer');
+    INSERT INTO streetname VALUES('transport');
+    INSERT INTO streetname VALUES('trehurst');
+    INSERT INTO streetname VALUES('trexler');
+    INSERT INTO streetname VALUES('trillium fields');
+    INSERT INTO streetname VALUES('trimbach');
+    INSERT INTO streetname VALUES('tucker');
+    INSERT INTO streetname VALUES('tullamore');
+    INSERT INTO streetname VALUES('tullock creek');
+    INSERT INTO streetname VALUES('tunston');
+    INSERT INTO streetname VALUES('tupelo');
+    INSERT INTO streetname VALUES('turnabout');
+    INSERT INTO streetname VALUES('turney');
+    INSERT INTO streetname VALUES('turtle cross');
+    INSERT INTO streetname VALUES('turtleback');
+    INSERT INTO streetname VALUES('twelvestone');
+    INSERT INTO streetname VALUES('twin');
+    INSERT INTO streetname VALUES('twin brook');
+    INSERT INTO streetname VALUES('twin lakes');
+    INSERT INTO streetname VALUES('twisted pine');
+    INSERT INTO streetname VALUES('tyler finley');
+    INSERT INTO streetname VALUES('university station');
+    INSERT INTO streetname VALUES('uphill');
+    INSERT INTO streetname VALUES('valeview');
+    INSERT INTO streetname VALUES('valhalla');
+    INSERT INTO streetname VALUES('van');
+    INSERT INTO streetname VALUES('vance davis');
+    INSERT INTO streetname VALUES('vanhoy');
+    INSERT INTO streetname VALUES('veckman');
+    INSERT INTO streetname VALUES('victoria');
+    INSERT INTO streetname VALUES('victory');
+    INSERT INTO streetname VALUES('village glen');
+    INSERT INTO streetname VALUES('vireo');
+    INSERT INTO streetname VALUES('viscount');
+    INSERT INTO streetname VALUES('voeltz');
+    INSERT INTO streetname VALUES('wade e morgan');
+    INSERT INTO streetname VALUES('wake');
+    INSERT INTO streetname VALUES('wales');
+    INSERT INTO streetname VALUES('wallace ridge');
+    INSERT INTO streetname VALUES('waltham');
+    INSERT INTO streetname VALUES('wanamassa');
+    INSERT INTO streetname VALUES('warbler wood');
+    INSERT INTO streetname VALUES('washington');
+    INSERT INTO streetname VALUES('water');
+    INSERT INTO streetname VALUES('waterelm');
+    INSERT INTO streetname VALUES('waterford hills');
+    INSERT INTO streetname VALUES('waterford valley');
+    INSERT INTO streetname VALUES('waterloo');
+    INSERT INTO streetname VALUES('waterton leas');
+    INSERT INTO streetname VALUES('waverly lynn');
+    INSERT INTO streetname VALUES('waverlyglen');
+    INSERT INTO streetname VALUES('wayside');
+    INSERT INTO streetname VALUES('westbury lake');
+    INSERT INTO streetname VALUES('westray');
+    INSERT INTO streetname VALUES('whistlers chase');
+    INSERT INTO streetname VALUES('whistley green');
+    INSERT INTO streetname VALUES('whistling oak');
+    INSERT INTO streetname VALUES('whitcomb');
+    INSERT INTO streetname VALUES('white aspen');
+    INSERT INTO streetname VALUES('white cascade');
+    INSERT INTO streetname VALUES('white mist');
+    INSERT INTO streetname VALUES('white rock');
+    INSERT INTO streetname VALUES('white stag');
+    INSERT INTO streetname VALUES('whitegate');
+    INSERT INTO streetname VALUES('whitehill');
+    INSERT INTO streetname VALUES('whitetail');
+    INSERT INTO streetname VALUES('whitewood');
+    INSERT INTO streetname VALUES('wilburn park');
+    INSERT INTO streetname VALUES('wild garden');
+    INSERT INTO streetname VALUES('wild rose');
+    INSERT INTO streetname VALUES('wilkins terrace');
+    INSERT INTO streetname VALUES('william ficklen');
+    INSERT INTO streetname VALUES('wiltshire ridge');
+    INSERT INTO streetname VALUES('windchase');
+    INSERT INTO streetname VALUES('winding jordan');
+    INSERT INTO streetname VALUES('windy meadow');
+    INSERT INTO streetname VALUES('winghaven');
+    INSERT INTO streetname VALUES('wingmont');
+    INSERT INTO streetname VALUES('winslow');
+    INSERT INTO streetname VALUES('winter pine');
+    INSERT INTO streetname VALUES('winter view');
+    INSERT INTO streetname VALUES('wolf creek');
+    INSERT INTO streetname VALUES('wondering oak');
+    INSERT INTO streetname VALUES('woodard');
+    INSERT INTO streetname VALUES('woodfire');
+    INSERT INTO streetname VALUES('woodland commons');
+    INSERT INTO streetname VALUES('woodland hills');
+    INSERT INTO streetname VALUES('woodnotch');
+    INSERT INTO streetname VALUES('woodstone');
+    INSERT INTO streetname VALUES('worsley');
+    INSERT INTO streetname VALUES('wren creek');
+    INSERT INTO streetname VALUES('wrens nest');
+    INSERT INTO streetname VALUES('wrexham');
+    INSERT INTO streetname VALUES('wt harris');
+    INSERT INTO streetname VALUES('wylie meadow');
+    INSERT INTO streetname VALUES('wynborough');
+    INSERT INTO streetname VALUES('wynbrook');
+    INSERT INTO streetname VALUES('wyndham hill');
+    INSERT INTO streetname VALUES('yandem');
+    INSERT INTO streetname VALUES('yellow rose');
+    INSERT INTO streetname VALUES('yellow spaniel');
+    INSERT INTO streetname VALUES('yorkford');
+    INSERT INTO streetname VALUES('ziegler');
+    INSERT INTO streetname VALUES('zion renaissance');
+
+    SELECT count(*) FROM streetname;
+----
+stmt 0 ok
+stmt 118 err 1 -1 179 no such table: f2_rules
+stmt 179 err 1 -1 240 no such table: f2_rules
+stmt 240 err 1 -1 301 no such table: f2_rules
+stmt 301 err 1 -1 362 no such table: f2_rules
+stmt 362 err 1 -1 423 no such table: f2_rules
+stmt 423 err 1 -1 484 no such table: f2_rules
+stmt 484 err 1 -1 545 no such table: f2_rules
+stmt 545 err 1 -1 606 no such table: f2_rules
+stmt 606 err 1 -1 667 no such table: f2_rules
+stmt 667 err 1 -1 728 no such table: f2_rules
+stmt 728 err 1 -1 789 no such table: f2_rules
+stmt 789 err 1 -1 850 no such table: f2_rules
+stmt 850 err 1 -1 911 no such table: f2_rules
+stmt 911 err 1 -1 974 no such table: f2_rules
+stmt 974 err 1 -1 1036 no such table: f2_rules
+stmt 1036 err 1 -1 1098 no such table: f2_rules
+stmt 1098 err 1 -1 1159 no such table: f2_rules
+stmt 1159 err 1 -1 1220 no such table: f2_rules
+stmt 1220 err 1 -1 1280 no such table: f2_rules
+stmt 1280 err 1 -1 1340 no such table: f2_rules
+stmt 1340 err 1 -1 1400 no such table: f2_rules
+stmt 1400 err 1 -1 1460 no such table: f2_rules
+stmt 1460 err 1 -1 1520 no such table: f2_rules
+stmt 1520 err 1 -1 1580 no such table: f2_rules
+stmt 1580 err 1 -1 1640 no such table: f2_rules
+stmt 1640 err 1 -1 1700 no such table: f2_rules
+stmt 1700 err 1 -1 1760 no such table: f2_rules
+stmt 1760 err 1 -1 1820 no such table: f2_rules
+stmt 1820 err 1 -1 1880 no such table: f2_rules
+stmt 1880 err 1 -1 1940 no such table: f2_rules
+stmt 1940 err 1 -1 2000 no such table: f2_rules
+stmt 2000 err 1 -1 2060 no such table: f2_rules
+stmt 2060 err 1 -1 2121 no such table: f2_rules
+stmt 2121 err 1 -1 2182 no such table: f2_rules
+stmt 2182 err 1 -1 2243 no such table: f2_rules
+stmt 2243 err 1 -1 2304 no such table: f2_rules
+stmt 2304 err 1 -1 2364 no such table: f2_rules
+stmt 2364 err 1 -1 2424 no such table: f2_rules
+stmt 2424 err 1 -1 2484 no such table: f2_rules
+stmt 2484 err 1 -1 2544 no such table: f2_rules
+stmt 2544 err 1 -1 2604 no such table: f2_rules
+stmt 2604 err 1 -1 2664 no such table: f2_rules
+stmt 2664 err 1 -1 2724 no such table: f2_rules
+stmt 2724 err 1 -1 2784 no such table: f2_rules
+stmt 2784 err 1 -1 2845 no such table: f2_rules
+stmt 2845 err 1 -1 2906 no such table: f2_rules
+stmt 2906 err 1 -1 2967 no such table: f2_rules
+stmt 2967 err 1 -1 3028 no such table: f2_rules
+stmt 3028 err 1 -1 3088 no such table: f2_rules
+stmt 3088 err 1 -1 3148 no such table: f2_rules
+stmt 3148 err 1 -1 3208 no such table: f2_rules
+stmt 3208 err 1 -1 3268 no such table: f2_rules
+stmt 3268 err 1 -1 3328 no such table: f2_rules
+stmt 3328 err 1 -1 3388 no such table: f2_rules
+stmt 3388 err 1 -1 3448 no such table: f2_rules
+stmt 3448 err 1 -1 3508 no such table: f2_rules
+stmt 3508 err 1 -1 3569 no such table: f2_rules
+stmt 3569 err 1 -1 3630 no such table: f2_rules
+stmt 3630 err 1 -1 3690 no such table: f2_rules
+stmt 3690 err 1 -1 3750 no such table: f2_rules
+stmt 3750 err 1 -1 3811 no such table: f2_rules
+stmt 3811 err 1 -1 3872 no such table: f2_rules
+stmt 3872 err 1 -1 3933 no such table: f2_rules
+stmt 3933 err 1 -1 3994 no such table: f2_rules
+stmt 3994 err 1 -1 4055 no such table: f2_rules
+stmt 4055 err 1 -1 4116 no such table: f2_rules
+stmt 4116 err 1 -1 4228 no such table: f2_rules
+stmt 4228 err 1 -1 4345 no such table: f2_rules
+stmt 4345 err 1 -1 4458 no such table: f2_rules
+stmt 4458 err 1 -1 4661 no such table: f2_rules
+stmt 4661 ok
+stmt 4720 ok
+stmt 4820 err 1 -1 4869 no such table: streetname
+stmt 4869 err 1 -1 4919 no such table: streetname
+stmt 4919 err 1 -1 4966 no such table: streetname
+stmt 4966 err 1 -1 5010 no such table: streetname
+stmt 5010 err 1 -1 5061 no such table: streetname
+stmt 5061 err 1 -1 5111 no such table: streetname
+stmt 5111 err 1 -1 5162 no such table: streetname
+stmt 5162 err 1 -1 5205 no such table: streetname
+stmt 5205 err 1 -1 5251 no such table: streetname
+stmt 5251 err 1 -1 5297 no such table: streetname
+stmt 5297 err 1 -1 5345 no such table: streetname
+stmt 5345 err 1 -1 5388 no such table: streetname
+stmt 5388 err 1 -1 5436 no such table: streetname
+stmt 5436 err 1 -1 5485 no such table: streetname
+stmt 5485 err 1 -1 5532 no such table: streetname
+stmt 5532 err 1 -1 5576 no such table: streetname
+stmt 5576 err 1 -1 5628 no such table: streetname
+stmt 5628 err 1 -1 5679 no such table: streetname
+stmt 5679 err 1 -1 5725 no such table: streetname
+stmt 5725 err 1 -1 5770 no such table: streetname
+stmt 5770 err 1 -1 5814 no such table: streetname
+stmt 5814 err 1 -1 5863 no such table: streetname
+stmt 5863 err 1 -1 5912 no such table: streetname
+stmt 5912 err 1 -1 5966 no such table: streetname
+stmt 5966 err 1 -1 6018 no such table: streetname
+stmt 6018 err 1 -1 6065 no such table: streetname
+stmt 6065 err 1 -1 6107 no such table: streetname
+stmt 6107 err 1 -1 6159 no such table: streetname
+stmt 6159 err 1 -1 6206 no such table: streetname
+stmt 6206 err 1 -1 6258 no such table: streetname
+stmt 6258 err 1 -1 6309 no such table: streetname
+stmt 6309 err 1 -1 6354 no such table: streetname
+stmt 6354 err 1 -1 6402 no such table: streetname
+stmt 6402 err 1 -1 6448 no such table: streetname
+stmt 6448 err 1 -1 6495 no such table: streetname
+stmt 6495 err 1 -1 6540 no such table: streetname
+stmt 6540 err 1 -1 6589 no such table: streetname
+stmt 6589 err 1 -1 6639 no such table: streetname
+stmt 6639 err 1 -1 6689 no such table: streetname
+stmt 6689 err 1 -1 6735 no such table: streetname
+stmt 6735 err 1 -1 6785 no such table: streetname
+stmt 6785 err 1 -1 6833 no such table: streetname
+stmt 6833 err 1 -1 6885 no such table: streetname
+stmt 6885 err 1 -1 6936 no such table: streetname
+stmt 6936 err 1 -1 6984 no such table: streetname
+stmt 6984 err 1 -1 7029 no such table: streetname
+stmt 7029 err 1 -1 7076 no such table: streetname
+stmt 7076 err 1 -1 7120 no such table: streetname
+stmt 7120 err 1 -1 7167 no such table: streetname
+stmt 7167 err 1 -1 7219 no such table: streetname
+stmt 7219 err 1 -1 7265 no such table: streetname
+stmt 7265 err 1 -1 7309 no such table: streetname
+stmt 7309 err 1 -1 7355 no such table: streetname
+stmt 7355 err 1 -1 7405 no such table: streetname
+stmt 7405 err 1 -1 7455 no such table: streetname
+stmt 7455 err 1 -1 7507 no such table: streetname
+stmt 7507 err 1 -1 7558 no such table: streetname
+stmt 7558 err 1 -1 7602 no such table: streetname
+stmt 7602 err 1 -1 7655 no such table: streetname
+stmt 7655 err 1 -1 7704 no such table: streetname
+stmt 7704 err 1 -1 7755 no such table: streetname
+stmt 7755 err 1 -1 7807 no such table: streetname
+stmt 7807 err 1 -1 7857 no such table: streetname
+stmt 7857 err 1 -1 7905 no such table: streetname
+stmt 7905 err 1 -1 7953 no such table: streetname
+stmt 7953 err 1 -1 7999 no such table: streetname
+stmt 7999 err 1 -1 8045 no such table: streetname
+stmt 8045 err 1 -1 8096 no such table: streetname
+stmt 8096 err 1 -1 8143 no such table: streetname
+stmt 8143 err 1 -1 8188 no such table: streetname
+stmt 8188 err 1 -1 8234 no such table: streetname
+stmt 8234 err 1 -1 8279 no such table: streetname
+stmt 8279 err 1 -1 8328 no such table: streetname
+stmt 8328 err 1 -1 8375 no such table: streetname
+stmt 8375 err 1 -1 8425 no such table: streetname
+stmt 8425 err 1 -1 8469 no such table: streetname
+stmt 8469 err 1 -1 8515 no such table: streetname
+stmt 8515 err 1 -1 8560 no such table: streetname
+stmt 8560 err 1 -1 8614 no such table: streetname
+stmt 8614 err 1 -1 8661 no such table: streetname
+stmt 8661 err 1 -1 8706 no such table: streetname
+stmt 8706 err 1 -1 8751 no such table: streetname
+stmt 8751 err 1 -1 8801 no such table: streetname
+stmt 8801 err 1 -1 8852 no such table: streetname
+stmt 8852 err 1 -1 8897 no such table: streetname
+stmt 8897 err 1 -1 8945 no such table: streetname
+stmt 8945 err 1 -1 8990 no such table: streetname
+stmt 8990 err 1 -1 9034 no such table: streetname
+stmt 9034 err 1 -1 9082 no such table: streetname
+stmt 9082 err 1 -1 9128 no such table: streetname
+stmt 9128 err 1 -1 9176 no such table: streetname
+stmt 9176 err 1 -1 9227 no such table: streetname
+stmt 9227 err 1 -1 9279 no such table: streetname
+stmt 9279 err 1 -1 9328 no such table: streetname
+stmt 9328 err 1 -1 9377 no such table: streetname
+stmt 9377 err 1 -1 9427 no such table: streetname
+stmt 9427 err 1 -1 9471 no such table: streetname
+stmt 9471 err 1 -1 9519 no such table: streetname
+stmt 9519 err 1 -1 9566 no such table: streetname
+stmt 9566 err 1 -1 9615 no such table: streetname
+stmt 9615 err 1 -1 9663 no such table: streetname
+stmt 9663 err 1 -1 9714 no such table: streetname
+stmt 9714 err 1 -1 9762 no such table: streetname
+stmt 9762 err 1 -1 9814 no such table: streetname
+stmt 9814 err 1 -1 9866 no such table: streetname
+stmt 9866 err 1 -1 9914 no such table: streetname
+stmt 9914 err 1 -1 9961 no such table: streetname
+stmt 9961 err 1 -1 10016 no such table: streetname
+stmt 10016 err 1 -1 10065 no such table: streetname
+stmt 10065 err 1 -1 10113 no such table: streetname
+stmt 10113 err 1 -1 10159 no such table: streetname
+stmt 10159 err 1 -1 10207 no such table: streetname
+stmt 10207 err 1 -1 10253 no such table: streetname
+stmt 10253 err 1 -1 10302 no such table: streetname
+stmt 10302 err 1 -1 10351 no such table: streetname
+stmt 10351 err 1 -1 10400 no such table: streetname
+stmt 10400 err 1 -1 10447 no such table: streetname
+stmt 10447 err 1 -1 10493 no such table: streetname
+stmt 10493 err 1 -1 10542 no such table: streetname
+stmt 10542 err 1 -1 10591 no such table: streetname
+stmt 10591 err 1 -1 10639 no such table: streetname
+stmt 10639 err 1 -1 10689 no such table: streetname
+stmt 10689 err 1 -1 10739 no such table: streetname
+stmt 10739 err 1 -1 10787 no such table: streetname
+stmt 10787 err 1 -1 10838 no such table: streetname
+stmt 10838 err 1 -1 10885 no such table: streetname
+stmt 10885 err 1 -1 10934 no such table: streetname
+stmt 10934 err 1 -1 10983 no such table: streetname
+stmt 10983 err 1 -1 11032 no such table: streetname
+stmt 11032 err 1 -1 11079 no such table: streetname
+stmt 11079 err 1 -1 11127 no such table: streetname
+stmt 11127 err 1 -1 11176 no such table: streetname
+stmt 11176 err 1 -1 11221 no such table: streetname
+stmt 11221 err 1 -1 11266 no such table: streetname
+stmt 11266 err 1 -1 11314 no such table: streetname
+stmt 11314 err 1 -1 11360 no such table: streetname
+stmt 11360 err 1 -1 11404 no such table: streetname
+stmt 11404 err 1 -1 11450 no such table: streetname
+stmt 11450 err 1 -1 11503 no such table: streetname
+stmt 11503 err 1 -1 11555 no such table: streetname
+stmt 11555 err 1 -1 11602 no such table: streetname
+stmt 11602 err 1 -1 11646 no such table: streetname
+stmt 11646 err 1 -1 11696 no such table: streetname
+stmt 11696 err 1 -1 11742 no such table: streetname
+stmt 11742 err 1 -1 11793 no such table: streetname
+stmt 11793 err 1 -1 11844 no such table: streetname
+stmt 11844 err 1 -1 11893 no such table: streetname
+stmt 11893 err 1 -1 11942 no such table: streetname
+stmt 11942 err 1 -1 11993 no such table: streetname
+stmt 11993 err 1 -1 12039 no such table: streetname
+stmt 12039 err 1 -1 12089 no such table: streetname
+stmt 12089 err 1 -1 12139 no such table: streetname
+stmt 12139 err 1 -1 12184 no such table: streetname
+stmt 12184 err 1 -1 12229 no such table: streetname
+stmt 12229 err 1 -1 12275 no such table: streetname
+stmt 12275 err 1 -1 12323 no such table: streetname
+stmt 12323 err 1 -1 12372 no such table: streetname
+stmt 12372 err 1 -1 12421 no such table: streetname
+stmt 12421 err 1 -1 12471 no such table: streetname
+stmt 12471 err 1 -1 12520 no such table: streetname
+stmt 12520 err 1 -1 12569 no such table: streetname
+stmt 12569 err 1 -1 12620 no such table: streetname
+stmt 12620 err 1 -1 12665 no such table: streetname
+stmt 12665 err 1 -1 12714 no such table: streetname
+stmt 12714 err 1 -1 12762 no such table: streetname
+stmt 12762 err 1 -1 12812 no such table: streetname
+stmt 12812 err 1 -1 12856 no such table: streetname
+stmt 12856 err 1 -1 12907 no such table: streetname
+stmt 12907 err 1 -1 12957 no such table: streetname
+stmt 12957 err 1 -1 13004 no such table: streetname
+stmt 13004 err 1 -1 13054 no such table: streetname
+stmt 13054 err 1 -1 13102 no such table: streetname
+stmt 13102 err 1 -1 13147 no such table: streetname
+stmt 13147 err 1 -1 13199 no such table: streetname
+stmt 13199 err 1 -1 13251 no such table: streetname
+stmt 13251 err 1 -1 13306 no such table: streetname
+stmt 13306 err 1 -1 13351 no such table: streetname
+stmt 13351 err 1 -1 13400 no such table: streetname
+stmt 13400 err 1 -1 13443 no such table: streetname
+stmt 13443 err 1 -1 13492 no such table: streetname
+stmt 13492 err 1 -1 13543 no such table: streetname
+stmt 13543 err 1 -1 13592 no such table: streetname
+stmt 13592 err 1 -1 13636 no such table: streetname
+stmt 13636 err 1 -1 13686 no such table: streetname
+stmt 13686 err 1 -1 13733 no such table: streetname
+stmt 13733 err 1 -1 13779 no such table: streetname
+stmt 13779 err 1 -1 13825 no such table: streetname
+stmt 13825 err 1 -1 13873 no such table: streetname
+stmt 13873 err 1 -1 13923 no such table: streetname
+stmt 13923 err 1 -1 13973 no such table: streetname
+stmt 13973 err 1 -1 14021 no such table: streetname
+stmt 14021 err 1 -1 14070 no such table: streetname
+stmt 14070 err 1 -1 14122 no such table: streetname
+stmt 14122 err 1 -1 14167 no such table: streetname
+stmt 14167 err 1 -1 14213 no such table: streetname
+stmt 14213 err 1 -1 14263 no such table: streetname
+stmt 14263 err 1 -1 14308 no such table: streetname
+stmt 14308 err 1 -1 14358 no such table: streetname
+stmt 14358 err 1 -1 14403 no such table: streetname
+stmt 14403 err 1 -1 14448 no such table: streetname
+stmt 14448 err 1 -1 14492 no such table: streetname
+stmt 14492 err 1 -1 14542 no such table: streetname
+stmt 14542 err 1 -1 14594 no such table: streetname
+stmt 14594 err 1 -1 14647 no such table: streetname
+stmt 14647 err 1 -1 14700 no such table: streetname
+stmt 14700 err 1 -1 14746 no such table: streetname
+stmt 14746 err 1 -1 14794 no such table: streetname
+stmt 14794 err 1 -1 14839 no such table: streetname
+stmt 14839 err 1 -1 14889 no such table: streetname
+stmt 14889 err 1 -1 14937 no such table: streetname
+stmt 14937 err 1 -1 14984 no such table: streetname
+stmt 14984 err 1 -1 15031 no such table: streetname
+stmt 15031 err 1 -1 15082 no such table: streetname
+stmt 15082 err 1 -1 15131 no such table: streetname
+stmt 15131 err 1 -1 15181 no such table: streetname
+stmt 15181 err 1 -1 15226 no such table: streetname
+stmt 15226 err 1 -1 15271 no such table: streetname
+stmt 15271 err 1 -1 15325 no such table: streetname
+stmt 15325 err 1 -1 15374 no such table: streetname
+stmt 15374 err 1 -1 15423 no such table: streetname
+stmt 15423 err 1 -1 15468 no such table: streetname
+stmt 15468 err 1 -1 15516 no such table: streetname
+stmt 15516 err 1 -1 15565 no such table: streetname
+stmt 15565 err 1 -1 15612 no such table: streetname
+stmt 15612 err 1 -1 15666 no such table: streetname
+stmt 15666 err 1 -1 15719 no such table: streetname
+stmt 15719 err 1 -1 15773 no such table: streetname
+stmt 15773 err 1 -1 15824 no such table: streetname
+stmt 15824 err 1 -1 15879 no such table: streetname
+stmt 15879 err 1 -1 15929 no such table: streetname
+stmt 15929 err 1 -1 15977 no such table: streetname
+stmt 15977 err 1 -1 16022 no such table: streetname
+stmt 16022 err 1 -1 16073 no such table: streetname
+stmt 16073 err 1 -1 16126 no such table: streetname
+stmt 16126 err 1 -1 16172 no such table: streetname
+stmt 16172 err 1 -1 16220 no such table: streetname
+stmt 16220 err 1 -1 16266 no such table: streetname
+stmt 16266 err 1 -1 16318 no such table: streetname
+stmt 16318 err 1 -1 16372 no such table: streetname
+stmt 16372 err 1 -1 16421 no such table: streetname
+stmt 16421 err 1 -1 16469 no such table: streetname
+stmt 16469 err 1 -1 16518 no such table: streetname
+stmt 16518 err 1 -1 16565 no such table: streetname
+stmt 16565 err 1 -1 16616 no such table: streetname
+stmt 16616 err 1 -1 16673 no such table: streetname
+stmt 16673 err 1 -1 16721 no such table: streetname
+stmt 16721 err 1 -1 16765 no such table: streetname
+stmt 16765 err 1 -1 16817 no such table: streetname
+stmt 16817 err 1 -1 16863 no such table: streetname
+stmt 16863 err 1 -1 16914 no such table: streetname
+stmt 16914 err 1 -1 16965 no such table: streetname
+stmt 16965 err 1 -1 17016 no such table: streetname
+stmt 17016 err 1 -1 17064 no such table: streetname
+stmt 17064 err 1 -1 17115 no such table: streetname
+stmt 17115 err 1 -1 17165 no such table: streetname
+stmt 17165 err 1 -1 17217 no such table: streetname
+stmt 17217 err 1 -1 17265 no such table: streetname
+stmt 17265 err 1 -1 17314 no such table: streetname
+stmt 17314 err 1 -1 17359 no such table: streetname
+stmt 17359 err 1 -1 17408 no such table: streetname
+stmt 17408 err 1 -1 17458 no such table: streetname
+stmt 17458 err 1 -1 17509 no such table: streetname
+stmt 17509 err 1 -1 17556 no such table: streetname
+stmt 17556 err 1 -1 17604 no such table: streetname
+stmt 17604 err 1 -1 17652 no such table: streetname
+stmt 17652 err 1 -1 17698 no such table: streetname
+stmt 17698 err 1 -1 17744 no such table: streetname
+stmt 17744 err 1 -1 17795 no such table: streetname
+stmt 17795 err 1 -1 17840 no such table: streetname
+stmt 17840 err 1 -1 17891 no such table: streetname
+stmt 17891 err 1 -1 17937 no such table: streetname
+stmt 17937 err 1 -1 17986 no such table: streetname
+stmt 17986 err 1 -1 18038 no such table: streetname
+stmt 18038 err 1 -1 18088 no such table: streetname
+stmt 18088 err 1 -1 18137 no such table: streetname
+stmt 18137 err 1 -1 18184 no such table: streetname
+stmt 18184 err 1 -1 18229 no such table: streetname
+stmt 18229 err 1 -1 18279 no such table: streetname
+stmt 18279 err 1 -1 18330 no such table: streetname
+stmt 18330 err 1 -1 18375 no such table: streetname
+stmt 18375 err 1 -1 18423 no such table: streetname
+stmt 18423 err 1 -1 18470 no such table: streetname
+stmt 18470 err 1 -1 18514 no such table: streetname
+stmt 18514 err 1 -1 18567 no such table: streetname
+stmt 18567 err 1 -1 18620 no such table: streetname
+stmt 18620 err 1 -1 18666 no such table: streetname
+stmt 18666 err 1 -1 18717 no such table: streetname
+stmt 18717 err 1 -1 18770 no such table: streetname
+stmt 18770 err 1 -1 18822 no such table: streetname
+stmt 18822 err 1 -1 18867 no such table: streetname
+stmt 18867 err 1 -1 18916 no such table: streetname
+stmt 18916 err 1 -1 18964 no such table: streetname
+stmt 18964 err 1 -1 19012 no such table: streetname
+stmt 19012 err 1 -1 19060 no such table: streetname
+stmt 19060 err 1 -1 19109 no such table: streetname
+stmt 19109 err 1 -1 19159 no such table: streetname
+stmt 19159 err 1 -1 19213 no such table: streetname
+stmt 19213 err 1 -1 19257 no such table: streetname
+stmt 19257 err 1 -1 19313 no such table: streetname
+stmt 19313 err 1 -1 19362 no such table: streetname
+stmt 19362 err 1 -1 19413 no such table: streetname
+stmt 19413 err 1 -1 19465 no such table: streetname
+stmt 19465 err 1 -1 19516 no such table: streetname
+stmt 19516 err 1 -1 19570 no such table: streetname
+stmt 19570 err 1 -1 19621 no such table: streetname
+stmt 19621 err 1 -1 19668 no such table: streetname
+stmt 19668 err 1 -1 19717 no such table: streetname
+stmt 19717 err 1 -1 19765 no such table: streetname
+stmt 19765 err 1 -1 19817 no such table: streetname
+stmt 19817 err 1 -1 19862 no such table: streetname
+stmt 19862 err 1 -1 19906 no such table: streetname
+stmt 19906 err 1 -1 19954 no such table: streetname
+stmt 19954 err 1 -1 19998 no such table: streetname
+stmt 19998 err 1 -1 20046 no such table: streetname
+stmt 20046 err 1 -1 20090 no such table: streetname
+stmt 20090 err 1 -1 20143 no such table: streetname
+stmt 20143 err 1 -1 20192 no such table: streetname
+stmt 20192 err 1 -1 20242 no such table: streetname
+stmt 20242 err 1 -1 20289 no such table: streetname
+stmt 20289 err 1 -1 20336 no such table: streetname
+stmt 20336 err 1 -1 20382 no such table: streetname
+stmt 20382 err 1 -1 20429 no such table: streetname
+stmt 20429 err 1 -1 20479 no such table: streetname
+stmt 20479 err 1 -1 20528 no such table: streetname
+stmt 20528 err 1 -1 20574 no such table: streetname
+stmt 20574 err 1 -1 20621 no such table: streetname
+stmt 20621 err 1 -1 20668 no such table: streetname
+stmt 20668 err 1 -1 20716 no such table: streetname
+stmt 20716 err 1 -1 20764 no such table: streetname
+stmt 20764 err 1 -1 20812 no such table: streetname
+stmt 20812 err 1 -1 20859 no such table: streetname
+stmt 20859 err 1 -1 20904 no such table: streetname
+stmt 20904 err 1 -1 20955 no such table: streetname
+stmt 20955 err 1 -1 21002 no such table: streetname
+stmt 21002 err 1 -1 21048 no such table: streetname
+stmt 21048 err 1 -1 21092 no such table: streetname
+stmt 21092 err 1 -1 21142 no such table: streetname
+stmt 21142 err 1 -1 21192 no such table: streetname
+stmt 21192 err 1 -1 21240 no such table: streetname
+stmt 21240 err 1 -1 21288 no such table: streetname
+stmt 21288 err 1 -1 21334 no such table: streetname
+stmt 21334 err 1 -1 21392 no such table: streetname
+stmt 21392 err 1 -1 21445 no such table: streetname
+stmt 21445 err 1 -1 21498 no such table: streetname
+stmt 21498 err 1 -1 21553 no such table: streetname
+stmt 21553 err 1 -1 21600 no such table: streetname
+stmt 21600 err 1 -1 21660 no such table: streetname
+stmt 21660 err 1 -1 21702 no such table: streetname
+stmt 21702 err 1 -1 21755 no such table: streetname
+stmt 21755 err 1 -1 21807 no such table: streetname
+stmt 21807 err 1 -1 21853 no such table: streetname
+stmt 21853 err 1 -1 21899 no such table: streetname
+stmt 21899 err 1 -1 21947 no such table: streetname
+stmt 21947 err 1 -1 21992 no such table: streetname
+stmt 21992 err 1 -1 22039 no such table: streetname
+stmt 22039 err 1 -1 22086 no such table: streetname
+stmt 22086 err 1 -1 22131 no such table: streetname
+stmt 22131 err 1 -1 22177 no such table: streetname
+stmt 22177 err 1 -1 22224 no such table: streetname
+stmt 22224 err 1 -1 22269 no such table: streetname
+stmt 22269 err 1 -1 22315 no such table: streetname
+stmt 22315 err 1 -1 22365 no such table: streetname
+stmt 22365 err 1 -1 22415 no such table: streetname
+stmt 22415 err 1 -1 22462 no such table: streetname
+stmt 22462 err 1 -1 22508 no such table: streetname
+stmt 22508 err 1 -1 22558 no such table: streetname
+stmt 22558 err 1 -1 22609 no such table: streetname
+stmt 22609 err 1 -1 22654 no such table: streetname
+stmt 22654 err 1 -1 22702 no such table: streetname
+stmt 22702 err 1 -1 22751 no such table: streetname
+stmt 22751 err 1 -1 22801 no such table: streetname
+stmt 22801 err 1 -1 22854 no such table: streetname
+stmt 22854 err 1 -1 22910 no such table: streetname
+stmt 22910 err 1 -1 22953 no such table: streetname
+stmt 22953 err 1 -1 22996 no such table: streetname
+stmt 22996 err 1 -1 23043 no such table: streetname
+stmt 23043 err 1 -1 23090 no such table: streetname
+stmt 23090 err 1 -1 23138 no such table: streetname
+stmt 23138 err 1 -1 23187 no such table: streetname
+stmt 23187 err 1 -1 23234 no such table: streetname
+stmt 23234 err 1 -1 23284 no such table: streetname
+stmt 23284 err 1 -1 23330 no such table: streetname
+stmt 23330 err 1 -1 23378 no such table: streetname
+stmt 23378 err 1 -1 23432 no such table: streetname
+stmt 23432 err 1 -1 23478 no such table: streetname
+stmt 23478 err 1 -1 23526 no such table: streetname
+stmt 23526 err 1 -1 23573 no such table: streetname
+stmt 23573 err 1 -1 23618 no such table: streetname
+stmt 23618 err 1 -1 23665 no such table: streetname
+stmt 23665 err 1 -1 23709 no such table: streetname
+stmt 23709 err 1 -1 23757 no such table: streetname
+stmt 23757 err 1 -1 23810 no such table: streetname
+stmt 23810 err 1 -1 23854 no such table: streetname
+stmt 23854 err 1 -1 23902 no such table: streetname
+stmt 23902 err 1 -1 23955 no such table: streetname
+stmt 23955 err 1 -1 23999 no such table: streetname
+stmt 23999 err 1 -1 24047 no such table: streetname
+stmt 24047 err 1 -1 24102 no such table: streetname
+stmt 24102 err 1 -1 24151 no such table: streetname
+stmt 24151 err 1 -1 24194 no such table: streetname
+stmt 24194 err 1 -1 24242 no such table: streetname
+stmt 24242 err 1 -1 24287 no such table: streetname
+stmt 24287 err 1 -1 24343 no such table: streetname
+stmt 24343 err 1 -1 24392 no such table: streetname
+stmt 24392 err 1 -1 24440 no such table: streetname
+stmt 24440 err 1 -1 24488 no such table: streetname
+stmt 24488 err 1 -1 24535 no such table: streetname
+stmt 24535 err 1 -1 24581 no such table: streetname
+stmt 24581 err 1 -1 24628 no such table: streetname
+stmt 24628 err 1 -1 24678 no such table: streetname
+stmt 24678 err 1 -1 24726 no such table: streetname
+stmt 24726 err 1 -1 24774 no such table: streetname
+stmt 24774 err 1 -1 24826 no such table: streetname
+stmt 24826 err 1 -1 24876 no such table: streetname
+stmt 24876 err 1 -1 24926 no such table: streetname
+stmt 24926 err 1 -1 24973 no such table: streetname
+stmt 24973 err 1 -1 25020 no such table: streetname
+stmt 25020 err 1 -1 25065 no such table: streetname
+stmt 25065 err 1 -1 25116 no such table: streetname
+stmt 25116 err 1 -1 25163 no such table: streetname
+stmt 25163 err 1 -1 25214 no such table: streetname
+stmt 25214 err 1 -1 25262 no such table: streetname
+stmt 25262 err 1 -1 25309 no such table: streetname
+stmt 25309 err 1 -1 25363 no such table: streetname
+stmt 25363 err 1 -1 25412 no such table: streetname
+stmt 25412 err 1 -1 25458 no such table: streetname
+stmt 25458 err 1 -1 25504 no such table: streetname
+stmt 25504 err 1 -1 25555 no such table: streetname
+stmt 25555 err 1 -1 25601 no such table: streetname
+stmt 25601 err 1 -1 25652 no such table: streetname
+stmt 25652 err 1 -1 25702 no such table: streetname
+stmt 25702 err 1 -1 25760 no such table: streetname
+stmt 25760 err 1 -1 25809 no such table: streetname
+stmt 25809 err 1 -1 25862 no such table: streetname
+stmt 25862 err 1 -1 25914 no such table: streetname
+stmt 25914 err 1 -1 25966 no such table: streetname
+stmt 25966 err 1 -1 26014 no such table: streetname
+stmt 26014 err 1 -1 26061 no such table: streetname
+stmt 26061 err 1 -1 26108 no such table: streetname
+stmt 26108 err 1 -1 26156 no such table: streetname
+stmt 26156 err 1 -1 26203 no such table: streetname
+stmt 26203 err 1 -1 26250 no such table: streetname
+stmt 26250 err 1 -1 26301 no such table: streetname
+stmt 26301 err 1 -1 26347 no such table: streetname
+stmt 26347 err 1 -1 26398 no such table: streetname
+stmt 26398 err 1 -1 26446 no such table: streetname
+stmt 26446 err 1 -1 26489 no such table: streetname
+stmt 26489 err 1 -1 26535 no such table: streetname
+stmt 26535 err 1 -1 26585 no such table: streetname
+stmt 26585 err 1 -1 26638 no such table: streetname
+stmt 26638 err 1 -1 26683 no such table: streetname
+stmt 26683 err 1 -1 26734 no such table: streetname
+stmt 26734 err 1 -1 26783 no such table: streetname
+stmt 26783 err 1 -1 26830 no such table: streetname
+stmt 26830 err 1 -1 26881 no such table: streetname
+stmt 26881 err 1 -1 26928 no such table: streetname
+stmt 26928 err 1 -1 26973 no such table: streetname
+stmt 26973 err 1 -1 27018 no such table: streetname
+stmt 27018 err 1 -1 27064 no such table: streetname
+stmt 27064 err 1 -1 27111 no such table: streetname
+stmt 27111 err 1 -1 27156 no such table: streetname
+stmt 27156 err 1 -1 27209 no such table: streetname
+stmt 27209 err 1 -1 27260 no such table: streetname
+stmt 27260 err 1 -1 27306 no such table: streetname
+stmt 27306 err 1 -1 27353 no such table: streetname
+stmt 27353 err 1 -1 27400 no such table: streetname
+stmt 27400 err 1 -1 27448 no such table: streetname
+stmt 27448 err 1 -1 27492 no such table: streetname
+stmt 27492 err 1 -1 27541 no such table: streetname
+stmt 27541 err 1 -1 27589 no such table: streetname
+stmt 27589 err 1 -1 27637 no such table: streetname
+stmt 27637 err 1 -1 27686 no such table: streetname
+stmt 27686 err 1 -1 27735 no such table: streetname
+stmt 27735 err 1 -1 27783 no such table: streetname
+stmt 27783 err 1 -1 27830 no such table: streetname
+stmt 27830 err 1 -1 27878 no such table: streetname
+stmt 27878 err 1 -1 27925 no such table: streetname
+stmt 27925 err 1 -1 27973 no such table: streetname
+stmt 27973 err 1 -1 28021 no such table: streetname
+stmt 28021 err 1 -1 28069 no such table: streetname
+stmt 28069 err 1 -1 28119 no such table: streetname
+stmt 28119 err 1 -1 28169 no such table: streetname
+stmt 28169 err 1 -1 28219 no such table: streetname
+stmt 28219 err 1 -1 28271 no such table: streetname
+stmt 28271 err 1 -1 28321 no such table: streetname
+stmt 28321 err 1 -1 28367 no such table: streetname
+stmt 28367 err 1 -1 28419 no such table: streetname
+stmt 28419 err 1 -1 28464 no such table: streetname
+stmt 28464 err 1 -1 28512 no such table: streetname
+stmt 28512 err 1 -1 28558 no such table: streetname
+stmt 28558 err 1 -1 28608 no such table: streetname
+stmt 28608 err 1 -1 28661 no such table: streetname
+stmt 28661 err 1 -1 28708 no such table: streetname
+stmt 28708 err 1 -1 28760 no such table: streetname
+stmt 28760 err 1 -1 28806 no such table: streetname
+stmt 28806 err 1 -1 28853 no such table: streetname
+stmt 28853 err 1 -1 28903 no such table: streetname
+stmt 28903 err 1 -1 28952 no such table: streetname
+stmt 28952 err 1 -1 29003 no such table: streetname
+stmt 29003 err 1 -1 29053 no such table: streetname
+stmt 29053 err 1 -1 29104 no such table: streetname
+stmt 29104 err 1 -1 29156 no such table: streetname
+stmt 29156 err 1 -1 29201 no such table: streetname
+stmt 29201 err 1 -1 29249 no such table: streetname
+stmt 29249 err 1 -1 29302 no such table: streetname
+stmt 29302 err 1 -1 29350 no such table: streetname
+stmt 29350 err 1 -1 29405 no such table: streetname
+stmt 29405 err 1 -1 29461 no such table: streetname
+stmt 29461 err 1 -1 29512 no such table: streetname
+stmt 29512 err 1 -1 29560 no such table: streetname
+stmt 29560 err 1 -1 29613 no such table: streetname
+stmt 29613 err 1 -1 29660 no such table: streetname
+stmt 29660 err 1 -1 29704 no such table: streetname
+stmt 29704 err 1 -1 29751 no such table: streetname
+stmt 29751 err 1 -1 29799 no such table: streetname
+stmt 29799 err 1 -1 29853 no such table: streetname
+stmt 29853 err 1 -1 29907 no such table: streetname
+stmt 29907 err 1 -1 29953 no such table: streetname
+stmt 29953 err 1 -1 30002 no such table: streetname
+stmt 30002 err 1 -1 30047 no such table: streetname
+stmt 30047 err 1 -1 30093 no such table: streetname
+stmt 30093 err 1 -1 30141 no such table: streetname
+stmt 30141 err 1 -1 30186 no such table: streetname
+stmt 30186 err 1 -1 30241 no such table: streetname
+stmt 30241 err 1 -1 30293 no such table: streetname
+stmt 30293 err 1 -1 30339 no such table: streetname
+stmt 30339 err 1 -1 30392 no such table: streetname
+stmt 30392 err 1 -1 30441 no such table: streetname
+stmt 30441 err 1 -1 30496 no such table: streetname
+stmt 30496 err 1 -1 30549 no such table: streetname
+stmt 30549 err 1 -1 30599 no such table: streetname
+stmt 30599 err 1 -1 30649 no such table: streetname
+stmt 30649 err 1 -1 30699 no such table: streetname
+stmt 30699 err 1 -1 30748 no such table: streetname
+stmt 30748 err 1 -1 30800 no such table: streetname
+stmt 30800 err 1 -1 30850 no such table: streetname
+stmt 30850 err 1 -1 30901 no such table: streetname
+stmt 30901 err 1 -1 30957 no such table: streetname
+stmt 30957 err 1 -1 31008 no such table: streetname
+stmt 31008 err 1 -1 31062 no such table: streetname
+stmt 31062 err 1 -1 31114 no such table: streetname
+stmt 31114 err 1 -1 31160 no such table: streetname
+stmt 31160 err 1 -1 31206 no such table: streetname
+stmt 31206 err 1 -1 31254 no such table: streetname
+stmt 31254 err 1 -1 31302 no such table: streetname
+stmt 31302 err 1 -1 31347 no such table: streetname
+stmt 31347 err 1 -1 31396 no such table: streetname
+stmt 31396 err 1 -1 31442 no such table: streetname
+stmt 31442 err 1 -1 31492 no such table: streetname
+stmt 31492 err 1 -1 31537 no such table: streetname
+stmt 31537 err 1 -1 31586 no such table: streetname
+stmt 31586 err 1 -1 31635 no such table: streetname
+stmt 31635 err 1 -1 31685 no such table: streetname
+stmt 31685 err 1 -1 31734 no such table: streetname
+stmt 31734 err 1 -1 31782 no such table: streetname
+stmt 31782 err 1 -1 31826 no such table: streetname
+stmt 31826 err 1 -1 31874 no such table: streetname
+stmt 31874 err 1 -1 31927 no such table: streetname
+stmt 31927 err 1 -1 31982 no such table: streetname
+stmt 31982 err 1 -1 32027 no such table: streetname
+stmt 32027 err 1 -1 32080 no such table: streetname
+stmt 32080 err 1 -1 32133 no such table: streetname
+stmt 32133 err 1 -1 32182 no such table: streetname
+stmt 32182 err 1 -1 32231 no such table: streetname
+stmt 32231 err 1 -1 32276 no such table: streetname
+stmt 32276 err 1 -1 32323 no such table: streetname
+stmt 32323 err 1 -1 32369 no such table: streetname
+stmt 32369 err 1 -1 32420 no such table: streetname
+stmt 32420 err 1 -1 32472 no such table: streetname
+stmt 32472 err 1 -1 32520 no such table: streetname
+stmt 32520 err 1 -1 32570 no such table: streetname
+stmt 32570 err 1 -1 32620 no such table: streetname
+stmt 32620 err 1 -1 32668 no such table: streetname
+stmt 32668 err 1 -1 32715 no such table: streetname
+stmt 32715 err 1 -1 32770 no such table: streetname
+stmt 32770 err 1 -1 32823 no such table: streetname
+stmt 32823 err 1 -1 32875 no such table: streetname
+stmt 32875 err 1 -1 32927 no such table: streetname
+stmt 32927 err 1 -1 32976 no such table: streetname
+stmt 32976 err 1 -1 33025 no such table: streetname
+stmt 33025 err 1 -1 33071 no such table: streetname
+stmt 33071 err 1 -1 33121 no such table: streetname
+stmt 33121 err 1 -1 33167 no such table: streetname
+stmt 33167 err 1 -1 33216 no such table: streetname
+stmt 33216 err 1 -1 33262 no such table: streetname
+stmt 33262 err 1 -1 33313 no such table: streetname
+stmt 33313 err 1 -1 33363 no such table: streetname
+stmt 33363 err 1 -1 33411 no such table: streetname
+stmt 33411 err 1 -1 33456 no such table: streetname
+stmt 33456 err 1 -1 33502 no such table: streetname
+stmt 33502 err 1 -1 33552 no such table: streetname
+stmt 33552 err 1 -1 33599 no such table: streetname
+stmt 33599 err 1 -1 33651 no such table: streetname
+stmt 33651 err 1 -1 33695 no such table: streetname
+stmt 33695 err 1 -1 33740 no such table: streetname
+stmt 33740 err 1 -1 33786 no such table: streetname
+stmt 33786 err 1 -1 33838 no such table: streetname
+stmt 33838 err 1 -1 33890 no such table: streetname
+stmt 33890 err 1 -1 33934 no such table: streetname
+stmt 33934 err 1 -1 33986 no such table: streetname
+stmt 33986 err 1 -1 34039 no such table: streetname
+stmt 34039 err 1 -1 34092 no such table: streetname
+stmt 34092 err 1 -1 34143 no such table: streetname
+stmt 34143 err 1 -1 34192 no such table: streetname
+stmt 34192 err 1 -1 34249 no such table: streetname
+stmt 34249 err 1 -1 34296 no such table: streetname
+stmt 34296 err 1 -1 34342 no such table: streetname
+stmt 34342 err 1 -1 34402 no such table: streetname
+stmt 34402 err 1 -1 34445 no such table: streetname
+stmt 34445 err 1 -1 34491 no such table: streetname
+stmt 34491 err 1 -1 34542 no such table: streetname
+stmt 34542 err 1 -1 34593 no such table: streetname
+stmt 34593 err 1 -1 34642 no such table: streetname
+stmt 34642 err 1 -1 34690 no such table: streetname
+stmt 34690 err 1 -1 34738 no such table: streetname
+stmt 34738 err 1 -1 34789 no such table: streetname
+stmt 34789 err 1 -1 34835 no such table: streetname
+stmt 34835 err 1 -1 34886 no such table: streetname
+stmt 34886 err 1 -1 34932 no such table: streetname
+stmt 34932 err 1 -1 34975 no such table: streetname
+stmt 34975 err 1 -1 35026 no such table: streetname
+stmt 35026 err 1 -1 35072 no such table: streetname
+stmt 35072 err 1 -1 35123 no such table: streetname
+stmt 35123 err 1 -1 35169 no such table: streetname
+stmt 35169 err 1 -1 35221 no such table: streetname
+stmt 35221 err 1 -1 35275 no such table: streetname
+stmt 35275 err 1 -1 35319 no such table: streetname
+stmt 35319 err 1 -1 35367 no such table: streetname
+stmt 35367 err 1 -1 35413 no such table: streetname
+stmt 35413 err 1 -1 35461 no such table: streetname
+stmt 35461 err 1 -1 35509 no such table: streetname
+stmt 35509 err 1 -1 35558 no such table: streetname
+stmt 35558 err 1 -1 35604 no such table: streetname
+stmt 35604 err 1 -1 35649 no such table: streetname
+stmt 35649 err 1 -1 35694 no such table: streetname
+stmt 35694 err 1 -1 35738 no such table: streetname
+stmt 35738 err 1 -1 35782 no such table: streetname
+stmt 35782 err 1 -1 35826 no such table: streetname
+stmt 35826 err 1 -1 35874 no such table: streetname
+stmt 35874 err 1 -1 35926 no such table: streetname
+stmt 35926 err 1 -1 35976 no such table: streetname
+stmt 35976 err 1 -1 36023 no such table: streetname
+stmt 36023 err 1 -1 36069 no such table: streetname
+stmt 36069 err 1 -1 36121 no such table: streetname
+stmt 36121 err 1 -1 36171 no such table: streetname
+stmt 36171 err 1 -1 36222 no such table: streetname
+stmt 36222 err 1 -1 36274 no such table: streetname
+stmt 36274 err 1 -1 36320 no such table: streetname
+stmt 36320 err 1 -1 36368 no such table: streetname
+stmt 36368 err 1 -1 36412 no such table: streetname
+stmt 36412 err 1 -1 36458 no such table: streetname
+stmt 36458 err 1 -1 36506 no such table: streetname
+stmt 36506 err 1 -1 36555 no such table: streetname
+stmt 36555 err 1 -1 36602 no such table: streetname
+stmt 36602 err 1 -1 36649 no such table: streetname
+stmt 36649 err 1 -1 36696 no such table: streetname
+stmt 36696 err 1 -1 36746 no such table: streetname
+stmt 36746 err 1 -1 36790 no such table: streetname
+stmt 36790 err 1 -1 36835 no such table: streetname
+stmt 36835 err 1 -1 36878 no such table: streetname
+stmt 36878 err 1 -1 36929 no such table: streetname
+stmt 36929 err 1 -1 36975 no such table: streetname
+stmt 36975 err 1 -1 37023 no such table: streetname
+stmt 37023 err 1 -1 37070 no such table: streetname
+stmt 37070 err 1 -1 37113 no such table: streetname
+stmt 37113 err 1 -1 37169 no such table: streetname
+stmt 37169 err 1 -1 37216 no such table: streetname
+stmt 37216 err 1 -1 37268 no such table: streetname
+stmt 37268 err 1 -1 37313 no such table: streetname
+stmt 37313 err 1 -1 37360 no such table: streetname
+stmt 37360 err 1 -1 37406 no such table: streetname
+stmt 37406 err 1 -1 37457 no such table: streetname
+stmt 37457 err 1 -1 37503 no such table: streetname
+stmt 37503 err 1 -1 37556 no such table: streetname
+stmt 37556 err 1 -1 37610 no such table: streetname
+stmt 37610 err 1 -1 37656 no such table: streetname
+stmt 37656 err 1 -1 37707 no such table: streetname
+stmt 37707 err 1 -1 37758 no such table: streetname
+stmt 37758 err 1 -1 37807 no such table: streetname
+stmt 37807 err 1 -1 37857 no such table: streetname
+stmt 37857 err 1 -1 37902 no such table: streetname
+stmt 37902 err 1 -1 37949 no such table: streetname
+stmt 37949 err 1 -1 37999 no such table: streetname
+stmt 37999 err 1 -1 38047 no such table: streetname
+stmt 38047 err 1 -1 38097 no such table: streetname
+stmt 38097 err 1 -1 38147 no such table: streetname
+stmt 38147 err 1 -1 38192 no such table: streetname
+stmt 38192 err 1 -1 38238 no such table: streetname
+stmt 38238 err 1 -1 38287 no such table: streetname
+stmt 38287 err 1 -1 38331 no such table: streetname
+stmt 38331 err 1 -1 38380 no such table: streetname
+stmt 38380 err 1 -1 38426 no such table: streetname
+stmt 38426 err 1 -1 38471 no such table: streetname
+stmt 38471 err 1 -1 38521 no such table: streetname
+stmt 38521 err 1 -1 38567 no such table: streetname
+stmt 38567 err 1 -1 38618 no such table: streetname
+stmt 38618 err 1 -1 38669 no such table: streetname
+stmt 38669 err 1 -1 38714 no such table: streetname
+stmt 38714 err 1 -1 38766 no such table: streetname
+stmt 38766 err 1 -1 38814 no such table: streetname
+stmt 38814 err 1 -1 38860 no such table: streetname
+stmt 38860 err 1 -1 38906 no such table: streetname
+stmt 38906 err 1 -1 38955 no such table: streetname
+stmt 38955 err 1 -1 39003 no such table: streetname
+stmt 39003 err 1 -1 39057 no such table: streetname
+stmt 39057 err 1 -1 39107 no such table: streetname
+stmt 39107 err 1 -1 39159 no such table: streetname
+stmt 39159 err 1 -1 39211 no such table: streetname
+stmt 39211 err 1 -1 39255 no such table: streetname
+stmt 39255 err 1 -1 39299 no such table: streetname
+stmt 39299 err 1 -1 39345 no such table: streetname
+stmt 39345 err 1 -1 39392 no such table: streetname
+stmt 39392 err 1 -1 39445 no such table: streetname
+stmt 39445 err 1 -1 39491 no such table: streetname
+stmt 39491 err 1 -1 39538 no such table: streetname
+stmt 39538 err 1 -1 39583 no such table: streetname
+stmt 39583 err 1 -1 39634 no such table: streetname
+stmt 39634 err 1 -1 39680 no such table: streetname
+stmt 39680 err 1 -1 39731 no such table: streetname
+stmt 39731 err 1 -1 39784 no such table: streetname
+stmt 39784 err 1 -1 39836 no such table: streetname
+stmt 39836 err 1 -1 39887 no such table: streetname
+stmt 39887 err 1 -1 39938 no such table: streetname
+stmt 39938 err 1 -1 39990 no such table: streetname
+stmt 39990 err 1 -1 40041 no such table: streetname
+stmt 40041 err 1 -1 40086 no such table: streetname
+stmt 40086 err 1 -1 40132 no such table: streetname
+stmt 40132 err 1 -1 40179 no such table: streetname
+stmt 40179 err 1 -1 40223 no such table: streetname
+stmt 40223 err 1 -1 40272 no such table: streetname
+stmt 40272 err 1 -1 40321 no such table: streetname
+stmt 40321 err 1 -1 40373 no such table: streetname
+stmt 40373 err 1 -1 40419 no such table: streetname
+stmt 40419 err 1 -1 40464 no such table: streetname
+stmt 40464 err 1 -1 40511 no such table: streetname
+stmt 40511 err 1 -1 40560 no such table: streetname
+stmt 40560 err 1 -1 40608 no such table: streetname
+stmt 40608 err 1 -1 40652 no such table: streetname
+stmt 40652 err 1 -1 40699 no such table: streetname
+stmt 40699 err 1 -1 40747 no such table: streetname
+stmt 40747 err 1 -1 40795 no such table: streetname
+stmt 40795 err 1 -1 40840 no such table: streetname
+stmt 40840 err 1 -1 40888 no such table: streetname
+stmt 40888 err 1 -1 40934 no such table: streetname
+stmt 40934 err 1 -1 40980 no such table: streetname
+stmt 40980 err 1 -1 41028 no such table: streetname
+stmt 41028 err 1 -1 41077 no such table: streetname
+stmt 41077 err 1 -1 41125 no such table: streetname
+stmt 41125 err 1 -1 41176 no such table: streetname
+stmt 41176 err 1 -1 41227 no such table: streetname
+stmt 41227 err 1 -1 41277 no such table: streetname
+stmt 41277 err 1 -1 41326 no such table: streetname
+stmt 41326 err 1 -1 41380 no such table: streetname
+stmt 41380 err 1 -1 41435 no such table: streetname
+stmt 41435 err 1 -1 41482 no such table: streetname
+stmt 41482 err 1 -1 41530 no such table: streetname
+stmt 41530 err 1 -1 41576 no such table: streetname
+stmt 41576 err 1 -1 41632 no such table: streetname
+stmt 41632 err 1 -1 41683 no such table: streetname
+stmt 41683 err 1 -1 41728 no such table: streetname
+stmt 41728 err 1 -1 41774 no such table: streetname
+stmt 41774 err 1 -1 41822 no such table: streetname
+stmt 41822 err 1 -1 41881 no such table: streetname
+stmt 41881 err 1 -1 41926 no such table: streetname
+stmt 41926 err 1 -1 41973 no such table: streetname
+stmt 41973 err 1 -1 42018 no such table: streetname
+stmt 42018 err 1 -1 42073 no such table: streetname
+stmt 42073 err 1 -1 42125 no such table: streetname
+stmt 42125 err 1 -1 42176 no such table: streetname
+stmt 42176 err 1 -1 42223 no such table: streetname
+stmt 42223 err 1 -1 42270 no such table: streetname
+stmt 42270 err 1 -1 42314 no such table: streetname
+stmt 42314 err 1 -1 42364 no such table: streetname
+stmt 42364 err 1 -1 42414 no such table: streetname
+stmt 42414 err 1 -1 42463 no such table: streetname
+stmt 42463 err 1 -1 42512 no such table: streetname
+stmt 42512 err 1 -1 42564 no such table: streetname
+stmt 42564 err 1 -1 42609 no such table: streetname
+stmt 42609 err 1 -1 42663 no such table: streetname
+stmt 42663 err 1 -1 42710 no such table: streetname
+stmt 42710 err 1 -1 42757 no such table: streetname
+stmt 42757 err 1 -1 42805 no such table: streetname
+stmt 42805 err 1 -1 42849 no such table: streetname
+stmt 42849 err 1 -1 42899 no such table: streetname
+stmt 42899 err 1 -1 42949 no such table: streetname
+stmt 42949 err 1 -1 42999 no such table: streetname
+stmt 42999 err 1 -1 43044 no such table: streetname
+stmt 43044 err 1 -1 43092 no such table: streetname
+stmt 43092 err 1 -1 43141 no such table: streetname
+stmt 43141 err 1 -1 43191 no such table: streetname
+stmt 43191 err 1 -1 43245 no such table: streetname
+stmt 43245 err 1 -1 43297 no such table: streetname
+stmt 43297 err 1 -1 43342 no such table: streetname
+stmt 43342 err 1 -1 43388 no such table: streetname
+stmt 43388 err 1 -1 43433 no such table: streetname
+stmt 43433 err 1 -1 43478 no such table: streetname
+stmt 43478 err 1 -1 43527 no such table: streetname
+stmt 43527 err 1 -1 43575 no such table: streetname
+stmt 43575 err 1 -1 43621 no such table: streetname
+stmt 43621 err 1 -1 43665 no such table: streetname
+stmt 43665 err 1 -1 43715 no such table: streetname
+stmt 43715 err 1 -1 43764 no such table: streetname
+stmt 43764 err 1 -1 43814 no such table: streetname
+stmt 43814 err 1 -1 43864 no such table: streetname
+stmt 43864 err 1 -1 43912 no such table: streetname
+stmt 43912 err 1 -1 43958 no such table: streetname
+stmt 43958 err 1 -1 44006 no such table: streetname
+stmt 44006 err 1 -1 44052 no such table: streetname
+stmt 44052 err 1 -1 44098 no such table: streetname
+stmt 44098 err 1 -1 44145 no such table: streetname
+stmt 44145 err 1 -1 44190 no such table: streetname
+stmt 44190 err 1 -1 44237 no such table: streetname
+stmt 44237 err 1 -1 44284 no such table: streetname
+stmt 44284 err 1 -1 44333 no such table: streetname
+stmt 44333 err 1 -1 44381 no such table: streetname
+stmt 44381 err 1 -1 44439 no such table: streetname
+stmt 44439 err 1 -1 44484 no such table: streetname
+stmt 44484 err 1 -1 44534 no such table: streetname
+stmt 44534 err 1 -1 44581 no such table: streetname
+stmt 44581 err 1 -1 44627 no such table: streetname
+stmt 44627 err 1 -1 44669 no such table: streetname
+stmt 44669 err 1 -1 44716 no such table: streetname
+stmt 44716 err 1 -1 44766 no such table: streetname
+stmt 44766 err 1 -1 44812 no such table: streetname
+stmt 44812 err 1 -1 44859 no such table: streetname
+stmt 44859 err 1 -1 44905 no such table: streetname
+stmt 44905 err 1 -1 44950 no such table: streetname
+stmt 44950 err 1 -1 44994 no such table: streetname
+stmt 44994 err 1 -1 45043 no such table: streetname
+stmt 45043 err 1 -1 45089 no such table: streetname
+stmt 45089 err 1 -1 45139 no such table: streetname
+stmt 45139 err 1 -1 45193 no such table: streetname
+stmt 45193 err 1 -1 45242 no such table: streetname
+stmt 45242 err 1 -1 45297 no such table: streetname
+stmt 45297 err 1 -1 45351 no such table: streetname
+stmt 45351 err 1 -1 45400 no such table: streetname
+stmt 45400 err 1 -1 45448 no such table: streetname
+stmt 45448 err 1 -1 45497 no such table: streetname
+stmt 45497 err 1 -1 45544 no such table: streetname
+stmt 45544 err 1 -1 45589 no such table: streetname
+stmt 45589 err 1 -1 45635 no such table: streetname
+stmt 45635 err 1 -1 45680 no such table: streetname
+stmt 45680 err 1 -1 45726 no such table: streetname
+stmt 45726 err 1 -1 45768 no such table: streetname
+stmt 45768 err 1 -1 45812 no such table: streetname
+stmt 45812 err 1 -1 45858 no such table: streetname
+stmt 45858 err 1 -1 45909 no such table: streetname
+stmt 45909 err 1 -1 45959 no such table: streetname
+stmt 45959 err 1 -1 46010 no such table: streetname
+stmt 46010 err 1 -1 46061 no such table: streetname
+stmt 46061 err 1 -1 46107 no such table: streetname
+stmt 46107 err 1 -1 46155 no such table: streetname
+stmt 46155 err 1 -1 46203 no such table: streetname
+stmt 46203 err 1 -1 46250 no such table: streetname
+stmt 46250 err 1 -1 46298 no such table: streetname
+stmt 46298 err 1 -1 46347 no such table: streetname
+stmt 46347 err 1 -1 46393 no such table: streetname
+stmt 46393 err 1 -1 46445 no such table: streetname
+stmt 46445 err 1 -1 46496 no such table: streetname
+stmt 46496 err 1 -1 46539 no such table: streetname
+stmt 46539 err 1 -1 46590 no such table: streetname
+stmt 46590 err 1 -1 46638 no such table: streetname
+stmt 46638 err 1 -1 46690 no such table: streetname
+stmt 46690 err 1 -1 46741 no such table: streetname
+stmt 46741 err 1 -1 46792 no such table: streetname
+stmt 46792 err 1 -1 46837 no such table: streetname
+stmt 46837 err 1 -1 46888 no such table: streetname
+stmt 46888 err 1 -1 46933 no such table: streetname
+stmt 46933 err 1 -1 46977 no such table: streetname
+stmt 46977 err 1 -1 47024 no such table: streetname
+stmt 47024 err 1 -1 47075 no such table: streetname
+stmt 47075 err 1 -1 47124 no such table: streetname
+stmt 47124 err 1 -1 47171 no such table: streetname
+stmt 47171 err 1 -1 47217 no such table: streetname
+stmt 47217 err 1 -1 47263 no such table: streetname
+stmt 47263 err 1 -1 47310 no such table: streetname
+stmt 47310 err 1 -1 47360 no such table: streetname
+stmt 47360 err 1 -1 47408 no such table: streetname
+stmt 47408 err 1 -1 47457 no such table: streetname
+stmt 47457 err 1 -1 47503 no such table: streetname
+stmt 47503 err 1 -1 47552 no such table: streetname
+stmt 47552 err 1 -1 47599 no such table: streetname
+stmt 47599 err 1 -1 47645 no such table: streetname
+stmt 47645 err 1 -1 47696 no such table: streetname
+stmt 47696 err 1 -1 47744 no such table: streetname
+stmt 47744 err 1 -1 47787 no such table: streetname
+stmt 47787 err 1 -1 47837 no such table: streetname
+stmt 47837 err 1 -1 47887 no such table: streetname
+stmt 47887 err 1 -1 47934 no such table: streetname
+stmt 47934 err 1 -1 47981 no such table: streetname
+stmt 47981 err 1 -1 48027 no such table: streetname
+stmt 48027 err 1 -1 48075 no such table: streetname
+stmt 48075 err 1 -1 48126 no such table: streetname
+stmt 48126 err 1 -1 48171 no such table: streetname
+stmt 48171 err 1 -1 48214 no such table: streetname
+stmt 48214 err 1 -1 48259 no such table: streetname
+stmt 48259 err 1 -1 48305 no such table: streetname
+stmt 48305 err 1 -1 48353 no such table: streetname
+stmt 48353 err 1 -1 48406 no such table: streetname
+stmt 48406 err 1 -1 48456 no such table: streetname
+stmt 48456 err 1 -1 48504 no such table: streetname
+stmt 48504 err 1 -1 48552 no such table: streetname
+stmt 48552 err 1 -1 48603 no such table: streetname
+stmt 48603 err 1 -1 48656 no such table: streetname
+stmt 48656 err 1 -1 48702 no such table: streetname
+stmt 48702 err 1 -1 48753 no such table: streetname
+stmt 48753 err 1 -1 48799 no such table: streetname
+stmt 48799 err 1 -1 48852 no such table: streetname
+stmt 48852 err 1 -1 48899 no such table: streetname
+stmt 48899 err 1 -1 48946 no such table: streetname
+stmt 48946 err 1 -1 48996 no such table: streetname
+stmt 48996 err 1 -1 49043 no such table: streetname
+stmt 49043 err 1 -1 49092 no such table: streetname
+stmt 49092 err 1 -1 49148 no such table: streetname
+stmt 49148 err 1 -1 49205 no such table: streetname
+stmt 49205 err 1 -1 49259 no such table: streetname
+stmt 49259 err 1 -1 49314 no such table: streetname
+stmt 49314 err 1 -1 49369 no such table: streetname
+stmt 49369 err 1 -1 49423 no such table: streetname
+stmt 49423 err 1 -1 49474 no such table: streetname
+stmt 49474 err 1 -1 49518 no such table: streetname
+stmt 49518 err 1 -1 49567 no such table: streetname
+stmt 49567 err 1 -1 49611 no such table: streetname
+stmt 49611 err 1 -1 49656 no such table: streetname
+stmt 49656 err 1 -1 49704 no such table: streetname
+stmt 49704 err 1 -1 49753 no such table: streetname
+stmt 49753 err 1 -1 49796 no such table: streetname
+stmt 49796 err 1 -1 49844 no such table: streetname
+stmt 49844 err 1 -1 49893 no such table: streetname
+stmt 49893 err 1 -1 49938 no such table: streetname
+stmt 49938 err 1 -1 49988 no such table: streetname
+stmt 49988 err 1 -1 50036 no such table: streetname
+stmt 50036 err 1 -1 50083 no such table: streetname
+stmt 50083 err 1 -1 50132 no such table: streetname
+stmt 50132 err 1 -1 50179 no such table: streetname
+stmt 50179 err 1 -1 50226 no such table: streetname
+stmt 50226 err 1 -1 50273 no such table: streetname
+stmt 50273 err 1 -1 50321 no such table: streetname
+stmt 50321 err 1 -1 50368 no such table: streetname
+stmt 50368 err 1 -1 50420 no such table: streetname
+stmt 50420 err 1 -1 50467 no such table: streetname
+stmt 50467 err 1 -1 50512 no such table: streetname
+stmt 50512 err 1 -1 50556 no such table: streetname
+stmt 50556 err 1 -1 50603 no such table: streetname
+stmt 50603 err 1 -1 50651 no such table: streetname
+stmt 50651 err 1 -1 50700 no such table: streetname
+stmt 50700 err 1 -1 50754 no such table: streetname
+stmt 50754 err 1 -1 50802 no such table: streetname
+stmt 50802 err 1 -1 50849 no such table: streetname
+stmt 50849 err 1 -1 50893 no such table: streetname
+stmt 50893 err 1 -1 50943 no such table: streetname
+stmt 50943 err 1 -1 50992 no such table: streetname
+stmt 50992 err 1 -1 51041 no such table: streetname
+stmt 51041 err 1 -1 51090 no such table: streetname
+stmt 51090 err 1 -1 51138 no such table: streetname
+stmt 51138 err 1 -1 51194 no such table: streetname
+stmt 51194 err 1 -1 51238 no such table: streetname
+stmt 51238 err 1 -1 51288 no such table: streetname
+stmt 51288 err 1 -1 51333 no such table: streetname
+stmt 51333 err 1 -1 51378 no such table: streetname
+stmt 51378 err 1 -1 51426 no such table: streetname
+stmt 51426 err 1 -1 51470 no such table: streetname
+stmt 51470 err 1 -1 51520 no such table: streetname
+stmt 51520 err 1 -1 51564 no such table: streetname
+stmt 51564 err 1 -1 51614 no such table: streetname
+stmt 51614 err 1 -1 51664 no such table: streetname
+stmt 51664 err 1 -1 51711 no such table: streetname
+stmt 51711 err 1 -1 51765 no such table: streetname
+stmt 51765 err 1 -1 51815 no such table: streetname
+stmt 51815 err 1 -1 51869 no such table: streetname
+stmt 51869 err 1 -1 51914 no such table: streetname
+stmt 51914 err 1 -1 51958 no such table: streetname
+stmt 51958 err 1 -1 52008 no such table: streetname
+stmt 52008 err 1 -1 52060 no such table: streetname
+stmt 52060 err 1 -1 52109 no such table: streetname
+stmt 52109 err 1 -1 52156 no such table: streetname
+stmt 52156 err 1 -1 52207 no such table: streetname
+stmt 52207 err 1 -1 52255 no such table: streetname
+stmt 52255 err 1 -1 52302 no such table: streetname
+stmt 52302 err 1 -1 52348 no such table: streetname
+stmt 52348 err 1 -1 52398 no such table: streetname
+stmt 52398 err 1 -1 52447 no such table: streetname
+stmt 52447 err 1 -1 52498 no such table: streetname
+stmt 52498 err 1 -1 52544 no such table: streetname
+stmt 52544 err 1 -1 52595 no such table: streetname
+stmt 52595 err 1 -1 52647 no such table: streetname
+stmt 52647 err 1 -1 52699 no such table: streetname
+stmt 52699 err 1 -1 52747 no such table: streetname
+stmt 52747 err 1 -1 52792 no such table: streetname
+stmt 52792 err 1 -1 52844 no such table: streetname
+stmt 52844 err 1 -1 52891 no such table: streetname
+stmt 52891 err 1 -1 52936 no such table: streetname
+stmt 52936 err 1 -1 52991 no such table: streetname
+stmt 52991 err 1 -1 53044 no such table: streetname
+stmt 53044 err 1 -1 53092 no such table: streetname
+stmt 53092 err 1 -1 53142 no such table: streetname
+stmt 53142 err 1 -1 53188 no such table: streetname
+stmt 53188 err 1 -1 53235 no such table: streetname
+stmt 53235 err 1 -1 53279 no such table: streetname
+stmt 53279 err 1 -1 53329 no such table: streetname
+stmt 53329 err 1 -1 53379 no such table: streetname
+stmt 53379 err 1 -1 53429 no such table: streetname
+stmt 53429 err 1 -1 53477 no such table: streetname
+stmt 53477 err 1 -1 53527 no such table: streetname
+stmt 53527 err 1 -1 53573 no such table: streetname
+stmt 53573 err 1 -1 53623 no such table: streetname
+stmt 53623 err 1 -1 53666 no such table: streetname
+stmt 53666 err 1 -1 53716 no such table: streetname
+stmt 53716 err 1 -1 53761 no such table: streetname
+stmt 53761 err 1 -1 53806 no such table: streetname
+stmt 53806 err 1 -1 53857 no such table: streetname
+stmt 53857 err 1 -1 53906 no such table: streetname
+stmt 53906 err 1 -1 53953 no such table: streetname
+stmt 53953 err 1 -1 54005 no such table: streetname
+stmt 54005 err 1 -1 54055 no such table: streetname
+stmt 54055 err 1 -1 54099 no such table: streetname
+stmt 54099 err 1 -1 54147 no such table: streetname
+stmt 54147 err 1 -1 54194 no such table: streetname
+stmt 54194 err 1 -1 54240 no such table: streetname
+stmt 54240 err 1 -1 54284 no such table: streetname
+stmt 54284 err 1 -1 54336 no such table: streetname
+stmt 54336 err 1 -1 54384 no such table: streetname
+stmt 54384 err 1 -1 54432 no such table: streetname
+stmt 54432 err 1 -1 54480 no such table: streetname
+stmt 54480 err 1 -1 54525 no such table: streetname
+stmt 54525 err 1 -1 54570 no such table: streetname
+stmt 54570 err 1 -1 54615 no such table: streetname
+stmt 54615 err 1 -1 54660 no such table: streetname
+stmt 54660 err 1 -1 54711 no such table: streetname
+stmt 54711 err 1 -1 54758 no such table: streetname
+stmt 54758 err 1 -1 54804 no such table: streetname
+stmt 54804 err 1 -1 54853 no such table: streetname
+stmt 54853 err 1 -1 54904 no such table: streetname
+stmt 54904 err 1 -1 54953 no such table: streetname
+stmt 54953 err 1 -1 55003 no such table: streetname
+stmt 55003 err 1 -1 55056 no such table: streetname
+stmt 55056 err 1 -1 55107 no such table: streetname
+stmt 55107 err 1 -1 55157 no such table: streetname
+stmt 55157 err 1 -1 55210 no such table: streetname
+stmt 55210 err 1 -1 55257 no such table: streetname
+stmt 55257 err 1 -1 55304 no such table: streetname
+stmt 55304 err 1 -1 55350 no such table: streetname
+stmt 55350 err 1 -1 55398 no such table: streetname
+stmt 55398 err 1 -1 55448 no such table: streetname
+stmt 55448 err 1 -1 55492 no such table: streetname
+stmt 55492 err 1 -1 55541 no such table: streetname
+stmt 55541 err 1 -1 55591 no such table: streetname
+stmt 55591 err 1 -1 55643 no such table: streetname
+stmt 55643 err 1 -1 55691 no such table: streetname
+stmt 55691 err 1 -1 55740 no such table: streetname
+stmt 55740 err 1 -1 55789 no such table: streetname
+stmt 55789 err 1 -1 55838 no such table: streetname
+stmt 55838 err 1 -1 55886 no such table: streetname
+stmt 55886 err 1 -1 55935 no such table: streetname
+stmt 55935 err 1 -1 55987 no such table: streetname
+stmt 55987 err 1 -1 56036 no such table: streetname
+stmt 56036 err 1 -1 56088 no such table: streetname
+stmt 56088 err 1 -1 56137 no such table: streetname
+stmt 56137 err 1 -1 56187 no such table: streetname
+stmt 56187 err 1 -1 56238 no such table: streetname
+stmt 56238 err 1 -1 56285 no such table: streetname
+stmt 56285 err 1 -1 56332 no such table: streetname
+stmt 56332 err 1 -1 56382 no such table: streetname
+stmt 56382 err 1 -1 56431 no such table: streetname
+stmt 56431 err 1 -1 56480 no such table: streetname
+stmt 56480 err 1 -1 56531 no such table: streetname
+stmt 56531 err 1 -1 56583 no such table: streetname
+stmt 56583 err 1 -1 56633 no such table: streetname
+stmt 56633 err 1 -1 56683 no such table: streetname
+stmt 56683 err 1 -1 56732 no such table: streetname
+stmt 56732 err 1 -1 56781 no such table: streetname
+stmt 56781 err 1 -1 56827 no such table: streetname
+stmt 56827 err 1 -1 56875 no such table: streetname
+stmt 56875 err 1 -1 56921 no such table: streetname
+stmt 56921 err 1 -1 56966 no such table: streetname
+stmt 56966 err 1 -1 57017 no such table: streetname
+stmt 57017 err 1 -1 57064 no such table: streetname
+stmt 57064 err 1 -1 57111 no such table: streetname
+stmt 57111 err 1 -1 57157 no such table: streetname
+stmt 57157 err 1 -1 57208 no such table: streetname
+stmt 57208 err 1 -1 57257 no such table: streetname
+stmt 57257 err 1 -1 57308 no such table: streetname
+stmt 57308 err 1 -1 57355 no such table: streetname
+stmt 57355 err 1 -1 57405 no such table: streetname
+stmt 57405 err 1 -1 57454 no such table: streetname
+stmt 57454 err 1 -1 57509 no such table: streetname
+stmt 57509 err 1 -1 57558 no such table: streetname
+stmt 57558 err 1 -1 57612 no such table: streetname
+stmt 57612 err 1 -1 57657 no such table: streetname
+stmt 57657 err 1 -1 57710 no such table: streetname
+stmt 57710 err 1 -1 57755 no such table: streetname
+stmt 57755 err 1 -1 57799 no such table: streetname
+stmt 57799 err 1 -1 57844 no such table: streetname
+stmt 57844 err 1 -1 57890 no such table: streetname
+stmt 57890 err 1 -1 57941 no such table: streetname
+stmt 57941 err 1 -1 57987 no such table: streetname
+stmt 57987 err 1 -1 58035 no such table: streetname
+stmt 58035 err 1 -1 58079 no such table: streetname
+stmt 58079 err 1 -1 58125 no such table: streetname
+stmt 58125 err 1 -1 58171 no such table: streetname
+stmt 58171 err 1 -1 58216 no such table: streetname
+stmt 58216 err 1 -1 58263 no such table: streetname
+stmt 58263 err 1 -1 58311 no such table: streetname
+stmt 58311 err 1 -1 58362 no such table: streetname
+stmt 58362 err 1 -1 58408 no such table: streetname
+stmt 58408 err 1 -1 58451 no such table: streetname
+stmt 58451 err 1 -1 58495 no such table: streetname
+stmt 58495 err 1 -1 58544 no such table: streetname
+stmt 58544 err 1 -1 58590 no such table: streetname
+stmt 58590 err 1 -1 58642 no such table: streetname
+stmt 58642 err 1 -1 58692 no such table: streetname
+stmt 58692 err 1 -1 58743 no such table: streetname
+stmt 58743 err 1 -1 58792 no such table: streetname
+stmt 58792 err 1 -1 58843 no such table: streetname
+stmt 58843 err 1 -1 58890 no such table: streetname
+stmt 58890 err 1 -1 58941 no such table: streetname
+stmt 58941 err 1 -1 58983 no such table: streetname
+stmt 58983 err 1 -1 59029 no such table: streetname
+stmt 59029 err 1 -1 59076 no such table: streetname
+stmt 59076 err 1 -1 59128 no such table: streetname
+stmt 59128 err 1 -1 59173 no such table: streetname
+stmt 59173 err 1 -1 59219 no such table: streetname
+stmt 59219 err 1 -1 59269 no such table: streetname
+stmt 59269 err 1 -1 59322 no such table: streetname
+stmt 59322 err 1 -1 59368 no such table: streetname
+stmt 59368 err 1 -1 59416 no such table: streetname
+stmt 59416 err 1 -1 59463 no such table: streetname
+stmt 59463 err 1 -1 59509 no such table: streetname
+stmt 59509 err 1 -1 59563 no such table: streetname
+stmt 59563 err 1 -1 59610 no such table: streetname
+stmt 59610 err 1 -1 59655 no such table: streetname
+stmt 59655 err 1 -1 59703 no such table: streetname
+stmt 59703 err 1 -1 59755 no such table: streetname
+stmt 59755 err 1 -1 59801 no such table: streetname
+stmt 59801 err 1 -1 59846 no such table: streetname
+stmt 59846 err 1 -1 59894 no such table: streetname
+stmt 59894 err 1 -1 59939 no such table: streetname
+stmt 59939 err 1 -1 59990 no such table: streetname
+stmt 59990 err 1 -1 60039 no such table: streetname
+stmt 60039 err 1 -1 60089 no such table: streetname
+stmt 60089 err 1 -1 60132 no such table: streetname
+stmt 60132 err 1 -1 60181 no such table: streetname
+stmt 60181 err 1 -1 60230 no such table: streetname
+stmt 60230 err 1 -1 60281 no such table: streetname
+stmt 60281 err 1 -1 60332 no such table: streetname
+stmt 60332 err 1 -1 60389 no such table: streetname
+stmt 60389 err 1 -1 60434 no such table: streetname
+stmt 60434 err 1 -1 60481 no such table: streetname
+stmt 60481 err 1 -1 60528 no such table: streetname
+stmt 60528 err 1 -1 60570 no such table: streetname
+stmt 60570 err 1 -1 60620 no such table: streetname
+stmt 60620 err 1 -1 60665 no such table: streetname
+stmt 60665 err 1 -1 60711 no such table: streetname
+stmt 60711 err 1 -1 60758 no such table: streetname
+stmt 60758 err 1 -1 60804 no such table: streetname
+stmt 60804 err 1 -1 60855 no such table: streetname
+stmt 60855 err 1 -1 60899 no such table: streetname
+stmt 60899 err 1 -1 60946 no such table: streetname
+stmt 60946 err 1 -1 60991 no such table: streetname
+stmt 60991 err 1 -1 61043 no such table: streetname
+stmt 61043 err 1 -1 61086 no such table: streetname
+stmt 61086 err 1 -1 61130 no such table: streetname
+stmt 61130 err 1 -1 61182 no such table: streetname
+stmt 61182 err 1 -1 61228 no such table: streetname
+stmt 61228 err 1 -1 61276 no such table: streetname
+stmt 61276 err 1 -1 61327 no such table: streetname
+stmt 61327 err 1 -1 61376 no such table: streetname
+stmt 61376 err 1 -1 61420 no such table: streetname
+stmt 61420 err 1 -1 61467 no such table: streetname
+stmt 61467 err 1 -1 61521 no such table: streetname
+stmt 61521 err 1 -1 61576 no such table: streetname
+stmt 61576 err 1 -1 61623 no such table: streetname
+stmt 61623 err 1 -1 61675 no such table: streetname
+stmt 61675 err 1 -1 61726 no such table: streetname
+stmt 61726 err 1 -1 61776 no such table: streetname
+stmt 61776 err 1 -1 61822 no such table: streetname
+stmt 61822 err 1 -1 61874 no such table: streetname
+stmt 61874 err 1 -1 61920 no such table: streetname
+stmt 61920 err 1 -1 61974 no such table: streetname
+stmt 61974 err 1 -1 62027 no such table: streetname
+stmt 62027 err 1 -1 62079 no such table: streetname
+stmt 62079 err 1 -1 62126 no such table: streetname
+stmt 62126 err 1 -1 62176 no such table: streetname
+stmt 62176 err 1 -1 62228 no such table: streetname
+stmt 62228 err 1 -1 62277 no such table: streetname
+stmt 62277 err 1 -1 62326 no such table: streetname
+stmt 62326 err 1 -1 62375 no such table: streetname
+stmt 62375 err 1 -1 62423 no such table: streetname
+stmt 62423 err 1 -1 62471 no such table: streetname
+stmt 62471 err 1 -1 62519 no such table: streetname
+stmt 62519 err 1 -1 62567 no such table: streetname
+stmt 62567 err 1 -1 62618 no such table: streetname
+stmt 62618 err 1 -1 62668 no such table: streetname
+stmt 62668 err 1 -1 62716 no such table: streetname
+stmt 62716 err 1 -1 62770 no such table: streetname
+stmt 62770 err 1 -1 62824 no such table: streetname
+stmt 62824 err 1 -1 62878 no such table: streetname
+stmt 62878 err 1 -1 62926 no such table: streetname
+stmt 62926 err 1 -1 62979 no such table: streetname
+stmt 62979 err 1 -1 63030 no such table: streetname
+stmt 63030 err 1 -1 63078 no such table: streetname
+stmt 63078 err 1 -1 63125 no such table: streetname
+stmt 63125 err 1 -1 63171 no such table: streetname
+stmt 63171 err 1 -1 63221 no such table: streetname
+stmt 63221 err 1 -1 63271 no such table: streetname
+stmt 63271 err 1 -1 63320 no such table: streetname
+stmt 63320 err 1 -1 63372 no such table: streetname
+stmt 63372 err 1 -1 63418 no such table: streetname
+stmt 63418 err 1 -1 63465 no such table: streetname
+stmt 63465 err 1 -1 63520 no such table: streetname
+stmt 63520 err 1 -1 63573 no such table: streetname
+stmt 63573 err 1 -1 63621 no such table: streetname
+stmt 63621 err 1 -1 63669 no such table: streetname
+stmt 63669 err 1 -1 63715 no such table: streetname
+stmt 63715 err 1 -1 63764 no such table: streetname
+stmt 63764 err 1 -1 63813 no such table: streetname
+stmt 63813 err 1 -1 63859 no such table: streetname
+stmt 63859 err 1 -1 63907 no such table: streetname
+stmt 63907 err 1 -1 63958 no such table: streetname
+stmt 63958 err 1 -1 64007 no such table: streetname
+stmt 64007 err 1 -1 64054 no such table: streetname
+stmt 64054 err 1 -1 64105 no such table: streetname
+stmt 64105 err 1 -1 64150 no such table: streetname
+stmt 64150 err 1 -1 64200 no such table: streetname
+stmt 64200 err 1 -1 64253 no such table: streetname
+stmt 64253 err 1 -1 64300 no such table: streetname
+stmt 64300 err 1 -1 64346 no such table: streetname
+stmt 64346 err 1 -1 64401 no such table: streetname
+stmt 64401 err 1 -1 64439 no such table: streetname
+==== fuzzer1-2.1.dup2
+
+    SELECT n, distance FROM f2, streetname
+     WHERE f2.word MATCH 'wersley'
+       AND f2.distance<=150
+       AND f2.word=streetname.n
+----
+stmt 0 err 1 -1 139 no such table: f2
+==== fuzzer1-2.2
+
+    SELECT n, distance FROM f2, streetname
+     WHERE f2.word MATCH 'testledown'
+       AND f2.distance<=150
+       AND f2.word=streetname.n
+----
+stmt 0 err 1 -1 142 no such table: f2
+==== fuzzer1-2.3
+
+    SELECT DISTINCT streetname.n FROM f2, streetname
+     WHERE f2.word MATCH 'tayle'
+       AND f2.distance<=200
+       AND streetname.n>=f2.word AND streetname.n<=(f2.word || x'F7BFBFBF')
+----
+stmt 0 err 1 -1 191 no such table: f2
+==== fuzzer1-2.4.dup1
+
+    SELECT DISTINCT streetname.n
+      FROM f2 JOIN streetname
+        ON (streetname.n>=f2.word AND streetname.n<=(f2.word || 'zzzzzz'))
+     WHERE f2.word MATCH 'duck'
+       AND f2.distance<150
+       AND f2.ruleset=3
+     ORDER BY 1
+----
+stmt 0 err 1 -1 238 no such table: f2
+==== fuzzer1-2.5.dup1
+
+    SELECT DISTINCT streetname.n
+      FROM f2 JOIN streetname
+        ON (streetname.n>=f2.word AND streetname.n<=(f2.word || 'zzzzzz'))
+     WHERE f2.word MATCH 'duck'
+       AND f2.distance<150
+       AND f2.ruleset=2
+     ORDER BY 1
+----
+stmt 0 err 1 -1 238 no such table: f2
+==== fuzzer1-4.1
+
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.f3_rules(ruleset, cfrom, cto, cost);
+  INSERT INTO f3_rules(ruleset, cfrom, cto, cost) VALUES(0, 'x','y', 10);
+  INSERT INTO f3_rules(ruleset, cfrom, cto, cost) VALUES(1, 'a','b', 10);
+  CREATE VIRTUAL TABLE aux.f3 USING fuzzer(f3_rules);
+  SELECT word FROM f3 WHERE word MATCH 'ax'
+----
+stmt 0 ok
+stmt 28 err 1 44 57 unknown database aux
+stmt 84 err 1 -1 158 no such table: f3_rules
+stmt 158 err 1 -1 232 no such table: f3_rules
+stmt 232 err 1 256 276 unknown database aux
+stmt 286 err 1 -1 331 no such table: f3
+==== fuzzer1-generated
+ DROP TABLE IF EXISTS x2
+----
+stmt 0 ok
+==== fuzzer1-generated.dup1
+ 
+    SELECT word FROM x2 WHERE word MATCH 'aaa'
+----
+stmt 0 err 1 -1 49 no such table: x2
+==== 8.1
+
+  CREATE TABLE x3_rules(rule_set, cFrom, cTo, cost);
+  INSERT INTO x3_rules VALUES(2, 'a', 'x', 10);
+  INSERT INTO x3_rules VALUES(2, 'a', 'y',  9);
+  INSERT INTO x3_rules VALUES(2, 'a', 'z',  8);
+  CREATE VIRTUAL TABLE x3 USING fuzzer(x3_rules);
+----
+stmt 0 ok
+stmt 53 err 1 -1 101 no such table: x3_rules
+stmt 101 err 1 -1 149 no such table: x3_rules
+stmt 149 err 1 -1 197 no such table: x3_rules
+stmt 197 ok
+==== 8.2.1
+
+  SELECT cFrom, cTo, word 
+    FROM x3_rules CROSS JOIN x3 
+    WHERE word MATCH 'a' AND cost=distance AND ruleset=2
+    ORDER BY +cTo;
+----
+stmt 0 err 1 -1 136 no such table: x3_rules
+==== 8.2.2
+
+  SELECT cFrom, cTo, word 
+    FROM x3 CROSS JOIN x3_rules
+    WHERE word MATCH 'a' AND cost=distance AND ruleset=2
+    ORDER BY +cTo DESC
+----
+stmt 0 err 1 -1 140 no such table: x3
+==== 8.2.3
+
+  SELECT cFrom, cTo, word 
+    FROM x3_rules, x3 
+    WHERE word MATCH 'a' AND cost=distance AND ruleset=2
+    ORDER BY +cTo DESC;
+----
+stmt 0 err 1 -1 131 no such table: x3_rules
+==== 8.2.4
+
+  SELECT cFrom, cTo, word 
+    FROM x3, x3_rules
+    WHERE word MATCH 'a' AND cost=distance AND ruleset=2
+    ORDER BY +cTo DESC;
+----
+stmt 0 err 1 -1 130 no such table: x3
+==== 8.2.5
+
+  CREATE INDEX i1 ON x3_rules(cost);
+  SELECT cFrom, cTo, word 
+    FROM x3_rules, x3 
+    WHERE word MATCH 'a' AND cost=distance AND ruleset=2
+    ORDER BY +cTo DESC;
+----
+stmt 0 err 1 -1 37 no such table: main.x3_rules
+stmt 37 err 1 -1 168 no such table: x3_rules
+==== 8.2.5.dup1
+
+  SELECT word FROM x3_rules, x3 WHERE word MATCH x3_rules.cFrom AND ruleset=2
+----
+stmt 0 err 1 -1 79 no such table: x3_rules
+==== 8.2.6
+
+  SELECT word FROM x3_rules, x3 
+  WHERE word MATCH x3_rules.cFrom 
+    AND ruleset=2 
+    AND x3_rules.cost=8;
+----
+stmt 0 err 1 -1 112 no such table: x3_rules
+==== 8.2.7
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i2 ON t1(b);
+  SELECT word, distance FROM x3, t1 
+    WHERE x3.word MATCH t1.a AND ruleset=2 AND distance=t1.b;
+----
+stmt 0 ok
+stmt 25 err 1 -1 53 no such table: main.t1
+stmt 53 err 1 -1 152 no such table: x3
+==== 8.2.8
+
+  INSERT INTO x3_rules VALUES(1, 'a', 't',  5);
+  INSERT INTO x3_rules VALUES(1, 'a', 'u',  4);
+  INSERT INTO x3_rules VALUES(1, 'a', 'v',  3);
+  DROP TABLE x3;
+  CREATE VIRTUAL TABLE x3 USING fuzzer(x3_rules);
+  SELECT * FROM x3_rules;
+----
+stmt 0 err 1 -1 48 no such table: x3_rules
+stmt 48 err 1 -1 96 no such table: x3_rules
+stmt 96 err 1 -1 144 no such table: x3_rules
+stmt 144 err 1 -1 161 no such table: x3
+stmt 161 ok
+stmt 211 err 1 -1 237 no such table: x3_rules
+==== 8.2.9
+
+  SELECT word FROM x3 WHERE ruleset=2 AND word MATCH 'a' AND WORD MATCH 'b';
+----
+stmt 0 err 1 -1 77 no such table: x3
+==== 8.2.10
+
+  SELECT word FROM x3 WHERE ruleset=1 AND word MATCH 'a'
+----
+stmt 0 err 1 -1 58 no such table: x3
+==== 8.2.11
+
+  SELECT word FROM x3 WHERE ruleset<=1 AND word MATCH 'a'
+----
+stmt 0 err 1 -1 59 no such table: x3
+==== 8.2.12
+
+  SELECT word FROM x3 WHERE ruleset=1 AND word MATCH 'a' ORDER BY distance ASC;
+----
+stmt 0 err 1 -1 80 no such table: x3
+==== 8.2.13
+
+  SELECT word FROM x3 WHERE ruleset=1 AND word MATCH 'a' ORDER BY distance DESC;
+----
+stmt 0 err 1 -1 81 no such table: x3
+==== 8.2.13.dup1
+
+  SELECT word FROM x3 WHERE ruleset=1 AND word MATCH 'a' ORDER BY word ASC;
+----
+stmt 0 err 1 -1 76 no such table: x3
+==== 8.2.14
+
+  SELECT word FROM x3 WHERE ruleset=1 AND word MATCH 'a' ORDER BY word DESC;
+----
+stmt 0 err 1 -1 77 no such table: x3
+==== 9.1
+
+  CREATE TABLE x4_rules(a, b, c, d);
+  INSERT INTO x4_rules VALUES(0, 'a', 'b', 10);
+  INSERT INTO x4_rules VALUES(0, 'a', 'c', 11);
+  INSERT INTO x4_rules VALUES(0, 'bx', 'zz', 20);
+  INSERT INTO x4_rules VALUES(0, 'cx', 'yy', 15);
+  INSERT INTO x4_rules VALUES(0, 'zz', '!!', 50);
+  CREATE VIRTUAL TABLE x4 USING fuzzer(x4_rules);
+----
+stmt 0 ok
+stmt 37 err 1 -1 85 no such table: x4_rules
+stmt 85 err 1 -1 133 no such table: x4_rules
+stmt 133 err 1 -1 183 no such table: x4_rules
+stmt 183 err 1 -1 233 no such table: x4_rules
+stmt 233 err 1 -1 283 no such table: x4_rules
+stmt 283 ok
+==== 9.2
+
+  SELECT word, distance FROM x4 WHERE word MATCH 'ax';
+----
+stmt 0 err 1 -1 55 no such table: x4
+==== 10.1
+
+  CREATE TABLE x5_rules(a, b, c, d);
+  CREATE VIRTUAL TABLE x5 USING fuzzer(x5_rules);
+----
+stmt 0 ok
+stmt 37 ok
+==== 10.2
+
+  SELECT word, distance FROM x5 WHERE word MATCH 
+    'aaaaaaaaaXaaaaaaaaaXaaaaaaaaaXaaaaaaaaaXaaaaaaaaa' || 
+    'aaaaaaaaaXaaaaaaaaaXaaaaaaaaaXaaaaaaaaaXaaaaaaaaa' || 
+    'aaaaaaaaaXaaaaaaaaaXaaaaaaaaaXaaaaaaaaaXaaaaaaaaa'
+----
+stmt 0 err 1 -1 227 no such table: x5
+==== 10.3
+
+  INSERT INTO x5_rules VALUES(0, 'a', '0.1.2.3.4.5.6.7.8.9.a', 1);
+  DROP TABLE x5;
+  CREATE VIRTUAL TABLE x5 USING fuzzer(x5_rules);
+  SELECT length(word) FROM x5 WHERE word MATCH 'a' LIMIT 50;
+----
+stmt 0 err 1 -1 67 no such table: x5_rules
+stmt 67 err 1 -1 84 no such table: x5
+stmt 84 ok
+stmt 134 err 1 -1 195 no such table: x5
+==== 11.1
+
+  DROP TABLE IF EXISTS f1;
+  CREATE VIRTUAL TABLE f1 USING fuzzer('aaaaaaaaaaaaaaaa'bbbbbbbbbbbbbbbb);
+----
+stmt 0 ok
+stmt 27 ok
+==== 11.2
+
+  DROP TABLE IF EXISTS f2;
+  CREATE VIRTUAL TABLE f2 USING fuzzer("xxxxxxxxxxxxxxxx"yyyyyyyyyyyyyyyy);
+----
+stmt 0 ok
+stmt 27 ok
+==== 11.4
+
+  DROP TABLE IF EXISTS f4;
+  CREATE VIRTUAL TABLE f4 USING fuzzer('a'b);
+----
+stmt 0 ok
+stmt 27 ok

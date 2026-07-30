@@ -1,0 +1,34 @@
+==== 1.0
+
+  CREATE TABLE t1(x, y, UNIQUE(x, y));
+  INSERT INTO t1 VALUES('one', 'two');
+  SELECT * FROM t1 WHERE x='one';
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 39 err 1 -1 78 no such table: t1
+stmt 78 err 1 -1 112 no such table: t1
+stmt 112 ok
+==== 1.2
+
+  SELECT * FROM t1 WHERE x='one';
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 ok
+==== 2.1
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a, b);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: main.t1
+==== 3.1
+
+  PRAGMA page_size = 4096;
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a, b);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 52 err 1 -1 83 no such table: main.t1

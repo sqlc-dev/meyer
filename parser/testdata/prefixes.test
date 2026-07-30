@@ -1,0 +1,43 @@
+==== 2.0
+
+  CREATE TABLE t1(k TEXT UNIQUE, v INTEGER);
+  INSERT INTO t1 VALUES
+    ('aback', 1),
+    ('abaft', 2),
+    ('abandon', 3),
+    ('abandoned', 4),
+    ('abandoning', 5),
+    ('abandonment', 6),
+    ('abandons', 7),
+    ('abase', 8),
+    ('abased', 9),
+    ('abasement', 10),
+    ('abasements', 11),
+    ('abases', 12),
+    ('abash', 13),
+    ('abashed', 14),
+    ('abashes', 15),
+    ('abashing', 16),
+    ('abasing', 17),
+    ('abate', 18),
+    ('abated', 19),
+    ('abatement', 20),
+    ('abatements', 21);
+----
+stmt 0 ok
+stmt 45 err 1 -1 509 no such table: t1
+==== 3.1
+
+  SELECT prefix_length(null,'abc');
+----
+stmt 0 err 1 10 36 no such function: prefix_length
+==== 3.2
+
+  SELECT prefix_length('abc',null);
+----
+stmt 0 err 1 10 36 no such function: prefix_length
+==== 3.3
+
+  SELECT prefix_length(zeroblob(15000),zeroblob(5000));
+----
+stmt 0 err 1 10 56 no such function: prefix_length

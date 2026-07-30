@@ -1,0 +1,144 @@
+==== pagesize-1.1
+PRAGMA page_size
+----
+stmt 0 ok
+==== pagesize-1.3
+
+    CREATE TABLE t1(a);
+    PRAGMA page_size=2048;
+    PRAGMA page_size;
+----
+stmt 0 ok
+stmt 24 ok
+stmt 51 ok
+==== pagesize-1.5
+
+    PRAGMA page_size=512;
+    PRAGMA page_size;
+----
+stmt 0 ok
+stmt 26 ok
+==== pagesize-1.6
+
+      PRAGMA page_size=8192;
+      PRAGMA page_size;
+----
+stmt 0 ok
+stmt 29 ok
+==== pagesize-1.7
+
+      PRAGMA page_size=65537;
+      PRAGMA page_size;
+----
+stmt 0 ok
+stmt 30 ok
+==== pagesize-1.8
+
+      PRAGMA page_size=1234;
+      PRAGMA page_size
+----
+stmt 0 ok
+stmt 29 ok
+==== pagesize-generated
+
+        INSERT INTO t1 VALUES(1,2,3);
+        INSERT INTO t1 VALUES(2,3,4);
+        SELECT * FROM t1;
+----
+stmt 0 err 1 -1 38 no such table: t1
+stmt 38 err 1 -1 76 no such table: t1
+stmt 76 err 1 -1 102 no such table: t1
+==== pagesize-generated.dup1
+VACUUM
+----
+stmt 0 ok
+==== pagesize-generated.dup2
+
+      INSERT INTO t1 VALUES(randstr(10,9000));
+      INSERT INTO t1 VALUES(randstr(10,9000));
+      INSERT INTO t1 VALUES(randstr(10,9000));
+      BEGIN;
+      INSERT INTO t1 SELECT x||x FROM t1;
+      INSERT INTO t1 SELECT x||x FROM t1;
+      INSERT INTO t1 SELECT x||x FROM t1;
+      INSERT INTO t1 SELECT x||x FROM t1;
+      SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 47 no such table: t1
+stmt 47 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 141 no such table: t1
+stmt 141 ok
+stmt 154 err 1 -1 196 no such table: t1
+stmt 196 err 1 -1 238 no such table: t1
+stmt 238 err 1 -1 280 no such table: t1
+stmt 280 err 1 -1 322 no such table: t1
+stmt 322 err 1 -1 353 no such table: t1
+==== pagesize-generated.dup3
+
+      ROLLBACK;
+      SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 16 err 1 -1 47 no such table: t1
+==== pagesize-generated.dup4
+
+      INSERT INTO t1 SELECT x||x FROM t1;
+      INSERT INTO t1 SELECT x||x FROM t1;
+      INSERT INTO t1 SELECT x||x FROM t1;
+      INSERT INTO t1 SELECT x||x FROM t1;
+      INSERT INTO t1 SELECT x||x FROM t1;
+      INSERT INTO t1 SELECT x||x FROM t1;
+      SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 42 no such table: t1
+stmt 42 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 126 no such table: t1
+stmt 126 err 1 -1 168 no such table: t1
+stmt 168 err 1 -1 210 no such table: t1
+stmt 210 err 1 -1 252 no such table: t1
+stmt 252 err 1 -1 283 no such table: t1
+==== pagesize-generated.dup5
+
+      BEGIN;
+      DELETE FROM t1 WHERE rowid%5!=0;
+      SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 13 err 1 -1 52 no such table: t1
+stmt 52 err 1 -1 83 no such table: t1
+==== pagesize-generated.dup6
+
+      ROLLBACK;
+      SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 16 err 1 -1 47 no such table: t1
+==== pagesize-3.1
+
+  BEGIN;
+  SELECT * FROM sqlite_master;
+  PRAGMA page_size=2048;
+  PRAGMA main.page_size;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 40 ok
+stmt 65 ok
+==== pagesize-3.2
+
+  CREATE TABLE t1(x);
+  COMMIT;
+----
+stmt 0 ok
+stmt 22 ok
+==== pagesize-3.3
+
+  BEGIN;
+    PRAGMA page_size = 2048;
+  COMMIT;
+  PRAGMA main.page_size;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 38 ok
+stmt 48 ok

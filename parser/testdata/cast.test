@@ -1,0 +1,579 @@
+==== cast-1.1
+SELECT x'616263'
+----
+stmt 0 ok
+==== cast-1.2
+SELECT typeof(x'616263')
+----
+stmt 0 ok
+==== cast-1.3
+SELECT CAST(x'616263' AS text)
+----
+stmt 0 ok
+==== cast-1.4
+SELECT typeof(CAST(x'616263' AS text))
+----
+stmt 0 ok
+==== cast-1.5
+SELECT CAST(x'616263' AS numeric)
+----
+stmt 0 ok
+==== cast-1.6
+SELECT typeof(CAST(x'616263' AS numeric))
+----
+stmt 0 ok
+==== cast-1.7
+SELECT CAST(x'616263' AS blob)
+----
+stmt 0 ok
+==== cast-1.8
+SELECT typeof(CAST(x'616263' AS blob))
+----
+stmt 0 ok
+==== cast-1.9
+SELECT CAST(x'616263' AS integer)
+----
+stmt 0 ok
+==== cast-1.10
+SELECT typeof(CAST(x'616263' AS integer))
+----
+stmt 0 ok
+==== cast-1.11
+SELECT null
+----
+stmt 0 ok
+==== cast-1.12
+SELECT typeof(NULL)
+----
+stmt 0 ok
+==== cast-1.13
+SELECT CAST(NULL AS text)
+----
+stmt 0 ok
+==== cast-1.14
+SELECT typeof(CAST(NULL AS text))
+----
+stmt 0 ok
+==== cast-1.15
+SELECT CAST(NULL AS numeric)
+----
+stmt 0 ok
+==== cast-1.16
+SELECT typeof(CAST(NULL AS numeric))
+----
+stmt 0 ok
+==== cast-1.17
+SELECT CAST(NULL AS blob)
+----
+stmt 0 ok
+==== cast-1.18
+SELECT typeof(CAST(NULL AS blob))
+----
+stmt 0 ok
+==== cast-1.19
+SELECT CAST(NULL AS integer)
+----
+stmt 0 ok
+==== cast-1.20
+SELECT typeof(CAST(NULL AS integer))
+----
+stmt 0 ok
+==== cast-1.21
+SELECT 123
+----
+stmt 0 ok
+==== cast-1.22
+SELECT typeof(123)
+----
+stmt 0 ok
+==== cast-1.23
+SELECT CAST(123 AS text)
+----
+stmt 0 ok
+==== cast-1.24
+SELECT typeof(CAST(123 AS text))
+----
+stmt 0 ok
+==== cast-1.25
+SELECT CAST(123 AS numeric)
+----
+stmt 0 ok
+==== cast-1.26
+SELECT typeof(CAST(123 AS numeric))
+----
+stmt 0 ok
+==== cast-1.27
+SELECT CAST(123 AS blob)
+----
+stmt 0 ok
+==== cast-1.28
+SELECT typeof(CAST(123 AS blob))
+----
+stmt 0 ok
+==== cast-1.29
+SELECT CAST(123 AS integer)
+----
+stmt 0 ok
+==== cast-1.30
+SELECT typeof(CAST(123 AS integer))
+----
+stmt 0 ok
+==== cast-1.31
+SELECT 123.456
+----
+stmt 0 ok
+==== cast-1.32
+SELECT typeof(123.456)
+----
+stmt 0 ok
+==== cast-1.33
+SELECT CAST(123.456 AS text)
+----
+stmt 0 ok
+==== cast-1.34
+SELECT typeof(CAST(123.456 AS text))
+----
+stmt 0 ok
+==== cast-1.35
+SELECT CAST(123.456 AS numeric)
+----
+stmt 0 ok
+==== cast-1.36
+SELECT typeof(CAST(123.456 AS numeric))
+----
+stmt 0 ok
+==== cast-1.37
+SELECT CAST(123.456 AS blob)
+----
+stmt 0 ok
+==== cast-1.38
+SELECT typeof(CAST(123.456 AS blob))
+----
+stmt 0 ok
+==== cast-1.39
+SELECT CAST(123.456 AS integer)
+----
+stmt 0 ok
+==== cast-1.38.dup1
+SELECT typeof(CAST(123.456 AS integer))
+----
+stmt 0 ok
+==== cast-1.41
+SELECT '123abc'
+----
+stmt 0 ok
+==== cast-1.42
+SELECT typeof('123abc')
+----
+stmt 0 ok
+==== cast-1.43
+SELECT CAST('123abc' AS text)
+----
+stmt 0 ok
+==== cast-1.44
+SELECT typeof(CAST('123abc' AS text))
+----
+stmt 0 ok
+==== cast-1.45
+SELECT CAST('123abc' AS numeric)
+----
+stmt 0 ok
+==== cast-1.46
+SELECT typeof(CAST('123abc' AS numeric))
+----
+stmt 0 ok
+==== cast-1.47
+SELECT CAST('123abc' AS blob)
+----
+stmt 0 ok
+==== cast-1.48
+SELECT typeof(CAST('123abc' AS blob))
+----
+stmt 0 ok
+==== cast-1.49
+SELECT CAST('123abc' AS integer)
+----
+stmt 0 ok
+==== cast-1.50
+SELECT typeof(CAST('123abc' AS integer))
+----
+stmt 0 ok
+==== cast-1.51
+SELECT CAST('123.5abc' AS numeric)
+----
+stmt 0 ok
+==== cast-1.53
+SELECT CAST('123.5abc' AS integer)
+----
+stmt 0 ok
+==== cast-1.60
+SELECT CAST(null AS REAL)
+----
+stmt 0 ok
+==== cast-1.61
+SELECT typeof(CAST(null AS REAL))
+----
+stmt 0 ok
+==== cast-1.62
+SELECT CAST(1 AS REAL)
+----
+stmt 0 ok
+==== cast-1.63
+SELECT typeof(CAST(1 AS REAL))
+----
+stmt 0 ok
+==== cast-1.64
+SELECT CAST('1' AS REAL)
+----
+stmt 0 ok
+==== cast-1.65
+SELECT typeof(CAST('1' AS REAL))
+----
+stmt 0 ok
+==== cast-1.66
+SELECT CAST('abc' AS REAL)
+----
+stmt 0 ok
+==== cast-1.67
+SELECT typeof(CAST('abc' AS REAL))
+----
+stmt 0 ok
+==== cast-1.68
+SELECT CAST(x'31' AS REAL)
+----
+stmt 0 ok
+==== cast-1.69
+SELECT typeof(CAST(x'31' AS REAL))
+----
+stmt 0 ok
+==== cast-2.1
+SELECT CAST('   123' AS integer)
+----
+stmt 0 ok
+==== cast-2.2
+SELECT CAST('   -123.456' AS real)
+----
+stmt 0 ok
+==== cast-3.1
+SELECT CAST(9223372036854774800 AS integer)
+----
+stmt 0 ok
+==== cast-3.2
+SELECT CAST(9223372036854774800 AS numeric)
+----
+stmt 0 ok
+==== cast-3.4
+SELECT CAST(CAST(9223372036854774800 AS real) AS integer)
+----
+stmt 0 ok
+==== cast-3.5
+SELECT CAST(-9223372036854774800 AS integer)
+----
+stmt 0 ok
+==== cast-3.6
+SELECT CAST(-9223372036854774800 AS numeric)
+----
+stmt 0 ok
+==== cast-3.8
+SELECT CAST(CAST(-9223372036854774800 AS real) AS integer)
+----
+stmt 0 ok
+==== cast-3.11
+SELECT CAST('9223372036854774800' AS integer)
+----
+stmt 0 ok
+==== cast-3.12
+SELECT CAST('9223372036854774800' AS numeric)
+----
+stmt 0 ok
+==== cast-3.14
+SELECT CAST(CAST('9223372036854774800' AS real) AS integer)
+----
+stmt 0 ok
+==== cast-3.15
+SELECT CAST('-9223372036854774800' AS integer)
+----
+stmt 0 ok
+==== cast-3.16
+SELECT CAST('-9223372036854774800' AS numeric)
+----
+stmt 0 ok
+==== cast-3.18
+SELECT CAST(CAST('-9223372036854774800' AS real) AS integer)
+----
+stmt 0 ok
+==== cast-3.21
+SELECT CAST(x'39323233333732303336383534373734383030' AS integer)
+----
+stmt 0 ok
+==== cast-3.22
+SELECT CAST(x'39323233333732303336383534373734383030' AS numeric)
+----
+stmt 0 ok
+==== cast-3.24
+
+      SELECT CAST(CAST(x'39323233333732303336383534373734383030' AS real)
+                  AS integer)
+----
+stmt 0 ok
+==== cast-3.31
+SELECT CAST(NULL AS numeric)
+----
+stmt 0 ok
+==== cast-5.1
+
+  SELECT CAST('9223372036854775808' AS integer);
+  SELECT CAST('  +000009223372036854775808' AS integer);
+  SELECT CAST('12345678901234567890123' AS INTEGER);
+----
+stmt 0 ok
+stmt 49 ok
+stmt 106 ok
+==== cast-5.2
+
+  SELECT CAST('-9223372036854775808' AS integer);
+  SELECT CAST('-9223372036854775809' AS integer);
+  SELECT CAST('-12345678901234567890123' AS INTEGER);
+----
+stmt 0 ok
+stmt 50 ok
+stmt 100 ok
+==== cast-5.3
+
+  SELECT CAST('123e+5' AS INTEGER);
+  SELECT CAST('123e+5' AS NUMERIC);
+  SELECT CAST('123e+5' AS REAL);
+----
+stmt 0 ok
+stmt 36 ok
+stmt 72 ok
+==== cast-6.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a NUMERIC);
+  INSERT INTO t1 VALUES
+     ('9000000000000000001'),
+     ('9000000000000000001 '),
+     (' 9000000000000000001'),
+     (' 9000000000000000001 ');
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 57 err 1 -1 205 no such table: t1
+stmt 205 err 1 -1 225 no such table: t1
+==== cast-7.1
+
+  SELECT CAST('-' AS NUMERIC);
+----
+stmt 0 ok
+==== cast-7.2
+
+  SELECT CAST('-0' AS NUMERIC);
+----
+stmt 0 ok
+==== cast-7.3
+
+  SELECT CAST('+' AS NUMERIC);
+----
+stmt 0 ok
+==== cast-7.4
+
+  SELECT CAST('/' AS NUMERIC);
+----
+stmt 0 ok
+==== cast-7.10
+
+  SELECT '' - 2851427734582196970;
+----
+stmt 0 ok
+==== cast-7.11
+
+  SELECT 0 - 2851427734582196970;
+----
+stmt 0 ok
+==== cast-7.12
+
+  SELECT '' - 1;
+----
+stmt 0 ok
+==== cast-7.20
+
+  DROP TABLE IF EXISTS t0;
+  CREATE TABLE t0 (c0 TEXT);
+  INSERT INTO t0(c0) VALUES ('1.0');
+  SELECT CAST(c0 AS NUMERIC) FROM t0;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 56 err 1 -1 93 no such table: t0
+stmt 93 err 1 -1 131 no such table: t0
+==== cast-7.30
+
+  SELECT -'.';
+----
+stmt 0 ok
+==== cast-7.31
+
+  SELECT '.'+0;
+----
+stmt 0 ok
+==== cast-7.32
+
+  SELECT CAST('.' AS numeric);
+----
+stmt 0 ok
+==== cast-7.33
+
+  SELECT -CAST('.' AS numeric);
+----
+stmt 0 ok
+==== cast-7.40
+
+  SELECT CAST('-0.0' AS numeric);
+----
+stmt 0 ok
+==== cast-7.41
+
+  SELECT CAST('0.0' AS numeric);
+----
+stmt 0 ok
+==== cast-7.42
+
+  SELECT CAST('+0.0' AS numeric);
+----
+stmt 0 ok
+==== cast-7.43
+
+  SELECT CAST('-1.0' AS numeric);
+----
+stmt 0 ok
+==== cast-8.1
+
+    SELECT quote(X'310032003300')==quote(substr(X'310032003300', 1))
+----
+stmt 0 ok
+==== cast-8.2
+
+    SELECT CAST(X'310032003300' AS TEXT)
+         ==CAST(substr(X'310032003300', 1) AS TEXT)
+----
+stmt 0 ok
+==== cast-9.0
+
+  CREATE TABLE t0(c0);
+  INSERT INTO t0(c0) VALUES (0);
+  CREATE VIEW v1(c0, c1) AS 
+    SELECT CAST(0.0 AS NUMERIC), COUNT(*) OVER () FROM t0;
+  SELECT v1.c0 FROM v1, t0 WHERE v1.c0=0;
+----
+stmt 0 ok
+stmt 23 err 1 -1 56 no such table: t0
+stmt 56 ok
+stmt 144 err 1 -1 186 no such table: v1
+==== cast-9.1
+
+  CREATE TABLE dual(dummy TEXT);
+  INSERT INTO dual VALUES('X');
+  SELECT CAST(4 AS NUMERIC);
+----
+stmt 0 ok
+stmt 33 err 1 -1 65 no such table: dual
+stmt 65 ok
+==== cast-9.2
+
+  SELECT CAST(4.0 AS NUMERIC);
+----
+stmt 0 ok
+==== cast-9.3
+
+  SELECT CAST(4.5 AS NUMERIC);
+----
+stmt 0 ok
+==== cast-9.4
+
+  SELECT x, typeof(x) FROM (SELECT CAST(4 AS NUMERIC) AS x) JOIN dual;
+----
+stmt 0 err 1 -1 71 no such table: dual
+==== cast-9.5
+
+  SELECT x, typeof(x) FROM dual CROSS JOIN (SELECT CAST(4 AS NUMERIC) AS x);
+----
+stmt 0 err 1 -1 77 no such table: dual
+==== cast-9.10
+
+  SELECT x, typeof(x) FROM (SELECT CAST(4.0 AS NUMERIC) AS x) JOIN dual;
+----
+stmt 0 err 1 -1 73 no such table: dual
+==== cast-9.11
+
+  SELECT x, typeof(x) FROM dual CROSS JOIN (SELECT CAST(4.0 AS NUMERIC) AS x);
+----
+stmt 0 err 1 -1 79 no such table: dual
+==== cast-9.12
+
+  SELECT x, typeof(x) FROM (SELECT CAST(4.5 AS NUMERIC) AS x) JOIN dual;
+----
+stmt 0 err 1 -1 73 no such table: dual
+==== cast-9.13
+
+  SELECT x, typeof(x) FROM dual CROSS JOIN (SELECT CAST(4.5 AS NUMERIC) AS x);
+----
+stmt 0 err 1 -1 79 no such table: dual
+==== cast-10.1
+
+  VALUES(CAST(44 AS REAL)),(55);
+----
+stmt 0 ok
+==== cast-10.2
+
+  SELECT CAST(44 AS REAL) AS 'm' UNION ALL SELECT 55;
+----
+stmt 0 ok
+==== cast-10.3
+
+  SELECT * FROM (VALUES(CAST(44 AS REAL)),(55));
+----
+stmt 0 ok
+==== cast-10.4
+
+  SELECT * FROM (SELECT CAST(44 AS REAL) AS 'm' UNION ALL SELECT 55);
+----
+stmt 0 ok
+==== cast-10.5
+
+  SELECT * FROM dual CROSS JOIN (VALUES(CAST(44 AS REAL)),(55));
+----
+stmt 0 err 1 -1 65 no such table: dual
+==== cast-10.6
+
+  SELECT * FROM dual CROSS JOIN (SELECT CAST(44 AS REAL) AS 'm'
+                                 UNION ALL SELECT 55);
+----
+stmt 0 err 1 -1 119 no such table: dual
+==== cast-10.7
+
+    DROP VIEW v1;
+    CREATE VIEW v1 AS SELECT CAST(44 AS REAL) AS 'm' UNION ALL SELECT 55;
+    SELECT name, type FROM pragma_table_info('v1');
+----
+stmt 0 err 1 -1 18 no such view: v1
+stmt 18 ok
+stmt 92 ok
+==== cast-10.8
+
+    CREATE VIEW v2 AS VALUES(CAST(44 AS REAL)),(55);
+    SELECT type FROM pragma_table_info('v2');
+----
+stmt 0 ok
+stmt 53 ok
+==== cast-10.9
+
+    SELECT * FROM v1;
+----
+stmt 0 err 1 -1 22 no such table: v1
+==== cast-10.10
+
+    SELECT * FROM v2;
+----
+stmt 0 err 1 -1 22 no such table: v2

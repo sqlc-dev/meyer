@@ -1,0 +1,139 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c PRIMARY KEY);
+  CREATE TABLE t2(x, y, z);
+----
+stmt 0 ok
+stmt 40 ok
+==== 2.0
+
+  CREATE TABLE t1(a TEXT PRIMARY KEY, b TEXT) WITHOUT ROWID;
+  INSERT INTO t1 VALUES('1', 'one');
+  INSERT INTO t1 VALUES('2', NULL);
+  INSERT INTO t1 VALUES('3', 'three');
+----
+stmt 0 ok
+stmt 61 err 1 -1 98 no such table: t1
+stmt 98 err 1 -1 134 no such table: t1
+stmt 134 err 1 -1 173 no such table: t1
+==== 2.1
+
+  SELECT b FROM t1 WHERE a IN (1,2,3) ORDER BY b ASC NULLS LAST;
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== 3.0
+
+  CREATE TABLE x1(a);
+  INSERT INTO x1 VALUES(1), (2), (3);
+
+  CREATE TABLE x2(b);
+  INSERT INTO x2 VALUES(4), (5), (6);
+
+  CREATE TABLE t1(u);
+  INSERT INTO t1 VALUES(1), (2), (3), (4), (5), (6);
+
+  CREATE VIEW v1 AS SELECT u FROM t1 WHERE u IN (
+    SELECT a FROM x1
+  );
+  CREATE VIEW v2 AS SELECT u FROM t1 WHERE u IN (
+    SELECT b FROM x2
+  );
+----
+stmt 0 ok
+stmt 22 err 1 -1 60 no such table: x1
+stmt 60 ok
+stmt 83 err 1 -1 121 no such table: x2
+stmt 121 ok
+stmt 144 err 1 -1 197 no such table: t1
+stmt 197 ok
+stmt 274 ok
+==== 3.1
+
+  SELECT * FROM v1
+----
+stmt 0 err 1 -1 20 no such table: v1
+==== 3.2
+
+  SELECT * FROM v2
+----
+stmt 0 err 1 -1 20 no such table: v2
+==== 3.3
+
+  SELECT * FROM v2
+  UNION ALL
+  SELECT * FROM v1
+----
+stmt 0 err 1 -1 51 no such table: v1
+==== 3.4
+
+  WITH w1 AS (
+    SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
+  ),
+  w2 AS (
+    SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6
+  )
+  SELECT * FROM v1 WHERE u IN w1
+  UNION ALL
+  SELECT * FROM v2 WHERE u IN w2
+----
+stmt 0 err 1 -1 215 no such table: v2
+==== 3.5
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1 (a int UNIQUE);
+  CREATE TABLE t2 (b int UNIQUE);
+  INSERT INTO t1 VALUES (1);
+  INSERT INTO t2 VALUES (1), (2);
+  SELECT t1.a, t2.b FROM t1, t2 WHERE (t1.a, t2.b) = (1, 1);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 88 ok
+stmt 122 err 1 -1 151 no such table: t1
+stmt 151 err 1 -1 185 no such table: t2
+stmt 185 err 1 -1 246 no such table: t1
+==== 3.6
+
+  SELECT t1.a, t2.b FROM t1, t2 WHERE (t1.a, t2.b) IN ((1, 1));
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== 3.7
+
+  SELECT t1.a, t2.b FROM t1, t2 WHERE (t1.a, t2.b) = (1, 2);
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== 3.8
+
+  SELECT t1.a, t2.b FROM t1, t2 WHERE (t1.a, t2.b) IN ((1, 2));
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== 4.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  INSERT INTO t1 VALUES(1,x'1111');
+  CREATE TABLE t2(c);
+  CREATE TABLE t3(d);
+  CREATE TRIGGER t1tr UPDATE ON t1 BEGIN
+    UPDATE t1 SET b=x'2222' FROM t2;
+    UPDATE t1
+       SET b = (SELECT a IN (SELECT a
+                               FROM t1
+                              WHERE (b,a) IN (SELECT rowid, d
+                                                FROM t3
+                                             )
+                            )
+                  FROM t1 NATURAL RIGHT JOIN t1
+               );
+  END;
+  UPDATE t1 SET b=x'3333';
+  SELECT quote(b) FROM t1;
+----
+stmt 0 ok
+stmt 45 err 1 -1 81 no such table: t1
+stmt 81 ok
+stmt 103 ok
+stmt 125 err 1 -1 166 no such table: main.t1
+stmt 562 err 1 -1 589 no such table: t1
+stmt 589 err 1 -1 616 no such table: t1

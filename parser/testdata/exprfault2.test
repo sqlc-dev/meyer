@@ -1,0 +1,9 @@
+==== 1.0
+
+  CREATE TABLE t1(a,b,c,d,f,PRIMARY KEY(b,b));
+  CREATE TABLE t2(x INT PRIMARY KEY, y, z);
+  CREATE TABLE t3(a,b,c,d,e,PRIMARY KEY(a,b))WITHOUT ROWID;
+----
+stmt 0 ok
+stmt 47 ok
+stmt 91 ok

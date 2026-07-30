@@ -1,0 +1,19 @@
+==== tkt1536-1.1
+
+    CREATE TABLE t1(
+      a INTEGER PRIMARY KEY,
+      b TEXT
+    );
+    INSERT INTO t1 VALUES(1,'01');
+    SELECT typeof(a), typeof(b) FROM t1;
+----
+stmt 0 ok
+stmt 70 err 1 -1 105 no such table: t1
+stmt 105 err 1 -1 146 no such table: t1
+==== tkt1536-1.2
+
+    INSERT INTO t1(b) SELECT b FROM t1;
+    SELECT b FROM t1 WHERE rowid=2;
+----
+stmt 0 err 1 -1 40 no such table: t1
+stmt 40 err 1 -1 76 no such table: t1

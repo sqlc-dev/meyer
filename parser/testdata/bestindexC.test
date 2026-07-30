@@ -1,0 +1,212 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE x1 USING tcl(vtab_command "a b c d e f");
+  CREATE VIRTUAL TABLE x2 USING tcl(vtab_command "A B C D E F a b");
+----
+stmt 0 ok
+stmt 65 ok
+==== 1.1
+
+  CREATE TEMP TABLE t_unionall AS 
+    SELECT * FROM x1 UNION ALL SELECT * FROM x2;
+
+  CREATE TEMP TABLE t_intersect AS 
+    SELECT * FROM x1 INTERSECT SELECT * FROM x2;
+
+  CREATE TEMP TABLE t_union AS 
+    SELECT * FROM x1 UNION SELECT * FROM x2;
+
+  CREATE TEMP TABLE t_except AS 
+    SELECT * FROM x1 EXCEPT SELECT * FROM x2;
+----
+stmt 0 err 1 -1 84 no such table: x2
+stmt 84 err 1 -1 170 no such table: x2
+stmt 170 err 1 -1 248 no such table: x2
+stmt 248 err 1 -1 328 no such table: x2
+==== 2.0
+
+  CREATE VIRTUAL TABLE x1 USING tcl(vtab_command "a b c d e f");
+  CREATE VIRTUAL TABLE x2 USING tcl(vtab_command "a b e f");
+----
+stmt 0 ok
+stmt 65 ok
+==== 2.1
+
+  SELECT * FROM x1 
+    EXCEPT
+  SELECT * FROM x2
+  LIMIT 3
+----
+stmt 0 err 1 -1 61 no such table: x2
+==== 3.0
+
+  CREATE VIRTUAL TABLE y1 USING tcl(vtab_command "1 2 3 4 5 6 7 8 9 10");
+----
+stmt 0 ok
+==== 3.1
+
+  SELECT * FROM y1 WHERE a = COALESCE('8', a) LIMIT 3
+----
+stmt 0 err 1 -1 55 no such table: y1
+==== 3.2
+
+  SELECT * FROM y1 WHERE a = '2' LIMIT 3
+----
+stmt 0 err 1 -1 42 no such table: y1
+==== 3.3
+
+  SELECT * FROM generate_series(1, 5) WHERE value = (value & 14) LIMIT 3
+----
+stmt 0 err 1 -1 74 no such table: generate_series
+==== 3.4
+
+  SELECT value FROM generate_series(1,10) WHERE value>2 LIMIT 4 OFFSET 1;
+----
+stmt 0 err 1 -1 74 no such table: generate_series
+==== 3.5
+
+  SELECT * FROM y1 LIMIT 5 OFFSET 3
+----
+stmt 0 err 1 -1 37 no such table: y1
+==== 3.6
+
+  SELECT * FROM y1 LIMIT 5 OFFSET 3
+----
+stmt 0 err 1 -1 37 no such table: y1
+==== 4.0
+
+  CREATE VIRTUAL TABLE y1 USING tcl(vtab_command 1);
+----
+stmt 0 ok
+==== 4.2
+
+  CREATE VIRTUAL TABLE y1 USING tcl(vtab_command "PRAGMA page_size=1024");
+----
+stmt 0 ok
+==== 4.3
+
+  CREATE VIRTUAL TABLE y1 USING tcl(vtab_command "CREATE TABLE x1(");
+----
+stmt 0 ok
+==== 4.4
+
+  CREATE VIRTUAL TABLE y1 USING tcl(vtab_command "CREATE TABLE x1(insert)");
+----
+stmt 0 ok
+==== 5.1
+
+  CREATE VIRTUAL TABLE x1 USING tcl(vtab_command t1);
+  CREATE TABLE t1(a, b, c, d);
+----
+stmt 0 ok
+stmt 54 ok
+==== 5.3
+
+  SELECT * FROM x1 WHERE (a, b, c) = (?, ?, ?);
+----
+stmt 0 err 1 -1 48 no such table: x1
+==== 5.4
+
+  INSERT INTO t1(rowid, a, b, c, d) VALUES(1, 'x', 'y', 'z', 'one');
+  INSERT INTO t1(rowid, a, b, c, d) VALUES(2, 'X', 'Y', 'Z', 'two');
+  SELECT * FROM x1 WHERE (a, b, c) = ('X', 'Y', 'Z');
+----
+stmt 0 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 138 no such table: t1
+stmt 138 err 1 -1 192 no such table: x1
+==== 5.5
+
+  SELECT * FROM x1 WHERE a='x' AND b='y' AND c='z';
+----
+stmt 0 err 1 -1 52 no such table: x1
+==== 5.6
+
+  SELECT * FROM x1 
+  WHERE a='x' COLLATE nocase AND b='y' COLLATE nocase AND c='z'COLLATE nocase;
+----
+stmt 0 err 1 -1 99 no such table: x1
+==== 5.7
+
+  DELETE FROM t1;
+
+  INSERT INTO t1(rowid, a, b, c, d) VALUES(0, 'x', 'y', 'z', 'zero');
+  INSERT INTO t1(rowid, a, b, c, d) VALUES(1, 'x', 'y', 'Z', 'one');
+  INSERT INTO t1(rowid, a, b, c, d) VALUES(2, 'x', 'Y', 'z', 'two');
+  INSERT INTO t1(rowid, a, b, c, d) VALUES(3, 'x', 'Y', 'Z', 'three');
+  INSERT INTO t1(rowid, a, b, c, d) VALUES(4, 'X', 'y', 'z', 'four');
+  INSERT INTO t1(rowid, a, b, c, d) VALUES(5, 'X', 'y', 'Z', 'five');
+  INSERT INTO t1(rowid, a, b, c, d) VALUES(6, 'X', 'Y', 'z', 'six');
+  INSERT INTO t1(rowid, a, b, c, d) VALUES(7, 'X', 'Y', 'z', 'seven');
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 89 no such table: t1
+stmt 89 err 1 -1 158 no such table: t1
+stmt 158 err 1 -1 227 no such table: t1
+stmt 227 err 1 -1 298 no such table: t1
+stmt 298 err 1 -1 368 no such table: t1
+stmt 368 err 1 -1 438 no such table: t1
+stmt 438 err 1 -1 507 no such table: t1
+stmt 507 err 1 -1 578 no such table: t1
+==== 5.8
+
+    SELECT d FROM x1 
+    WHERE a='x' AND ((b='y' AND c='z') OR (b='Y' AND c='z' COLLATE nocase))
+----
+stmt 0 err 1 -1 99 no such table: x1
+==== 5.9
+
+    SELECT d FROM x1 
+    WHERE a='x' COLLATE nocase 
+    AND ((b='y' AND c='z') OR (b='Y' AND c='z' COLLATE nocase))
+----
+stmt 0 err 1 -1 119 no such table: x1
+==== 5.8.dup1
+
+    SELECT d FROM x1 
+    WHERE a='x' AND ((b='y' AND c='z') OR (b='Y' AND c='z' COLLATE nocase))
+----
+stmt 0 err 1 -1 99 no such table: x1
+==== 5.9.dup1
+
+    SELECT d FROM x1 
+    WHERE a='x' COLLATE nocase 
+    AND ((b='y' AND c='z') OR (b='Y' AND c='z' COLLATE nocase))
+----
+stmt 0 err 1 -1 119 no such table: x1
+==== 6.0
+
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES(2, 2);
+  CREATE VIRTUAL TABLE x1 USING tcl(vtab_command t1);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t1
+stmt 56 ok
+==== 6.1
+ SELECT * FROM x1 LIMIT 50
+----
+stmt 0 err 1 -1 27 no such table: x1
+==== 6.2
+ SELECT * FROM x1 WHERE b=c LIMIT 5
+----
+stmt 0 err 1 -1 36 no such table: x1
+==== 6.3
+ 
+  SELECT (SELECT a FROM x1 WHERE t1.x=t1.y LIMIT 10) FROM t1
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== 6.4
+ 
+  SELECT (SELECT a FROM x1 WHERE x1.a=1) FROM t1
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 6.5
+ 
+  SELECT (SELECT a FROM x1 WHERE x1.a=1 LIMIT 1) FROM t1
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== 6.6
+ 
+  SELECT (SELECT a FROM x1 WHERE x1.a=555 LIMIT 2) FROM t1
+----
+stmt 0 err 1 -1 61 no such table: t1

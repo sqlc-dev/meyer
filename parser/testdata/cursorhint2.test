@@ -1,0 +1,29 @@
+==== 1.0
+
+  PRAGMA automatic_index = 0;
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(c, d);
+  CREATE TABLE t3(e, f);
+----
+stmt 0 ok
+stmt 30 ok
+stmt 55 ok
+stmt 80 ok
+==== 2.0
+
+  CREATE TABLE x1(x, y);
+  CREATE TABLE x2(a, b);
+----
+stmt 0 ok
+stmt 25 ok
+==== 3.0
+
+  CREATE TABLE t1 (i1 TEXT);    
+  CREATE TABLE t2 (i2 TEXT UNIQUE);    
+  INSERT INTO t1 VALUES('0');
+  INSERT INTO t2 VALUES('0');
+----
+stmt 0 ok
+stmt 29 ok
+stmt 69 err 1 -1 103 no such table: t1
+stmt 103 err 1 -1 133 no such table: t2

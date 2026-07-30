@@ -1,0 +1,187 @@
+==== without_rowid5-1.1
+
+  CREATE TABLE t1(a PRIMARY KEY,b,c);
+  CREATE TABLE t1w(a PRIMARY KEY,b,c) WITHOUT ROWID;
+  INSERT INTO t1 VALUES(1565,681,1148),(1429,1190,1619),(425,358,1306);
+  INSERT INTO t1w SELECT a,b,c FROM t1;
+  SELECT rowid, _rowid_, oid FROM t1 ORDER BY a DESC;
+----
+stmt 0 ok
+stmt 38 ok
+stmt 91 err 1 -1 163 no such table: t1
+stmt 163 err 1 -1 203 no such table: t1w
+stmt 203 err 1 -1 257 no such table: t1
+==== without_rowid5-1.2
+
+  SELECT rowid FROM t1w;
+----
+stmt 0 err 1 -1 25 no such table: t1w
+==== without_rowid5-1.3
+
+  SELECT _rowid_ FROM t1w;
+----
+stmt 0 err 1 -1 27 no such table: t1w
+==== without_rowid5-1.4
+
+  SELECT oid FROM t1w;
+----
+stmt 0 err 1 -1 23 no such table: t1w
+==== without_rowid5-2.1
+
+  CREATE TABLE IF NOT EXISTS wordcount(
+    word TEXT PRIMARY KEY,
+    cnt INTEGER
+  ) WITHOUT ROWID;
+  INSERT INTO wordcount VALUES('one',1);
+----
+stmt 0 ok
+stmt 102 err 1 -1 143 no such table: wordcount
+==== without_rowid5-2.2
+
+  SELECT rowid FROM wordcount;
+----
+stmt 0 err 1 -1 31 no such table: wordcount
+==== without_rowid5-2.3
+
+  CREATE TABLE IF NOT EXISTS wordcount_b(
+    word TEXT PRIMARY KEY,
+    cnt INTEGER
+  ) WITHOUT rowid;
+  INSERT INTO wordcount_b VALUES('one',1);
+----
+stmt 0 ok
+stmt 104 err 1 -1 147 no such table: wordcount_b
+==== without_rowid5-2.4
+
+  SELECT rowid FROM wordcount_b;
+----
+stmt 0 err 1 -1 33 no such table: wordcount_b
+==== without_rowid5-2.5
+
+  CREATE TABLE IF NOT EXISTS wordcount_c(
+    word TEXT PRIMARY KEY,
+    cnt INTEGER
+  ) without rowid;
+  INSERT INTO wordcount_c VALUES('one',1);
+----
+stmt 0 ok
+stmt 104 err 1 -1 147 no such table: wordcount_c
+==== without_rowid5-2.6
+
+  SELECT rowid FROM wordcount_c;
+----
+stmt 0 err 1 -1 33 no such table: wordcount_c
+==== without_rowid5-2.7
+
+  CREATE TABLE IF NOT EXISTS wordcount_d(
+    word TEXT PRIMARY KEY,
+    cnt INTEGER
+  ) WITHOUT rowid;
+  INSERT INTO wordcount_d VALUES('one',1);
+----
+stmt 0 ok
+stmt 104 err 1 -1 147 no such table: wordcount_d
+==== without_rowid5-2.8
+
+  SELECT rowid FROM wordcount_d;
+----
+stmt 0 err 1 -1 33 no such table: wordcount_d
+==== without_rowid5-3.1
+
+  CREATE TABLE IF NOT EXISTS error1(
+    word TEXT PRIMARY KEY,
+    cnt INTEGER
+  ) WITHOUT _rowid_;
+----
+stmt 0 err 1 -1 101 unknown table option: _rowid_
+==== without_rowid5-3.2
+
+  CREATE TABLE IF NOT EXISTS error2(
+    word TEXT PRIMARY KEY,
+    cnt INTEGER
+  ) WITHOUT oid;
+----
+stmt 0 err 1 -1 97 unknown table option: oid
+==== without_rowid5-4.1
+
+  CREATE TABLE IF NOT EXISTS error3(
+    word TEXT UNIQUE,
+    cnt INTEGER
+  ) WITHOUT ROWID;
+----
+stmt 0 err 1 -1 94 PRIMARY KEY missing on table error3
+==== without_rowid5-5.1
+
+  CREATE TABLE ipk(key INTEGER PRIMARY KEY, val TEXT) WITHOUT ROWID;
+  INSERT INTO ipk VALUES('rival','bonus'); -- ok to insert non-integer key
+  SELECT * FROM ipk;
+----
+stmt 0 ok
+stmt 69 err 1 -1 112 no such table: ipk
+stmt 112 err 1 -1 165 no such table: ipk
+==== without_rowid5-5.2a
+
+  BEGIN;
+  INSERT INTO ipk VALUES(NULL,'sample'); -- no automatic generation of keys
+----
+stmt 0 ok
+stmt 9 err 1 -1 50 no such table: ipk
+==== without_rowid5-5.2b
+
+  ROLLBACK;
+----
+stmt 0 ok
+==== without_rowid5-5.3
+
+  CREATE TABLE ipk2(key INTEGER PRIMARY KEY AUTOINCREMENT, val TEXT)WITHOUT ROWID;
+----
+stmt 0 err 1 -1 83 AUTOINCREMENT not allowed on WITHOUT ROWID tables
+==== without_rowid5-5.4
+
+  CREATE TABLE nn(a, b, c, d, e, PRIMARY KEY(c,a,e));
+  CREATE TABLE nnw(a, b, c, d, e, PRIMARY KEY(c,a,e)) WITHOUT ROWID;
+  INSERT INTO nn VALUES(1,2,3,4,5);
+  INSERT INTO nnw VALUES(1,2,3,4,5);
+----
+stmt 0 ok
+stmt 54 ok
+stmt 123 err 1 -1 159 no such table: nn
+stmt 159 err 1 -1 196 no such table: nnw
+==== without_rowid5-5.5
+
+  INSERT INTO nn VALUES(NULL, 3,4,5,6);
+  INSERT INTO nn VALUES(3,4,NULL,7,8);
+  INSERT INTO nn VALUES(4,5,6,7,NULL);
+  SELECT count(*) FROM nn;
+----
+stmt 0 err 1 -1 40 no such table: nn
+stmt 40 err 1 -1 79 no such table: nn
+stmt 79 err 1 -1 118 no such table: nn
+stmt 118 err 1 -1 145 no such table: nn
+==== without_rowid5-5.6
+
+  INSERT INTO nnw VALUES(NULL, 3,4,5,6);
+----
+stmt 0 err 1 -1 41 no such table: nnw
+==== without_rowid5-5.7
+
+  INSERT INTO nnw VALUES(3,4,NULL,7,8)
+----
+stmt 0 err 1 -1 40 no such table: nnw
+==== without_rowid5-5.8
+
+  INSERT INTO nnw VALUES(4,5,6,7,NULL)
+----
+stmt 0 err 1 -1 40 no such table: nnw
+==== without_rowid5-5.9
+
+  SELECT count(*) FROM nnw;
+----
+stmt 0 err 1 -1 28 no such table: nnw
+==== without_rowid5-6.1
+
+  CREATE TABLE b1(a INTEGER PRIMARY KEY, b BLOB) WITHOUT ROWID;
+  INSERT INTO b1 VALUES(1,x'0102030405060708090a0b0c0d0e0f');
+----
+stmt 0 ok
+stmt 64 err 1 -1 126 no such table: b1

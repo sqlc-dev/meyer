@@ -1,0 +1,21 @@
+==== 1.0
+
+    CREATE TABLE t1(a, b);
+    CREATE TABLE t2(a, b);
+    INSERT INTO t1 VALUES('one'  , 1);
+    INSERT INTO t1 VALUES('two'  , 5);
+    INSERT INTO t1 VALUES('two'  , 2);
+    INSERT INTO t1 VALUES('three', 3);
+    PRAGMA count_changes = 1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 err 1 -1 93 no such table: t1
+stmt 93 err 1 -1 132 no such table: t1
+stmt 132 err 1 -1 171 no such table: t1
+stmt 171 err 1 -1 210 no such table: t1
+stmt 210 ok
+==== 1.1
+ INSERT INTO t2 SELECT * FROM t1
+----
+stmt 0 err 1 -1 33 no such table: t2

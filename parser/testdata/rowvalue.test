@@ -1,0 +1,968 @@
+==== 0.0
+
+  CREATE TABLE one(o);
+  INSERT INTO one VALUES(1);
+----
+stmt 0 ok
+stmt 23 err 1 -1 52 no such table: one
+==== 3.0
+
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES(1, 1);
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(2, 3);
+  INSERT INTO t1 VALUES(2, 4);
+  INSERT INTO t1 VALUES(3, 5);
+  INSERT INTO t1 VALUES(3, 6);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t1
+stmt 56 err 1 -1 87 no such table: t1
+stmt 87 err 1 -1 118 no such table: t1
+stmt 118 err 1 -1 149 no such table: t1
+stmt 149 err 1 -1 180 no such table: t1
+stmt 180 err 1 -1 211 no such table: t1
+==== 6.0
+
+  CREATE TABLE hh(a, b, c);
+  INSERT INTO hh VALUES('abc', 1, 'i');
+  INSERT INTO hh VALUES('ABC', 1, 'ii');
+  INSERT INTO hh VALUES('def', 2, 'iii');
+  INSERT INTO hh VALUES('DEF', 2, 'iv');
+  INSERT INTO hh VALUES('GHI', 3, 'v');
+  INSERT INTO hh VALUES('ghi', 3, 'vi');
+
+  CREATE INDEX hh_ab ON hh(a, b);
+----
+stmt 0 ok
+stmt 28 err 1 -1 68 no such table: hh
+stmt 68 err 1 -1 109 no such table: hh
+stmt 109 err 1 -1 151 no such table: hh
+stmt 151 err 1 -1 192 no such table: hh
+stmt 192 err 1 -1 232 no such table: hh
+stmt 232 err 1 -1 273 no such table: hh
+stmt 273 err 1 -1 308 no such table: main.hh
+==== 6.1
+
+  SELECT c FROM hh WHERE (a, b) = (SELECT 'abc', 1);
+----
+stmt 0 err 1 -1 53 no such table: hh
+==== 6.2
+
+  SELECT c FROM hh WHERE (a, b) = (SELECT 'abc' COLLATE nocase, 1);
+----
+stmt 0 err 1 -1 68 no such table: hh
+==== 6.3
+
+  SELECT c FROM hh WHERE a = (SELECT 'abc' COLLATE nocase) AND b = (SELECT 1);
+----
+stmt 0 err 1 -1 79 no such table: hh
+==== 6.4
+
+  SELECT c FROM hh WHERE +a = (SELECT 'abc' COLLATE nocase) AND b = (SELECT 1);
+----
+stmt 0 err 1 -1 80 no such table: hh
+==== 6.5
+
+  SELECT c FROM hh WHERE a = (SELECT 'abc') COLLATE nocase AND b = (SELECT 1);
+----
+stmt 0 err 1 -1 79 no such table: hh
+==== 6.6
+
+  SELECT c FROM hh WHERE (a, b) = (SELECT 'abc', 1) COLLATE nocase;
+----
+stmt 0 err 1 -1 68 no such table: hh
+==== 6.7
+
+  SELECT c FROM hh WHERE (a, b) = 1;
+----
+stmt 0 err 1 -1 37 no such table: hh
+==== 6.8
+
+  SELECT c FROM hh WHERE (a COLLATE nocase, b) = (SELECT 'def', 2);
+----
+stmt 0 err 1 -1 68 no such table: hh
+==== 6.9
+
+  SELECT c FROM hh WHERE (a COLLATE nocase, b) IS NOT (SELECT 'def', 2);
+----
+stmt 0 err 1 -1 73 no such table: hh
+==== 6.10
+
+  SELECT c FROM hh WHERE (b, a) = (SELECT 2, 'def');
+----
+stmt 0 err 1 -1 53 no such table: hh
+==== 7.0
+
+  CREATE TABLE xy(i INTEGER PRIMARY KEY, j, k);
+  INSERT INTO xy VALUES(1, 1, 1);
+  INSERT INTO xy VALUES(2, 2, 2);
+  INSERT INTO xy VALUES(3, 3, 3);
+  INSERT INTO xy VALUES(4, 4, 4);
+----
+stmt 0 ok
+stmt 48 err 1 -1 82 no such table: xy
+stmt 82 err 1 -1 116 no such table: xy
+stmt 116 err 1 -1 150 no such table: xy
+stmt 150 err 1 -1 184 no such table: xy
+==== 8.0
+
+  CREATE TABLE j1(a);
+----
+stmt 0 ok
+==== 8.1
+
+  SELECT * FROM j1 WHERE (select min(a) FROM j1) IN (?, ?, ?)
+----
+stmt 0 err 1 -1 63 no such table: j1
+==== 9.0
+
+  CREATE TABLE t2(a INTEGER PRIMARY KEY, b, c);
+  INSERT INTO t2 VALUES(1, 1, 1);
+  INSERT INTO t2 VALUES(2, 2, 2);
+  INSERT INTO t2 VALUES(3, 3, 3);
+  INSERT INTO t2 VALUES(4, 4, 4);
+  INSERT INTO t2 VALUES(5, 5, 5);
+----
+stmt 0 ok
+stmt 48 err 1 -1 82 no such table: t2
+stmt 82 err 1 -1 116 no such table: t2
+stmt 116 err 1 -1 150 no such table: t2
+stmt 150 err 1 -1 184 no such table: t2
+stmt 184 err 1 -1 218 no such table: t2
+==== 10.0
+
+  CREATE TABLE dual(dummy); INSERT INTO dual(dummy) VALUES('X');
+  CREATE TABLE t3(a TEXT,b TEXT,c TEXT,d TEXT,e TEXT,f TEXT);
+  CREATE INDEX t3x ON t3(b,c,d,e,f);
+
+  SELECT a FROM t3
+    WHERE (c,d) IN (SELECT 'c','d' FROM dual)
+    AND (a,b,e) IN (SELECT 'a','b','d' FROM dual);
+----
+stmt 0 ok
+stmt 28 err 1 -1 65 no such table: dual
+stmt 65 ok
+stmt 127 err 1 -1 164 no such table: main.t3
+stmt 164 err 1 -1 281 no such table: t3
+==== 11.1
+
+  CREATE TABLE t11(a);
+  SELECT * FROM t11 WHERE (a,a)<=1;
+----
+stmt 0 ok
+stmt 23 err 1 -1 59 no such table: t11
+==== 11.2
+
+  SELECT * FROM t11 WHERE (a,a)<1;
+----
+stmt 0 err 1 -1 35 no such table: t11
+==== 11.3
+
+  SELECT * FROM t11 WHERE (a,a)>=1;
+----
+stmt 0 err 1 -1 36 no such table: t11
+==== 11.4
+
+  SELECT * FROM t11 WHERE (a,a)>1;
+----
+stmt 0 err 1 -1 35 no such table: t11
+==== 11.5
+
+  SELECT * FROM t11 WHERE (a,a)==1;
+----
+stmt 0 err 1 -1 36 no such table: t11
+==== 11.6
+
+  SELECT * FROM t11 WHERE (a,a)<>1;
+----
+stmt 0 err 1 -1 36 no such table: t11
+==== 11.7
+
+  SELECT * FROM t11 WHERE (a,a) IS 1;
+----
+stmt 0 err 1 -1 38 no such table: t11
+==== 11.8
+
+  SELECT * FROM t11 WHERE (a,a) IS NOT 1;
+----
+stmt 0 err 1 -1 42 no such table: t11
+==== 12.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INT,b INT); INSERT INTO t1 VALUES(1,2);
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t2(x INT,y INT); INSERT INTO t2 VALUES(3,4);
+  SELECT *,'x' FROM t1 LEFT JOIN t2 ON (a,b)=(x,y);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 59 err 1 -1 87 no such table: t1
+stmt 87 ok
+stmt 114 ok
+stmt 146 err 1 -1 174 no such table: t2
+stmt 174 err 1 -1 226 no such table: t1
+==== 12.2
+
+  SELECT t1.*, t2.* FROM t2 RIGHT JOIN t1 ON (a,b)=(x,y);
+----
+stmt 0 err 1 -1 58 no such table: t2
+==== 12.3
+
+  SELECT t1.*, t2.* FROM t1 FULL JOIN t2 ON (a,b)=(x,y)
+   ORDER BY coalesce(a,x);
+----
+stmt 0 err 1 -1 83 no such table: t1
+==== 14.0
+
+  CREATE TABLE t12(x);
+  INSERT INTO t12 VALUES(2), (4);
+----
+stmt 0 ok
+stmt 23 err 1 -1 57 no such table: t12
+==== 14.6
+
+  SELECT 1 FROM t12 WHERE (1,x) BETWEEN (1,1) AND (3,3)
+----
+stmt 0 err 1 -1 57 no such table: t12
+==== 14.1
+
+  CREATE TABLE x1(a PRIMARY KEY, b);
+  CREATE TABLE x2(a INTEGER PRIMARY KEY, b);
+----
+stmt 0 ok
+stmt 37 ok
+==== 15.1
+
+  DETACH (SELECT * FROM (SELECT 1,2))<3;
+----
+stmt 0 err 1 -1 41 row value misused
+==== 15.2
+
+  UPDATE x1 SET a=(SELECT * FROM (SELECT b,2))<3;
+----
+stmt 0 err 1 -1 50 no such table: x1
+==== 15.3
+
+  UPDATE x1 SET a=NULL WHERE  a<(SELECT * FROM (SELECT b,2));
+----
+stmt 0 err 1 -1 62 no such table: x1
+==== 15.4
+
+  DELETE FROM x1 WHERE  a<(SELECT * FROM (SELECT b,2));
+----
+stmt 0 err 1 -1 56 no such table: x1
+==== 15.5
+
+  INSERT INTO x1(a,b) VALUES(1,(SELECT * FROM (SELECT 1,2))<3);
+----
+stmt 0 err 1 -1 64 no such table: x1
+==== 16.1
+
+  CREATE TABLE t16a(a,b,c);
+  INSERT INTO t16a VALUES(1,2,3);
+  CREATE TABLE t16b(x);
+  INSERT INTO t16b(x) VALUES(1);
+  CREATE TRIGGER t16r AFTER UPDATE ON t16b BEGIN
+     UPDATE t16a SET (a,b,c)=(SELECT new.x,new.x+1,new.x+2);
+  END;
+  UPDATE t16b SET x=7;
+  SELECT * FROM t16a;
+----
+stmt 0 ok
+stmt 28 err 1 -1 62 no such table: t16a
+stmt 62 ok
+stmt 86 err 1 -1 119 no such table: t16b
+stmt 119 err 1 -1 168 no such table: main.t16b
+stmt 236 err 1 -1 259 no such table: t16b
+stmt 259 err 1 -1 281 no such table: t16a
+==== 16.2
+
+  UPDATE t16b SET x=97;
+  SELECT * FROM t16a;
+----
+stmt 0 err 1 -1 24 no such table: t16b
+stmt 24 err 1 -1 46 no such table: t16a
+==== 16.3
+
+  CREATE TABLE t16c(a, b, c, d, e);
+  INSERT INTO t16c VALUES(1, 'a', 'b', 'c', 'd');
+  CREATE TRIGGER t16c1 AFTER INSERT ON t16c BEGIN
+    UPDATE t16c SET (c, d) = (SELECT 'A', 'B'), (e, b) = (SELECT 'C', 'D')
+      WHERE a = new.a-1;
+  END;
+
+  SELECT * FROM t16c;
+----
+stmt 0 ok
+stmt 36 err 1 -1 86 no such table: t16c
+stmt 86 err 1 -1 136 no such table: main.t16c
+stmt 243 err 1 -1 266 no such table: t16c
+==== 16.4
+
+  INSERT INTO t16c VALUES(2, 'w', 'x', 'y', 'z');
+  SELECT * FROM t16c;
+----
+stmt 0 err 1 -1 50 no such table: t16c
+stmt 50 err 1 -1 72 no such table: t16c
+==== 16.5
+
+  DROP TRIGGER t16c1;
+  PRAGMA recursive_triggers = 1;
+  INSERT INTO t16c VALUES(3, 'i', 'ii', 'iii', 'iv');
+  CREATE TRIGGER t16c1 AFTER UPDATE ON t16c WHEN new.a>1 BEGIN
+    UPDATE t16c SET (e, d) = (
+      SELECT b, c FROM t16c WHERE a = new.a-1
+    ), (c, b) = (
+      SELECT d, e FROM t16c WHERE a = new.a-1
+    ) WHERE a = new.a-1;
+  END;
+
+  UPDATE t16c SET a=a WHERE a=3;
+  SELECT * FROM t16c;
+----
+stmt 0 err 1 -1 22 no such trigger: t16c1
+stmt 22 ok
+stmt 55 err 1 -1 109 no such table: t16c
+stmt 109 err 1 -1 172 no such table: main.t16c
+stmt 345 err 1 -1 379 no such table: t16c
+stmt 379 err 1 -1 401 no such table: t16c
+==== 17.0
+
+  CREATE TABLE b1(a, b);
+  CREATE TABLE b2(x);
+----
+stmt 0 ok
+stmt 25 ok
+==== 17.1
+
+  SELECT * FROM b2 CROSS JOIN b1 
+  WHERE b2.x=b1.a AND (b1.a, 2) 
+  IN (VALUES(1, 2));
+----
+stmt 0 err 1 -1 88 no such table: b2
+==== 18.0
+
+  CREATE TABLE b3 ( a, b, PRIMARY KEY (a, b) );
+  CREATE TABLE b4 ( a );
+  CREATE TABLE b5 ( a, b );
+  INSERT INTO b3 VALUES (1, 1), (1, 2);
+  INSERT INTO b4 VALUES (1);
+  INSERT INTO b5 VALUES (1, 1), (1, 2);
+----
+stmt 0 ok
+stmt 48 ok
+stmt 73 ok
+stmt 101 err 1 -1 141 no such table: b3
+stmt 141 err 1 -1 170 no such table: b4
+stmt 170 err 1 -1 210 no such table: b5
+==== 18.1
+
+  SELECT * FROM b3 WHERE (SELECT b3.a, b3.b) IN ( SELECT a, b FROM b5 )
+----
+stmt 0 err 1 -1 73 no such table: b3
+==== 18.2
+
+  SELECT * FROM b3 WHERE (VALUES(b3.a, b3.b)) IN ( SELECT a, b FROM b5 );
+----
+stmt 0 err 1 -1 74 no such table: b3
+==== 18.3
+
+  SELECT * FROM b3 WHERE (b3.a, b3.b) IN ( SELECT a, b FROM b5 );
+----
+stmt 0 err 1 -1 66 no such table: b3
+==== 18.4
+
+  SELECT * FROM b3 JOIN b4 ON b4.a = b3.a
+  WHERE (SELECT b3.a, b3.b) IN ( SELECT a, b FROM b5 );
+----
+stmt 0 err 1 -1 98 no such table: b3
+==== 18.5
+
+  SELECT * FROM b3 JOIN b4 ON b4.a = b3.a
+  WHERE (VALUES(b3.a, b3.b)) IN ( SELECT a, b FROM b5 );
+----
+stmt 0 err 1 -1 99 no such table: b3
+==== 18.6
+
+  SELECT * FROM b3 JOIN b4 ON b4.a = b3.a
+  WHERE (b3.a, b3.b) IN ( SELECT a, b FROM b5 );
+----
+stmt 0 err 1 -1 91 no such table: b3
+==== 19.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY,b);
+  INSERT INTO t1(a,b) VALUES(1,11),(2,22),(3,33),(4,44);
+  SELECT * FROM t1 WHERE (a,b)>(0,0) ORDER BY a;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 71 err 1 -1 128 no such table: t1
+stmt 128 err 1 -1 177 no such table: t1
+==== 19.2
+
+  SELECT * FROM t1 WHERE (a,b)>=(0,0) ORDER BY a;
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 19.3
+
+  SELECT * FROM t1 WHERE (a,b)<(5,0) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== 19.4
+
+  SELECT * FROM t1 WHERE (a,b)<=(5,0) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== 19.5
+
+  SELECT * FROM t1 WHERE (a,b)>(3,0) ORDER BY a;
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== 19.6
+
+  SELECT * FROM t1 WHERE (a,b)>=(3,0) ORDER BY a;
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 19.7
+
+  SELECT * FROM t1 WHERE (a,b)<(3,0) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== 19.8
+
+  SELECT * FROM t1 WHERE (a,b)<=(3,0) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== 19.9
+
+  SELECT * FROM t1 WHERE (a,b)>(3,32) ORDER BY a;
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 19.10
+
+  SELECT * FROM t1 WHERE (a,b)>(3,33) ORDER BY a;
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 19.11
+
+  SELECT * FROM t1 WHERE (a,b)>=(3,33) ORDER BY a;
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 19.12
+
+  SELECT * FROM t1 WHERE (a,b)>=(3,34) ORDER BY a;
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 19.13
+
+  SELECT * FROM t1 WHERE (a,b)<(3,34) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== 19.14
+
+  SELECT * FROM t1 WHERE (a,b)<(3,33) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== 19.15
+
+  SELECT * FROM t1 WHERE (a,b)<=(3,33) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== 19.16
+
+  SELECT * FROM t1 WHERE (a,b)<=(3,32) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== 19.21
+
+  SELECT * FROM t1 WHERE (0,0)<(a,b) ORDER BY a;
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== 19.22
+
+  SELECT * FROM t1 WHERE (0,0)<=(a,b) ORDER BY a;
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 19.23
+
+  SELECT * FROM t1 WHERE (5,0)>(a,b) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== 19.24
+
+  SELECT * FROM t1 WHERE (5,0)>=(a,b) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== 19.25
+
+  SELECT * FROM t1 WHERE (3,0)<(a,b) ORDER BY a;
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== 19.26
+
+  SELECT * FROM t1 WHERE (3,0)<=(a,b) ORDER BY a;
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 19.27
+
+  SELECT * FROM t1 WHERE (3,0)>(a,b) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== 19.28
+
+  SELECT * FROM t1 WHERE (3,0)>=(a,b) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== 19.29
+
+  SELECT * FROM t1 WHERE (3,32)<(a,b) ORDER BY a;
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 19.30
+
+  SELECT * FROM t1 WHERE (3,33)<(a,b) ORDER BY a;
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 19.31
+
+  SELECT * FROM t1 WHERE (3,33)<=(a,b) ORDER BY a;
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 19.32
+
+  SELECT * FROM t1 WHERE (3,34)<=(a,b) ORDER BY a;
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 19.33
+
+  SELECT * FROM t1 WHERE (3,34)>(a,b) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== 19.34
+
+  SELECT * FROM t1 WHERE (3,33)>(a,b) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== 19.35
+
+  SELECT * FROM t1 WHERE (3,33)>=(a,b) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== 19.36
+
+  SELECT * FROM t1 WHERE (3,32)>=(a,b) ORDER BY a DESC;
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== 20.1
+
+  SELECT 1 WHERE (2,(2,0)) IS (2,(2,0));
+----
+stmt 0 ok
+==== 21.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a,b,PRIMARY KEY(b,b));
+  INSERT INTO t1 VALUES(1,2),(3,4),(5,6);
+  SELECT * FROM t1 WHERE (a,b) IN (VALUES(1,2));
+----
+stmt 0 ok
+stmt 27 ok
+stmt 68 err 1 -1 110 no such table: t1
+stmt 110 err 1 -1 159 no such table: t1
+==== 22.100
+
+  SELECT (SELECT 3,4 UNION SELECT 5,6 ORDER BY 1) IN (SELECT 3,4);
+  SELECT (SELECT 3,4 UNION SELECT 5,6 ORDER BY 1) IN (SELECT 5,6);
+  SELECT (SELECT 5,6 UNION SELECT 3,4 ORDER BY 1) IN (SELECT 3,4);
+  SELECT (SELECT 5,6 UNION SELECT 3,4 ORDER BY 1) IN (SELECT 5,6);
+  SELECT (SELECT 3,4 UNION SELECT 5,6 ORDER BY 1 DESC) IN (SELECT 3,4);
+  SELECT (SELECT 3,4 UNION SELECT 5,6 ORDER BY 1 DESC) IN (SELECT 5,6);
+  SELECT (SELECT 5,6 UNION SELECT 3,4 ORDER BY 1 DESC) IN (SELECT 3,4);
+  SELECT (SELECT 5,6 UNION SELECT 3,4 ORDER BY 1 DESC) IN (SELECT 5,6);
+----
+stmt 0 ok
+stmt 67 ok
+stmt 134 ok
+stmt 201 ok
+stmt 268 ok
+stmt 340 ok
+stmt 412 ok
+stmt 484 ok
+==== 23.100
+
+  DROP TABLE IF EXISTS t0;
+  CREATE TABLE t0(aa COLLATE NOCASE, bb);
+  INSERT INTO t0 VALUES('a', 'A');
+  SELECT (+bb,1) >= (aa, 1), (aa,1)<=(+bb,1) FROM t0;
+  SELECT 2 FROM t0 WHERE (+bb,1) >= (aa,1);
+  SELECT 3 FROM t0 WHERE (aa,1) <= (+bb,1);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 69 err 1 -1 104 no such table: t0
+stmt 104 err 1 -1 158 no such table: t0
+stmt 158 err 1 -1 202 no such table: t0
+stmt 202 err 1 -1 246 no such table: t0
+==== 23.110
+
+  SELECT (SELECT +bb,1) >= (aa, 1), (aa,1)<=(SELECT +bb,1) FROM t0;
+  SELECT 2 FROM t0 WHERE (SELECT +bb,1) >= (aa,1);
+  SELECT 3 FROM t0 WHERE (aa,1) <= (SELECT +bb,1);
+----
+stmt 0 err 1 -1 68 no such table: t0
+stmt 68 err 1 -1 119 no such table: t0
+stmt 119 err 1 -1 170 no such table: t0
+==== 24.100
+
+  DROP TABLE t0;
+  CREATE TABLE t0(c0 TEXT PRIMARY KEY);
+  INSERT INTO t0(c0) VALUES ('');
+  SELECT (t0.c0, TRUE) > (CAST(0 AS REAL), FALSE) FROM t0;
+  SELECT 2 FROM t0 WHERE (t0.c0, TRUE) > (CAST('' AS REAL), FALSE);
+----
+stmt 0 err 1 -1 17 no such table: t0
+stmt 17 ok
+stmt 57 err 1 -1 91 no such table: t0
+stmt 91 err 1 -1 150 no such table: t0
+stmt 150 err 1 -1 218 no such table: t0
+==== 25.10
+
+  DROP TABLE t0;
+  CREATE TABLE t0(c0 UNIQUE);
+  INSERT INTO t0(c0) VALUES('a');
+  SELECT (t0.c0, 0) < ('B' COLLATE NOCASE, 0) FROM t0;
+  SELECT 2 FROM t0 WHERE (t0.c0, 0) < ('B' COLLATE NOCASE, 0);
+----
+stmt 0 err 1 -1 17 no such table: t0
+stmt 17 ok
+stmt 47 err 1 -1 81 no such table: t0
+stmt 81 err 1 -1 136 no such table: t0
+stmt 136 err 1 -1 199 no such table: t0
+==== 25.20
+
+  SELECT ('B' COLLATE NOCASE, 0)> (t0.c0, 0) FROM t0;
+  SELECT 2 FROM t0 WHERE ('B' COLLATE NOCASE, 0)> (t0.c0, 0);
+----
+stmt 0 err 1 -1 54 no such table: t0
+stmt 54 err 1 -1 116 no such table: t0
+==== 25.30
+
+  SELECT ('B', 0)> (t0.c0 COLLATE nocase, 0) FROM t0;
+  SELECT 2 FROM t0 WHERE ('B', 0)> (t0.c0 COLLATE nocase, 0);
+----
+stmt 0 err 1 -1 54 no such table: t0
+stmt 54 err 1 -1 116 no such table: t0
+==== 25.40
+
+  SELECT (t0.c0 COLLATE nocase, 0) < ('B', 0) FROM t0;
+  SELECT 2 FROM t0 WHERE (t0.c0 COLLATE nocase, 0) < ('B', 0);
+----
+stmt 0 err 1 -1 55 no such table: t0
+stmt 55 err 1 -1 118 no such table: t0
+==== 26.10
+
+  CREATE TABLE t0(c0);
+  CREATE TABLE t1(c1);
+  INSERT INTO t1(c1) VALUES (0);
+  SELECT (c0, x'') != (NULL, 0) FROM t1 LEFT JOIN t0;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 46 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 133 no such table: t1
+==== 26.20
+
+  SELECT 2 FROM t1 LEFT JOIN t0 ON (c0, x'') != (NULL, 0);
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== 26.21
+
+  SELECT 21 FROM t0 RIGHT JOIN t1 ON (c0, x'') != (NULL, 0);
+----
+stmt 0 err 1 -1 61 no such table: t0
+==== 26.30
+
+  SELECT 3 FROM t1 LEFT JOIN t0 WHERE (c0, x'') != (NULL, 0);
+----
+stmt 0 err 1 -1 62 no such table: t1
+==== 26.31
+
+  SELECT 31 FROM t0 RIGHT JOIN t1 WHERE (c0, x'') != (NULL, 0);
+----
+stmt 0 err 1 -1 64 no such table: t0
+==== 27.10
+
+  CREATE TABLE t0(c0 CHECK(((0, 0) > (0, c0))));
+  INSERT INTO t0(c0) VALUES(0) ON CONFLICT(c0) DO UPDATE SET c0 = 3;
+----
+stmt 0 ok
+stmt 49 err 1 -1 118 no such table: t0
+==== 28.10
+
+  CREATE TABLE t0(c0 PRIMARY KEY, c1);
+  CREATE TRIGGER trigger0 BEFORE DELETE ON t0 BEGIN
+   SELECT (SELECT c0,c1  FROM t0)  FROM t0;
+  END ;
+  DELETE FROM t0;
+----
+stmt 0 ok
+stmt 39 err 1 -1 91 no such table: main.t0
+stmt 143 err 1 -1 161 no such table: t0
+==== 29.1
+
+  SELECT (SELECT 1 WHERE ((SELECT 1 WHERE (2,(2,0)) IS (2,(20))),(2,0)) IS (2,(20))) WHERE (2,(2,0)) IS (2 IN(SELECT 1 WHERE (2,(2,2,0)) IS (2,(20))),(20));
+----
+stmt 0 err 1 -1 157 row value misused
+==== 30.0
+
+  CREATE TABLE t1(x, y, z);
+  CREATE TABLE t2(a, b);
+
+  INSERT INTO t1 VALUES(1000, 2000, 3000);
+  INSERT INTO t2 VALUES(NULL, NULL);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 53 err 1 -1 97 no such table: t1
+stmt 97 err 1 -1 134 no such table: t2
+==== 30.1
+
+  UPDATE t2 SET (a,b)=(
+    SELECT max( t1.x ) OVER( PARTITION BY sum( (SELECT t1.y) ) ), 2
+  )
+  FROM t1;
+----
+stmt 0 err 1 -1 107 no such table: t2
+==== 30.2
+
+  SELECT * FROM t2
+----
+stmt 0 err 1 -1 20 no such table: t2
+==== 30.3
+
+  CREATE TABLE t1(x INT PRIMARY KEY, y, z);
+  CREATE TABLE t2(a,b,c,d,e,PRIMARY KEY(a,b))WITHOUT ROWID;
+
+  UPDATE t2 SET (d,d,a)=(SELECT EXISTS(SELECT 1 IN(SELECT max( 1 IN(SELECT x ORDER BY 1)) OVER(PARTITION BY sum((SELECT y FROM t1 UNION SELECT x ORDER BY 1)))INTERSECT SELECT EXISTS(SELECT 1 FROM t1 UNION SELECT x ORDER BY 1) ORDER BY 1) ORDERa)|9 AS blob, 2, 3) FROM t1 WHERE x<a;
+----
+stmt 0 ok
+stmt 44 ok
+stmt 104 err 1 -1 387 no such table: t2
+==== 31.1
+
+  CREATE TABLE a(a1 PRIMARY KEY,a2);
+  INSERT INTO a VALUES(1,5);
+  CREATE TABLE b(b1 UNIQUE,b2);
+  SELECT * FROM a LEFT JOIN b ON b2=NULL AND b2=5 WHERE (b1,substr(b.b1,1,1))==(SELECT 1024,'b');
+----
+stmt 0 ok
+stmt 37 err 1 -1 66 no such table: a
+stmt 66 ok
+stmt 98 err 1 -1 196 no such table: a
+==== 31.1b
+
+  SELECT * FROM b RIGHT JOIN a ON b2=NULL AND b2=5 WHERE (b1,substr(b.b1,1,1))==(SELECT 1024,'b');
+----
+stmt 0 err 1 -1 99 no such table: b
+==== 31.2
+
+  CREATE TABLE t1(a);
+  INSERT INTO t1 VALUES(0);
+  CREATE TABLE t2(b,c,d);
+  INSERT INTO t2 VALUES(NULL,123,456);
+  SELECT * FROM t1 LEFT JOIN t2 ON b=NULL WHERE (c,d)==(SELECT 123, 456+a);
+----
+stmt 0 ok
+stmt 22 err 1 -1 50 no such table: t1
+stmt 50 ok
+stmt 76 err 1 -1 115 no such table: t2
+stmt 115 err 1 -1 191 no such table: t1
+==== 31.2b
+
+  SELECT * FROM t2 RIGHT JOIN t1 ON b=NULL WHERE (c,d)==(SELECT 123, 456+a);
+----
+stmt 0 err 1 -1 77 no such table: t2
+==== 32.1
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b INT, c INT);
+  CREATE TABLE t2(d INTEGER PRIMARY KEY);
+  INSERT INTO t1(a,b,c) VALUES(500,654,456);
+  INSERT INTO t1(a,b,c) VALUES(501,655,456);
+  INSERT INTO t1(a,b,c) VALUES(502,654,122);
+  INSERT INTO t1(a,b,c) VALUES(503,654,221);
+  INSERT INTO t1(a,b,c) VALUES(601,654,122);
+  INSERT INTO t2(d) VALUES(456);
+  INSERT INTO t2(d) VALUES(122);
+  SELECT a FROM (
+    SELECT t1.a FROM t2, t1 
+    WHERE (987, t1.b) = ( SELECT 987, 654 ) AND t2.d=t1.c
+  ) AS t3
+  WHERE a=1234 OR a<=567;
+----
+stmt 0 ok
+stmt 56 ok
+stmt 98 err 1 -1 143 no such table: t1
+stmt 143 err 1 -1 188 no such table: t1
+stmt 188 err 1 -1 233 no such table: t1
+stmt 233 err 1 -1 278 no such table: t1
+stmt 278 err 1 -1 323 no such table: t1
+stmt 323 err 1 -1 356 no such table: t2
+stmt 356 err 1 -1 389 no such table: t2
+stmt 389 err 1 -1 530 no such table: t2
+==== 33.1
+
+  CREATE TABLE t1(a INT, b INT PRIMARY KEY) WITHOUT ROWID;
+  INSERT INTO t1(a, b) VALUES (0, 1),(15,-7),(3,100);
+  ANALYZE;
+----
+stmt 0 ok
+stmt 59 err 1 -1 113 no such table: t1
+stmt 113 ok
+==== 33.2
+
+  SELECT * FROM t1 WHERE (b,a) BETWEEN (0,5) AND (99,-2);
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 33.3
+
+  SELECT * FROM t1 WHERE (b,a) BETWEEN (-8,5) AND (0,-2);
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 33.3.dup1
+
+  SELECT * FROM t1 WHERE (b,a) BETWEEN (3,5) AND (100,4);
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 33.3.dup2
+
+  SELECT * FROM t1 WHERE (b,a) BETWEEN (3,5) AND (100,2);
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 33.3.dup3
+
+  SELECT * FROM t1 WHERE (a,b) BETWEEN (-2,99) AND (1,0);
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 33.3.dup4
+
+  SELECT * FROM t1 WHERE (a,b) BETWEEN (14,99) AND (16,0);
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== 33.3.dup5
+
+  SELECT * FROM t1 WHERE (a,b) BETWEEN (2,99) AND (4,0);
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== 34.1
+
+  CREATE TABLE items (
+    Id INTEGER  /* rowid alias */,
+    Item INTEGER  /* any type */,
+    Test TEXT  /* TEXT or BLOB */,
+    Filler,  /* any type */
+    PRIMARY KEY(Id),
+    UNIQUE(Item, Id)
+  );
+  INSERT INTO items (Id, Item)
+    VALUES (1, 2), (2, 2), (3, 3), (4, 5);
+  UPDATE items SET test='ok'
+    WHERE (Id, Item) IN (SELECT Id, Item FROM items);
+  SELECT Id, Item, test FROM items ORDER BY id;
+----
+stmt 0 ok
+stmt 202 err 1 -1 276 no such table: items
+stmt 276 err 1 -1 359 no such table: items
+stmt 359 err 1 -1 407 no such table: items
+==== 34.2
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b, c, d);
+  CREATE INDEX idx ON t1(b,a);
+  INSERT INTO t1(a,b) VALUES (1, 22);
+  SELECT * FROM t1 INDEXED BY idx WHERE (b,a) IN (SELECT b,a FROM t1);
+----
+stmt 0 ok
+stmt 51 err 1 -1 82 no such table: main.t1
+stmt 82 err 1 -1 120 no such table: t1
+stmt 120 err 1 -1 191 no such table: t1
+==== 34.3
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a, b, c, d);
+  CREATE INDEX idx ON t1(b,a,a);
+  INSERT INTO t1(a,b) VALUES (1, 22);
+  SELECT * FROM t1 INDEXED BY idx WHERE (b,a) IN (SELECT b,a FROM t1);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 48 err 1 -1 81 no such table: main.t1
+stmt 81 err 1 -1 119 no such table: t1
+stmt 119 err 1 -1 190 no such table: t1
+==== 34.4
+
+  DROP TABLE t1;
+  CREATE TABLE t1(id INTEGER PRIMARY KEY, a INT);
+  CREATE INDEX t1a ON t1(a,id);  -- index includes PRIMARY KEY
+  CREATE TABLE t2(id INTEGER PRIMARY KEY);
+  WITH RECURSIVE c(n) AS (VALUES(1) UNION ALL SELECT n+1 FROM c WHERE n<100)
+    INSERT INTO t1(id,a) SELECT n, 777 FROM c;
+  INSERT INTO t2 SELECT id FROM t1;
+  SELECT *
+    FROM t1 JOIN t2 USING(id)
+   WHERE t1.a=777 AND t2.id>999
+   ORDER BY t1.id;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 67 err 1 -1 99 no such table: main.t1
+stmt 99 ok
+stmt 173 err 1 -1 297 no such table: t1
+stmt 297 err 1 -1 333 no such table: t2
+stmt 333 err 1 -1 425 no such table: t1
+==== 34.5
+
+  EXPLAIN QUERY PLAN
+  SELECT *
+    FROM t1 JOIN t2 USING(id)
+   WHERE t1.a=777 AND t2.id>999
+   ORDER BY t1.id;
+----
+stmt 0 err 1 -1 113 no such table: t1
+==== 35.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(c1 TEXT, c2 INTEGER, PRIMARY KEY(c1, c2));
+  INSERT INTO t1(c1, c2) VALUES ('a', 1);
+  SELECT ('a', 1) IN (SELECT c1, c2 from t1);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 88 err 1 -1 130 no such table: t1
+stmt 130 err 1 -1 176 no such table: t1
+==== 35.1
+
+  SELECT (1, 'a') IN (SELECT c2, c1 from t1);
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== 36.0
+
+  DROP TABLE t1;
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(1),(2),(3);
+  SELECT (1,2,3,max(x)) IN () FROM t1;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 39 err 1 -1 75 no such table: t1
+stmt 75 err 1 -1 114 no such table: t1
+==== 36.1
+
+  SELECT (1,2,max(x),3) IN () FROM t1;
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== 36.2
+
+  SELECT (max(x),1,23) IN () FROM t1;
+----
+stmt 0 err 1 -1 38 no such table: t1

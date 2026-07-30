@@ -1,0 +1,5 @@
+==== 5.1
+
+  SELECT 1 ORDER BY 2_3;
+----
+stmt 0 err 1 -1 25 1st ORDER BY term out of range - should be between 1 and 1

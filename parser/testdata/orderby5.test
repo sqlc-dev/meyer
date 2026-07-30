@@ -1,0 +1,225 @@
+==== 1.1
+
+  CREATE TABLE t1(a,b,c);
+  CREATE INDEX t1bc ON t1(b,c);
+
+  EXPLAIN QUERY PLAN
+  SELECT DISTINCT a, b, c FROM t1 WHERE a=0;
+----
+stmt 0 ok
+stmt 26 err 1 -1 58 no such table: main.t1
+stmt 58 err 1 -1 125 no such table: t1
+==== 1.2.1
+
+  EXPLAIN QUERY PLAN
+  SELECT DISTINCT a, c, b FROM t1 WHERE a=0;
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== 1.2.2
+
+  EXPLAIN QUERY PLAN
+  SELECT DISTINCT a, c, b FROM t1 WHERE a='xyz' COLLATE nocase;
+----
+stmt 0 err 1 -1 85 no such table: t1
+==== 1.2.3
+
+  EXPLAIN QUERY PLAN
+  SELECT DISTINCT a COLLATE nocase, c, b FROM t1 WHERE a='xyz';
+----
+stmt 0 err 1 -1 85 no such table: t1
+==== 1.2.4
+
+  EXPLAIN QUERY PLAN
+  SELECT DISTINCT a COLLATE nocase, c, b FROM t1 WHERE a='xyz' COLLATE nocase;
+----
+stmt 0 err 1 -1 100 no such table: t1
+==== 1.3
+
+  EXPLAIN QUERY PLAN
+  SELECT DISTINCT b, a, c FROM t1 WHERE a=0;
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== 1.4
+
+  EXPLAIN QUERY PLAN
+  SELECT DISTINCT b, c, a FROM t1 WHERE a=0;
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== 1.5
+
+  EXPLAIN QUERY PLAN
+  SELECT DISTINCT c, a, b FROM t1 WHERE a=0;
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== 1.6
+
+  EXPLAIN QUERY PLAN
+  SELECT DISTINCT c, b, a FROM t1 WHERE a=0;
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== 1.7
+
+  EXPLAIN QUERY PLAN
+  SELECT DISTINCT c, b, a FROM t1 WHERE +a=0;
+----
+stmt 0 err 1 -1 67 no such table: t1
+==== 2.1a
+
+  CREATE TABLE t2(a,b,c);
+  CREATE INDEX t2bc ON t2(b,c);
+  ANALYZE;
+  INSERT INTO sqlite_stat1 VALUES('t1','t1bc','1000000 10 9');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2bc','100 10 5');
+  ANALYZE sqlite_master;
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t2 WHERE a=0 ORDER BY a, b, c;
+----
+stmt 0 ok
+stmt 26 err 1 -1 58 no such table: main.t2
+stmt 58 ok
+stmt 69 err 1 -1 132 no such table: sqlite_stat1
+stmt 132 err 1 -1 191 no such table: sqlite_stat1
+stmt 191 ok
+stmt 216 err 1 -1 285 no such table: t2
+==== 2.1b
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE likelihood(a=0, 0.03) ORDER BY a, b, c;
+----
+stmt 0 err 1 -1 86 no such table: t1
+==== 2.2
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE +a=0 ORDER BY a, b, c;
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== 2.3
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a=0 ORDER BY b, a, c;
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== 2.4
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a=0 ORDER BY b, c, a;
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== 2.5
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a=0 ORDER BY a, c, b;
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== 2.6
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a=0 ORDER BY c, a, b;
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== 2.7
+
+  EXPLAIN QUERY PLAN
+  SELECT * FROM t1 WHERE a=0 ORDER BY c, b, a;
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== 3.0
+
+  CREATE TABLE t3(a INTEGER PRIMARY KEY, b, c, d, e, f);
+  CREATE INDEX t3bcde ON t3(b, c, d, e);
+  EXPLAIN QUERY PLAN
+  SELECT a FROM t3 WHERE b=2 AND c=3 ORDER BY d DESC, e DESC, b, c, a DESC;
+----
+stmt 0 ok
+stmt 57 err 1 -1 98 no such table: main.t3
+stmt 98 err 1 -1 195 no such table: t3
+==== 3.1
+
+  DROP TABLE t3;
+  CREATE TABLE t3(a INTEGER PRIMARY KEY, b, c, d, e, f) WITHOUT rowid;
+  CREATE INDEX t3bcde ON t3(b, c, d, e);
+  EXPLAIN QUERY PLAN
+  SELECT a FROM t3 WHERE b=2 AND c=3 ORDER BY d DESC, e DESC, b, c, a DESC;
+----
+stmt 0 err 1 -1 17 no such table: t3
+stmt 17 ok
+stmt 88 err 1 -1 129 no such table: main.t3
+stmt 129 err 1 -1 226 no such table: t3
+==== 4.1.0
+
+  CREATE TABLE t4(b COLLATE nocase);
+  INSERT INTO t4 VALUES('abc');
+  INSERT INTO t4 VALUES('ABC');
+  INSERT INTO t4 VALUES('aBC');
+----
+stmt 0 ok
+stmt 37 err 1 -1 69 no such table: t4
+stmt 69 err 1 -1 101 no such table: t4
+stmt 101 err 1 -1 133 no such table: t4
+==== 4.1.1
+
+  SELECT * FROM t4 ORDER BY b COLLATE binary
+----
+stmt 0 err 1 -1 46 no such table: t4
+==== 4.1.2
+
+  SELECT * FROM t4 WHERE b='abc' ORDER BY b COLLATE binary
+----
+stmt 0 err 1 -1 60 no such table: t4
+==== 4.2.1
+
+  CREATE TABLE Records(typeID INTEGER, key TEXT COLLATE nocase, value TEXT);
+  CREATE INDEX RecordsIndex ON Records(typeID, key, value);
+----
+stmt 0 ok
+stmt 77 err 1 -1 137 no such table: main.Records
+==== 4.2.2
+
+  explain query plan
+  SELECT typeID, key, value FROM Records 
+  WHERE typeID = 2 AND key = 'x' 
+  ORDER BY key, value;
+----
+stmt 0 err 1 -1 120 no such table: Records
+==== 4.2.3
+
+  explain query plan
+  SELECT typeID, key, value FROM Records 
+  WHERE typeID = 2 AND (key = 'x' COLLATE binary)
+  ORDER BY key, value;
+----
+stmt 0 err 1 -1 136 no such table: Records
+==== 4.2.4
+
+  explain query plan
+  SELECT typeID, key, value FROM Records 
+  WHERE typeID = 2 
+  ORDER BY key, value;
+----
+stmt 0 err 1 -1 106 no such table: Records
+==== 4.3.1
+
+  CREATE TABLE t5(a INTEGER PRIMARY KEY, b COLLATE hello, c, d);
+----
+stmt 0 err 1 -1 58 no such collation sequence: hello
+==== 4.3.2
+
+  SELECT a FROM t5 WHERE b='def' ORDER BY b;
+----
+stmt 0 err 1 -1 45 no such table: t5
+==== 4.4.0
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a);
+  DROP TABLE t2;
+  CREATE TABLE t2(b INTEGER PRIMARY KEY, c INT);
+  SELECT DISTINCT *
+    FROM t1 LEFT JOIN t2 ON b=c AND b=(SELECT a FROM t1)
+   WHERE c>10;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 39 err 1 -1 56 no such table: t2
+stmt 56 ok
+stmt 105 err 1 -1 197 no such table: t1

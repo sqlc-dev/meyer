@@ -1,0 +1,40 @@
+==== nulls2-generated
+
+    CREATE TABLE t1(a, b, c);
+
+    INSERT INTO t1 VALUES(1, 1, NULL);
+    INSERT INTO t1 VALUES(2, 2, NULL);
+
+    CREATE TABLE t2(d NOT NULL, e NOT NULL, f);
+    INSERT INTO t2 VALUES(1, 1, NULL);
+    INSERT INTO t2 VALUES(2, 2, NULL);
+----
+stmt 0 ok
+stmt 30 err 1 -1 70 no such table: t1
+stmt 70 err 1 -1 109 no such table: t1
+stmt 109 ok
+stmt 158 err 1 -1 197 no such table: t2
+stmt 197 err 1 -1 236 no such table: t2
+==== nulls2-generated.dup1
+
+    SELECT rowid FROM t2 WHERE (d, e, f) IN (
+        SELECT a, b, c FROM t1
+    )
+----
+stmt 0 err 1 -1 84 no such table: t2
+==== nulls2-generated.dup2
+
+    CREATE TABLE t1(a, b, c COLLATE nocase);
+    INSERT INTO t1 VALUES('one', 'two', 'THREE');
+    INSERT INTO t1 VALUES('four', 'five', 'SIX');
+----
+stmt 0 ok
+stmt 45 err 1 -1 95 no such table: t1
+stmt 95 err 1 -1 145 no such table: t1
+==== nulls2-generated.dup3
+
+    SELECT (NULL, 'two', 'three') IN (
+        SELECT a, b, c FROM t1
+    ) IS NULL
+----
+stmt 0 err 1 -1 85 no such table: t1

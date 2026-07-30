@@ -1,0 +1,70 @@
+==== eval-1.1
+
+    CREATE TABLE t1(x INTEGER PRIMARY KEY); 
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(2);
+    INSERT INTO t1 SELECT x+2 FROM t1;
+    INSERT INTO t1 SELECT x+4 FROM t1;
+    INSERT INTO t1 SELECT x+8 FROM t1;
+    INSERT INTO t1 SELECT x+16 FROM t1;
+    INSERT INTO t1 SELECT x+32 FROM t1;
+    INSERT INTO t1 SELECT x+64 FROM t1;
+    INSERT INTO t1 SELECT x+128 FROM t1;
+    INSERT INTO t1 SELECT x+256 FROM t1;
+    SELECT count(*), max(x) FROM t1;
+----
+stmt 0 ok
+stmt 44 err 1 -1 75 no such table: t1
+stmt 75 err 1 -1 105 no such table: t1
+stmt 105 err 1 -1 144 no such table: t1
+stmt 144 err 1 -1 183 no such table: t1
+stmt 183 err 1 -1 222 no such table: t1
+stmt 222 err 1 -1 262 no such table: t1
+stmt 262 err 1 -1 302 no such table: t1
+stmt 302 err 1 -1 342 no such table: t1
+stmt 342 err 1 -1 383 no such table: t1
+stmt 383 err 1 -1 424 no such table: t1
+stmt 424 err 1 -1 461 no such table: t1
+==== eval-1.2
+
+    SELECT x, test_eval('SELECT max(x) FROM t1 WHERE x<' || x) FROM t1 LIMIT 5
+----
+stmt 0 err 1 -1 80 no such table: t1
+==== eval-2.1
+
+    CREATE TABLE t2(x,y);
+    INSERT INTO t2 SELECT x, x+1 FROM t1 WHERE x<5;
+    SELECT x, test_eval('DELETE FROM t2 WHERE x='||x), y FROM t2;
+----
+stmt 0 ok
+stmt 26 err 1 -1 78 no such table: t2
+stmt 78 err 1 -1 144 no such table: t2
+==== eval-2.2
+
+    SELECT * FROM t2
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== eval-2.3
+
+    INSERT INTO t2 SELECT x, x+1 FROM t1 WHERE x<5;
+    SELECT x, test_eval('DELETE FROM t2 WHERE x='||x), y FROM t2
+     ORDER BY rowid DESC;
+----
+stmt 0 err 1 -1 52 no such table: t2
+stmt 52 err 1 -1 143 no such table: t2
+==== eval-2.4
+
+    SELECT * FROM t2
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== eval-3.1
+
+    INSERT INTO t2 SELECT x, x+1 FROM t1 WHERE x<5;
+    SELECT x, test_eval('UPDATE t2 SET y=y+100 WHERE x='||x), y FROM t2;
+----
+stmt 0 err 1 -1 52 no such table: t2
+stmt 52 err 1 -1 125 no such table: t2
+==== eval-4.1
+ SELECT test_eval('SELECT ''abcdefghij''')
+----
+stmt 0 err 1 8 43 no such function: test_eval

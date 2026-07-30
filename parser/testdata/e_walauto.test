@@ -1,0 +1,8 @@
+==== e_walauto-generated
+ PRAGMA journal_mode = WAL
+----
+stmt 0 ok
+==== e_walauto-generated.dup1
+ CREATE TABLE t1(a, b)
+----
+stmt 0 ok

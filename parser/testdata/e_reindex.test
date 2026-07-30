@@ -1,0 +1,112 @@
+==== e_reindex-0.0
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a, b);
+  CREATE INDEX i2 ON t1(b, a);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: main.t1
+stmt 56 err 1 -1 87 no such table: main.t1
+==== e_reindex-1.1
+
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(3, 4);
+  INSERT INTO t1 VALUES(5, 6);
+
+  CREATE TABLE saved(a,b,c,d,e);
+  INSERT INTO saved SELECT * FROM sqlite_master WHERE type = 'index';
+  PRAGMA writable_schema = 1;
+  DELETE FROM sqlite_master WHERE type = 'index';
+----
+stmt 0 err 1 -1 31 no such table: t1
+stmt 31 err 1 -1 62 no such table: t1
+stmt 62 err 1 -1 93 no such table: t1
+stmt 93 ok
+stmt 127 err 1 -1 197 no such table: saved
+stmt 197 ok
+stmt 227 ok
+==== e_reindex-1.2
+
+  DELETE FROM t1 WHERE a = 3;
+  INSERT INTO t1 VALUES(7, 8);
+  INSERT INTO t1 VALUES(9, 10);
+  PRAGMA writable_schema = 1;
+  INSERT INTO sqlite_master SELECT * FROM saved;
+  DROP TABLE saved;
+----
+stmt 0 err 1 -1 30 no such table: t1
+stmt 30 err 1 -1 61 no such table: t1
+stmt 61 err 1 -1 93 no such table: t1
+stmt 93 ok
+stmt 123 err 1 -1 172 no such table: saved
+stmt 172 err 1 -1 192 no such table: saved
+==== e_reindex-1.3
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== e_reindex-1.4
+
+  REINDEX;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 11 ok
+==== e_reindex-2.0
+
+  ATTACH 'test.db2' AS aux;
+
+  CREATE TABLE t1(x);
+  CREATE INDEX i1_a ON t1(x COLLATE collA);
+  CREATE INDEX i1_b ON t1(x COLLATE collB);
+  INSERT INTO t1 VALUES('one');
+  INSERT INTO t1 VALUES('two');
+  INSERT INTO t1 VALUES('three');
+  INSERT INTO t1 VALUES('four');
+  INSERT INTO t1 VALUES('five');
+  INSERT INTO t1 VALUES('six');
+  INSERT INTO t1 VALUES('seven');
+  INSERT INTO t1 VALUES('eight');
+
+  CREATE TABLE t2(x);
+  CREATE INDEX i2_a ON t2(x COLLATE collA);
+  CREATE INDEX i2_b ON t2(x COLLATE collB);
+  INSERT INTO t2 SELECT x FROM t1;
+
+  CREATE TABLE aux.t1(x);
+  CREATE INDEX aux.i1_a ON t1(x COLLATE collA);
+  CREATE INDEX aux.i1_b ON t1(x COLLATE collB);
+  INSERT INTO aux.t1 SELECT x FROM main.t1;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 51 err 1 -1 95 no such table: main.t1
+stmt 95 err 1 -1 139 no such table: main.t1
+stmt 139 err 1 -1 171 no such table: t1
+stmt 171 err 1 -1 203 no such table: t1
+stmt 203 err 1 -1 237 no such table: t1
+stmt 237 err 1 -1 270 no such table: t1
+stmt 270 err 1 -1 303 no such table: t1
+stmt 303 err 1 -1 335 no such table: t1
+stmt 335 err 1 -1 369 no such table: t1
+stmt 369 err 1 -1 403 no such table: t1
+stmt 403 ok
+stmt 426 err 1 -1 470 no such table: main.t2
+stmt 470 err 1 -1 514 no such table: main.t2
+stmt 514 err 1 -1 549 no such table: t2
+stmt 549 err 1 566 573 unknown database aux
+stmt 576 err 1 592 624 unknown database aux
+stmt 624 err 1 640 672 unknown database aux
+stmt 672 err 1 -1 716 no such table: aux.t1
+==== e_reindex-2.6.0
+
+  CREATE TABLE collA(x);
+  CREATE INDEX icolla_a ON collA(x COLLATE collA);
+  CREATE INDEX icolla_b ON collA(x COLLATE collB);
+
+  INSERT INTO collA SELECT x FROM t1;
+----
+stmt 0 ok
+stmt 25 err 1 -1 76 no such table: main.collA
+stmt 76 err 1 -1 127 no such table: main.collA
+stmt 127 err 1 -1 166 no such table: collA

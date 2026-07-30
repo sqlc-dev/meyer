@@ -1,0 +1,50 @@
+==== 100
+
+  SELECT spellfix1_scriptcode('And God said, “Let there be light”');
+----
+stmt 0 err 1 10 73 no such function: spellfix1_scriptcode
+==== 110
+
+  SELECT spellfix1_scriptcode('Бог сказал: "Да будет свет"');
+----
+stmt 0 err 1 10 82 no such function: spellfix1_scriptcode
+==== 120
+
+  SELECT spellfix1_scriptcode('και ειπεν ο θεος γενηθητω φως και εγενετο φως');
+----
+stmt 0 err 1 10 117 no such function: spellfix1_scriptcode
+==== 130
+
+  SELECT spellfix1_scriptcode('וַיֹּ֥אמֶר אֱלֹהִ֖ים יְהִ֣י א֑וֹר וַֽיְהִי־אֽוֹר׃');
+----
+stmt 0 err 1 10 129 no such function: spellfix1_scriptcode
+==== 140
+
+  SELECT spellfix1_scriptcode('فِي ذَلِكَ الوَقتِ، قالَ اللهُ: لِيَكُنْ نُورٌ. فَصَارَ نُورٌ.');
+----
+stmt 0 err 1 10 148 no such function: spellfix1_scriptcode
+==== 200
+
+  SELECT spellfix1_scriptcode('+3.14159');
+----
+stmt 0 err 1 10 43 no such function: spellfix1_scriptcode
+==== 210
+
+  SELECT spellfix1_scriptcode('And God said: "Да будет свет"');
+----
+stmt 0 err 1 10 75 no such function: spellfix1_scriptcode
+==== 220
+
+  SELECT spellfix1_scriptcode('+3.14159 light');
+----
+stmt 0 err 1 10 49 no such function: spellfix1_scriptcode
+==== 230
+
+  SELECT spellfix1_scriptcode('+3.14159 свет');
+----
+stmt 0 err 1 10 52 no such function: spellfix1_scriptcode
+==== 240
+
+  SELECT spellfix1_scriptcode('וַיֹּ֥אמֶר +3.14159');
+----
+stmt 0 err 1 10 64 no such function: spellfix1_scriptcode

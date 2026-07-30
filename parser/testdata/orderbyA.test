@@ -1,0 +1,66 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES('one',   1, 11);
+  INSERT INTO t1 VALUES('three', 7, 11);
+  INSERT INTO t1 VALUES('one',   2, 11);
+  INSERT INTO t1 VALUES('one',   3, 11);
+  INSERT INTO t1 VALUES('two',   4, 11);
+  INSERT INTO t1 VALUES('two',   6, 11);
+  INSERT INTO t1 VALUES('three', 8, 11);
+  INSERT INTO t1 VALUES('two',   5, 11);
+  INSERT INTO t1 VALUES('three', 9, 11);
+----
+stmt 0 ok
+stmt 28 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 110 no such table: t1
+stmt 110 err 1 -1 151 no such table: t1
+stmt 151 err 1 -1 192 no such table: t1
+stmt 192 err 1 -1 233 no such table: t1
+stmt 233 err 1 -1 274 no such table: t1
+stmt 274 err 1 -1 315 no such table: t1
+stmt 315 err 1 -1 356 no such table: t1
+stmt 356 err 1 -1 397 no such table: t1
+==== 2.0
+
+  CREATE TABLE t2(a, b, c);
+  INSERT INTO t2 VALUES(1, 'one', 1);
+  INSERT INTO t2 VALUES(1, 'two', 2);
+  INSERT INTO t2 VALUES(1, 'one', 3);
+  INSERT INTO t2 VALUES(1, 'two', 4);
+  INSERT INTO t2 VALUES(1, 'one', 5);
+  INSERT INTO t2 VALUES(1, 'two', 6);
+
+  INSERT INTO t2 VALUES(2, 'one', 7);
+  INSERT INTO t2 VALUES(2, 'two', 8);
+  INSERT INTO t2 VALUES(2, 'one', 9);
+  INSERT INTO t2 VALUES(2, 'two', 10);
+  INSERT INTO t2 VALUES(2, 'one', 11);
+  INSERT INTO t2 VALUES(2, 'two', 12);
+
+  INSERT INTO t2 VALUES(NULL, 'one', 13);
+  INSERT INTO t2 VALUES(NULL, 'two', 14);
+  INSERT INTO t2 VALUES(NULL, 'one', 15);
+  INSERT INTO t2 VALUES(NULL, 'two', 16);
+  INSERT INTO t2 VALUES(NULL, 'one', 17);
+  INSERT INTO t2 VALUES(NULL, 'two', 18);
+----
+stmt 0 ok
+stmt 28 err 1 -1 66 no such table: t2
+stmt 66 err 1 -1 104 no such table: t2
+stmt 104 err 1 -1 142 no such table: t2
+stmt 142 err 1 -1 180 no such table: t2
+stmt 180 err 1 -1 218 no such table: t2
+stmt 218 err 1 -1 256 no such table: t2
+stmt 256 err 1 -1 295 no such table: t2
+stmt 295 err 1 -1 333 no such table: t2
+stmt 333 err 1 -1 371 no such table: t2
+stmt 371 err 1 -1 410 no such table: t2
+stmt 410 err 1 -1 449 no such table: t2
+stmt 449 err 1 -1 488 no such table: t2
+stmt 488 err 1 -1 531 no such table: t2
+stmt 531 err 1 -1 573 no such table: t2
+stmt 573 err 1 -1 615 no such table: t2
+stmt 615 err 1 -1 657 no such table: t2
+stmt 657 err 1 -1 699 no such table: t2
+stmt 699 err 1 -1 741 no such table: t2

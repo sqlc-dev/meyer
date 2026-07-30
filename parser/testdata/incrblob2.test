@@ -1,0 +1,45 @@
+==== incrblob2-1.0
+
+    CREATE TABLE blobs(id INTEGER PRIMARY KEY, data BLOB);
+    INSERT INTO blobs VALUES(NULL, zeroblob(5000));
+    INSERT INTO blobs VALUES(NULL, zeroblob(5000));
+    INSERT INTO blobs VALUES(NULL, zeroblob(5000));
+    INSERT INTO blobs VALUES(NULL, zeroblob(5000));
+----
+stmt 0 ok
+stmt 59 err 1 -1 111 no such table: blobs
+stmt 111 err 1 -1 163 no such table: blobs
+stmt 163 err 1 -1 215 no such table: blobs
+stmt 215 err 1 -1 267 no such table: blobs
+==== incrblob2-3.2
+
+    INSERT INTO blobs VALUES(5, zeroblob(10240));
+----
+stmt 0 err 1 -1 50 no such table: blobs
+==== incrblob2-8.3
+
+    CREATE TABLE t3(a INTEGER UNIQUE, b TEXT);
+    INSERT INTO t3 VALUES(1, 'aaaaaaaaaaaaaaaaaaaa');
+    INSERT INTO t3 VALUES(2, 'bbbbbbbbbbbbbbbbbbbb');
+    INSERT INTO t3 VALUES(3, 'cccccccccccccccccccc');
+    INSERT INTO t3 VALUES(4, 'dddddddddddddddddddd');
+    INSERT INTO t3 VALUES(5, 'eeeeeeeeeeeeeeeeeeee');
+----
+stmt 0 ok
+stmt 47 err 1 -1 101 no such table: t3
+stmt 101 err 1 -1 155 no such table: t3
+stmt 155 err 1 -1 209 no such table: t3
+stmt 209 err 1 -1 263 no such table: t3
+stmt 263 err 1 -1 317 no such table: t3
+==== incrblob2-8.5
+UPDATE t3 SET a = 6 WHERE a > 3
+----
+stmt 0 err 1 -1 32 no such table: t3
+==== incrblob2-8.6
+UPDATE t3 SET a = 6 WHERE a > 3
+----
+stmt 0 err 1 -1 32 no such table: t3
+==== incrblob2-8.8
+UPDATE t3 SET a = 6 WHERE a = 3 OR a = 5
+----
+stmt 0 err 1 -1 41 no such table: t3

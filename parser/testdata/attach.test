@@ -1,0 +1,401 @@
+==== attach-1.1
+
+    CREATE TABLE t1(a,b);
+    INSERT INTO t1 VALUES(1,2);
+    INSERT INTO t1 VALUES(3,4);
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 26 err 1 -1 58 no such table: t1
+stmt 58 err 1 -1 90 no such table: t1
+stmt 90 err 1 -1 112 no such table: t1
+==== attach-1.3
+
+    ATTACH DATABASE 'test2.db' AS two;
+    SELECT * FROM two.t2;
+----
+stmt 0 ok
+stmt 39 err 1 -1 65 no such table: two.t2
+==== attach-1.4
+
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== attach-1.5
+
+    DETACH DATABASE two;
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 25 err 1 -1 47 no such table: t1
+==== attach-1.6
+
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== attach-1.7
+
+    SELECT * FROM two.t2;
+----
+stmt 0 err 1 -1 26 no such table: two.t2
+==== attach-1.8
+
+    ATTACH DATABASE 'test3.db' AS three;
+----
+stmt 0 ok
+==== attach-1.9
+
+    SELECT * FROM three.sqlite_master;
+----
+stmt 0 err 1 -1 39 no such table: three.sqlite_master
+==== attach-1.11
+
+    ATTACH 'test.db' AS db2;
+    ATTACH 'test.db' AS db3;
+    ATTACH 'test.db' AS db4;
+    ATTACH 'test.db' AS db5;
+    ATTACH 'test.db' AS db6;
+    ATTACH 'test.db' AS db7;
+    ATTACH 'test.db' AS db8;
+    ATTACH 'test.db' AS db9;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 58 ok
+stmt 87 ok
+stmt 116 ok
+stmt 145 ok
+stmt 174 ok
+stmt 203 ok
+==== attach-1.12
+
+    ATTACH 'test.db' as db2;
+----
+stmt 0 ok
+==== attach-1.13
+
+    ATTACH 'test.db' as db5;
+----
+stmt 0 ok
+==== attach-1.14
+
+    ATTACH 'test.db' as db9;
+----
+stmt 0 ok
+==== attach-1.15
+
+  ATTACH 'test.db' as main;
+----
+stmt 0 ok
+==== attach-1.16
+
+      ATTACH 'test.db' as temp;
+----
+stmt 0 ok
+==== attach-1.17
+
+  ATTACH 'test.db' as MAIN;
+----
+stmt 0 ok
+==== attach-1.18
+
+    ATTACH 'test.db' as db10;
+    ATTACH 'test.db' as db11;
+----
+stmt 0 ok
+stmt 30 ok
+==== attach-1.19
+
+      ATTACH 'test.db' as db12;
+----
+stmt 0 ok
+==== attach-1.20.1
+
+    DETACH db5;
+----
+stmt 0 ok
+==== attach-1.21
+
+    ATTACH 'test.db' as db12;
+----
+stmt 0 ok
+==== attach-1.22
+
+      ATTACH 'test.db' as db13;
+----
+stmt 0 ok
+==== attach-1.23
+
+    DETACH "db14";
+----
+stmt 0 ok
+==== attach-1.24
+
+    DETACH db12;
+----
+stmt 0 ok
+==== attach-1.25
+
+    DETACH db12;
+----
+stmt 0 ok
+==== attach-1.26
+
+    DETACH main;
+----
+stmt 0 ok
+==== attach-1.27
+
+      DETACH Temp;
+----
+stmt 0 ok
+==== attach-1.27.dup1
+
+      DETACH Temp;
+----
+stmt 0 ok
+==== attach-1.28
+
+    DETACH db11;
+    DETACH db10;
+    DETACH db9;
+    DETACH db8;
+    DETACH db7;
+    DETACH db6;
+    DETACH db4;
+    DETACH db3;
+    DETACH db2;
+----
+stmt 0 ok
+stmt 17 ok
+stmt 34 ok
+stmt 50 ok
+stmt 66 ok
+stmt 82 ok
+stmt 98 ok
+stmt 114 ok
+stmt 130 ok
+==== attach-2.3
+
+    CREATE TABLE tx(x1,x2,y1,y2);
+    SELECT * FROM tx;
+----
+stmt 0 ok
+stmt 34 err 1 -1 56 no such table: tx
+==== attach-2.4
+
+    ATTACH 'test2.db' AS db2;
+----
+stmt 0 ok
+==== attach-2.5
+
+    UPDATE db2.t2 SET x=x+10;
+    SELECT * FROM db2.tx;
+----
+stmt 0 err 1 -1 30 no such table: db2.t2
+stmt 30 err 1 -1 56 no such table: db2.tx
+==== attach-2.6
+
+    SELECT * FROM main.tx;
+----
+stmt 0 err 1 -1 27 no such table: main.tx
+==== attach-2.7
+
+    SELECT type, name, tbl_name FROM db2.sqlite_master;
+----
+stmt 0 err 1 -1 56 no such table: db2.sqlite_master
+==== attach-2.13
+
+    SELECT * FROM t2 WHERE x>5;
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== attach-2.14
+
+    SELECT type, name, tbl_name FROM sqlite_master;
+----
+stmt 0 ok
+==== attach-2.15
+
+    SELECT type, name, tbl_name FROM db2.sqlite_master;
+----
+stmt 0 err 1 -1 56 no such table: db2.sqlite_master
+==== attach-3.2
+
+    SELECT * FROM t2
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== attach-3.3
+
+    ATTACH DATABASE 'test2.db' AS db2;
+    SELECT * FROM t2
+----
+stmt 0 ok
+stmt 39 err 1 -1 61 no such table: t2
+==== attach-3.10
+SELECT * FROM t1
+----
+stmt 0 err 1 -1 17 no such table: t1
+==== attach-3.11
+UPDATE t1 SET a=a+1
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== attach-3.12
+SELECT * FROM t1
+----
+stmt 0 err 1 -1 17 no such table: t1
+==== attach-3.13
+UPDATE t2 SET x=x+1 WHERE x=50
+----
+stmt 0 err 1 -1 31 no such table: t2
+==== attach-3.14
+SELECT * FROM t1
+----
+stmt 0 err 1 -1 17 no such table: t1
+==== attach-4.2
+
+    CREATE TABLE t3(a,b);
+    CREATE UNIQUE INDEX t3i1b ON t3(a);
+    INSERT INTO t3 VALUES(9,10);
+    SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 26 err 1 -1 66 no such table: main.t3
+stmt 66 err 1 -1 99 no such table: t3
+stmt 99 err 1 -1 121 no such table: t3
+==== attach-4.3
+
+    ATTACH DATABASE 'test2.db' AS db2;
+    SELECT * FROM db2.t3;
+----
+stmt 0 ok
+stmt 39 err 1 -1 65 no such table: db2.t3
+==== attach-4.4
+
+    SELECT * FROM main.t3;
+----
+stmt 0 err 1 -1 27 no such table: main.t3
+==== attach-4.5
+
+    INSERT INTO db2.t3 VALUES(9,10);
+    SELECT * FROM db2.t3;
+----
+stmt 0 err 1 -1 37 no such table: db2.t3
+stmt 37 err 1 -1 63 no such table: db2.t3
+==== attach-4.7
+
+      CREATE TABLE t4(y);
+      CREATE TRIGGER t3r3 AFTER INSERT ON t3 BEGIN
+        INSERT INTO t4 VALUES('main.' || NEW.a);
+      END;
+      INSERT INTO main.t3 VALUES(11,12);
+      SELECT * FROM main.t4;
+----
+stmt 0 ok
+stmt 26 err 1 -1 77 no such table: main.t3
+stmt 137 err 1 -1 178 no such table: main.t3
+stmt 178 err 1 -1 207 no such table: main.t4
+==== attach-4.8
+
+    ATTACH DATABASE 'test2.db' AS db2;
+    INSERT INTO db2.t3 VALUES(13,14);
+    SELECT * FROM db2.t4 UNION ALL SELECT * FROM main.t4;
+----
+stmt 0 ok
+stmt 39 err 1 -1 77 no such table: db2.t3
+stmt 77 err 1 -1 135 no such table: main.t4
+==== attach-4.11
+
+    CREATE VIEW v3 AS SELECT a*100+b FROM t3;
+    SELECT * FROM v3;
+----
+stmt 0 ok
+stmt 46 err 1 -1 68 no such table: v3
+==== attach-4.12
+
+    ATTACH DATABASE 'test2.db' AS db2;
+    SELECT * FROM db2.v3;
+----
+stmt 0 ok
+stmt 39 err 1 -1 65 no such table: db2.v3
+==== attach-4.13
+
+    SELECT * FROM main.v3;
+----
+stmt 0 err 1 -1 27 no such table: main.v3
+==== attach-6.1
+
+    ATTACH DATABASE 'no-such-file' AS nosuch;
+----
+stmt 0 ok
+==== attach-6.3
+
+    CREATE TABLE no_such_db.t1(a, b, c);
+----
+stmt 0 err 1 18 32 unknown database no_such_db
+==== attach-9.2
+
+    BEGIN;
+      INSERT INTO aux1.t1 VALUES(3, 4);
+      INSERT INTO aux2.t1 VALUES(5, 6);
+----
+stmt 0 ok
+stmt 11 err 1 -1 51 no such table: aux1.t1
+stmt 51 err 1 -1 91 no such table: aux2.t1
+==== attach-9.3
+
+    COMMIT;
+    SELECT * FROM aux2.t1;
+----
+stmt 0 ok
+stmt 12 err 1 -1 39 no such table: aux2.t1
+==== attach-10.1
+
+    ATTACH '' AS noname;
+    ATTACH ':memory:' AS inmem;
+    BEGIN;
+    CREATE TABLE noname.noname(x);
+    CREATE TABLE inmem.inmem(y);
+    CREATE TABLE main.main(z);
+    COMMIT;
+    SELECT name FROM noname.sqlite_master;
+    SELECT name FROM inmem.sqlite_master;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 57 ok
+stmt 68 err 1 86 100 unknown database noname
+stmt 103 err 1 121 133 unknown database inmem
+stmt 136 ok
+stmt 167 ok
+stmt 179 err 1 -1 222 no such table: noname.sqlite_master
+stmt 222 err 1 -1 264 no such table: inmem.sqlite_master
+==== attach-11.1
+
+  ATTACH printf('file:%09000x/x.db?mode=memory&cache=shared',1) AS aux1;
+  CREATE TABLE aux1.t1(x,y);
+  INSERT INTO aux1.t1(x,y) VALUES(1,2),(3,4);
+  SELECT * FROM aux1.t1;
+----
+stmt 0 ok
+stmt 73 err 1 89 97 unknown database aux1
+stmt 102 err 1 -1 148 no such table: aux1.t1
+stmt 148 err 1 -1 173 no such table: aux1.t1
+==== attach-12.1
+
+  CREATE TABLE Table1 (col TEXT NOT NULL PRIMARY KEY);
+  ATTACH ':memory:' AS db2;
+  CREATE TABLE db2.Table2(col1 INTEGER, col2 INTEGER, col3 INTEGER, col4);
+  CREATE UNIQUE INDEX db2.idx_col1_unique ON Table2 (col1);
+  CREATE UNIQUE INDEX db2.idx_col23_unique ON Table2 (col2, col3);
+  CREATE INDEX db2.idx_col2 ON Table2 (col2);
+  INSERT INTO Table2 VALUES(1,2,3,4);
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 55 ok
+stmt 83 err 1 99 110 unknown database db2
+stmt 158 err 1 181 218 unknown database db2
+stmt 218 err 1 241 285 unknown database db2
+stmt 285 err 1 301 331 unknown database db2
+stmt 331 err 1 -1 369 no such table: Table2
+stmt 369 ok

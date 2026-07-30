@@ -1,0 +1,70 @@
+==== incrvacuum2-3.1
+
+    PRAGMA auto_vacuum = 'full';
+    BEGIN;
+    CREATE TABLE abc(a);
+    INSERT INTO abc VALUES(randstr(1500,1500));
+    COMMIT;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 44 ok
+stmt 69 err 1 -1 117 no such table: abc
+stmt 117 ok
+==== incrvacuum2-3.2
+
+    BEGIN;
+    DELETE FROM abc;
+    PRAGMA incremental_vacuum;
+    COMMIT;
+----
+stmt 0 ok
+stmt 11 err 1 -1 32 no such table: abc
+stmt 32 ok
+stmt 63 ok
+==== 4.1
+
+    PRAGMA page_size = 512;
+    PRAGMA auto_vacuum = 2;
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(randomblob(400));
+    INSERT INTO t1 SELECT * FROM t1;            --    2
+    INSERT INTO t1 SELECT * FROM t1;            --    4
+    INSERT INTO t1 SELECT * FROM t1;            --    8
+    INSERT INTO t1 SELECT * FROM t1;            --   16
+    INSERT INTO t1 SELECT * FROM t1;            --   32
+    INSERT INTO t1 SELECT * FROM t1;            --  128
+    INSERT INTO t1 SELECT * FROM t1;            --  256
+    INSERT INTO t1 SELECT * FROM t1;            --  512
+    INSERT INTO t1 SELECT * FROM t1;            -- 1024
+    INSERT INTO t1 SELECT * FROM t1;            -- 2048
+    INSERT INTO t1 SELECT * FROM t1;            -- 4096
+    INSERT INTO t1 SELECT * FROM t1;            -- 8192
+    DELETE FROM t1 WHERE oid>512;
+    DELETE FROM t1;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 56 ok
+stmt 80 err 1 -1 124 no such table: t1
+stmt 124 err 1 -1 161 no such table: t1
+stmt 161 err 1 -1 217 no such table: t1
+stmt 217 err 1 -1 273 no such table: t1
+stmt 273 err 1 -1 329 no such table: t1
+stmt 329 err 1 -1 385 no such table: t1
+stmt 385 err 1 -1 441 no such table: t1
+stmt 441 err 1 -1 497 no such table: t1
+stmt 497 err 1 -1 553 no such table: t1
+stmt 553 err 1 -1 609 no such table: t1
+stmt 609 err 1 -1 665 no such table: t1
+stmt 665 err 1 -1 721 no such table: t1
+stmt 721 err 1 -1 777 no such table: t1
+stmt 777 err 1 -1 830 no such table: t1
+stmt 830 err 1 -1 850 no such table: t1
+==== 4.2
+ 
+      PRAGMA journal_mode = WAL;
+      PRAGMA incremental_vacuum(1);
+----
+stmt 0 ok
+stmt 34 ok

@@ -1,0 +1,24 @@
+==== 1.1
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<30)
+  SELECT stmtrand()%10 FROM c
+----
+stmt 0 err 1 86 107 no such function: stmtrand
+==== 1.2
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<30)
+  SELECT stmtrand(0)%10 FROM c
+----
+stmt 0 err 1 86 108 no such function: stmtrand
+==== 1.3
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<30)
+  SELECT stmtrand(1)%10 FROM c
+----
+stmt 0 err 1 86 108 no such function: stmtrand
+==== 1.4
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<30)
+  SELECT stmtrand(x)%10 FROM c
+----
+stmt 0 err 1 86 108 no such function: stmtrand

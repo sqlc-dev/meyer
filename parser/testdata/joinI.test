@@ -1,0 +1,287 @@
+==== 1.0
+
+  CREATE TABLE t1(a INT);
+  CREATE TABLE t2(b INT);
+  CREATE TABLE t3(c INT);
+----
+stmt 0 ok
+stmt 26 ok
+stmt 52 ok
+==== 2.0
+
+  CREATE TABLE t0(c0 INT, c1 INT);
+  CREATE TABLE t1 (c0 INT);
+
+  CREATE VIEW v1(c0) AS SELECT t0.c0 FROM t0 NATURAL RIGHT JOIN t1;
+  CREATE VIEW v2(c0) AS SELECT 0 FROM v1;
+
+  INSERT INTO t0(c0, c1) VALUES (-1, 0);
+  INSERT INTO t1(c0) VALUES (NULL);
+
+  SELECT * FROM v1 INNER JOIN (v2 CROSS JOIN t0) ON (t0.c0 < t0.c1);
+----
+stmt 0 ok
+stmt 35 ok
+stmt 63 ok
+stmt 132 ok
+stmt 174 err 1 -1 216 no such table: t0
+stmt 216 err 1 -1 252 no such table: t1
+stmt 252 err 1 -1 322 no such table: v1
+==== 3.0
+
+  CREATE TABLE t0(c0, c1);
+  CREATE TABLE t1(v);
+  CREATE TABLE t2(w);
+  CREATE TABLE t3(x);
+  CREATE TABLE t4(y);
+  CREATE TABLE t5(z);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 49 ok
+stmt 71 ok
+stmt 93 ok
+stmt 115 ok
+==== 3.1
+
+  SELECT 1234 FROM t4 
+  RIGHT JOIN t5 
+  CROSS JOIN (t2 CROSS JOIN t0) AS a1 ON (a1.c0 < a1.c1);
+----
+stmt 0 err 1 -1 98 no such table: t4
+==== 3.2
+
+  SELECT 1234 FROM t4 
+  RIGHT JOIN t5 
+  CROSS JOIN (t2 CROSS JOIN t1 CROSS JOIN t0) AS a1 ON (a1.c0 < a1.c1);
+----
+stmt 0 err 1 -1 112 no such table: t4
+==== 3.3
+
+  SELECT 5678 FROM t0 RIGHT JOIN t1 ON (
+    SELECT 1 FROM t2 RIGHT JOIN t3 ON t2.w
+  ) CROSS JOIN t4;
+----
+stmt 0 err 1 -1 103 no such table: t0
+==== 3.4
+
+  SELECT 5678 FROM t0 RIGHT JOIN t1 ON (
+    SELECT 1 FROM t2 RIGHT JOIN t3 ON t4.y
+  ) CROSS JOIN t4;
+----
+stmt 0 err 1 -1 103 no such table: t0
+==== 3.5
+
+  SELECT 5678 FROM t0 RIGHT JOIN t1 ON (
+    SELECT 1 FROM t2 RIGHT JOIN t3 ON 0=t1.v
+  ) CROSS JOIN t4;
+----
+stmt 0 err 1 -1 105 no such table: t0
+==== 3.6
+
+  SELECT 5678 FROM t0 RIGHT JOIN t1 ON (
+    SELECT 1 FROM t2 RIGHT JOIN t3 ON max(0,t5.z) CROSS JOIN t5
+  ) CROSS JOIN t4;
+----
+stmt 0 err 1 -1 124 no such table: t0
+==== 4.0
+
+  CREATE TABLE t1(a);
+  CREATE TABLE t2(b);
+  CREATE TABLE t3(c, d);
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 ok
+==== 4.1
+
+  SELECT c+d AS cd FROM t1 LEFT JOIN t2 ON (cd=5) CROSS JOIN t3;
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== 5.0
+
+  CREATE TABLE parent1(parent1key, child1key, Child2key, child3key);
+  CREATE TABLE child1 ( child1key NVARCHAR, value NVARCHAR );
+  CREATE TABLE child2 ( child2key NVARCHAR, value NVARCHAR );
+----
+stmt 0 ok
+stmt 69 ok
+stmt 131 ok
+==== 5.1
+
+  SELECT parent1.parent1key, child1.value, child2.value
+    FROM parent1
+    LEFT OUTER JOIN child1 ON child1.child1key = parent1.child1key
+    INNER JOIN child2 ON child2.child2key = parent1.child2key;
+----
+stmt 0 err 1 -1 203 no such table: parent1
+==== 6.0
+
+  CREATE TABLE t5(a, d);
+  CREATE TABLE t6(a, e);
+  INSERT INTO t5 VALUES(1, 'red');
+  INSERT INTO t6 VALUES(0, 1000);
+
+  CREATE TABLE t7(x);
+  CREATE TABLE t8(y);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 85 no such table: t5
+stmt 85 err 1 -1 119 no such table: t6
+stmt 119 ok
+stmt 142 ok
+==== 6.1
+
+  SELECT * FROM t6 CROSS JOIN (t7 RIGHT JOIN t8 ON (t6.a));
+----
+stmt 0 err 1 -1 60 no such table: t6
+==== 6.4
+
+  SELECT * FROM t7 RIGHT JOIN t8 ON (t6.a) CROSS JOIN t6;
+----
+stmt 0 err 1 -1 58 no such table: t7
+==== 6.5
+
+  SELECT * FROM 
+  (SELECT * FROM t7 RIGHT JOIN t8 ON (t6.a) CROSS JOIN t6);
+----
+stmt 0 err 1 -1 77 no such table: t7
+==== 6.6
+
+  SELECT *, NOT EXISTS (
+      SELECT * FROM t7 RIGHT JOIN t8 ON (t6.a) CROSS JOIN t6
+  ) FROM t5;
+----
+stmt 0 err 1 -1 99 no such table: t5
+==== 6.7
+
+  SELECT *, NOT EXISTS (
+      SELECT 1 
+        EXCEPT 
+      SELECT 11 FROM t7 RIGHT JOIN t8 ON (t6.a) CROSS JOIN t6
+  ) FROM t5;
+----
+stmt 0 err 1 -1 132 no such table: t5
+==== 6.8
+
+  SELECT *, NOT EXISTS (
+      SELECT 11 FROM t7 RIGHT JOIN t8 ON (t6.a) CROSS JOIN t6
+        EXCEPT 
+      SELECT 1 
+  ) FROM t5;
+----
+stmt 0 err 1 -1 132 no such table: t5
+==== 7.0
+
+  CREATE TABLE t1(a);
+  INSERT INTO t1 VALUES(1);
+  CREATE TABLE t2(d, e);
+  CREATE INDEX t2def ON t2(d, (e+1));
+  INSERT INTO t2 VALUES(1, 3);
+  INSERT INTO t2 VALUES(2, 555);
+  INSERT INTO t2 VALUES(3, 3);
+----
+stmt 0 ok
+stmt 22 err 1 -1 50 no such table: t1
+stmt 50 ok
+stmt 75 err 1 -1 113 no such table: main.t2
+stmt 113 err 1 -1 144 no such table: t2
+stmt 144 err 1 -1 177 no such table: t2
+stmt 177 err 1 -1 208 no such table: t2
+==== 7.1
+
+  SELECT * FROM t1 RIGHT JOIN t2 ON ( a=d ) WHERE (t2.e+1)!=4;
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== 7.2
+
+  CREATE TABLE rt0(c0 INTEGER PRIMARY KEY, c1, c2);
+  CREATE TABLE t1 (c1 INTEGER, c2 BLOB, c4 INTEGER);
+  CREATE UNIQUE INDEX i81 ON t1(c1, c4, +c2);
+
+  INSERT INTO t1(c4) VALUES ('a');
+  INSERT INTO rt0(c1, c2) VALUES (0.0, 0.0);
+  INSERT INTO t1(c2, c1) VALUES (1, 'b');
+----
+stmt 0 ok
+stmt 52 ok
+stmt 105 err 1 -1 151 no such table: main.t1
+stmt 151 err 1 -1 187 no such table: t1
+stmt 187 err 1 -1 232 no such table: rt0
+stmt 232 err 1 -1 274 no such table: t1
+==== 7.2.dup1
+
+  SELECT count(*) FROM (
+      SELECT DISTINCT * FROM rt0 FULL JOIN t1 ON rt0.c0=t1.c1
+      WHERE ((rt0.c1 OR t1.c4)) IS NOT (+ t1.c2)
+  );
+----
+stmt 0 err 1 -1 141 no such table: rt0
+==== 7.3
+
+  SELECT count(*) FROM (
+      SELECT DISTINCT * FROM rt0 LEFT JOIN t1 ON rt0.c0=t1.c1
+      WHERE ((rt0.c1 OR t1.c4)) IS NOT (+ t1.c2)
+      UNION
+      SELECT DISTINCT * FROM rt0 RIGHT JOIN t1 ON rt0.c0=t1.c1
+      WHERE ((rt0.c1 OR t1.c4)) IS NOT (+ t1.c2)
+  );
+----
+stmt 0 err 1 -1 265 no such table: rt0
+==== 8.0
+
+  CREATE TABLE t1(x REAL);
+  CREATE TABLE t2(x REAL);
+  INSERT INTO t1 VALUES(2.5);
+  INSERT INTO t2 VALUES(2.5);
+  SELECT x FROM t1 JOIN t2 USING(x) WHERE x='2.5';
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 114 no such table: t2
+stmt 114 err 1 -1 165 no such table: t1
+==== 8.1
+
+  SELECT x FROM t1 LEFT JOIN t2 USING(x) WHERE x='2.5';
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== 8.2
+
+  SELECT x FROM t1 RIGHT JOIN t2 USING(x) WHERE x='2.5';
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== 8.3
+
+  SELECT x FROM t1 FULL JOIN t2 USING(x) WHERE x='2.5';
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== 8.10
+
+  CREATE TABLE t3(x TEXT COLLATE nocase);
+  CREATE TABLE t4(x TEXT COLLATE nocase);
+  INSERT INTO t3 VALUES('abc');
+  INSERT INTO t4 VALUES('ABC');
+  SELECT lower(x) FROM t3 JOIN t4 USING(x) WHERE x='Abc';
+----
+stmt 0 ok
+stmt 42 ok
+stmt 84 err 1 -1 116 no such table: t3
+stmt 116 err 1 -1 148 no such table: t4
+stmt 148 err 1 -1 206 no such table: t3
+==== 8.11
+
+  SELECT lower(x) FROM t3 LEFT JOIN t4 USING(x) WHERE x='Abc';
+----
+stmt 0 err 1 -1 63 no such table: t3
+==== 8.12
+
+  SELECT lower(x) FROM t3 RIGHT JOIN t4 USING(x) WHERE x='Abc';
+----
+stmt 0 err 1 -1 64 no such table: t3
+==== 8.13
+
+  SELECT lower(x) FROM t3 FULL JOIN t4 USING(x) WHERE x='Abc';
+----
+stmt 0 err 1 -1 63 no such table: t3

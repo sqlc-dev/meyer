@@ -1,0 +1,70 @@
+==== tkt2251-1.1
+
+    CREATE TABLE t1(a INTEGER);
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(2);
+    INSERT INTO t1 VALUES(9);
+    INSERT INTO t1 VALUES(9);
+    INSERT INTO t1 VALUES(9);
+    INSERT INTO t1 VALUES(3);
+    INSERT INTO t1 VALUES(2);
+    ALTER TABLE t1 ADD COLUMN b REAL DEFAULT 4.0;
+    SELECT avg(b), typeof(avg(b)) FROM t1;
+----
+stmt 0 ok
+stmt 32 err 1 -1 62 no such table: t1
+stmt 62 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 122 no such table: t1
+stmt 122 err 1 -1 152 no such table: t1
+stmt 152 err 1 -1 182 no such table: t1
+stmt 182 err 1 -1 212 no such table: t1
+stmt 212 err 1 -1 242 no such table: t1
+stmt 242 err 1 -1 272 no such table: t1
+stmt 272 err 1 -1 317 no such table: t1
+stmt 322 err 1 -1 365 no such table: t1
+==== tkt2251-1.2
+
+    SELECT sum(b), typeof(sum(b)) FROM t1;
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== tkt2251-1.3
+
+    SELECT a, sum(b), typeof(sum(b)) FROM t1 GROUP BY a ORDER BY a;
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== tkt2251-2.1
+
+    SELECT b, typeof(b) FROM t1 WHERE a=3;
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== tkt2251-2.2
+
+    CREATE INDEX t1i1 ON t1(a,b);
+    SELECT b, typeof(b) FROM t1 WHERE a=3;
+----
+stmt 0 err 1 -1 34 no such table: main.t1
+stmt 34 err 1 -1 77 no such table: t1
+==== tkt2251-2.3
+
+    REINDEX;
+    SELECT b, typeof(b) FROM t1 WHERE a=3;
+----
+stmt 0 ok
+stmt 13 err 1 -1 56 no such table: t1
+==== tkt2251-3.1
+
+    CREATE TABLE t2(x,y);
+    INSERT INTO t2 SELECT * FROM t1;
+    SELECT y, typeof(y) FROM t2 WHERE x=3;
+----
+stmt 0 ok
+stmt 26 err 1 -1 63 no such table: t2
+stmt 63 err 1 -1 106 no such table: t2
+==== tkt2251-3.2
+
+    CREATE TABLE t3 AS SELECT * FROM t1;
+    SELECT b, typeof(b) FROM t3 WHERE a=3;
+----
+stmt 0 err 1 -1 41 no such table: t1
+stmt 41 err 1 -1 84 no such table: t3
