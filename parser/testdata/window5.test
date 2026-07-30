@@ -1,0 +1,44 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(4, 'a');
+  INSERT INTO t1 VALUES(6, 'b');
+  INSERT INTO t1 VALUES(1, 'c');
+  INSERT INTO t1 VALUES(5, 'd');
+  INSERT INTO t1 VALUES(2, 'e');
+  INSERT INTO t1 VALUES(3, 'f');
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t1
+stmt 58 err 1 -1 no such table: t1
+stmt 91 err 1 -1 no such table: t1
+stmt 124 err 1 -1 no such table: t1
+stmt 157 err 1 -1 no such table: t1
+stmt 190 err 1 -1 no such table: t1
+==== 1.1
+
+  SELECT win(a) OVER (ORDER BY b), median(a) OVER (ORDER BY b) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 2.0
+
+  SELECT sumint(a) OVER (ORDER BY rowid) FROM t1 ORDER BY rowid;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 2.1
+
+  SELECT sumint(a) OVER (ORDER BY rowid ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM t1 ORDER BY rowid;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.0
+
+  SELECT sum(a) OVER 
+  (ORDER BY b ROWS BETWEEN 1 PRECEDING AND CURRENT ROW) 
+  FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.1
+
+  SELECT sum(a) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1

@@ -1,0 +1,202 @@
+==== upsert2-100
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b int, c DEFAULT 0);
+  INSERT INTO t1(a,b) VALUES(1,2),(3,4);
+  INSERT INTO t1(a,b) VALUES(1,8),(2,11),(3,1)
+    ON CONFLICT(a) DO UPDATE SET b=excluded.b, c=c+1 WHERE t1.b<excluded.b;
+  SELECT *, 'x' FROM t1 ORDER BY a;
+----
+stmt 0 ok
+stmt 62 err 1 -1 no such table: t1
+stmt 103 err 1 -1 no such table: t1
+stmt 226 err 1 -1 no such table: t1
+==== upsert2-110
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INT PRIMARY KEY, b int, c DEFAULT 0) WITHOUT ROWID;
+  INSERT INTO t1(a,b) VALUES(1,2),(3,4);
+  INSERT INTO t1(a,b) VALUES(1,8),(2,11),(3,1)
+    ON CONFLICT(a) DO UPDATE SET b=excluded.b, c=c+1 WHERE t1.b<excluded.b;
+  SELECT *, 'x' FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 89 err 1 -1 no such table: t1
+stmt 130 err 1 -1 no such table: t1
+stmt 253 err 1 -1 no such table: t1
+==== upsert2-200
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b int, c DEFAULT 0);
+  INSERT INTO t1(a,b) VALUES(1,2),(3,4);
+  WITH nx(a,b) AS (VALUES(1,8),(2,11),(3,1),(2,15),(1,4),(1,99))
+  INSERT INTO t1(a,b) SELECT a, b FROM nx WHERE true
+    ON CONFLICT(a) DO UPDATE SET b=excluded.b, c=c+1 WHERE t1.b<excluded.b;
+  SELECT *, 'x' FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 79 err 1 -1 no such table: t1
+stmt 120 err 1 -1 no such table: t1
+stmt 314 err 1 -1 no such table: t1
+==== upsert2-201
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b) VALUES(1,2),(3,4);
+  WITH nx(a,b) AS (VALUES(1,8),(2,11),(3,1),(2,15),(1,4),(1,99))
+  INSERT INTO main.t1 AS t2(a,b) SELECT a, b FROM nx WHERE true
+    ON CONFLICT(a) DO UPDATE SET b=excluded.b, c=t2.c+1 WHERE t2.b<excluded.b;
+  SELECT *, 'x' FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 59 err 1 -1 no such table: main.t1
+stmt 267 err 1 -1 no such table: t1
+==== upsert2-202
+
+  WITH nx(a,b) AS (VALUES(1,8),(2,11),(3,1),(2,15),(1,4),(1,99))
+  INSERT INTO t1 AS t2(a,b) SELECT a, b FROM nx WHERE true
+    ON CONFLICT(a) DO UPDATE SET b=excluded.b, c=t1.c+1 WHERE t1.b<excluded.b;
+----
+stmt 0 err 1 -1 no such table: t1
+==== upsert2-210
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INT PRIMARY KEY, b int, c DEFAULT 0) WITHOUT ROWID;
+  INSERT INTO t1(a,b) VALUES(1,2),(3,4);
+  WITH nx(a,b) AS (VALUES(1,8),(2,11),(3,1),(2,15),(1,4),(1,99))
+  INSERT INTO t1(a,b) SELECT a, b FROM nx WHERE true
+    ON CONFLICT(a) DO UPDATE SET b=excluded.b, c=c+1 WHERE t1.b<excluded.b;
+  SELECT *, 'x' FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 89 err 1 -1 no such table: t1
+stmt 130 err 1 -1 no such table: t1
+stmt 324 err 1 -1 no such table: t1
+==== upsert2-300
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b int, c DEFAULT 0);
+  CREATE TABLE record(x TEXT, y TEXT);
+  CREATE TRIGGER r1 BEFORE INSERT ON t1 BEGIN
+    INSERT INTO record(x,y)
+        VALUES('before-insert',format('%d,%d,%d',new.a,new.b,new.c));
+  END;
+  CREATE TRIGGER r2 AFTER INSERT ON t1 BEGIN
+    INSERT INTO record(x,y)
+        VALUES('after-insert',printf('%d,%d,%d',new.a,new.b,new.c));
+  END;
+  CREATE TRIGGER r3 BEFORE UPDATE ON t1 BEGIN
+    INSERT INTO record(x,y)
+        VALUES('before-update',format('%d,%d,%d/%d,%d,%d',
+                                      old.a,old.b,old.c,new.a,new.b,new.c));
+  END;
+  CREATE TRIGGER r4 AFTER UPDATE ON t1 BEGIN
+    INSERT INTO record(x,y)
+        VALUES('after-update',printf('%d,%d,%d/%d,%d,%d',
+                                      old.a,old.b,old.c,new.a,new.b,new.c));
+  END;
+  INSERT INTO t1(a,b) VALUES(1,2);
+  DELETE FROM record;
+  INSERT INTO t1(a,b) VALUES(1,2)
+    ON CONFLICT(a) DO UPDATE SET c=t1.c+1;
+  SELECT * FROM record
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 79 ok
+stmt 118 err 1 -1 no such table: main.t1
+stmt 269 err 1 -1 no such table: main.t1
+stmt 418 err 1 -1 no such table: main.t1
+stmt 635 err 1 -1 no such table: main.t1
+stmt 850 err 1 -1 no such table: t1
+stmt 885 err 1 -1 no such table: record
+stmt 907 err 1 -1 no such table: t1
+stmt 984 err 1 -1 no such table: record
+==== upsert2-310
+
+  DELETE FROM record;
+  INSERT INTO t1(a,b) VALUES(1,2) ON CONFLICT DO NOTHING;
+  SELECT * FROM record;
+----
+stmt 0 err 1 -1 no such table: record
+stmt 22 err 1 -1 no such table: t1
+stmt 80 err 1 -1 no such table: record
+==== upsert2-320
+
+  DELETE FROM record;
+  INSERT INTO t1(a,b) VALUES(1,2)
+    ON CONFLICT(a) DO UPDATE SET c=c+1 WHERE c<0;
+  SELECT * FROM record;
+----
+stmt 0 err 1 -1 no such table: record
+stmt 22 err 1 -1 no such table: t1
+stmt 106 err 1 -1 no such table: record
+==== upsert2-321
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== upsert2-400
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INT PRIMARY KEY, b int, c DEFAULT 0) WITHOUT ROWID;
+  CREATE TRIGGER r1 BEFORE INSERT ON t1 BEGIN
+    INSERT INTO record(x,y)
+        VALUES('before-insert',format('%d,%d,%d',new.a,new.b,new.c));
+  END;
+  CREATE TRIGGER r2 AFTER INSERT ON t1 BEGIN
+    INSERT INTO record(x,y)
+        VALUES('after-insert',printf('%d,%d,%d',new.a,new.b,new.c));
+  END;
+  CREATE TRIGGER r3 BEFORE UPDATE ON t1 BEGIN
+    INSERT INTO record(x,y)
+        VALUES('before-update',format('%d,%d,%d/%d,%d,%d',
+                                      old.a,old.b,old.c,new.a,new.b,new.c));
+  END;
+  CREATE TRIGGER r4 AFTER UPDATE ON t1 BEGIN
+    INSERT INTO record(x,y)
+        VALUES('after-update',printf('%d,%d,%d/%d,%d,%d',
+                                      old.a,old.b,old.c,new.a,new.b,new.c));
+  END;
+  INSERT INTO t1(a,b) VALUES(1,2);
+  DELETE FROM record;
+  INSERT INTO t1(a,b) VALUES(1,2)
+    ON CONFLICT(a) DO UPDATE SET c=t1.c+1;
+  SELECT * FROM record
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 89 err 1 -1 no such table: main.t1
+stmt 240 err 1 -1 no such table: main.t1
+stmt 389 err 1 -1 no such table: main.t1
+stmt 606 err 1 -1 no such table: main.t1
+stmt 821 err 1 -1 no such table: t1
+stmt 856 err 1 -1 no such table: record
+stmt 878 err 1 -1 no such table: t1
+stmt 955 err 1 -1 no such table: record
+==== upsert2-410
+
+  DELETE FROM record;
+  INSERT INTO t1(a,b) VALUES(1,2) ON CONFLICT DO NOTHING;
+  SELECT * FROM record;
+----
+stmt 0 err 1 -1 no such table: record
+stmt 22 err 1 -1 no such table: t1
+stmt 80 err 1 -1 no such table: record
+==== upsert2-420
+
+  DELETE FROM record;
+  INSERT INTO t1(a,b) VALUES(1,2)
+    ON CONFLICT(a) DO UPDATE SET c=c+1 WHERE c<0;
+  SELECT * FROM record;
+----
+stmt 0 err 1 -1 no such table: record
+stmt 22 err 1 -1 no such table: t1
+stmt 106 err 1 -1 no such table: record
+==== upsert2-421
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1

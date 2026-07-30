@@ -1,0 +1,445 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(NULL, 1);
+  INSERT INTO t1 VALUES(NULL, 2);
+  INSERT INTO t1 VALUES(NULL, 3);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t1
+stmt 59 err 1 -1 no such table: t1
+stmt 93 err 1 -1 no such table: t1
+==== 1.2
+
+  SELECT sum(b) OVER win FROM t1
+  WINDOW win AS (
+    ORDER BY a DESC NULLS FIRST RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING
+  )
+----
+stmt 0 err 1 -1 no such table: t1
+==== 2.0
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, NULL);
+  INSERT INTO t1 VALUES(2, 45);
+  INSERT INTO t1 VALUES(3, 66.2);
+  INSERT INTO t1 VALUES(4, 'hello world');
+  INSERT INTO t1 VALUES(5, 'hello world');
+  INSERT INTO t1 VALUES(6, X'1234');
+  INSERT INTO t1 VALUES(7, X'1234');
+  INSERT INTO t1 VALUES(8, NULL);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t1
+stmt 59 err 1 -1 no such table: t1
+stmt 91 err 1 -1 no such table: t1
+stmt 125 err 1 -1 no such table: t1
+stmt 168 err 1 -1 no such table: t1
+stmt 211 err 1 -1 no such table: t1
+stmt 248 err 1 -1 no such table: t1
+stmt 285 err 1 -1 no such table: t1
+==== 3.0
+
+    CREATE TABLE testjson(id INTEGER PRIMARY KEY, j TEXT, x TEXT);
+    INSERT INTO testjson VALUES(1, '{"a":1}', 'a');
+    INSERT INTO testjson VALUES(2, '{"b":2}', 'b');
+    INSERT INTO testjson VALUES(3, '{"c":3}', 'c');
+    INSERT INTO testjson VALUES(4, '{"d":4}', 'd');
+----
+stmt 0 ok
+stmt 67 err 1 -1 no such table: testjson
+stmt 119 err 1 -1 no such table: testjson
+stmt 171 err 1 -1 no such table: testjson
+stmt 223 err 1 -1 no such table: testjson
+==== 3.1
+
+    SELECT json_group_array(json(j)) FROM testjson;
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.2
+
+    SELECT json_group_array(json(j)) OVER (ORDER BY id) FROM testjson;
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.3
+
+    SELECT json_group_array(json(j)) OVER (
+      ORDER BY id RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+      EXCLUDE TIES
+    ) FROM testjson;
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.4
+
+    SELECT json_group_array(json(j)) OVER (
+      ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
+    ) FROM testjson;
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.5
+
+    SELECT json_group_array(json(j)) OVER (
+      ORDER BY id ROWS BETWEEN 2 PRECEDING AND 1 PRECEDING
+    ) FROM testjson;
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.5a
+
+    UPDATE testjson SET j = replace(j,char(125),',"e":9'||char(125));
+    SELECT j FROM testjson;
+----
+stmt 0 err 1 -1 no such table: testjson
+stmt 70 err 1 -1 no such table: testjson
+==== 3.5b
+
+    SELECT group_concat(x,'') OVER (
+      ORDER BY id ROWS BETWEEN 1 FOLLOWING AND 2 FOLLOWING
+    ) FROM testjson ORDER BY id;
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.5c
+
+    SELECT json_group_array(json(j)) OVER (
+      ORDER BY id ROWS BETWEEN 1 FOLLOWING AND 2 FOLLOWING
+    ) FROM testjson;
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.5d
+
+    SELECT json_group_object(x,json(j)) OVER (
+      ORDER BY id ROWS BETWEEN 1 FOLLOWING AND 2 FOLLOWING
+    ) FROM testjson;
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.7b
+
+    SELECT group_concat(x,'') FILTER (WHERE id!=2) OVER (
+      ORDER BY id ROWS BETWEEN 2 PRECEDING AND 1 PRECEDING
+    ) FROM testjson;
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.7c
+
+    SELECT json_group_array(json(j)) FILTER (WHERE id!=2) OVER (
+      ORDER BY id ROWS BETWEEN 2 PRECEDING AND 1 PRECEDING
+    ) FROM testjson
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.7d
+
+    SELECT json_group_object(x,json(j)) FILTER (WHERE id!=2) OVER (
+      ORDER BY id ROWS BETWEEN 2 PRECEDING AND 1 PRECEDING
+    ) FROM testjson
+----
+stmt 0 err 1 -1 no such table: testjson
+==== 3.8
+
+    CREATE TABLE t1(id INT, k TEXT, v INT);
+    INSERT INTO t1 VALUES
+      (1, 'a', 1),
+      (2, 'b', 2),
+      (3, 'c', 3),
+      (4, 'd', 4),
+      (5, 'f', 5),
+      (6, 'g', 6),
+      (7, 'h', 7);
+----
+stmt 0 ok
+stmt 44 err 1 -1 no such table: t1
+==== 3.9
+
+     SELECT id, json_group_object(if(id<>1,k),v) OVER 
+                 (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS jx
+       FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.10
+
+     SELECT id, json_group_object(if(id>4,k),v) OVER 
+                 (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS jx
+       FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.11
+
+     SELECT id, json_group_object(if(id>4,k||'@'),v) OVER 
+                 (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS jx
+       FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.12
+
+     SELECT id, json_group_object(k,v) OVER 
+                 (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS jx
+       FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.13
+
+     SELECT id, json_group_object(if(id>1 AND id<7,k),v) OVER 
+                 (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS jx
+       FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.14
+
+     SELECT id, json_group_object(if(id>2 AND id<6,k),v) OVER 
+                 (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS jx
+       FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.15
+
+     SELECT id, json_group_object(if(id<2 OR id>6,k),v) OVER 
+                 (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS jx
+       FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.16
+
+     SELECT id, json_group_object(if(id<3 OR id>5,k),v) OVER 
+                 (ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS jx
+       FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 4.0
+
+  CREATE TABLE x(a);
+  INSERT INTO x VALUES(1);
+  INSERT INTO x VALUES(2);
+----
+stmt 0 ok
+stmt 21 err 1 -1 no such table: x
+stmt 48 err 1 -1 no such table: x
+==== 4.1
+
+  WITH y AS (
+      SELECT Row_Number() OVER (win) FROM x WINDOW win AS (PARTITION BY a)
+  )
+  SELECT * FROM y;
+----
+stmt 0 err 1 -1 no such table: x
+==== 4.2
+
+  WITH y AS (
+    SELECT Row_Number() OVER (win) FROM x WINDOW win AS (PARTITION
+  BY fake_column))
+  SELECT * FROM y;
+----
+stmt 0 err 1 -1 no such table: x
+==== 4.3
+
+  SELECT 1 WINDOW win AS (PARTITION BY fake_column);
+----
+stmt 0 ok
+==== 5.0
+
+  CREATE TABLE t1(a, c);
+  CREATE INDEX i1 ON t1(a);
+
+  INSERT INTO t1 VALUES(0, 421);
+  INSERT INTO t1 VALUES(1, 844);
+  INSERT INTO t1 VALUES(2, 1001);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: main.t1
+stmt 53 err 1 -1 no such table: t1
+stmt 87 err 1 -1 no such table: t1
+stmt 120 err 1 -1 no such table: t1
+==== 5.1
+
+  SELECT a, sum(c) OVER (
+    ORDER BY a RANGE BETWEEN 0 PRECEDING AND 3 PRECEDING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 5.2
+
+  INSERT INTO t1 VALUES(NULL, 123);
+  INSERT INTO t1 VALUES(NULL, 111);
+  INSERT INTO t1 VALUES('xyz', 222);
+  INSERT INTO t1 VALUES('xyz', 333);
+
+  SELECT a, sum(c) OVER (
+    ORDER BY a RANGE BETWEEN 0 PRECEDING AND 3 PRECEDING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 36 err 1 -1 no such table: t1
+stmt 72 err 1 -1 no such table: t1
+stmt 109 err 1 -1 no such table: t1
+stmt 146 err 1 -1 no such table: t1
+==== 5.3
+
+  SELECT a, sum(c) OVER (
+    ORDER BY a RANGE BETWEEN 2 FOLLOWING AND 0 FOLLOWING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 5.4
+
+  SELECT a, sum(c) OVER (
+    ORDER BY a RANGE BETWEEN 0 PRECEDING AND 3 PRECEDING EXCLUDE NO OTHERS
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 5.5
+
+  SELECT a, sum(c) OVER (
+    ORDER BY a RANGE BETWEEN 2 FOLLOWING AND 0 FOLLOWING EXCLUDE NO OTHERS
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 6.0
+
+  CREATE TABLE t1(a, c);
+  CREATE INDEX i1 ON t1(a);
+
+  INSERT INTO t1 VALUES(7,  997);
+  INSERT INTO t1 VALUES(8,  997);
+  INSERT INTO t1 VALUES('abc', 1001);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: main.t1
+stmt 53 err 1 -1 no such table: t1
+stmt 88 err 1 -1 no such table: t1
+stmt 122 err 1 -1 no such table: t1
+==== 6.1
+
+  SELECT a, sum(c) OVER (
+    ORDER BY a RANGE BETWEEN 2 FOLLOWING AND 0 FOLLOWING 
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 6.2
+
+  SELECT a, sum(c) OVER (
+    ORDER BY a RANGE BETWEEN 2 FOLLOWING AND 0 FOLLOWING EXCLUDE NO OTHERS
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.0
+
+  CREATE TABLE t1(a, c);
+  CREATE INDEX i1 ON t1(a);
+
+  INSERT INTO t1 VALUES(NULL, 46);
+  INSERT INTO t1 VALUES(NULL, 45);
+  INSERT INTO t1 VALUES(7,  997);
+  INSERT INTO t1 VALUES(7,  1000);
+  INSERT INTO t1 VALUES(8,  997);
+  INSERT INTO t1 VALUES(8,  1000);
+  INSERT INTO t1 VALUES('abc', 1001);
+  INSERT INTO t1 VALUES('abc', 1004);
+  INSERT INTO t1 VALUES('xyz', 3333);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: main.t1
+stmt 53 err 1 -1 no such table: t1
+stmt 89 err 1 -1 no such table: t1
+stmt 124 err 1 -1 no such table: t1
+stmt 158 err 1 -1 no such table: t1
+stmt 193 err 1 -1 no such table: t1
+stmt 227 err 1 -1 no such table: t1
+stmt 262 err 1 -1 no such table: t1
+stmt 300 err 1 -1 no such table: t1
+stmt 338 err 1 -1 no such table: t1
+==== 7.1
+
+  SELECT a, max(c) OVER (
+    ORDER BY a RANGE BETWEEN 2 FOLLOWING AND 0 FOLLOWING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.2
+
+  SELECT a, min(c) OVER (
+    ORDER BY a RANGE BETWEEN 2 FOLLOWING AND 0 FOLLOWING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.3
+
+  SELECT a, max(c) OVER (
+    ORDER BY a RANGE BETWEEN 0 PRECEDING AND 2 PRECEDING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.4
+
+  SELECT a, min(c) OVER (
+    ORDER BY a RANGE BETWEEN 0 PRECEDING AND 2 PRECEDING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 8.0
+
+  BEGIN TRANSACTION;
+    CREATE TABLE t1(a, c);
+    INSERT INTO t1 VALUES('aa', 111);
+    INSERT INTO t1 VALUES('BB', 660);
+    INSERT INTO t1 VALUES('CC', 938);
+    INSERT INTO t1 VALUES('dd', 979);
+  COMMIT;
+
+  CREATE INDEX i1 ON t1(a COLLATE nocase);
+----
+stmt 0 ok
+stmt 21 ok
+stmt 48 err 1 -1 no such table: t1
+stmt 86 err 1 -1 no such table: t1
+stmt 124 err 1 -1 no such table: t1
+stmt 162 err 1 -1 no such table: t1
+stmt 200 ok
+stmt 210 err 1 -1 no such table: main.t1
+==== 8.1
+
+  SELECT sum(c) OVER
+    (ORDER BY a COLLATE nocase RANGE BETWEEN 10.0 PRECEDING AND 5.0 PRECEDING)
+  FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 9.0
+
+  CREATE TABLE seps(x);
+  INSERT INTO seps(x) VALUES ('1'), ('22'), ('333'), ('4444');
+  SELECT group_concat('-', x)
+    OVER ( ORDER BY x ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING )
+  FROM seps;
+----
+stmt 0 ok
+stmt 24 err 1 -1 no such table: seps
+stmt 87 err 1 -1 no such table: seps
+==== 10.1
+
+  CREATE TABLE t1(i INTEGER PRIMARY KEY, v);
+  INSERT INTO t1 VALUES( 1, 'one' );
+  INSERT INTO t1 VALUES( 2, 'two' );
+----
+stmt 0 ok
+stmt 45 err 1 -1 no such table: t1
+stmt 82 err 1 -1 no such table: t1
+==== 10.2
+
+  SELECT 
+    json_group_array( v ) OVER w,
+    json_group_array( v ) OVER w
+  FROM t1
+  window w as ( 
+    range between unbounded preceding and unbounded following 
+  )
+----
+stmt 0 err 1 -1 no such table: t1
+==== 10.3
+
+  SELECT 
+    group_concat( v ) OVER w,
+    json_group_array( v ) OVER w,
+    json_group_array( v ) OVER w,
+    group_concat( v ) OVER w
+  FROM t1
+  window w as ( 
+    range between unbounded preceding and unbounded following 
+  )
+----
+stmt 0 err 1 -1 no such table: t1

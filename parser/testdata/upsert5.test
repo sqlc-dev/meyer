@@ -1,0 +1,663 @@
+==== upsert5-generated
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,3,4,5)
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 285 err 1 -1 no such table: t1
+==== upsert5-generated.dup1
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,3,4,5)
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 286 err 1 -1 no such table: t1
+==== upsert5-generated.dup2
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,4,5)
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 287 err 1 -1 no such table: t1
+==== upsert5-generated.dup3
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,94,5)
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 288 err 1 -1 no such table: t1
+==== upsert5-generated.dup4
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 288 err 1 -1 no such table: t1
+==== upsert5-generated.dup5
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,3,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 287 err 1 -1 no such table: t1
+==== upsert5-generated.dup6
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,3,4,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 285 err 1 -1 no such table: t1
+==== upsert5-generated.dup7
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 287 err 1 -1 no such table: t1
+==== upsert5-generated.dup8
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,4,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 287 err 1 -1 no such table: t1
+==== upsert5-generated.dup9
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 288 err 1 -1 no such table: t1
+==== upsert5-generated.dup10
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,4,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 287 err 1 -1 no such table: t1
+==== upsert5-generated.dup11
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 287 err 1 -1 no such table: t1
+==== upsert5-generated.dup12
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,94,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(a) DO UPDATE SET b='a'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 288 err 1 -1 no such table: t1
+==== upsert5-generated.dup13
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,94,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e'
+      ON CONFLICT(a) DO UPDATE SET b='a';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 288 err 1 -1 no such table: t1
+==== upsert5-generated.dup14
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e'
+      ON CONFLICT(a) DO UPDATE SET b='a';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 287 err 1 -1 no such table: t1
+==== upsert5-generated.dup15
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(e) DO UPDATE SET b='e'
+      ON CONFLICT(a) DO UPDATE SET b='a';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 288 err 1 -1 no such table: t1
+==== upsert5-generated.dup16
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(a) DO UPDATE SET b='a1'
+      ON CONFLICT(a) DO UPDATE SET b='a2'
+      ON CONFLICT(a) DO UPDATE SET b='a3'
+      ON CONFLICT(a) DO UPDATE SET b='a4'
+      ON CONFLICT(a) DO UPDATE SET b='a5'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 457 err 1 -1 no such table: t1
+==== upsert5-generated.dup17
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,94,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT(a) DO UPDATE SET b='a1'
+      ON CONFLICT(a) DO UPDATE SET b='a2'
+      ON CONFLICT(a) DO UPDATE SET b='a3'
+      ON CONFLICT(a) DO UPDATE SET b='a4'
+      ON CONFLICT(a) DO UPDATE SET b='a5'
+      ON CONFLICT(e) DO UPDATE SET b='e';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 457 err 1 -1 no such table: t1
+==== upsert5-generated.dup18
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 244 err 1 -1 no such table: t1
+==== upsert5-generated.dup19
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,94,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 244 err 1 -1 no such table: t1
+==== upsert5-generated.dup20
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 244 err 1 -1 no such table: t1
+==== upsert5-generated.dup21
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,3,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 244 err 1 -1 no such table: t1
+==== upsert5-generated.dup22
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,3,4,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 243 err 1 -1 no such table: t1
+==== upsert5-generated.dup23
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,4,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 242 err 1 -1 no such table: t1
+==== upsert5-generated.dup24
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,95)
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 162 err 1 -1 no such table: t1
+==== upsert5-generated.dup25
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,94,5)
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 162 err 1 -1 no such table: t1
+==== upsert5-generated.dup26
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,4,95)
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 162 err 1 -1 no such table: t1
+==== upsert5-generated.dup27
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,3,94,95)
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 162 err 1 -1 no such table: t1
+==== upsert5-generated.dup28
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,95)
+      ON CONFLICT(c) DO NOTHING
+      ON CONFLICT(d) DO NOTHING
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 226 err 1 -1 no such table: t1
+==== upsert5-generated.dup29
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,94,5)
+      ON CONFLICT(c) DO NOTHING
+      ON CONFLICT(d) DO NOTHING
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 226 err 1 -1 no such table: t1
+==== upsert5-generated.dup30
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,4,95)
+      ON CONFLICT(c) DO NOTHING
+      ON CONFLICT(d) DO NOTHING
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 226 err 1 -1 no such table: t1
+==== upsert5-generated.dup31
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,3,94,95)
+      ON CONFLICT(c) DO NOTHING
+      ON CONFLICT(d) DO NOTHING
+      ON CONFLICT DO UPDATE set b='x';
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 226 err 1 -1 no such table: t1
+==== upsert5-generated.dup32
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO NOTHING;
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 235 err 1 -1 no such table: t1
+==== upsert5-generated.dup33
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,93,94,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO NOTHING;
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 235 err 1 -1 no such table: t1
+==== upsert5-generated.dup34
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO NOTHING;
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 235 err 1 -1 no such table: t1
+==== upsert5-generated.dup35
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,3,94,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO NOTHING;
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 235 err 1 -1 no such table: t1
+==== upsert5-generated.dup36
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(91,NULL,3,4,95)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO NOTHING;
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 234 err 1 -1 no such table: t1
+==== upsert5-generated.dup37
+
+    DELETE FROM t1;
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+    INSERT INTO t1(a,b,c,d,e) VALUES(1,NULL,93,4,5)
+      ON CONFLICT(c) DO UPDATE SET b='c'
+      ON CONFLICT(d) DO UPDATE SET b='d'
+      ON CONFLICT DO NOTHING;
+    SELECT a,b,c,d,e FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+stmt 233 err 1 -1 no such table: t1
+==== 2.0
+
+  CREATE TABLE t2(a, b, c REAL, d, e, PRIMARY KEY(a,b)) WITHOUT ROWID;
+  CREATE UNIQUE INDEX t2c ON t2(c);
+----
+stmt 0 ok
+stmt 71 err 1 -1 no such table: main.t2
+==== 2.1
+
+  INSERT INTO t2(a,b,c,e,d) VALUES(1,2,3,4,5)
+      ON CONFLICT(c) DO UPDATE SET b=''
+      ON CONFLICT((SELECT t2 FROM nosuchtable)) DO NOTHING;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 3.0
+
+  CREATE TABLE t1(aa INTEGER PRIMARY KEY, bb INT);
+  INSERT INTO t1 VALUES(11,22);
+  CREATE UNIQUE INDEX t1bb ON t1(bb);
+  REPLACE INTO t1 VALUES(11,33)
+    ON CONFLICT(bb) DO UPDATE SET aa = 44
+    ON CONFLICT(bb) DO UPDATE SET aa = 44;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 51 err 1 -1 no such table: t1
+stmt 83 err 1 -1 no such table: main.t1
+stmt 121 err 1 -1 no such table: t1
+stmt 238 ok
+==== 3.1
+
+  SELECT * FROM t1 NOT INDEXED;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.2
+
+  SELECT * FROM t1 INDEXED BY t1bb;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.3
+
+  DROP TABLE t1;
+  CREATE TABLE t1(aa INTEGER PRIMARY KEY, bb INT, cc INT);
+  INSERT INTO t1 VALUES(10,21,32),(11,22,33),(12,23,34);
+  CREATE UNIQUE INDEX t1bb ON t1(bb);
+  CREATE UNIQUE INDEX t1cc ON t1(cc);
+  REPLACE INTO t1 VALUES(11,44,55)
+    ON CONFLICT(bb) DO UPDATE SET aa = 99
+    ON CONFLICT(cc) DO UPDATE SET aa = 99
+    ON CONFLICT(bb) DO UPDATE SET aa = 99;
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 76 err 1 -1 no such table: t1
+stmt 133 err 1 -1 no such table: main.t1
+stmt 171 err 1 -1 no such table: main.t1
+stmt 209 err 1 -1 no such table: t1
+stmt 371 ok
+==== 3.4
+
+  SELECT * FROM t1 NOT INDEXED ORDER BY +aa;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.5
+
+  SELECT * FROM t1 INDEXED BY t1bb ORDER BY +aa;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.6
+
+  SELECT * FROM t1 INDEXED BY t1cc ORDER BY +aa;
+----
+stmt 0 err 1 -1 no such table: t1
+==== upsert5-generated.dup38
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== upsert5-generated.dup39
+
+    INSERT INTO t1(c, d, e) VALUES(22, 555, 4) 
+      ON CONFLICT(d) DO UPDATE SET b=excluded.c;
+----
+stmt 0 err 1 -1 no such table: t1
+==== upsert5-generated.dup40
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 4.3.0
+
+  CREATE TABLE t2(a, b GENERATED ALWAYS AS (a+1) VIRTUAL, c REAL, d UNIQUE);
+  INSERT INTO t2(a, c, d) VALUES(555, 555, 555);
+----
+stmt 0 ok
+stmt 77 err 1 -1 no such table: t2
+==== 4.3.1
+
+  SELECT * FROM t2
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.3.2
+
+  INSERT INTO t2(c, d) VALUES(22, 555)
+    ON CONFLICT(d) DO UPDATE SET a = excluded.c;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.3.3
+
+  SELECT * FROM t2
+----
+stmt 0 err 1 -1 no such table: t2

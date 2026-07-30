@@ -1,0 +1,54 @@
+==== 1.0
+
+  CREATE TABLE t1(c, b, a, PRIMARY KEY(b, a)) WITHOUT ROWID;
+  INSERT INTO t1 VALUES(1, 2, 3), (4, 5, 6);
+----
+stmt 0 ok
+stmt 61 err 1 -1 no such table: t1
+==== 1.1
+
+  ALTER TABLE t1 DROP c;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.2.1
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.2.2
+
+  SELECT sql FROM sqlite_schema;
+----
+stmt 0 ok
+==== 3.0
+
+  CREATE TABLE yyy(q, w, e CHECK (e > 0), r);
+  INSERT INTO yyy VALUES(1,1,1,1), (2,2,2,2);
+
+  CREATE TABLE zzz(q, w, e, r, CHECK (e > 0));
+  INSERT INTO zzz VALUES(1,1,1,1), (2,2,2,2);
+----
+stmt 0 ok
+stmt 46 err 1 -1 no such table: yyy
+stmt 92 ok
+stmt 140 err 1 -1 no such table: zzz
+==== 3.1.1
+
+  INSERT INTO yyy VALUES(0,0,0,0);
+----
+stmt 0 err 1 -1 no such table: yyy
+==== 3.1.2
+
+  INSERT INTO yyy VALUES(0,0,0,0);
+----
+stmt 0 err 1 -1 no such table: yyy
+==== 3.2.1
+
+  ALTER TABLE yyy DROP e;
+----
+stmt 0 err 1 -1 no such table: yyy
+==== 3.2.2
+
+  ALTER TABLE zzz DROP e;
+----
+stmt 0 err 1 -1 no such table: zzz

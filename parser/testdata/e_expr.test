@@ -1,0 +1,1129 @@
+==== e_expr-1.2.1
+ 
+  SELECT 0 < 2 LIKE 1,   (0 < 2) LIKE 1,   0 < (2 LIKE 1)
+----
+stmt 0 ok
+==== e_expr-1.2.2
+ 
+  SELECT 0 LIKE 0 < 2,   (0 LIKE 0) < 2,   0 LIKE (0 < 2)
+----
+stmt 0 ok
+==== e_expr-1.2.3
+ 
+  SELECT 2 LIKE 2 == 1,   (2 LIKE 2) == 1,    2 LIKE (2 == 1)
+----
+stmt 0 ok
+==== e_expr-1.2.4
+ 
+  SELECT 2 == 2 LIKE 1,   (2 == 2) LIKE 1,    2 == (2 LIKE 1)
+----
+stmt 0 ok
+==== e_expr-1.2.5
+ 
+  SELECT 0 < 2 == 1,   (0 < 2) == 1,   0 < (2 == 1)
+----
+stmt 0 ok
+==== e_expr-1.6
+ 
+  SELECT 0 == 0 < 2,   (0 == 0) < 2,   0 == (0 < 2)
+----
+stmt 0 ok
+==== e_expr-2.1
+ SELECT -   10
+----
+stmt 0 ok
+==== e_expr-2.2
+ SELECT +   10
+----
+stmt 0 ok
+==== e_expr-2.3
+ SELECT ~   10
+----
+stmt 0 ok
+==== e_expr-2.4
+ SELECT NOT 10
+----
+stmt 0 ok
+==== e_expr-6.1
+SELECT  72%5
+----
+stmt 0 ok
+==== e_expr-6.2
+SELECT  72%-5
+----
+stmt 0 ok
+==== e_expr-6.3
+SELECT -72%-5
+----
+stmt 0 ok
+==== e_expr-6.4
+SELECT -72%5
+----
+stmt 0 ok
+==== e_expr-6.5
+SELECT 72.35%5
+----
+stmt 0 ok
+==== e_expr-8.1.1
+ SELECT NULL IS     NULL
+----
+stmt 0 ok
+==== e_expr-8.1.2
+ SELECT 'ab' IS     NULL
+----
+stmt 0 ok
+==== e_expr-8.1.3
+ SELECT NULL IS     'ab'
+----
+stmt 0 ok
+==== e_expr-8.1.4
+ SELECT 'ab' IS     'ab'
+----
+stmt 0 ok
+==== e_expr-8.1.5
+ SELECT NULL ==     NULL
+----
+stmt 0 ok
+==== e_expr-8.1.6
+ SELECT 'ab' ==     NULL
+----
+stmt 0 ok
+==== e_expr-8.1.7
+ SELECT NULL ==     'ab'
+----
+stmt 0 ok
+==== e_expr-8.1.8
+ SELECT 'ab' ==     'ab'
+----
+stmt 0 ok
+==== e_expr-8.1.9
+ SELECT NULL IS NOT NULL
+----
+stmt 0 ok
+==== e_expr-8.1.10
+ SELECT 'ab' IS NOT NULL
+----
+stmt 0 ok
+==== e_expr-8.1.11
+ SELECT NULL IS NOT 'ab'
+----
+stmt 0 ok
+==== e_expr-8.1.12
+ SELECT 'ab' IS NOT 'ab'
+----
+stmt 0 ok
+==== e_expr-8.1.13
+ SELECT NULL !=     NULL
+----
+stmt 0 ok
+==== e_expr-8.1.14
+ SELECT 'ab' !=     NULL
+----
+stmt 0 ok
+==== e_expr-8.1.15
+ SELECT NULL !=     'ab'
+----
+stmt 0 ok
+==== e_expr-8.1.16
+ SELECT 'ab' !=     'ab'
+----
+stmt 0 ok
+==== e_expr-9.1
+ SELECT  'abcd' < 'bbbb'    COLLATE reverse
+----
+stmt 0 err 1 -1 no such collation sequence: reverse
+==== e_expr-9.2
+ SELECT ('abcd' < 'bbbb')   COLLATE reverse
+----
+stmt 0 ok
+==== e_expr-9.3
+ SELECT  'abcd' <= 'bbbb'   COLLATE reverse
+----
+stmt 0 err 1 -1 no such collation sequence: reverse
+==== e_expr-9.4
+ SELECT ('abcd' <= 'bbbb')  COLLATE reverse
+----
+stmt 0 ok
+==== e_expr-9.5
+ SELECT  'abcd' > 'bbbb'    COLLATE reverse
+----
+stmt 0 err 1 -1 no such collation sequence: reverse
+==== e_expr-9.6
+ SELECT ('abcd' > 'bbbb')   COLLATE reverse
+----
+stmt 0 ok
+==== e_expr-9.7
+ SELECT  'abcd' >= 'bbbb'   COLLATE reverse
+----
+stmt 0 err 1 -1 no such collation sequence: reverse
+==== e_expr-9.8
+ SELECT ('abcd' >= 'bbbb')  COLLATE reverse
+----
+stmt 0 ok
+==== e_expr-9.10
+ SELECT  'abcd' =  'ABCD'  COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.11
+ SELECT ('abcd' =  'ABCD') COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.12
+ SELECT  'abcd' == 'ABCD'  COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.13
+ SELECT ('abcd' == 'ABCD') COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.14
+ SELECT  'abcd' IS 'ABCD'  COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.15
+ SELECT ('abcd' IS 'ABCD') COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.16
+ SELECT  'abcd' != 'ABCD'      COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.17
+ SELECT ('abcd' != 'ABCD')     COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.18
+ SELECT  'abcd' <> 'ABCD'      COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.19
+ SELECT ('abcd' <> 'ABCD')     COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.20
+ SELECT  'abcd' IS NOT 'ABCD'  COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.21
+ SELECT ('abcd' IS NOT 'ABCD') COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.22
+ 
+  SELECT 'bbb' BETWEEN 'AAA' AND 'CCC' COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.23
+ 
+  SELECT ('bbb' BETWEEN 'AAA' AND 'CCC') COLLATE nocase
+----
+stmt 0 ok
+==== e_expr-9.24
+ 
+  CREATE TABLE t24(a COLLATE NOCASE, b);
+  INSERT INTO t24 VALUES('aaa', 1);
+  INSERT INTO t24 VALUES('bbb', 2);
+  INSERT INTO t24 VALUES('ccc', 3);
+----
+stmt 0 ok
+stmt 42 err 1 -1 no such table: t24
+stmt 78 err 1 -1 no such table: t24
+stmt 114 err 1 -1 no such table: t24
+==== e_expr-9.25
+ SELECT 'BBB' = a FROM t24
+----
+stmt 0 err 1 -1 no such table: t24
+==== e_expr-9.25.dup1
+ SELECT a = 'BBB' FROM t24
+----
+stmt 0 err 1 -1 no such table: t24
+==== e_expr-9.25.dup2
+ SELECT 'BBB' = a COLLATE binary FROM t24
+----
+stmt 0 err 1 -1 no such table: t24
+==== e_expr-9.25.dup3
+ SELECT a COLLATE binary = 'BBB' FROM t24
+----
+stmt 0 err 1 -1 no such table: t24
+==== e_expr-10.1.1
+ SELECT typeof(5)
+----
+stmt 0 ok
+==== e_expr-10.1.2
+ SELECT typeof(5.1)
+----
+stmt 0 ok
+==== e_expr-10.1.3
+ SELECT typeof('5.1')
+----
+stmt 0 ok
+==== e_expr-10.1.4
+ SELECT typeof(X'ABCD')
+----
+stmt 0 ok
+==== e_expr-10.1.5
+ SELECT typeof(NULL)
+----
+stmt 0 ok
+==== e_expr-10.2.1
+ SELECT typeof(3.4e-02)
+----
+stmt 0 ok
+==== e_expr-10.2.2
+ SELECT typeof(3e+5)
+----
+stmt 0 ok
+==== e_expr-10.2.3
+ SELECT 3.4e-02
+----
+stmt 0 ok
+==== e_expr-10.2.4
+ SELECT 3e+4
+----
+stmt 0 ok
+==== e_expr-10.3.1
+ SELECT 'is not'
+----
+stmt 0 ok
+==== e_expr-10.3.2
+ SELECT typeof('is not')
+----
+stmt 0 ok
+==== e_expr-10.3.3
+ SELECT 'isn''t'
+----
+stmt 0 ok
+==== e_expr-10.3.4
+ SELECT typeof('isn''t')
+----
+stmt 0 ok
+==== e_expr-10.4.1
+ SELECT typeof(X'0123456789ABCDEF')
+----
+stmt 0 ok
+==== e_expr-10.4.2
+ SELECT typeof(x'0123456789ABCDEF')
+----
+stmt 0 ok
+==== e_expr-10.4.3
+ SELECT typeof(X'0123456789abcdef')
+----
+stmt 0 ok
+==== e_expr-10.4.4
+ SELECT typeof(x'0123456789abcdef')
+----
+stmt 0 ok
+==== e_expr-10.4.5
+ SELECT typeof(X'53514C697465')
+----
+stmt 0 ok
+==== e_expr-10.5.1
+ SELECT NULL
+----
+stmt 0 ok
+==== e_expr-10.5.2
+ SELECT typeof(NULL)
+----
+stmt 0 ok
+==== e_expr-12.1.1
+ SELECT 0, +0, -0
+----
+stmt 0 ok
+==== e_expr-12.1.2
+ SELECT 1, +1, -1
+----
+stmt 0 ok
+==== e_expr-12.1.3
+ SELECT 2, +2, -2
+----
+stmt 0 ok
+==== e_expr-12.1.4
+ 
+  SELECT 1.4, +1.4, -1.4
+----
+stmt 0 ok
+==== e_expr-12.1.5
+ 
+  SELECT 1.5e+5, +1.5e+5, -1.5e+5
+----
+stmt 0 ok
+==== e_expr-12.1.6
+ 
+  SELECT 0.0001, +0.0001, -0.0001
+----
+stmt 0 ok
+==== e_expr-12.2.1
+SELECT 123
+----
+stmt 0 ok
+==== e_expr-12.2.2
+SELECT 123.4e05
+----
+stmt 0 ok
+==== e_expr-12.2.3
+SELECT 'abcde'
+----
+stmt 0 ok
+==== e_expr-12.2.4
+SELECT X'414243'
+----
+stmt 0 ok
+==== e_expr-12.2.5
+SELECT NULL
+----
+stmt 0 ok
+==== e_expr-12.2.6
+SELECT CURRENT_TIME
+----
+stmt 0 ok
+==== e_expr-12.2.7
+SELECT CURRENT_DATE
+----
+stmt 0 ok
+==== e_expr-12.2.8
+SELECT CURRENT_TIMESTAMP
+----
+stmt 0 ok
+==== e_expr-13.2.1
+ SELECT 1 == 10 BETWEEN 0 AND 2
+----
+stmt 0 ok
+==== e_expr-13.2.2
+ SELECT (1 == 10) BETWEEN 0 AND 2
+----
+stmt 0 ok
+==== e_expr-13.2.3
+ SELECT 1 == (10 BETWEEN 0 AND 2)
+----
+stmt 0 ok
+==== e_expr-13.2.4
+ SELECT  6 BETWEEN 4 AND 8 == 1
+----
+stmt 0 ok
+==== e_expr-13.2.5
+ SELECT (6 BETWEEN 4 AND 8) == 1
+----
+stmt 0 ok
+==== e_expr-13.2.6
+ SELECT  6 BETWEEN 4 AND (8 == 1)
+----
+stmt 0 ok
+==== e_expr-13.2.7
+ SELECT  5 BETWEEN 0 AND 0  != 1
+----
+stmt 0 ok
+==== e_expr-13.2.8
+ SELECT (5 BETWEEN 0 AND 0) != 1
+----
+stmt 0 ok
+==== e_expr-13.2.9
+ SELECT  5 BETWEEN 0 AND (0 != 1)
+----
+stmt 0 ok
+==== e_expr-13.2.10
+ SELECT  1 != 0  BETWEEN 0 AND 2
+----
+stmt 0 ok
+==== e_expr-13.2.11
+ SELECT (1 != 0) BETWEEN 0 AND 2
+----
+stmt 0 ok
+==== e_expr-13.2.12
+ SELECT  1 != (0 BETWEEN 0 AND 2)
+----
+stmt 0 ok
+==== e_expr-13.2.13
+ SELECT 1 LIKE 10 BETWEEN 0 AND 2
+----
+stmt 0 ok
+==== e_expr-13.2.14
+ SELECT (1 LIKE 10) BETWEEN 0 AND 2
+----
+stmt 0 ok
+==== e_expr-13.2.15
+ SELECT 1 LIKE (10 BETWEEN 0 AND 2)
+----
+stmt 0 ok
+==== e_expr-13.2.16
+ SELECT  6 BETWEEN 4 AND 8 LIKE 1
+----
+stmt 0 ok
+==== e_expr-13.2.17
+ SELECT (6 BETWEEN 4 AND 8) LIKE 1
+----
+stmt 0 ok
+==== e_expr-13.2.18
+ SELECT  6 BETWEEN 4 AND (8 LIKE 1)
+----
+stmt 0 ok
+==== e_expr-13.2.19
+ SELECT 0 AND 0 BETWEEN 0 AND 1
+----
+stmt 0 ok
+==== e_expr-13.2.20
+ SELECT 0 AND (0 BETWEEN 0 AND 1)
+----
+stmt 0 ok
+==== e_expr-13.2.21
+ SELECT (0 AND 0) BETWEEN 0 AND 1
+----
+stmt 0 ok
+==== e_expr-13.2.22
+ SELECT 0 BETWEEN -1 AND 1 AND 0
+----
+stmt 0 ok
+==== e_expr-13.2.23
+ SELECT (0 BETWEEN -1 AND 1) AND 0
+----
+stmt 0 ok
+==== e_expr-13.2.24
+ SELECT 0 BETWEEN -1 AND (1 AND 0)
+----
+stmt 0 ok
+==== e_expr-13.2.25
+ SELECT 2 < 3 BETWEEN 0 AND 1
+----
+stmt 0 ok
+==== e_expr-13.2.26
+ SELECT (2 < 3) BETWEEN 0 AND 1
+----
+stmt 0 ok
+==== e_expr-13.2.27
+ SELECT 2 < (3 BETWEEN 0 AND 1)
+----
+stmt 0 ok
+==== e_expr-13.2.28
+ SELECT 2 BETWEEN 1 AND 2 < 3
+----
+stmt 0 ok
+==== e_expr-13.2.29
+ SELECT 2 BETWEEN 1 AND (2 < 3)
+----
+stmt 0 ok
+==== e_expr-13.2.30
+ SELECT (2 BETWEEN 1 AND 2) < 3
+----
+stmt 0 ok
+==== e_expr-14.1.1
+ SELECT 'abc%' LIKE 'abcde'
+----
+stmt 0 ok
+==== e_expr-14.1.2
+ SELECT 'abcde' LIKE 'abc%'
+----
+stmt 0 ok
+==== e_expr-14.2.1
+ SELECT 'abde'    LIKE 'ab%de'
+----
+stmt 0 ok
+==== e_expr-14.2.2
+ SELECT 'abXde'   LIKE 'ab%de'
+----
+stmt 0 ok
+==== e_expr-14.2.3
+ SELECT 'abABCde' LIKE 'ab%de'
+----
+stmt 0 ok
+==== e_expr-14.3.1
+ SELECT 'abde'    LIKE 'ab_de'
+----
+stmt 0 ok
+==== e_expr-14.3.2
+ SELECT 'abXde'   LIKE 'ab_de'
+----
+stmt 0 ok
+==== e_expr-14.3.3
+ SELECT 'abABCde' LIKE 'ab_de'
+----
+stmt 0 ok
+==== e_expr-14.4.1
+ SELECT 'abc' LIKE 'aBc'
+----
+stmt 0 ok
+==== e_expr-14.4.2
+ SELECT 'aBc' LIKE 'aBc'
+----
+stmt 0 ok
+==== e_expr-14.4.3
+ SELECT 'ac'  LIKE 'aBc'
+----
+stmt 0 ok
+==== e_expr-14.5.1
+ SELECT 'A' LIKE 'a'
+----
+stmt 0 ok
+==== e_expr-14.6.1
+ 
+  SELECT 'A' LIKE 'a' ESCAPE '12'
+----
+stmt 0 ok
+==== e_expr-14.6.2
+ 
+  SELECT 'A' LIKE 'a' ESCAPE ''
+----
+stmt 0 ok
+==== e_expr-14.6.3
+ SELECT 'A' LIKE 'a' ESCAPE 'x'
+----
+stmt 0 ok
+==== e_expr-14.7.1
+ SELECT 'abc%'  LIKE 'abcX%' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.2
+ SELECT 'abc5'  LIKE 'abcX%' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.3
+ SELECT 'abc'   LIKE 'abcX%' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.4
+ SELECT 'abcX%' LIKE 'abcX%' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.5
+ SELECT 'abc%%' LIKE 'abcX%' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.6
+ SELECT 'abc_'  LIKE 'abcX_' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.7
+ SELECT 'abc5'  LIKE 'abcX_' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.8
+ SELECT 'abc'   LIKE 'abcX_' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.9
+ SELECT 'abcX_' LIKE 'abcX_' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.10
+ SELECT 'abc__' LIKE 'abcX_' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.11
+ SELECT 'abcX'  LIKE 'abcXX' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.12
+ SELECT 'abc5'  LIKE 'abcXX' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.13
+ SELECT 'abc'   LIKE 'abcXX' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-14.7.14
+ SELECT 'abcXX' LIKE 'abcXX' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-15.1.1
+ SELECT 'abc' LIKE 'def'
+----
+stmt 0 ok
+==== e_expr-15.1.3
+ SELECT 'abc' LIKE 'def' ESCAPE 'X'
+----
+stmt 0 ok
+==== e_expr-16.1.1
+ SELECT 'abcxyz' LIKE 'ABC%'
+----
+stmt 0 ok
+==== e_expr-16.1.2
+ PRAGMA case_sensitive_like = 1
+----
+stmt 0 ok
+==== e_expr-16.1.3
+ SELECT 'abcxyz' LIKE 'ABC%'
+----
+stmt 0 ok
+==== e_expr-16.1.4
+ SELECT 'ABCxyz' LIKE 'ABC%'
+----
+stmt 0 ok
+==== e_expr-16.1.5
+ PRAGMA case_sensitive_like = 0
+----
+stmt 0 ok
+==== e_expr-16.1.6
+ SELECT 'abcxyz' LIKE 'ABC%'
+----
+stmt 0 ok
+==== e_expr-16.1.7
+ SELECT 'ABCxyz' LIKE 'ABC%'
+----
+stmt 0 ok
+==== e_expr-17.1.1
+ SELECT 'abcxyz' GLOB 'abc%'
+----
+stmt 0 ok
+==== e_expr-17.1.2
+ SELECT 'abcxyz' GLOB 'abc*'
+----
+stmt 0 ok
+==== e_expr-17.1.3
+ SELECT 'abcxyz' GLOB 'abc___'
+----
+stmt 0 ok
+==== e_expr-17.1.4
+ SELECT 'abcxyz' GLOB 'abc???'
+----
+stmt 0 ok
+==== e_expr-17.1.5
+ SELECT 'abcxyz' GLOB 'abc*'
+----
+stmt 0 ok
+==== e_expr-17.1.6
+ SELECT 'ABCxyz' GLOB 'abc*'
+----
+stmt 0 ok
+==== e_expr-17.1.7
+ SELECT 'abcxyz' GLOB 'ABC*'
+----
+stmt 0 ok
+==== e_expr-17.2.1
+ SELECT 'abcxyz' NOT GLOB 'ABC*'
+----
+stmt 0 ok
+==== e_expr-17.2.2
+ SELECT 'abcxyz' NOT GLOB 'abc*'
+----
+stmt 0 ok
+==== e_expr-17.2.3
+ SELECT 'abcxyz' NOT LIKE 'ABC%'
+----
+stmt 0 ok
+==== e_expr-17.2.4
+ SELECT 'abcxyz' NOT LIKE 'abc%'
+----
+stmt 0 ok
+==== e_expr-17.2.5
+ SELECT 'abdxyz' NOT LIKE 'abc%'
+----
+stmt 0 ok
+==== e_expr-17.2.6
+ SELECT 'abcxyz' NOT GLOB NULL
+----
+stmt 0 ok
+==== e_expr-17.2.7
+ SELECT 'abcxyz' NOT LIKE NULL
+----
+stmt 0 ok
+==== e_expr-17.2.8
+ SELECT NULL NOT GLOB 'abc*'
+----
+stmt 0 ok
+==== e_expr-17.2.9
+ SELECT NULL NOT LIKE 'ABC%'
+----
+stmt 0 ok
+==== e_expr-17.3.1
+ SELECT 'abc' GLOB 'def'
+----
+stmt 0 ok
+==== e_expr-17.3.3
+ SELECT 'X' NOT GLOB 'Y'
+----
+stmt 0 ok
+==== e_expr-18.1.1
+ 
+    SELECT regexp('abc', 'def')
+----
+stmt 0 err 1 13 no such function: regexp
+==== e_expr-18.1.2
+ 
+    SELECT 'abc' REGEXP 'def'
+----
+stmt 0 err 1 19 no such function: REGEXP
+==== e_expr-18.2.1
+ SELECT 'abc' REGEXP 'def'
+----
+stmt 0 err 1 14 no such function: REGEXP
+==== e_expr-18.2.3
+ SELECT 'X' NOT REGEXP 'Y'
+----
+stmt 0 err 1 16 no such function: REGEXP
+==== e_expr-19.1.1
+ 
+  SELECT 'abc' MATCH 'def'
+----
+stmt 0 ok
+==== e_expr-19.1.2
+ 
+  SELECT match('abc', 'def')
+----
+stmt 0 ok
+==== e_expr-19.2.1
+ SELECT 'abc' MATCH 'def'
+----
+stmt 0 ok
+==== e_expr-19.2.3
+ SELECT 'X' NOT MATCH 'Y'
+----
+stmt 0 ok
+==== e_expr-20.1
+
+  SELECT CASE WHEN 1 THEN 'true' WHEN 0 THEN 'false' ELSE 'else' END;
+----
+stmt 0 ok
+==== e_expr-20.2
+
+  SELECT CASE 0 WHEN 1 THEN 'true' WHEN 0 THEN 'false' ELSE 'else' END;
+----
+stmt 0 ok
+==== e_expr-21.1.1
+
+  SELECT CASE WHEN var('a') THEN 'A' 
+              WHEN var('b') THEN 'B' 
+              WHEN var('c') THEN 'C' END
+----
+stmt 0 err 1 20 no such function: var
+==== e_expr-21.1.3
+
+  SELECT CASE WHEN var('c') THEN 'C' 
+              WHEN var('b') THEN 'B' 
+              WHEN var('a') THEN 'A' 
+              ELSE 'no result'
+  END
+----
+stmt 0 err 1 20 no such function: var
+==== e_expr-21.2.1
+
+  SELECT CASE WHEN var('a') THEN 'A' 
+              WHEN var('b') THEN 'B' 
+              WHEN var('c') THEN 'C' 
+              ELSE 'no result'
+  END
+----
+stmt 0 err 1 20 no such function: var
+==== e_expr-21.2.2
+
+  SELECT CASE WHEN var('a') THEN 'A' 
+              WHEN var('b') THEN 'B' 
+              WHEN var('c') THEN 'C'
+              ELSE 'no result'
+  END
+----
+stmt 0 err 1 20 no such function: var
+==== e_expr-21.2.3
+
+  SELECT CASE WHEN var('a') THEN 'A' 
+              WHEN var('b') THEN 'B' 
+              WHEN var('c') THEN 'C'
+              ELSE 'no result'
+  END
+----
+stmt 0 err 1 20 no such function: var
+==== e_expr-21.3.1
+
+  SELECT CASE WHEN var('a') THEN 'A' 
+              WHEN var('b') THEN 'B' 
+              WHEN var('c') THEN 'C'
+              ELSE 'no result'
+  END
+----
+stmt 0 err 1 20 no such function: var
+==== e_expr-21.3.2
+
+  SELECT CASE WHEN var('a') THEN 'A' 
+              WHEN var('b') THEN 'B' 
+              WHEN var('c') THEN 'C'
+  END
+----
+stmt 0 err 1 20 no such function: var
+==== e_expr-21.4.1a
+
+  SELECT CASE WHEN NULL THEN 'A' WHEN 1 THEN 'B' END, iif(NULL,8,99);
+----
+stmt 0 ok
+==== e_expr-21.4.1b
+
+  SELECT CASE WHEN NULL THEN 'A' WHEN 1 THEN 'B' END, if(NULL,8,99);
+----
+stmt 0 ok
+==== e_expr-21.4.2a
+
+  SELECT CASE WHEN 0 THEN 'A' WHEN NULL THEN 'B' ELSE 'C' END, iif(0,8,99);
+----
+stmt 0 ok
+==== e_expr-21.4.2b
+
+  SELECT CASE WHEN 0 THEN 'A' WHEN NULL THEN 'B' ELSE 'C' END, if(0,8,99);
+----
+stmt 0 ok
+==== e_expr-22.1.1
+
+  SELECT CASE var('a') WHEN 1 THEN 'A' WHEN 2 THEN 'B' WHEN 3 THEN 'C' END
+----
+stmt 0 err 1 15 no such function: var
+==== e_expr-22.2.1
+
+  SELECT CASE 23 WHEN 1 THEN 'A' WHEN 23 THEN 'B' WHEN 23 THEN 'C' END
+----
+stmt 0 ok
+==== e_expr-22.2.2
+
+  SELECT CASE 1 WHEN 1 THEN 'A' WHEN 23 THEN 'B' WHEN 23 THEN 'C' END
+----
+stmt 0 ok
+==== e_expr-22.3.1
+
+  SELECT CASE 24 WHEN 1 THEN 'A' WHEN 23 THEN 'B' WHEN 23 THEN 'C' ELSE 'D' END
+----
+stmt 0 ok
+==== e_expr-22.4.1
+
+  SELECT CASE 24 WHEN 1 THEN 'A' WHEN 23 THEN 'B' WHEN 23 THEN 'C' END
+----
+stmt 0 ok
+==== e_expr-22.4.2
+
+  SELECT CASE 24 WHEN 1 THEN 'A' WHEN 23 THEN 'B' WHEN 23 THEN 'C' END
+----
+stmt 0 ok
+==== e_expr-23.1.1
+
+  CREATE TABLE t1(
+    a TEXT     COLLATE NOCASE,
+    b          COLLATE REVERSE,
+    c INTEGER,
+    d BLOB
+  );
+  INSERT INTO t1 VALUES('abc', 'cba', 55, 34.5);
+----
+stmt 0 err 1 -1 no such collation sequence: REVERSE
+stmt 113 err 1 -1 no such table: t1
+==== e_expr-23.1.2
+
+  SELECT CASE a WHEN 'xyz' THEN 'A' WHEN 'AbC' THEN 'B' END FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== e_expr-23.1.3
+
+  SELECT CASE 'AbC' WHEN 'abc' THEN 'A' WHEN a THEN 'B' END FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== e_expr-23.1.4
+
+  SELECT CASE a WHEN b THEN 'A' ELSE 'B' END FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== e_expr-23.1.5
+
+  SELECT CASE b WHEN a THEN 'A' ELSE 'B' END FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== e_expr-23.1.6
+
+  SELECT CASE 55 WHEN '55' THEN 'A' ELSE 'B' END
+----
+stmt 0 ok
+==== e_expr-23.1.7
+
+  SELECT CASE c WHEN '55' THEN 'A' ELSE 'B' END FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== e_expr-23.1.8
+
+  SELECT CASE '34.5' WHEN d THEN 'A' ELSE 'B' END FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== e_expr-23.1.9
+
+  SELECT CASE NULL WHEN NULL THEN 'A' ELSE 'B' END
+----
+stmt 0 ok
+==== e_expr-24.1.1
+
+  SELECT CASE NULL WHEN 'abc' THEN 'A' WHEN 'def' THEN 'B' END;
+----
+stmt 0 ok
+==== e_expr-24.1.2
+
+  SELECT CASE NULL WHEN 'abc' THEN 'A' WHEN 'def' THEN 'B' ELSE 'C' END;
+----
+stmt 0 ok
+==== e_expr-25.1.1
+
+  SELECT CASE WHEN var('a') THEN 'A' 
+              WHEN var('b') THEN 'B' 
+              WHEN var('c') THEN 'C' 
+  END
+----
+stmt 0 err 1 20 no such function: var
+==== e_expr-25.1.3
+
+  SELECT CASE '0' WHEN var('a') THEN 'A' 
+                  WHEN var('b') THEN 'B' 
+                  WHEN var('c') THEN 'C' 
+  END
+----
+stmt 0 err 1 24 no such function: var
+==== e_expr-26.1.1
+
+  CREATE TABLE t2(x, w1, r1, w2, r2, r3);
+  INSERT INTO t2 VALUES(1, 1, 'R1', 2, 'R2', 'R3');
+  INSERT INTO t2 VALUES(2, 1, 'R1', 2, 'R2', 'R3');
+  INSERT INTO t2 VALUES(3, 1, 'R1', 2, 'R2', 'R3');
+----
+stmt 0 ok
+stmt 42 err 1 -1 no such table: t2
+stmt 94 err 1 -1 no such table: t2
+stmt 146 err 1 -1 no such table: t2
+==== e_expr-26.1.2
+
+  SELECT CASE x WHEN w1 THEN r1 WHEN w2 THEN r2 ELSE r3 END FROM t2
+----
+stmt 0 err 1 -1 no such table: t2
+==== e_expr-26.1.3
+
+  SELECT CASE WHEN x=w1 THEN r1 WHEN x=w2 THEN r2 ELSE r3 END FROM t2
+----
+stmt 0 err 1 -1 no such table: t2
+==== e_expr-26.1.4
+
+  SELECT CASE ceval(x) WHEN w1 THEN r1 WHEN w2 THEN r2 ELSE r3 END FROM t2
+----
+stmt 0 err 1 -1 no such table: t2
+==== e_expr-26.1.6
+
+  SELECT CASE 
+    WHEN ceval(x)=w1 THEN r1 
+    WHEN ceval(x)=w2 THEN r2 
+    ELSE r3 END 
+  FROM t2
+----
+stmt 0 err 1 -1 no such table: t2
+==== e_expr-27.1.1
+
+  CREATE TABLE t3(a TEXT, b REAL, c INTEGER);
+  INSERT INTO t3 VALUES(X'555655', '1.23abc', 4.5);
+  SELECT typeof(a), a, typeof(b), b, typeof(c), c FROM t3;
+----
+stmt 0 ok
+stmt 46 err 1 -1 no such table: t3
+stmt 98 err 1 -1 no such table: t3
+==== e_expr-27.1.2
+
+  SELECT 
+    typeof(CAST(X'555655' as TEXT)), CAST(X'555655' as TEXT),
+    typeof(CAST('1.23abc' as REAL)), CAST('1.23abc' as REAL),
+    typeof(CAST(4.5 as INTEGER)), CAST(4.5 as INTEGER)
+----
+stmt 0 ok
+==== e_expr-32.2.8
+
+  WITH t1(x) AS (VALUES
+     ('9000000000000000001'),
+     ('9000000000000000001x'),
+     ('9000000000000000001 '),
+     (' 9000000000000000001 '),
+     (' 9000000000000000001'),
+     (' 9000000000000000001.'),
+     ('9223372036854775807'),
+     ('9223372036854775807 '),
+     ('   9223372036854775807   '),
+     ('9223372036854775808'),
+     ('   9223372036854775808   '),
+     ('9223372036854775807.0'),
+     ('9223372036854775807e+0'),
+     ('-5.0'),
+     ('-5e+0'))
+  SELECT typeof(CAST(x AS NUMERIC)), CAST(x AS NUMERIC)||'' FROM t1;
+----
+stmt 0 ok
+==== e_expr-34.1
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(NULL, 2);
+  INSERT INTO t1 VALUES(1, NULL);
+  INSERT INTO t1 VALUES(NULL, NULL);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t1
+stmt 56 err 1 -1 no such table: t1
+stmt 90 err 1 -1 no such table: t1
+stmt 124 err 1 -1 no such table: t1
+==== e_expr-35.0
+
+    CREATE TABLE t2(a, b);
+    INSERT INTO t2 VALUES('one', 'two');
+    INSERT INTO t2 VALUES('three', NULL);
+    INSERT INTO t2 VALUES(4, 5.0);
+----
+stmt 0 ok
+stmt 27 err 1 -1 no such table: t2
+stmt 68 err 1 -1 no such table: t2
+stmt 110 err 1 -1 no such table: t2
+==== e_expr-36.3.1
+
+  CREATE TABLE t4(x, y);
+  INSERT INTO t4 VALUES(1, 'one');
+  INSERT INTO t4 VALUES(2, 'two');
+  INSERT INTO t4 VALUES(3, 'three');
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t4
+stmt 60 err 1 -1 no such table: t4
+stmt 95 err 1 -1 no such table: t4
+==== e_expr-37.1
+
+   SELECT CASE WHEN NULL THEN 'true' ELSE 'false' END, iif(NULL,'true','false');
+----
+stmt 0 ok
+==== e_expr-37.2
+
+   SELECT CASE WHEN 0.0 THEN 'true' ELSE 'false' END, iif(0.0,'true','false');
+----
+stmt 0 ok
+==== e_expr-37.3
+
+   SELECT CASE WHEN 0 THEN 'true' ELSE 'false' END, iif(0,'true','false');
+----
+stmt 0 ok
+==== e_expr-37.4
+
+   SELECT CASE WHEN 'engligh' THEN 'true' ELSE 'false' END, iif('engligh','true','false');
+----
+stmt 0 ok
+==== e_expr-37.5
+
+   SELECT CASE WHEN '0' THEN 'true' ELSE 'false' END, iif('0','true','false');
+----
+stmt 0 ok
+==== e_expr-37.6a
+
+   SELECT CASE WHEN 1 THEN 'true' ELSE 'false' END, iif(1,'true','false');
+----
+stmt 0 ok
+==== e_expr-37.6b
+
+   SELECT CASE WHEN 1 THEN 'true' ELSE 'false' END, if(1,'true');
+----
+stmt 0 ok
+==== e_expr-37.7
+
+   SELECT CASE WHEN 1.0 THEN 'true' ELSE 'false' END, iif(1.0,'true','false');
+----
+stmt 0 ok
+==== e_expr-37.8
+
+   SELECT CASE WHEN 0.1 THEN 'true' ELSE 'false' END, iif(0.1,'true','false');
+----
+stmt 0 ok
+==== e_expr-37.9
+
+   SELECT CASE WHEN -0.1 THEN 'true' ELSE 'false' END, iif(-0.1,'true','false');
+----
+stmt 0 ok
+==== e_expr-37.10
+
+   SELECT CASE WHEN '1english' THEN 'true' ELSE 'false' END, iif('1engl','true','false');
+----
+stmt 0 ok

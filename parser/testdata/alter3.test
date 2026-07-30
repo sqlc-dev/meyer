@@ -1,0 +1,270 @@
+==== alter3-1.4
+
+    CREATE TABLE main.t1(a, b);
+    ALTER TABLE t1 ADD c;
+    SELECT sql FROM sqlite_master WHERE tbl_name = 't1';
+----
+stmt 0 ok
+stmt 32 err 1 -1 no such table: t1
+stmt 58 ok
+==== alter3-1.5
+
+    ALTER TABLE t1 ADD d CHECK (a>d);
+    SELECT sql FROM sqlite_master WHERE tbl_name = 't1';
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 38 ok
+==== alter3-1.6
+
+      CREATE TABLE t2(a, b, UNIQUE(a, b));
+      ALTER TABLE t2 ADD c REFERENCES t1(c)  ;
+      SELECT sql FROM sqlite_master WHERE tbl_name = 't2' AND type = 'table';
+----
+stmt 0 ok
+stmt 43 err 1 -1 no such table: t2
+stmt 90 ok
+==== alter3-1.7
+
+    CREATE TABLE t3(a, b, UNIQUE(a, b));
+    ALTER TABLE t3 ADD COLUMN c VARCHAR(10, 20);
+    SELECT sql FROM sqlite_master WHERE tbl_name = 't3' AND type = 'table';
+----
+stmt 0 ok
+stmt 41 err 1 -1 no such table: t3
+stmt 90 ok
+==== alter3-2.2
+
+    ALTER TABLE t1 ADD c UNIQUE
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-2.3
+
+    ALTER TABLE t1 ADD b VARCHAR(10)
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-2.3.dup1
+
+    ALTER TABLE t1 ADD c NOT NULL;
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-2.4
+
+    ALTER TABLE t1 ADD c NOT NULL DEFAULT 10;
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-2.6
+
+    alter table t1 add column d DEFAULT CURRENT_TIME;
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-2.99
+
+    DROP TABLE t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-3.1
+
+    CREATE TABLE t1(a, b);
+    INSERT INTO t1 VALUES(1, 100);
+    INSERT INTO t1 VALUES(2, 300);
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 27 err 1 -1 no such table: t1
+stmt 62 err 1 -1 no such table: t1
+stmt 97 err 1 -1 no such table: t1
+==== alter3-3.1.dup1
+
+    PRAGMA schema_version = 10;
+----
+stmt 0 ok
+==== alter3-3.2
+
+    ALTER TABLE t1 ADD c;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 26 err 1 -1 no such table: t1
+==== alter3-3.4
+
+      PRAGMA schema_version;
+----
+stmt 0 ok
+==== alter3-4.1
+
+    PRAGMA schema_version = 20;
+----
+stmt 0 ok
+==== alter3-4.2
+
+    ALTER TABLE t1 ADD c DEFAULT 'hello world';
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 48 err 1 -1 no such table: t1
+==== alter3-4.4
+
+      PRAGMA schema_version;
+----
+stmt 0 ok
+==== alter3-4.99
+
+    DROP TABLE t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-5.2
+
+      ALTER TABLE aux.t1 ADD COLUMN c VARCHAR(128);
+      SELECT sql FROM aux.sqlite_master;
+----
+stmt 0 err 1 -1 no such table: aux.t1
+stmt 52 err 1 -1 no such table: aux.sqlite_master
+==== alter3-5.3
+
+      SELECT * FROM aux.t1;
+----
+stmt 0 err 1 -1 no such table: aux.t1
+==== alter3-5.4
+
+        PRAGMA aux.schema_version;
+----
+stmt 0 err 1 16 unknown database aux
+==== alter3-5.6
+
+      ALTER TABLE aux.t1 ADD COLUMN d DEFAULT 1000;
+      SELECT sql FROM aux.sqlite_master;
+----
+stmt 0 err 1 -1 no such table: aux.t1
+stmt 52 err 1 -1 no such table: aux.sqlite_master
+==== alter3-5.7
+
+      SELECT * FROM aux.t1;
+----
+stmt 0 err 1 -1 no such table: aux.t1
+==== alter3-5.8
+
+        PRAGMA aux.schema_version;
+----
+stmt 0 err 1 16 unknown database aux
+==== alter3-5.9
+
+      SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-5.99
+
+      DROP TABLE aux.t1;
+      DROP TABLE t1;
+----
+stmt 0 err 1 -1 no such table: aux.t1
+stmt 25 err 1 -1 no such table: t1
+==== alter3-6.1
+
+      CREATE TABLE t1(a, b);
+      CREATE TABLE log(trig, a, b);
+
+      CREATE TRIGGER t1_a AFTER INSERT ON t1 BEGIN
+        INSERT INTO log VALUES('a', new.a, new.b);
+      END;
+      CREATE TEMP TRIGGER t1_b AFTER INSERT ON t1 BEGIN
+        INSERT INTO log VALUES('b', new.a, new.b);
+      END;
+  
+      INSERT INTO t1 VALUES(1, 2);
+      SELECT * FROM log;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 65 err 1 -1 no such table: main.t1
+stmt 179 err 1 -1 no such table: t1
+stmt 297 err 1 -1 no such table: t1
+stmt 335 err 1 -1 no such table: log
+==== alter3-6.2
+
+      ALTER TABLE t1 ADD COLUMN c DEFAULT 'c';
+      INSERT INTO t1(a, b) VALUES(3, 4);
+      SELECT * FROM log;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 47 err 1 -1 no such table: t1
+stmt 88 err 1 -1 no such table: log
+==== alter3-8.1
+
+    CREATE TABLE t4(c1);
+----
+stmt 0 ok
+==== alter3-8.2
+
+    SELECT sql FROM sqlite_master WHERE name = 't4';
+----
+stmt 0 ok
+==== alter3-9.1
+
+  CREATE TABLE t1(a,b);
+  INSERT INTO t1 VALUES(1, 2), ('null!',NULL), (3,4);
+----
+stmt 0 ok
+stmt 24 err 1 -1 no such table: t1
+==== alter3-9.2
+
+  ALTER TABLE t1 ADD COLUMN c CHECK(a!=1);
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-9.3
+
+  ALTER TABLE t1 ADD COLUMN c CHECK(a!=3);
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-9.4
+
+  ALTER TABLE t1 ADD COLUMN c CHECK(a!=2);
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-9.5
+
+  ALTER TABLE t1 ADD COLUMN d AS (b+1) NOT NULL;
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-9.6
+
+  ALTER TABLE t1 ADD COLUMN d AS (b+1) NOT NULL CHECK(a!=1);
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-9.7
+
+  ALTER TABLE t1 ADD COLUMN d AS (b+1) NOT NULL CHECK(a!=3);
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter3-9.10
+
+  CREATE TEMP TABLE t0(m,n);
+  INSERT INTO t0 VALUES(1, 2), ('null!',NULL), (3,4);
+  ATTACH ':memory:' AS aux1;
+  CREATE TABLE aux1.t2(x,y);
+  INSERT INTO t2 VALUES(1, 2), ('null!',NULL), (3,4);
+----
+stmt 0 ok
+stmt 29 err 1 -1 no such table: t0
+stmt 83 ok
+stmt 112 err 1 128 unknown database aux1
+stmt 141 err 1 -1 no such table: t2
+==== alter3-9.11
+
+  ALTER TABLE t0 ADD COLUMN xtra1 AS (n+1) NOT NULL CHECK(m!=1);
+----
+stmt 0 err 1 -1 no such table: t0
+==== alter3-9.12
+
+  ALTER TABLE t0 ADD COLUMN xtra1 AS (n+1) NOT NULL CHECK(m!=3);
+----
+stmt 0 err 1 -1 no such table: t0
+==== alter3-9.13
+
+  ALTER TABLE t2 ADD COLUMN xtra1 AS (y+1) NOT NULL CHECK(x!=1);
+----
+stmt 0 err 1 -1 no such table: t2
+==== alter3-9.14
+
+  ALTER TABLE t2 ADD COLUMN xtra1 AS (y+1) NOT NULL CHECK(x!=3);
+----
+stmt 0 err 1 -1 no such table: t2

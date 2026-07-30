@@ -1,0 +1,5 @@
+==== in2-1
+
+    CREATE TABLE a(i INTEGER PRIMARY KEY, a);
+----
+stmt 0 ok

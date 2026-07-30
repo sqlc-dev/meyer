@@ -1,0 +1,344 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c);
+  CREATE VIEW v1 AS SELECT * FROM t1;
+
+  CREATE TABLE t2(x INTEGER PRIMARY KEY, y, z UNIQUE);
+  CREATE INDEX t2y ON t2(y);
+
+  CREATE TABLE t3(q, r, s);
+  CREATE INDEX t3rs ON t3(r+s);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 66 ok
+stmt 122 err 1 -1 no such table: main.t2
+stmt 151 ok
+stmt 180 err 1 -1 no such table: main.t3
+==== 1.1
+
+  ALTER TABLE nosuch DROP COLUMN z;
+----
+stmt 0 err 1 -1 no such table: nosuch
+==== 1.2
+
+  ALTER TABLE v1 DROP COLUMN c;
+----
+stmt 0 err 1 -1 no such table: v1
+==== 1.3.1
+
+    CREATE VIRTUAL TABLE ft1 USING fts5(one, two);
+----
+stmt 0 ok
+==== 1.3.2
+
+    ALTER TABLE ft1 DROP COLUMN two;
+----
+stmt 0 err 1 -1 no such table: ft1
+==== 1.4
+
+  ALTER TABLE sqlite_schema DROP COLUMN sql;
+----
+stmt 0 err 1 -1 table sqlite_master may not be altered
+==== 1.5
+
+  ALTER TABLE t1 DROP COLUMN d;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.6.1
+
+  ALTER TABLE t1 DROP COLUMN b;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.6.2
+
+  SELECT sql FROM sqlite_schema WHERE name = 't1'
+----
+stmt 0 ok
+==== 1.7.1
+
+  ALTER TABLE t1 DROP COLUMN c;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.7.2
+
+  SELECT sql FROM sqlite_schema WHERE name = 't1'
+----
+stmt 0 ok
+==== 1.7.3
+
+  ALTER TABLE t1 DROP COLUMN a;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.8
+
+  ALTER TABLE t2 DROP COLUMN z
+----
+stmt 0 err 1 -1 no such table: t2
+==== 1.9
+
+  ALTER TABLE t2 DROP COLUMN x
+----
+stmt 0 err 1 -1 no such table: t2
+==== 1.10
+
+  ALTER TABLE t2 DROP COLUMN y
+----
+stmt 0 err 1 -1 no such table: t2
+==== 1.11
+
+  ALTER TABLE t3 DROP COLUMN s
+----
+stmt 0 err 1 -1 no such table: t3
+==== 2.%TN%.0
+
+    CREATE TABLE t1(x, y INTEGER PRIMARY KEY, z) %WO% ;
+    INSERT INTO t1 VALUES(1, 2, 3);
+    INSERT INTO t1 VALUES(4, 5, 6);
+    INSERT INTO t1 VALUES(7, 8, 9);
+----
+stmt 0 err 1 50 near "%": syntax error
+stmt 56 err 1 -1 no such table: t1
+stmt 92 err 1 -1 no such table: t1
+stmt 128 err 1 -1 no such table: t1
+==== 2.%TN%.1
+
+    ALTER TABLE t1 DROP COLUMN x;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 34 err 1 -1 no such table: t1
+==== 2.%TN%.2
+
+    ALTER TABLE t1 DROP COLUMN z;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 34 err 1 -1 no such table: t1
+==== 3.0
+
+  CREATE TABLE t12(a, b, c, CHECK(c>10));
+  CREATE TABLE t13(a, b, c CHECK(c>10));
+----
+stmt 0 ok
+stmt 42 ok
+==== 3.1
+
+  ALTER TABLE t12 DROP COLUMN c;
+----
+stmt 0 err 1 -1 no such table: t12
+==== 3.2
+
+  ALTER TABLE t13 DROP COLUMN c;
+----
+stmt 0 err 1 -1 no such table: t13
+==== alterdropcol-generated
+
+    INSERT INTO "my table"(a, b, d) VALUES(1, 2, 'hello');
+    INSERT INTO "my table"(a, b, d) VALUES(3, 4, 'world');
+
+    SELECT * FROM "my table"
+----
+stmt 0 err 1 -1 no such table: my table
+stmt 59 err 1 -1 no such table: my table
+stmt 118 err 1 -1 no such table: my table
+==== alterdropcol-generated.dup1
+
+    ALTER TABLE "my table" DROP COLUMN c;
+----
+stmt 0 err 1 -1 no such table: my table
+==== alterdropcol-generated.dup2
+
+    SELECT * FROM "my table"
+----
+stmt 0 err 1 -1 no such table: my table
+==== alterdropcol-generated.dup3
+
+    INSERT INTO x1(a, b, c, e) VALUES(1, 2, 3, 4);
+    INSERT INTO x1(a, b, c, e) VALUES(5, 6, 7, 8);
+    INSERT INTO x1(a, b, c, e) VALUES(9, 10, 11, 12);
+    SELECT * FROM x1;
+----
+stmt 0 err 1 -1 no such table: x1
+stmt 51 err 1 -1 no such table: x1
+stmt 102 err 1 -1 no such table: x1
+stmt 156 err 1 -1 no such table: x1
+==== alterdropcol-generated.dup4
+
+    ALTER TABLE x1 DROP COLUMN a
+----
+stmt 0 err 1 -1 no such table: x1
+==== alterdropcol-generated.dup5
+
+    SELECT * FROM x1
+----
+stmt 0 err 1 -1 no such table: x1
+==== alterdropcol-generated.dup6
+
+    ALTER TABLE x1 DROP COLUMN e
+----
+stmt 0 err 1 -1 no such table: x1
+==== alterdropcol-generated.dup7
+
+    SELECT * FROM x1
+----
+stmt 0 err 1 -1 no such table: x1
+==== 5.0
+
+  CREATE TABLE p1(a PRIMARY KEY, b UNIQUE);
+  CREATE TABLE c1(x, y, z REFERENCES p1(c));
+  CREATE TABLE c2(x, y, z, w REFERENCES p1(b));
+----
+stmt 0 ok
+stmt 44 ok
+stmt 89 ok
+==== 5.1
+
+  ALTER TABLE c1 DROP COLUMN z;
+  ALTER TABLE c2 DROP COLUMN z;
+  SELECT sql FROM sqlite_schema WHERE name IN ('c1', 'c2');
+----
+stmt 0 err 1 -1 no such table: c1
+stmt 32 err 1 -1 no such table: c2
+stmt 64 ok
+==== 5.2.1
+
+  CREATE VIEW v1 AS SELECT d, e FROM p1
+----
+stmt 0 ok
+==== 5.2.2
+
+  ALTER TABLE c1 DROP COLUMN x
+----
+stmt 0 err 1 -1 no such table: c1
+==== 5.3.1
+
+  DROP VIEW v1;
+  CREATE VIEW v1 AS SELECT x, y FROM c1;
+----
+stmt 0 err 1 -1 no such view: v1
+stmt 16 ok
+==== 5.3.2
+
+  ALTER TABLE c1 DROP COLUMN x
+----
+stmt 0 err 1 -1 no such table: c1
+==== 5.4.1
+
+  CREATE TRIGGER tr AFTER INSERT ON c1 BEGIN
+    INSERT INTO p1 VALUES(new.y, new.xyz);
+  END;
+----
+stmt 0 err 1 -1 no such table: main.c1
+==== 5.4.2
+
+  ALTER TABLE c1 DROP COLUMN y
+----
+stmt 0 err 1 -1 no such table: c1
+==== 5.5.1
+
+  DROP TRIGGER tr;
+  CREATE TRIGGER tr AFTER INSERT ON c1 BEGIN
+    INSERT INTO p1 VALUES(new.y, new.z);
+  END;
+----
+stmt 0 err 1 -1 no such trigger: tr
+stmt 19 err 1 -1 no such table: main.c1
+==== 5.5.2
+
+  ALTER TABLE c1 DROP COLUMN y
+----
+stmt 0 err 1 -1 no such table: c1
+==== 6.0
+
+  CREATE TABLE t1(a,b,c);
+  CREATE TABLE t2(x,y,z);
+  PRAGMA writable_schema=ON;
+  UPDATE sqlite_schema SET sql='CREATE INDEX t1b ON t1(b)' WHERE name='t2';
+  PRAGMA writable_schema=OFF;
+  ALTER TABLE t2 DROP COLUMN z;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 52 ok
+stmt 81 ok
+stmt 157 ok
+stmt 187 err 1 -1 no such table: t2
+==== 6.1
+
+  CREATE TABLE t1(a,b,c);
+  CREATE TABLE t2(x,y,z);
+  PRAGMA writable_schema=ON;
+  UPDATE sqlite_schema SET sql='CREATE VIEW t2(x,y,z) AS SELECT b,a,c FROM t1'
+   WHERE name='t2';
+  PRAGMA writable_schema=OFF;
+  ALTER TABLE t2 DROP COLUMN z;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 52 ok
+stmt 81 ok
+stmt 180 ok
+stmt 210 err 1 -1 no such table: t2
+==== 7.0
+
+  CREATE TABLE t1(a, b, c, PRIMARY KEY(a COLLATE nocase, a)) WITHOUT ROWID;
+  INSERT INTO t1 VALUES(1, 2, 3);
+  INSERT INTO t1 VALUES(4, 5, 6);
+----
+stmt 0 ok
+stmt 76 err 1 -1 no such table: t1
+stmt 110 err 1 -1 no such table: t1
+==== 7.1
+
+  ALTER TABLE t1 DROP COLUMN c;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.2
+
+  SELECT sql FROM sqlite_schema;
+----
+stmt 0 ok
+==== 7.3
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 8.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  PRAGMA writable_schema = 1;
+  UPDATE sqlite_schema 
+  SET sql = 'CREATE TABLE t1(a INTEGER PRIMARY KEY AUTOINCREMENT, b)'
+----
+stmt 0 ok
+stmt 45 ok
+stmt 75 ok
+==== 8.1
+
+  ALTER TABLE t1 DROP COLUMN b;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 8.2
+
+  SELECT sql FROM sqlite_schema;
+----
+stmt 0 ok
+==== alterdropcol-generated.dup8
+
+    WITH s(i) AS (
+        SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<50000
+    )
+    INSERT INTO t1(a, b, c) SELECT i, 123, 456 FROM s;
+----
+stmt 0 err 1 -1 no such table: t1
+==== alterdropcol-generated.dup9
+
+    ALTER TABLE t1 DROP COLUMN b;
+----
+stmt 0 err 1 -1 no such table: t1
+==== alterdropcol-generated.dup10
+
+    SELECT count(*), c FROM t1 GROUP BY c;
+----
+stmt 0 err 1 -1 no such table: t1

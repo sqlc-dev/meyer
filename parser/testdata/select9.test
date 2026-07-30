@@ -1,0 +1,114 @@
+==== select9-1.0
+
+    CREATE TABLE t1(a, b, c);
+    CREATE TABLE t2(d, e, f);
+    BEGIN;
+      INSERT INTO t1 VALUES(1,  'one',   'I');
+      INSERT INTO t1 VALUES(3,  NULL,    NULL);
+      INSERT INTO t1 VALUES(5,  'five',  'V');
+      INSERT INTO t1 VALUES(7,  'seven', 'VII');
+      INSERT INTO t1 VALUES(9,  NULL,    NULL);
+      INSERT INTO t1 VALUES(2,  'two',   'II');
+      INSERT INTO t1 VALUES(4,  'four',  'IV');
+      INSERT INTO t1 VALUES(6,  NULL,    NULL);
+      INSERT INTO t1 VALUES(8,  'eight', 'VIII');
+      INSERT INTO t1 VALUES(10, 'ten',   'X');
+
+      INSERT INTO t2 VALUES(1,  'two',      'IV');
+      INSERT INTO t2 VALUES(2,  'four',     'VIII');
+      INSERT INTO t2 VALUES(3,  NULL,       NULL);
+      INSERT INTO t2 VALUES(4,  'eight',    'XVI');
+      INSERT INTO t2 VALUES(5,  'ten',      'XX');
+      INSERT INTO t2 VALUES(6,  NULL,       NULL);
+      INSERT INTO t2 VALUES(7,  'fourteen', 'XXVIII');
+      INSERT INTO t2 VALUES(8,  'sixteen',  'XXXII');
+      INSERT INTO t2 VALUES(9,  NULL,       NULL);
+      INSERT INTO t2 VALUES(10, 'twenty',   'XL');
+
+    COMMIT;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 60 ok
+stmt 71 err 1 -1 no such table: t1
+stmt 118 err 1 -1 no such table: t1
+stmt 166 err 1 -1 no such table: t1
+stmt 213 err 1 -1 no such table: t1
+stmt 262 err 1 -1 no such table: t1
+stmt 310 err 1 -1 no such table: t1
+stmt 358 err 1 -1 no such table: t1
+stmt 406 err 1 -1 no such table: t1
+stmt 454 err 1 -1 no such table: t1
+stmt 504 err 1 -1 no such table: t1
+stmt 551 err 1 -1 no such table: t2
+stmt 603 err 1 -1 no such table: t2
+stmt 656 err 1 -1 no such table: t2
+stmt 707 err 1 -1 no such table: t2
+stmt 759 err 1 -1 no such table: t2
+stmt 810 err 1 -1 no such table: t2
+stmt 861 err 1 -1 no such table: t2
+stmt 916 err 1 -1 no such table: t2
+stmt 970 err 1 -1 no such table: t2
+stmt 1021 err 1 -1 no such table: t2
+stmt 1072 ok
+==== select9-2.0
+
+    DROP INDEX i1;
+    DROP INDEX i2;
+    DROP INDEX i3;
+    DROP INDEX i4;
+----
+stmt 0 err 1 -1 no such index: i1
+stmt 19 err 1 -1 no such index: i2
+stmt 38 err 1 -1 no such index: i3
+stmt 57 err 1 -1 no such index: i4
+==== select9-2.X
+
+    DROP INDEX i1;
+    DROP INDEX i2;
+    DROP INDEX i3;
+----
+stmt 0 err 1 -1 no such index: i1
+stmt 19 err 1 -1 no such index: i2
+stmt 38 err 1 -1 no such index: i3
+==== select9-3.X
+
+    DROP INDEX i1;
+    DROP INDEX i2;
+    DROP VIEW v1;
+----
+stmt 0 err 1 -1 no such index: i1
+stmt 19 err 1 -1 no such index: i2
+stmt 38 err 1 -1 no such view: v1
+==== select9-4.X
+
+    DROP INDEX i1;
+    DROP INDEX i2;
+    DROP VIEW v1;
+----
+stmt 0 err 1 -1 no such index: i1
+stmt 19 err 1 -1 no such index: i2
+stmt 38 err 1 -1 no such view: v1
+==== select9-6.1
+
+  CREATE TABLE t61(a);
+  CREATE TABLE t62(b);
+  INSERT INTO t61 VALUES(111);
+  INSERT INTO t62 VALUES(222);
+  SELECT a FROM t61 WHERE 0 UNION SELECT b FROM t62;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 46 err 1 -1 no such table: t61
+stmt 77 err 1 -1 no such table: t62
+stmt 108 err 1 -1 no such table: t62
+==== select9-6.2
+
+  SELECT a FROM t61 WHERE 0 UNION ALL SELECT b FROM t62;
+----
+stmt 0 err 1 -1 no such table: t62
+==== select9-6.3
+
+  SELECT a FROM t61 UNION SELECT b FROM t62 WHERE 0;
+----
+stmt 0 err 1 -1 no such table: t62

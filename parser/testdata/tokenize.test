@@ -1,0 +1,56 @@
+==== tokenize-1.1
+SELECT 1.0e+
+----
+stmt 0 err 1 7 unrecognized token: "1.0e"
+==== tokenize-1.2
+SELECT 1.0E+
+----
+stmt 0 err 1 7 unrecognized token: "1.0E"
+==== tokenize-1.3
+SELECT 1.0e-
+----
+stmt 0 err 1 7 unrecognized token: "1.0e"
+==== tokenize-1.4
+SELECT 1.0E-
+----
+stmt 0 err 1 7 unrecognized token: "1.0E"
+==== tokenize-1.5
+SELECT 1.0e+/
+----
+stmt 0 err 1 7 unrecognized token: "1.0e"
+==== tokenize-1.6
+SELECT 1.0E+:
+----
+stmt 0 err 1 7 unrecognized token: "1.0E"
+==== tokenize-1.7
+SELECT 1.0e-:
+----
+stmt 0 err 1 7 unrecognized token: "1.0e"
+==== tokenize-1.8
+SELECT 1.0E-/
+----
+stmt 0 err 1 7 unrecognized token: "1.0E"
+==== tokenize-1.9
+SELECT 1.0F+5
+----
+stmt 0 err 1 7 unrecognized token: "1.0F"
+==== tokenize-1.10
+SELECT 1.0d-10
+----
+stmt 0 err 1 7 unrecognized token: "1.0d"
+==== tokenize-1.11
+SELECT 1.0e,5
+----
+stmt 0 err 1 7 unrecognized token: "1.0e"
+==== tokenize-1.12
+SELECT 1.0E.10
+----
+stmt 0 err 1 7 unrecognized token: "1.0E"
+==== tokenize-2.1
+SELECT 1, 2 /*
+----
+stmt 0 ok
+==== tokenize-2.2
+SELECT 1, 2 /*
+----
+stmt 0 ok

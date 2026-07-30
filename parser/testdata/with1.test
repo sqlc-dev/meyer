@@ -1,0 +1,1092 @@
+==== 1.0
+
+  CREATE TABLE t1(x INTEGER, y INTEGER);
+  WITH x(a) AS ( SELECT * FROM t1) SELECT 10
+----
+stmt 0 ok
+stmt 41 ok
+==== 1.1
+
+  SELECT * FROM ( WITH x AS ( SELECT * FROM t1) SELECT 10 );
+----
+stmt 0 ok
+==== 1.2
+
+  WITH x(a) AS ( SELECT * FROM t1) INSERT INTO t1 VALUES(1,2);
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.3
+
+  WITH x(a) AS ( SELECT * FROM t1) DELETE FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.4
+
+  WITH x(a) AS ( SELECT * FROM t1) UPDATE t1 SET x = y;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 2.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(1);
+  INSERT INTO t1 VALUES(2);
+  WITH tmp AS ( SELECT * FROM t1 ) SELECT x FROM tmp;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 49 err 1 -1 no such table: t1
+stmt 77 err 1 -1 no such table: t1
+stmt 105 err 1 -1 no such table: t1
+==== 2.2
+
+  WITH tmp(a) AS ( SELECT * FROM t1 ) SELECT a FROM tmp;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 2.3
+
+  SELECT * FROM (
+    WITH tmp(a) AS ( SELECT * FROM t1 ) SELECT a FROM tmp
+  );
+----
+stmt 0 err 1 -1 no such table: t1
+==== 2.4
+
+  WITH tmp1(a) AS ( SELECT * FROM t1 ),
+       tmp2(x) AS ( SELECT * FROM tmp1)
+  SELECT * FROM tmp2;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 2.5
+
+  WITH tmp2(x) AS ( SELECT * FROM tmp1),
+       tmp1(a) AS ( SELECT * FROM t1 )
+  SELECT * FROM tmp2;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.1
+
+  WITH tmp2(x) AS ( SELECT * FROM tmp1 ),
+       tmp1(a) AS ( SELECT * FROM tmp2 )
+  SELECT * FROM tmp1;
+----
+stmt 0 err 1 -1 circular reference: tmp1
+==== 3.2
+
+  CREATE TABLE t2(x INTEGER);
+  WITH tmp(a) AS (SELECT * FROM t1),
+       tmp(a) AS (SELECT * FROM t1)
+  SELECT * FROM tmp;
+----
+stmt 0 ok
+stmt 30 err 1 -1 duplicate WITH table name: tmp
+==== 3.3
+
+  CREATE TABLE t3(x);
+  CREATE TABLE t4(x);
+
+  INSERT INTO t3 VALUES('T3');
+  INSERT INTO t4 VALUES('T4');
+
+  WITH t3(a) AS (SELECT * FROM t4)
+  SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 no such table: t3
+stmt 76 err 1 -1 no such table: t4
+stmt 107 err 1 -1 no such table: t4
+==== 3.4
+
+  WITH tmp  AS ( SELECT * FROM t3 ),
+       tmp2 AS ( WITH tmp AS ( SELECT * FROM t4 ) SELECT * FROM tmp )
+  SELECT * FROM tmp2;
+----
+stmt 0 err 1 -1 no such table: t4
+==== 3.5
+
+  WITH tmp  AS ( SELECT * FROM t3 ),
+       tmp2 AS ( WITH xxxx AS ( SELECT * FROM t4 ) SELECT * FROM tmp )
+  SELECT * FROM tmp2;
+----
+stmt 0 err 1 -1 no such table: t3
+==== 3.6
+
+  WITH tmp AS ( SELECT * FROM t3 ),
+  SELECT * FROM tmp;
+----
+stmt 0 err 1 39 near "SELECT": syntax error
+==== 4.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(1);
+  INSERT INTO t1 VALUES(2);
+  INSERT INTO t1 VALUES(3);
+  INSERT INTO t1 VALUES(4);
+
+  WITH dset AS ( SELECT 2 UNION ALL SELECT 4 )
+  DELETE FROM t1 WHERE x IN dset;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 49 err 1 -1 no such table: t1
+stmt 77 err 1 -1 no such table: t1
+stmt 105 err 1 -1 no such table: t1
+stmt 133 err 1 -1 no such table: t1
+stmt 161 err 1 -1 no such table: t1
+stmt 243 err 1 -1 no such table: t1
+==== 4.2
+
+  WITH iset AS ( SELECT 2 UNION ALL SELECT 4 )
+  INSERT INTO t1 SELECT * FROM iset;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 84 err 1 -1 no such table: t1
+==== 4.3
+
+  WITH uset(a, b) AS ( SELECT 2, 8 UNION ALL SELECT 4, 9 )
+  UPDATE t1 SET x = COALESCE( (SELECT b FROM uset WHERE a=x), x );
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 126 err 1 -1 no such table: t1
+==== 5.1
+
+  WITH i(x) AS ( VALUES(1) UNION ALL SELECT x+1 FROM i)
+  SELECT x FROM i LIMIT 10;
+----
+stmt 0 ok
+==== 5.2
+
+  WITH i(x) AS ( VALUES(1) UNION ALL SELECT x+1 FROM i ORDER BY 1)
+  SELECT x FROM i LIMIT 10;
+----
+stmt 0 ok
+==== 5.2.1
+
+  CREATE TABLE edge(xfrom, xto, seq, PRIMARY KEY(xfrom, xto)) WITHOUT ROWID;
+  INSERT INTO edge VALUES(0, 1, 10);
+  INSERT INTO edge VALUES(1, 2, 20);
+  INSERT INTO edge VALUES(0, 3, 30);
+  INSERT INTO edge VALUES(2, 4, 40);
+  INSERT INTO edge VALUES(3, 4, 40);
+  INSERT INTO edge VALUES(2, 5, 50);
+  INSERT INTO edge VALUES(3, 6, 60);
+  INSERT INTO edge VALUES(5, 7, 70);
+  INSERT INTO edge VALUES(3, 7, 70);
+  INSERT INTO edge VALUES(4, 8, 80);
+  INSERT INTO edge VALUES(7, 8, 80);
+  INSERT INTO edge VALUES(8, 9, 90);
+  
+  WITH RECURSIVE
+    ancest(id, mtime) AS
+      (VALUES(0, 0)
+       UNION
+       SELECT edge.xto, edge.seq FROM edge, ancest
+        WHERE edge.xfrom=ancest.id
+        ORDER BY 2
+      )
+  SELECT * FROM ancest;
+----
+stmt 0 ok
+stmt 77 err 1 -1 no such table: edge
+stmt 114 err 1 -1 no such table: edge
+stmt 151 err 1 -1 no such table: edge
+stmt 188 err 1 -1 no such table: edge
+stmt 225 err 1 -1 no such table: edge
+stmt 262 err 1 -1 no such table: edge
+stmt 299 err 1 -1 no such table: edge
+stmt 336 err 1 -1 no such table: edge
+stmt 373 err 1 -1 no such table: edge
+stmt 410 err 1 -1 no such table: edge
+stmt 447 err 1 -1 no such table: edge
+stmt 484 err 1 -1 no such table: edge
+stmt 521 err 1 -1 no such table: edge
+==== 5.2.2
+
+  WITH RECURSIVE
+    ancest(id, mtime) AS
+      (VALUES(0, 0)
+       UNION ALL
+       SELECT edge.xto, edge.seq FROM edge, ancest
+        WHERE edge.xfrom=ancest.id
+        ORDER BY 2
+      )
+  SELECT * FROM ancest;
+----
+stmt 0 err 1 -1 no such table: edge
+==== 5.2.3
+
+  WITH RECURSIVE
+    ancest(id, mtime) AS
+      (VALUES(0, 0)
+       UNION ALL
+       SELECT edge.xto, edge.seq FROM edge, ancest
+        WHERE edge.xfrom=ancest.id
+        ORDER BY 2 LIMIT 4 OFFSET 2
+      )
+  SELECT * FROM ancest;
+----
+stmt 0 err 1 -1 no such table: edge
+==== 5.3
+
+  WITH i(x) AS ( VALUES(1) UNION ALL SELECT x+1 FROM i LIMIT 5)
+  SELECT x FROM i;
+----
+stmt 0 ok
+==== 5.4
+
+  WITH i(x) AS ( VALUES(1) UNION ALL SELECT (x+1)%10 FROM i)
+  SELECT x FROM i LIMIT 20;
+----
+stmt 0 ok
+==== 5.5
+
+  WITH i(x) AS ( VALUES(1) UNION SELECT (x+1)%10 FROM i)
+  SELECT x FROM i LIMIT 20;
+----
+stmt 0 ok
+==== 5.6.1
+
+  WITH i(x, y) AS ( VALUES(1) )
+  SELECT * FROM i;
+----
+stmt 0 err 1 -1 table i has 1 values for 2 columns
+==== 5.6.2
+
+  WITH i(x) AS ( VALUES(1,2) )
+  SELECT * FROM i;
+----
+stmt 0 err 1 -1 table i has 2 values for 1 columns
+==== 5.6.3
+
+  CREATE TABLE t5(a, b);
+  WITH i(x) AS ( SELECT * FROM t5 )
+  SELECT * FROM i;
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t5
+==== 5.6.4
+
+  WITH i(x) AS ( SELECT 1, 2 UNION ALL SELECT 1 )
+  SELECT * FROM i;
+----
+stmt 0 err 1 -1 table i has 2 values for 1 columns
+==== 5.6.5
+
+  WITH i(x) AS ( SELECT 1 UNION ALL SELECT 1, 2 )
+  SELECT * FROM i;
+----
+stmt 0 err 1 -1 SELECTs to the left and right of UNION ALL do not have the same number of result columns
+==== 5.6.6
+
+  WITH i(x) AS ( SELECT 1 UNION ALL SELECT x+1, x*2 FROM i )
+  SELECT * FROM i;
+----
+stmt 0 err 1 -1 SELECTs to the left and right of UNION ALL do not have the same number of result columns
+==== 5.6.7
+
+  WITH i(x) AS ( SELECT 1, 2 UNION SELECT x+1 FROM i )
+  SELECT * FROM i;
+----
+stmt 0 err 1 -1 table i has 2 values for 1 columns
+==== 6.1
+
+  CREATE TABLE f(
+      id INTEGER PRIMARY KEY, parentid REFERENCES f, name TEXT
+  );
+
+  INSERT INTO f VALUES(0, NULL, '');
+  INSERT INTO f VALUES(1, 0, 'bin');
+    INSERT INTO f VALUES(2, 1, 'true');
+    INSERT INTO f VALUES(3, 1, 'false');
+    INSERT INTO f VALUES(4, 1, 'ls');
+    INSERT INTO f VALUES(5, 1, 'grep');
+  INSERT INTO f VALUES(6, 0, 'etc');
+    INSERT INTO f VALUES(7, 6, 'rc.d');
+      INSERT INTO f VALUES(8, 7, 'rc.apache');
+      INSERT INTO f VALUES(9, 7, 'rc.samba');
+  INSERT INTO f VALUES(10, 0, 'home');
+    INSERT INTO f VALUES(11, 10, 'dan');
+      INSERT INTO f VALUES(12, 11, 'public_html');
+        INSERT INTO f VALUES(13, 12, 'index.html');
+          INSERT INTO f VALUES(14, 13, 'logo.gif');
+----
+stmt 0 ok
+stmt 86 err 1 -1 no such table: f
+stmt 124 err 1 -1 no such table: f
+stmt 161 err 1 -1 no such table: f
+stmt 201 err 1 -1 no such table: f
+stmt 242 err 1 -1 no such table: f
+stmt 280 err 1 -1 no such table: f
+stmt 320 err 1 -1 no such table: f
+stmt 357 err 1 -1 no such table: f
+stmt 397 err 1 -1 no such table: f
+stmt 444 err 1 -1 no such table: f
+stmt 490 err 1 -1 no such table: f
+stmt 529 err 1 -1 no such table: f
+stmt 570 err 1 -1 no such table: f
+stmt 621 err 1 -1 no such table: f
+stmt 673 err 1 -1 no such table: f
+==== 6.2
+
+  WITH flat(fid, fpath) AS (
+    SELECT id, '' FROM f WHERE parentid IS NULL
+    UNION ALL
+    SELECT id, fpath || '/' || name FROM f, flat WHERE parentid=fid
+  )
+  SELECT fpath FROM flat WHERE fpath!='' ORDER BY 1;
+----
+stmt 0 err 1 -1 no such table: f
+==== 6.3
+
+  WITH flat(fid, fpath) AS (
+    SELECT id, '' FROM f WHERE parentid IS NULL
+    UNION ALL
+    SELECT id, fpath || '/' || name FROM f, flat WHERE parentid=fid
+  )
+  SELECT count(*) FROM flat;
+----
+stmt 0 err 1 -1 no such table: f
+==== 6.4
+
+  WITH x(i) AS (
+    SELECT 1
+    UNION ALL
+    SELECT i+1 FROM x WHERE i<10
+  )
+  SELECT count(*) FROM x
+----
+stmt 0 ok
+==== 7.1
+
+  CREATE TABLE tree(i, p);
+  INSERT INTO tree VALUES(1, NULL);
+  INSERT INTO tree VALUES(2, 1);
+  INSERT INTO tree VALUES(3, 1);
+  INSERT INTO tree VALUES(4, 2);
+  INSERT INTO tree VALUES(5, 4);
+----
+stmt 0 ok
+stmt 27 err 1 -1 no such table: tree
+stmt 63 err 1 -1 no such table: tree
+stmt 96 err 1 -1 no such table: tree
+stmt 129 err 1 -1 no such table: tree
+stmt 162 err 1 -1 no such table: tree
+==== 7.2
+
+  WITH t(id, path) AS (
+    SELECT i, '' FROM tree WHERE p IS NULL
+    UNION ALL
+    SELECT i, path || '/' || i FROM tree, t WHERE p = id
+  ) 
+  SELECT path FROM t;
+----
+stmt 0 err 1 -1 no such table: tree
+==== 7.3
+
+  WITH t(id) AS (
+    VALUES(2)
+    UNION ALL
+    SELECT i FROM tree, t WHERE p = id
+  ) 
+  SELECT id FROM t;
+----
+stmt 0 err 1 -1 no such table: tree
+==== 7.4
+
+  WITH t(id) AS (
+    VALUES(2)
+    UNION ALL
+    SELECT i FROM tree WHERE p IN (SELECT id FROM t)
+  ) 
+  SELECT id FROM t;
+----
+stmt 0 err 1 -1 no such table: tree
+==== 7.5
+
+  WITH t(id) AS (
+    VALUES(2)
+    UNION ALL
+    SELECT i FROM tree, t WHERE p = id AND p IN (SELECT id FROM t)
+  ) 
+  SELECT id FROM t;
+----
+stmt 0 err 1 -1 no such table: tree
+==== 7.6
+
+  WITH t(id) AS (
+    SELECT i FROM tree WHERE 2 IN (SELECT id FROM t)
+    UNION ALL
+    SELECT i FROM tree, t WHERE p = id
+  ) 
+  SELECT id FROM t;
+----
+stmt 0 err 1 -1 no such table: tree
+==== 8.1-mandelbrot
+
+  WITH RECURSIVE
+    xaxis(x) AS (VALUES(-2.0) UNION ALL SELECT x+0.05 FROM xaxis WHERE x<1.2),
+    yaxis(y) AS (VALUES(-1.0) UNION ALL SELECT y+0.1 FROM yaxis WHERE y<1.0),
+    m(iter, cx, cy, x, y) AS (
+      SELECT 0, x, y, 0.0, 0.0 FROM xaxis, yaxis
+      UNION ALL
+      SELECT iter+1, cx, cy, x*x-y*y + cx, 2.0*x*y + cy FROM m 
+       WHERE (x*x + y*y) < 4.0 AND iter<28
+    ),
+    m2(iter, cx, cy) AS (
+      SELECT max(iter), cx, cy FROM m GROUP BY cx, cy
+    ),
+    a(t) AS (
+      SELECT group_concat( substr(' .+*#', 1+min(iter/7,4), 1), '') 
+      FROM m2 GROUP BY cy
+    )
+  SELECT group_concat(rtrim(t),x'0a') FROM a;
+----
+stmt 0 ok
+==== 8.2-soduko
+
+  WITH RECURSIVE
+    input(sud) AS (
+      VALUES('53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79')
+    ),
+  
+    /* A table filled with digits 1..9, inclusive. */
+    digits(z, lp) AS (
+      VALUES('1', 1)
+      UNION ALL SELECT
+      CAST(lp+1 AS TEXT), lp+1 FROM digits WHERE lp<9
+    ),
+  
+    /* The tricky bit. */
+    x(s, ind) AS (
+      SELECT sud, instr(sud, '.') FROM input
+      UNION ALL
+      SELECT
+        substr(s, 1, ind-1) || z || substr(s, ind+1),
+        instr( substr(s, 1, ind-1) || z || substr(s, ind+1), '.' )
+       FROM x, digits AS z
+      WHERE ind>0
+        AND NOT EXISTS (
+              SELECT 1
+                FROM digits AS lp
+               WHERE z.z = substr(s, ((ind-1)/9)*9 + lp, 1)
+                  OR z.z = substr(s, ((ind-1)%9) + (lp-1)*9 + 1, 1)
+                  OR z.z = substr(s, (((ind-1)/3) % 3) * 3
+                          + ((ind-1)/27) * 27 + lp
+                          + ((lp-1) / 3) * 6, 1)
+           )
+    )
+  SELECT s FROM x WHERE ind=0;
+----
+stmt 0 ok
+==== 10.1
+
+  DROP TABLE IF EXISTS tree;
+  CREATE TABLE tree(id INTEGER PRIMARY KEY, parentid, payload);
+----
+stmt 0 ok
+stmt 29 ok
+==== 10.2
+
+  WITH flat(fid, p) AS (
+    SELECT id, '/' || payload FROM tree WHERE parentid IS NULL
+    UNION ALL
+    SELECT id, p || '/' || payload FROM flat, tree WHERE parentid=fid
+  )
+  SELECT p FROM flat ORDER BY p;
+----
+stmt 0 err 1 -1 no such table: tree
+==== 10.7.1
+
+  WITH t(a) AS (
+    SELECT 1 AS b UNION ALL SELECT a+1 AS c FROM t WHERE a<5 ORDER BY a
+  ) 
+  SELECT * FROM t
+----
+stmt 0 err 1 -1 1st ORDER BY term does not match any column in the result set
+==== 10.7.2
+
+  WITH t(a) AS (
+    SELECT 1 AS b UNION ALL SELECT a+1 AS c FROM t WHERE a<5 ORDER BY b
+  ) 
+  SELECT * FROM t
+----
+stmt 0 ok
+==== 10.7.3
+
+  WITH t(a) AS (
+    SELECT 1 AS b UNION ALL SELECT a+1 AS c FROM t WHERE a<5 ORDER BY c
+  ) 
+  SELECT * FROM t
+----
+stmt 0 ok
+==== 10.8.1
+
+  WITH flat(fid, depth, p) AS (
+    SELECT id, 1, '/' || payload FROM tree WHERE parentid IS NULL
+    UNION ALL
+    SELECT id, depth+1, p||'/'||payload FROM flat, tree WHERE parentid=fid
+    ORDER BY 2, 3 COLLATE nocase
+  )
+  SELECT p FROM flat;
+----
+stmt 0 err 1 -1 no such table: tree
+==== 10.8.2
+
+  WITH flat(fid, depth, p) AS (
+      SELECT id, 1, ('/' || payload) COLLATE nocase 
+      FROM tree WHERE parentid IS NULL
+    UNION ALL
+      SELECT id, depth+1, (p||'/'||payload)
+      FROM flat, tree WHERE parentid=fid
+    ORDER BY 2, 3
+  )
+  SELECT p FROM flat;
+----
+stmt 0 err 1 -1 no such table: tree
+==== 10.8.3
+
+  WITH flat(fid, depth, p) AS (
+      SELECT id, 1, ('/' || payload)
+      FROM tree WHERE parentid IS NULL
+    UNION ALL
+      SELECT id, depth+1, (p||'/'||payload) COLLATE nocase 
+      FROM flat, tree WHERE parentid=fid
+    ORDER BY 2, 3
+  )
+  SELECT p FROM flat;
+----
+stmt 0 err 1 -1 no such table: tree
+==== 10.8.4.1
+
+  CREATE TABLE tst(a,b);
+  INSERT INTO tst VALUES('a', 'A');
+  INSERT INTO tst VALUES('b', 'B');
+  INSERT INTO tst VALUES('c', 'C');
+  SELECT a COLLATE nocase FROM tst UNION ALL SELECT b FROM tst ORDER BY 1;
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: tst
+stmt 61 err 1 -1 no such table: tst
+stmt 97 err 1 -1 no such table: tst
+stmt 133 err 1 -1 no such table: tst
+==== 10.8.4.2
+
+  SELECT a FROM tst UNION ALL SELECT b COLLATE nocase FROM tst ORDER BY 1;
+----
+stmt 0 err 1 -1 no such table: tst
+==== 10.8.4.3
+
+  SELECT a||'' FROM tst UNION ALL SELECT b COLLATE nocase FROM tst ORDER BY 1;
+----
+stmt 0 err 1 -1 no such table: tst
+==== 11.1
+
+  CREATE TABLE org(
+    name TEXT PRIMARY KEY,
+    boss TEXT REFERENCES org
+  ) WITHOUT ROWID;
+  INSERT INTO org VALUES('Alice',NULL);
+  INSERT INTO org VALUES('Bob','Alice');
+  INSERT INTO org VALUES('Cindy','Alice');
+  INSERT INTO org VALUES('Dave','Bob');
+  INSERT INTO org VALUES('Emma','Bob');
+  INSERT INTO org VALUES('Fred','Cindy');
+  INSERT INTO org VALUES('Gail','Cindy');
+  INSERT INTO org VALUES('Harry','Dave');
+  INSERT INTO org VALUES('Ingrid','Dave');
+  INSERT INTO org VALUES('Jim','Emma');
+  INSERT INTO org VALUES('Kate','Emma');
+  INSERT INTO org VALUES('Lanny','Fred');
+  INSERT INTO org VALUES('Mary','Fred');
+  INSERT INTO org VALUES('Noland','Gail');
+  INSERT INTO org VALUES('Olivia','Gail');
+  -- The above are all under Alice.  Add a few more records for people
+  -- not in Alice's group, just to prove that they won't be selected.
+  INSERT INTO org VALUES('Xaviar',NULL);
+  INSERT INTO org VALUES('Xia','Xaviar');
+  INSERT INTO org VALUES('Xerxes','Xaviar');
+  INSERT INTO org VALUES('Xena','Xia');
+  -- Find all members of Alice's group, breath-first order  
+  WITH RECURSIVE
+    under_alice(name,level) AS (
+       VALUES('Alice','0')
+       UNION ALL
+       SELECT org.name, under_alice.level+1
+         FROM org, under_alice
+        WHERE org.boss=under_alice.name
+        ORDER BY 2
+    )
+  SELECT group_concat(substr('...............',1,level*3) || name,x'0a')
+    FROM under_alice;
+----
+stmt 0 ok
+stmt 95 err 1 -1 no such table: org
+stmt 135 err 1 -1 no such table: org
+stmt 176 err 1 -1 no such table: org
+stmt 219 err 1 -1 no such table: org
+stmt 259 err 1 -1 no such table: org
+stmt 299 err 1 -1 no such table: org
+stmt 341 err 1 -1 no such table: org
+stmt 383 err 1 -1 no such table: org
+stmt 425 err 1 -1 no such table: org
+stmt 468 err 1 -1 no such table: org
+stmt 508 err 1 -1 no such table: org
+stmt 549 err 1 -1 no such table: org
+stmt 591 err 1 -1 no such table: org
+stmt 632 err 1 -1 no such table: org
+stmt 675 err 1 -1 no such table: org
+stmt 718 err 1 -1 no such table: org
+stmt 900 err 1 -1 no such table: org
+stmt 942 err 1 -1 no such table: org
+stmt 987 err 1 -1 no such table: org
+stmt 1027 err 1 -1 no such table: org
+==== 11.2
+
+  WITH RECURSIVE
+    under_alice(name,level) AS (
+       VALUES('Alice','0')
+       UNION ALL
+       SELECT org.name, under_alice.level+1
+         FROM org, under_alice
+        WHERE org.boss=under_alice.name
+        ORDER BY 2 DESC
+    )
+  SELECT group_concat(substr('...............',1,level*3) || name,x'0a')
+    FROM under_alice;
+----
+stmt 0 err 1 -1 no such table: org
+==== 11.3
+
+  WITH RECURSIVE
+    under_alice(name,level) AS (
+       VALUES('Alice','0')
+       UNION ALL
+       SELECT org.name, under_alice.level+1
+         FROM org, under_alice
+        WHERE org.boss=under_alice.name
+    )
+  SELECT group_concat(substr('...............',1,level*3) || name,x'0a')
+    FROM under_alice;
+----
+stmt 0 err 1 -1 no such table: org
+==== 12.1
+
+WITH RECURSIVE
+  t1(x) AS (VALUES(2) UNION ALL SELECT x+2 FROM t1 WHERE x<20),
+  t2(y) AS (VALUES(3) UNION ALL SELECT y+3 FROM t2 WHERE y<20)
+SELECT x FROM t1 EXCEPT SELECT y FROM t2 ORDER BY 1;
+----
+stmt 0 ok
+==== 13.1
+
+  WITH RECURSIVE c(i) AS (SELECT * UNION ALL SELECT i+1 FROM c WHERE i<10)
+  SELECT i FROM c;
+----
+stmt 0 err 1 -1 no tables specified
+==== 13.2
+
+  WITH RECURSIVE c(i) AS (SELECT 5,* UNION ALL SELECT i+1 FROM c WHERE i<10)
+  SELECT i FROM c;
+----
+stmt 0 err 1 -1 no tables specified
+==== 13.3
+
+  WITH RECURSIVE c(i,j) AS (SELECT 5,* UNION ALL SELECT i+1,11 FROM c WHERE i<10)
+  SELECT i FROM c;
+----
+stmt 0 err 1 -1 table c has 1 values for 2 columns
+==== 14.1
+
+  WITH x AS (SELECT * FROM t) SELECT 0 EXCEPT SELECT 0 ORDER BY 1 COLLATE binary;
+----
+stmt 0 ok
+==== 15.1
+
+  WITH RECURSIVE
+    d(x) AS (VALUES(1) UNION ALL SELECT rowid+1 FROM d WHERE rowid<10)
+  SELECT x FROM d;
+----
+stmt 0 err 1 58 no such column: rowid
+==== 16.1
+
+  WITH RECURSIVE
+    i(x) AS (VALUES(1) UNION SELECT count(*) FROM i)
+  SELECT * FROM i;
+----
+stmt 0 err 1 -1 recursive aggregate queries not supported
+==== 16.2
+
+    WITH RECURSIVE
+      i(x) AS (VALUES(1) UNION SELECT count(*) OVER () FROM i)
+      SELECT * FROM i;
+----
+stmt 0 err 1 -1 cannot use window functions in recursive queries
+==== 16.3
+
+    WITH RECURSIVE
+      t(id, parent) AS (VALUES(1,2)),
+      q(id, parent, rn) AS (
+          VALUES(1,2,3)
+          UNION ALL
+          SELECT t.*, ROW_NUMBER() OVER (ORDER BY t.id) AS rn
+          FROM q JOIN t ON t.parent = q.id
+          )
+        SELECT * FROM q;
+----
+stmt 0 err 1 -1 cannot use window functions in recursive queries
+==== 17.1
+
+  WITH x(a) AS (
+    WITH y(b) AS (SELECT 10)
+    SELECT 9 UNION ALL SELECT * FROM y
+  )
+  SELECT * FROM x
+----
+stmt 0 ok
+==== 17.2
+
+  WITH x AS (
+    WITH y(b) AS (SELECT 10)
+    SELECT * FROM y UNION ALL SELECT * FROM y
+  )
+  SELECT * FROM x
+----
+stmt 0 ok
+==== 17.3
+
+  WITH i AS (
+    WITH j AS (SELECT 5)
+    SELECT 5 FROM i UNION SELECT 8 FROM i
+  )
+  SELECT * FROM i;
+----
+stmt 0 err 1 -1 circular reference: i
+==== 17.4
+
+  WITH i AS (
+    WITH j AS (SELECT 5)
+    SELECT 5 FROM t1 UNION SELECT 8 FROM t11
+  )
+  SELECT * FROM i;
+----
+stmt 0 err 1 -1 no such table: t11
+==== 17.5
+
+  WITH 
+  x1 AS (SELECT 10),
+  x2 AS (SELECT * FROM x1),
+  x3 AS (
+    WITH x1 AS (SELECT 11)
+    SELECT * FROM x2 UNION ALL SELECT * FROM x2
+  )
+  SELECT * FROM x3;
+----
+stmt 0 ok
+==== 17.6
+
+  WITH 
+  x1 AS (SELECT 10),
+  x2 AS (SELECT * FROM x1),
+  x3 AS (
+    WITH x1 AS (SELECT 11)
+    SELECT * FROM x2 UNION ALL SELECT * FROM x1
+  )
+  SELECT * FROM x3;
+----
+stmt 0 ok
+==== 17.7
+
+  WITH 
+  x1 AS (SELECT 10),
+  x2 AS (SELECT * FROM x1),
+  x3 AS (
+    WITH 
+      x1 AS ( SELECT 11 ),
+      x4 AS ( SELECT * FROM x2 )
+    SELECT * FROM x4 UNION ALL SELECT * FROM x1
+  )
+  SELECT * FROM x3;
+----
+stmt 0 ok
+==== 17.8
+
+  WITH 
+  x1 AS (SELECT 10),
+  x2 AS (SELECT * FROM x1),
+  x3 AS (
+    WITH 
+      x1 AS ( SELECT 11 ),
+      x4 AS ( SELECT * FROM x2 )
+    SELECT * FROM x4 UNION ALL SELECT * FROM x1
+  )
+  SELECT * FROM x3;
+----
+stmt 0 ok
+==== 17.9
+
+  WITH 
+  x1 AS (SELECT 10),
+  x2 AS (SELECT 11),
+  x3 AS (
+    SELECT * FROM x1 UNION ALL SELECT * FROM x2
+  ),
+  x4 AS (
+    WITH 
+    x1 AS (SELECT 12),
+    x2 AS (SELECT 13)
+    SELECT * FROM x3
+  )
+  SELECT * FROM x4;
+----
+stmt 0 ok
+==== 18.1
+
+  WITH xyz(x) AS (VALUES(NULL) UNION SELECT round(1<x) FROM xyz ORDER BY 1)
+  SELECT quote(x) FROM xyz;
+----
+stmt 0 ok
+==== 18.2
+
+  WITH xyz(x) AS (
+    SELECT printf('%d', 5) * NULL
+    UNION SELECT round(1<1+x) 
+    FROM xyz ORDER BY 1
+  )
+  SELECT 1 FROM xyz;
+----
+stmt 0 ok
+==== 19.1a
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x);
+----
+stmt 0 ok
+stmt 27 ok
+==== 20.1
+
+  WITH c(i)AS(VALUES(9)UNION SELECT~i FROM c)SELECT max(5)>i fROM c;
+----
+stmt 0 ok
+==== 20.2
+
+  WITH c(i)AS(VALUES(5)UNIoN SELECT 0)SELECT min(1)-i fROM c;
+----
+stmt 0 ok
+==== 21.1
+
+   WITH RECURSIVE t21(a,b) AS (
+    WITH t21(x) AS (VALUES(1))
+    SELECT x, x FROM t21 ORDER BY 1
+  )
+  SELECT * FROM t21 AS tA, t21 AS tB
+----
+stmt 0 ok
+==== 21.1b
+
+   /* This variant from chromium bug 922312 on 2019-01-16 */
+   WITH RECURSIVE t21(a,b) AS (
+    WITH t21(x) AS (VALUES(1))
+    SELECT x, x FROM t21 ORDER BY 1 LIMIT 5
+  )
+  SELECT * FROM t21 AS tA, t21 AS tB
+----
+stmt 0 ok
+==== 21.2
+
+  SELECT printf('',
+     EXISTS (WITH RECURSIVE Table0 AS (WITH Table0 AS (SELECT DISTINCT 1)
+                                       SELECT *, * FROM Table0 ORDER BY 1 DESC)
+             SELECT * FROM Table0  NATURAL JOIN  Table0));
+----
+stmt 0 ok
+==== 22.1
+
+  WITH RECURSIVE c AS NOT MATERIALIZED (
+     WITH RECURSIVE c AS NOT MATERIALIZED (
+        WITH RECURSIVE c AS NOT MATERIALIZED (
+           WITH RECURSIVE c AS NOT MATERIALIZED (
+               WITH  c AS (VALUES(0))
+               SELECT 1 FROM c LEFT JOIN c ON ltrim(1)
+           )
+           SELECT 1 FROM c,c,c,c,c,c,c,c,c
+        )
+        SELECT  2 FROM c,c,c,c,c,c,c,c,c
+     )
+     SELECT 3 FROM c,c,c,c,c,c,c,c,c
+  )
+  SELECT 4 FROM c,c,c,c,c,c,c,c,c;
+----
+stmt 0 err 1 -1 too many FROM clause terms, max: 200
+==== 23.1
+
+  CREATE TABLE t1(id INTEGER NULL PRIMARY KEY, name Text);
+  INSERT INTO t1 VALUES (1, 'john');
+  INSERT INTO t1 VALUES (2, 'james');
+  INSERT INTO t1 VALUES (3, 'jingle');
+  INSERT INTO t1 VALUES (4, 'himer');
+  INSERT INTO t1 VALUES (5, 'smith');
+  CREATE VIEW v2 AS
+    WITH t4(Name) AS (VALUES ('A'), ('B'))
+    SELECT Name Name FROM t4;
+  CREATE VIEW v3 AS
+    WITH t4(Att, Val, Act) AS (VALUES
+      ('C', 'D', 'E'),
+      ('F', 'G', 'H')
+    )
+    SELECT D.Id Id, P.Name Protocol, T.Att Att, T.Val Val, T.Act Act
+    FROM t1 D
+    CROSS JOIN v2 P
+    CROSS JOIN t4 T;
+  SELECT * FROM v3;
+----
+stmt 0 ok
+stmt 59 err 1 -1 no such table: t1
+stmt 96 err 1 -1 no such table: t1
+stmt 134 err 1 -1 no such table: t1
+stmt 173 err 1 -1 no such table: t1
+stmt 211 err 1 -1 no such table: t1
+stmt 249 ok
+stmt 342 ok
+stmt 575 err 1 -1 no such table: v3
+==== 24.1
+
+  CREATE TABLE t1(a, b, c);
+  CREATE VIEW v1 AS SELECT max(a), min(b) FROM t1 GROUP BY c;
+----
+stmt 0 ok
+stmt 28 ok
+==== 24.2
+
+  ATTACH "" AS aux;
+  CREATE VIEW aux.v3 AS VALUES(1);
+  CREATE VIEW main.v3 AS VALUES(3);
+
+  CREATE VIEW aux.v2 AS SELECT * FROM v3;
+  CREATE VIEW main.v2 AS SELECT * FROM v3;
+
+  SELECT * FROM main.v2 AS a, aux.v2 AS b, aux.v2 AS c, main.v2 AS d;
+----
+stmt 0 ok
+stmt 20 err 1 35 unknown database aux
+stmt 55 ok
+stmt 91 err 1 107 unknown database aux
+stmt 134 ok
+stmt 177 err 1 -1 no such table: main.v2
+==== with1-generated
+
+    WITH cte1 AS (
+      SELECT TRUE, (
+        WITH cte2 AS (SELECT avg(DISTINCT TRUE) FROM dual)
+        SELECT 2571 FROM cte2
+      ) AS subquery1
+      FROM dual
+      GROUP BY 1
+    )
+    SELECT (SELECT 1324 FROM cte1) FROM cte1;
+----
+stmt 0 err 1 -1 no such table: dual
+==== 26.0
+
+  WITH i(x) AS ( 
+    VALUES(1) UNION ALL SELECT x+1 FRO, a.b,O. * ,I¬i O, a.b,O. * ORDER BY 1
+  )
+  SELECT x,O. * O FROM i ¬I,I? 10;
+----
+stmt 0 err 1 117 near "O": syntax error
+==== 26.1
+
+  CREATE TABLE t (label VARCHAR(10), step INTEGER);
+  INSERT INTO T VALUES('a', 1);
+  INSERT INTO T VALUES('a', 1);
+  INSERT INTO T VALUES('b', 1);
+  WITH RECURSIVE cte(label, step) AS (
+      SELECT DISTINCT * FROM t 
+    UNION ALL 
+      SELECT label, step + 1 FROM cte WHERE step < 3
+  )
+  SELECT * FROM cte ORDER BY +label, +step;
+----
+stmt 0 ok
+stmt 52 err 1 -1 no such table: T
+stmt 84 err 1 -1 no such table: T
+stmt 116 err 1 -1 no such table: T
+stmt 148 err 1 -1 no such table: t
+==== 26.2
+
+  WITH RECURSIVE cte(label, step) AS (
+      SELECT * FROM t 
+    UNION
+      SELECT label, step + 1 FROM cte WHERE step < 3
+  )
+  SELECT * FROM cte ORDER BY +label, +step;
+----
+stmt 0 err 1 -1 no such table: t
+==== 26.3
+
+  CREATE TABLE tworow(x);
+  INSERT INTO tworow(x) VALUES(1),(2);
+  DELETE FROM t WHERE rowid=2;
+  WITH RECURSIVE cte(label, step) AS (
+      SELECT * FROM t
+    UNION ALL
+      SELECT DISTINCT label, step + 1 FROM cte, tworow WHERE step < 3
+  )
+  SELECT * FROM cte ORDER BY +label, +step;
+----
+stmt 0 ok
+stmt 26 err 1 -1 no such table: tworow
+stmt 65 err 1 -1 no such table: t
+stmt 96 err 1 -1 no such table: t
+==== 27.1
+
+  CREATE TABLE t1(k);
+  CREATE TABLE log(k, cte_map, main_map);
+  CREATE TABLE map(k, v);
+  INSERT INTO map VALUES(1, 'main1'), (2, 'main2');
+  
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO log
+        WITH map(k,v) AS (VALUES(1,'cte1'),(2,'cte2'))
+        SELECT
+          new.k,
+          (SELECT v FROM map WHERE k=new.k),
+          (SELECT v FROM main.map WHERE k=new.k);
+  END;
+  
+  INSERT INTO t1 VALUES(1);
+  INSERT INTO t1 VALUES(2);
+  SELECT k, cte_map, main_map, '|' FROM log ORDER BY k;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 64 ok
+stmt 90 err 1 -1 no such table: map
+stmt 142 err 1 -1 no such table: main.t1
+stmt 400 err 1 -1 no such table: t1
+stmt 431 err 1 -1 no such table: t1
+stmt 459 err 1 -1 no such table: log
+==== 28.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(x INTEGER PRIMARY KEY);
+  INSERT INTO t1 VALUES(1),(4),(999);
+  SELECT (
+    WITH RECURSIVE t2(y) AS (
+      SELECT 4
+      UNION
+      SELECT NULL
+      UNION
+      SELECT y+1 FROM t2 WHERE y=4 ORDER BY 1
+    )
+    SELECT 1 FROM t2 WHERE y=x
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 59 err 1 -1 no such table: t1
+stmt 97 err 1 -1 no such table: t1
