@@ -9,6 +9,9 @@ https://sqlite.org/lang.html.
 ## Rules
 
 - **Zero dependencies.** `go.mod` must never gain a `require` line.
+- The keyword table and the `%fallback` set are transcriptions, and tests in
+  `token` rebuild both from the vendored upstream sources to keep them
+  honest. Advancing the pin surfaces a keyword change as a failure.
 - **No parser generators.** Everything is hand-written recursive descent.
 - **Never edit `parser/testdata/*.test` by hand.** Corpus files are produced
   by `cmd/regenerate-parse` from SQLite's own test suite plus a real SQLite
@@ -16,7 +19,8 @@ https://sqlite.org/lang.html.
   (`go test ./parser -check-parse`), not by hand. The hand-written snapshot
   inputs under `parser/testdata/ast/` are the exception — see below.
 - Every nontrivial parse function carries a comment naming the `parse.y`
-  rule(s) it implements.
+  rule(s) it implements. `TestEveryRuleIsNamed` enforces this from the other
+  side: no nonterminal of the vendored grammar may go unmentioned.
 - Error messages must match SQLite's parser byte-for-byte
   (`near "X": syntax error`, `unrecognized token: "X"`, `incomplete input`).
 

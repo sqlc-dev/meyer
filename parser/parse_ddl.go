@@ -85,7 +85,8 @@ func (p *parser) parseCreateTable(start int, temp bool) ast.Stmt {
 	return n
 }
 
-// parseColumnAndConstraintList implements "columnlist conslist_opt".
+// parseColumnAndConstraintList implements "columnlist conslist_opt", and
+// so also "conslist", "tconscomma" and the column half of "carglist".
 //
 // The two lists are told apart by their first token: a column definition
 // starts with a name, and none of CONSTRAINT, PRIMARY, UNIQUE, CHECK and
