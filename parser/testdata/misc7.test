@@ -25,6 +25,21 @@ stmt 0 err 1 -1 62 no such table: t1
     CREATE TABLE abc(a PRIMARY KEY, b, c);
 ----
 stmt 0 ok
+==== misc7-14.1
+
+    SELECT * FROM abc AS t2 WHERE rowid = 1;
+----
+stmt 0 err 1 -1 45 no such table: abc
+==== misc7-14.2
+
+    SELECT * FROM abc AS t2 WHERE a = 1;
+----
+stmt 0 err 1 -1 41 no such table: abc
+==== misc7-14.3
+
+    SELECT * FROM abc AS t2 ORDER BY a;
+----
+stmt 0 err 1 -1 40 no such table: abc
 ==== misc7-15.2
 
     DELETE FROM abc WHERE rowid > 12;

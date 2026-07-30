@@ -87,6 +87,16 @@ stmt 115 err 1 -1 149 no such table: t301
 stmt 149 ok
 stmt 176 err 1 -1 208 no such table: t302
 stmt 208 ok
+==== where3-3.0a
+
+  SELECT * FROM t302, t301 WHERE t302.x=5 AND t301.a=t302.y;
+----
+stmt 0 err 1 -1 61 no such table: t302
+==== where3-3.1
+
+  SELECT * FROM t301, t302 WHERE t302.x=5 AND t301.a=t302.y;
+----
+stmt 0 err 1 -1 61 no such table: t301
 ==== where3-3.2
 
   SELECT * FROM t301 WHERE c=3 AND a IS NULL;
@@ -148,6 +158,46 @@ stmt 438 ok
 stmt 734 err 1 -1 776 no such table: main.bbb
 stmt 776 err 1 -1 826 no such table: main.bbb
 stmt 826 err 1 -1 876 no such table: main.bbb
+==== where3-5.0a
+
+   SELECT bbb.title AS tag_title 
+     FROM aaa JOIN bbb ON bbb.id = aaa.parent  
+    WHERE aaa.fk = 'constant'
+      AND LENGTH(bbb.title) > 0
+      AND bbb.parent = 4
+    ORDER BY bbb.title COLLATE NOCASE ASC;
+----
+stmt 0 err 1 -1 212 no such table: aaa
+==== where3-5.1
+
+   SELECT bbb.title AS tag_title 
+     FROM aaa JOIN aaa AS bbb ON bbb.id = aaa.parent  
+    WHERE aaa.fk = 'constant'
+      AND LENGTH(bbb.title) > 0
+      AND bbb.parent = 4
+    ORDER BY bbb.title COLLATE NOCASE ASC;
+----
+stmt 0 err 1 -1 219 no such table: aaa
+==== where3-5.2
+
+   SELECT bbb.title AS tag_title 
+     FROM bbb JOIN aaa ON bbb.id = aaa.parent  
+    WHERE aaa.fk = 'constant'
+      AND LENGTH(bbb.title) > 0
+      AND bbb.parent = 4
+    ORDER BY bbb.title COLLATE NOCASE ASC;
+----
+stmt 0 err 1 -1 212 no such table: bbb
+==== where3-5.3
+
+   SELECT bbb.title AS tag_title 
+     FROM aaa AS bbb JOIN aaa ON bbb.id = aaa.parent  
+    WHERE aaa.fk = 'constant'
+      AND LENGTH(bbb.title) > 0
+      AND bbb.parent = 4
+    ORDER BY bbb.title COLLATE NOCASE ASC;
+----
+stmt 0 err 1 -1 219 no such table: aaa
 ==== where3-7-setup
 
   CREATE TABLE t71(x1 INTEGER PRIMARY KEY, y1);
@@ -227,3 +277,8 @@ stmt 61 ok
 stmt 85 err 1 -1 118 no such table: t2
 stmt 118 err 1 -1 150 no such table: main.t2
 stmt 150 err 1 -1 203 no such table: t1
+==== where3-8.2
+
+  SELECT 1 FROM t1 JOIN t2 ON x=c AND y=d WHERE d>0;
+----
+stmt 0 err 1 -1 53 no such table: t1

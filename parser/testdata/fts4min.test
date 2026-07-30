@@ -16,6 +16,16 @@ stmt 0 ok
 stmt 41 err 1 -1 95 no such table: ft
 stmt 95 err 1 -1 149 no such table: ft
 stmt 149 err 1 -1 203 no such table: ft
+==== 1.1.1
+
+  SELECT max(rowid) FROM ft
+----
+stmt 0 err 1 -1 29 no such table: ft
+==== 1.1.2
+
+  SELECT min(rowid) FROM ft
+----
+stmt 0 err 1 -1 29 no such table: ft
 ==== 1.2.1
 
   SELECT max(rowid) FROM ft

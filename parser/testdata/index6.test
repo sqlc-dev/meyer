@@ -320,6 +320,11 @@ stmt 209 err 1 -1 248 no such table: t8b
 stmt 248 err 1 -1 286 no such table: t8b
 stmt 286 err 1 -1 324 no such table: t8b
 stmt 324 err 1 -1 362 no such table: t8b
+==== index6-8.1
+
+  SELECT * FROM t8a LEFT JOIN t8b ON (x = 'value' AND y = a)
+----
+stmt 0 err 1 -1 62 no such table: t8a
 ==== index6-8.2
 
   SELECT * FROM t8a LEFT JOIN t8b ON (x = 'value' AND y = a)

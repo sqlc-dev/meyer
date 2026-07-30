@@ -18,6 +18,17 @@ stmt 368 err 1 -1 412 no such table: main.a
 stmt 412 err 1 -1 471 no such table: main.a
 stmt 471 ok
 stmt 537 err 1 -1 573 no such table: main.b
+==== 110
+
+  SELECT dc, count(cn)
+    FROM (SELECT coalesce(b.bg, a.bc) as dc, cn
+            FROM a LEFT JOIN b
+                  ON a.bn = b.bn
+                 AND CASE WHEN a.vb IS NOT NULL THEN 1 ELSE 0 END = b.iv
+           WHERE pd BETWEEN 0 AND 10)
+   GROUP BY dc;
+----
+stmt 0 err 1 -1 262 no such table: a
 ==== 200
 
   CREATE TABLE t1(

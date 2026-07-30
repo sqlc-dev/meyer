@@ -1,10 +1,12 @@
 // Package tclextract pulls literal SQL test cases out of SQLite's TCL test
 // scripts (test/*.test in the SQLite source tree).
 //
-// It recognizes the two dominant test commands:
+// It recognizes the dominant test commands, which all take the SQL as their
+// second word:
 //
 //	do_execsql_test  <name> {SQL} ?{expected}?
 //	do_catchsql_test <name> {SQL} {expected}
+//	do_eqp_test      <name> {SQL} {plan}
 //
 // plus the older style used by e.g. tokenize.test, but only when the body is
 // exactly one execsql/catchsql call:
@@ -40,7 +42,7 @@ type Stats struct {
 	GeneratedNames int // dynamic test names replaced with file-local ones
 }
 
-var commands = []string{"do_execsql_test", "do_catchsql_test", "do_test"}
+var commands = []string{"do_execsql_test", "do_catchsql_test", "do_eqp_test", "do_test"}
 
 // File extracts all cases from one TCL test script. base names the script
 // (e.g. "select1") and seeds generated case names.

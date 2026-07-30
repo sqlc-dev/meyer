@@ -225,3 +225,8 @@ stmt 0 err 1 -1 82 no such table: peoplew
   CREATE TABLE t3(a, b, c, PRIMARY KEY(a, b)) WITHOUT ROWID;
 ----
 stmt 0 ok
+==== skipscan2-3.3eqp
+
+  SELECT * FROM t3 WHERE b=42;
+----
+stmt 0 err 1 -1 31 no such table: t3

@@ -478,6 +478,12 @@ stmt 266 ok
 stmt 277 err 1 -1 305 no such table: sqlite_stat1
 stmt 305 err 1 -1 491 no such table: sqlite_stat1
 stmt 491 ok
+==== 9.1
+
+SELECT count(*) FROM edge
+ WHERE node_from IN sub_nodes AND node_to IN sub_nodes;
+----
+stmt 0 err 1 -1 82 no such table: edge
 ==== 10.0
 
   CREATE TABLE t1(a,b,c,d,PRIMARY KEY(a,b,c)) WITHOUT ROWID;

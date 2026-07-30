@@ -142,6 +142,36 @@ stmt 0 err 1 -1 44 no such table: generate_series
   SELECT DISTINCT value FROM generate_series(1,x), t1 ORDER BY 1;
 ----
 stmt 0 err 1 -1 66 no such table: generate_series
+==== tabfunc01-3.10
+
+  SELECT value FROM generate_series(1,10) ORDER BY value;
+----
+stmt 0 err 1 -1 58 no such table: generate_series
+==== tabfunc01-3.11
+
+  SELECT value FROM generate_series(1,10) ORDER BY +value;
+----
+stmt 0 err 1 -1 59 no such table: generate_series
+==== tabfunc01-3.12
+
+  SELECT value FROM generate_series(1,10) ORDER BY value, stop;
+----
+stmt 0 err 1 -1 64 no such table: generate_series
+==== tabfunc01-3.13
+
+  SELECT value FROM generate_series(1,10) ORDER BY stop, value;
+----
+stmt 0 err 1 -1 64 no such table: generate_series
+==== tabfunc01-3.20
+
+  WITH t1(a) AS (
+    SELECT value FROM generate_series(0,10,2)
+    UNION ALL
+    SELECT value FROM generate_series(9,18,3)
+  )
+  SELECT * FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 159 no such table: generate_series
 ==== tabfunc01-4.1
 
   SELECT * FROM main.generate_series(1,4)

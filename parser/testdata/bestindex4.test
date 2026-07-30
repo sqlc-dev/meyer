@@ -5,3 +5,13 @@
 ----
 stmt 0 ok
 stmt 51 ok
+==== 2.1
+
+  SELECT * FROM t1, x1 WHERE x1.d=t1.x;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== 2.2
+
+  SELECT * FROM t1, x1(t1.x)
+----
+stmt 0 err 1 -1 30 no such table: t1

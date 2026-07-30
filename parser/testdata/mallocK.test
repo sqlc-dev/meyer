@@ -79,6 +79,11 @@ stmt 1491 err 1 -1 1527 no such table: t3
 stmt 1527 err 1 -1 1559 no such table: main.t3
 stmt 1559 ok
 stmt 1570 ok
+==== 6.1
+
+    SELECT DISTINCT c FROM t3 WHERE b BETWEEN '.xx..' AND '.xxxx';
+----
+stmt 0 err 1 -1 67 no such table: t3
 ==== 7.1
 
   CREATE TABLE x1(a INTEGER PRIMARY KEY, b);

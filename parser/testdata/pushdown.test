@@ -102,7 +102,17 @@ stmt 215 ok
 stmt 288 err 1 -1 376 no such table: t2
 stmt 376 ok
 stmt 469 err 1 -1 509 no such table: v3
+==== 3.6
+
+  SELECT * FROM v3 WHERE a=2 AND b=200;
+----
+stmt 0 err 1 -1 40 no such table: v3
 ==== 3.7
+
+  SELECT count(*) FROM v3;
+----
+stmt 0 err 1 -1 27 no such table: v3
+==== 3.8
 
   SELECT count(*) FROM v3;
 ----
@@ -181,6 +191,22 @@ stmt 185 err 1 -1 220 no such table: main.t02
 stmt 220 ok
 stmt 265 ok
 stmt 287 err 1 -1 322 no such table: k1
+==== 6.1
+
+  WITH k(n) AS (VALUES(77),(88),(99))
+  SELECT max(z) FROM t0 WHERE w=123 AND x IN k AND y BETWEEN 44 AND 55;
+----
+stmt 0 err 1 -1 110 no such table: t0
+==== 6.2
+
+  SELECT max(z) FROM t0 WHERE w=123 AND x IN v1 AND y BETWEEN 44 AND 55;
+----
+stmt 0 err 1 -1 73 no such table: t0
+==== 6.3
+
+  SELECT max(z) FROM t0 WHERE w=123 AND x IN k1 AND y BETWEEN 44 AND 55;
+----
+stmt 0 err 1 -1 73 no such table: t0
 ==== 7.0
 
   CREATE  TABLE  t0_1(a INT , b INT, c INT);

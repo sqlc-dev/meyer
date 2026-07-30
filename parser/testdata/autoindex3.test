@@ -66,6 +66,11 @@ stmt 296 err 1 -1 323 no such table: main.v
 stmt 323 err 1 -1 356 no such table: main.v
 stmt 356 ok
 stmt 394 ok
+==== 220
+
+  select count(*) from u, v where u.b = v.b and v.e > 34;
+----
+stmt 0 err 1 -1 58 no such table: u
 ==== 300
 
   CREATE TABLE t1(id INTEGER PRIMARY KEY);
@@ -83,3 +88,12 @@ stmt 115 err 1 -1 149 no such table: main.t2
 stmt 149 ok
 stmt 174 err 1 -1 312 no such table: sqlite_stat1
 stmt 312 ok
+==== 310
+
+  WITH RECURSIVE children(id) AS (
+    SELECT cid FROM t2 WHERE pid = ?1 AND rx = ?2
+    UNION 
+    SELECT cid FROM t2 JOIN children ON t2.pid = children.id AND rx = ?2
+  ) SELECT count(id) FROM children;
+----
+stmt 0 err 1 -1 205 no such table: t2

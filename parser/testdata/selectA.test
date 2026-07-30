@@ -1307,6 +1307,14 @@ stmt 117 err 1 -1 150 no such table: t4
 stmt 150 err 1 -1 183 no such table: t4
 stmt 183 err 1 -1 212 no such table: main.t4
 stmt 212 err 1 -1 240 no such table: main.t5
+==== 4.1.2
+
+  SELECT c, d FROM t5 
+  UNION ALL
+  SELECT a, b FROM t4 WHERE f()==f()
+  ORDER BY 1,2
+----
+stmt 0 err 1 -1 88 no such table: t4
 ==== 4.1.3
 
   SELECT c, d FROM t5 

@@ -867,6 +867,16 @@ stmt 0 ok
 ----
 stmt 0 ok
 stmt 27 ok
+==== 19.1b
+
+  WITH
+    x1(a) AS (values(100))
+  INSERT INTO t1(x)
+    SELECT * FROM (WITH x2(y) AS (SELECT * FROM x1) SELECT y+a FROM x1, x2);
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 131 no such table: t1
+stmt 131 err 1 -1 151 no such table: t1
 ==== 20.1
 
   WITH c(i)AS(VALUES(9)UNION SELECT~i FROM c)SELECT max(5)>i fROM c;

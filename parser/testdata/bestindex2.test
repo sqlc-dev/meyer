@@ -7,8 +7,44 @@
 stmt 0 ok
 stmt 58 ok
 stmt 116 ok
+==== 1.1
+
+  SELECT * FROM t1 WHERE a='abc'
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== 1.2
+
+  SELECT * FROM t1 WHERE a='abc' AND b='def'
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== 1.3
+
+  SELECT * FROM t1 WHERE a='abc' AND a='def'
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== 1.4
+
+  SELECT * FROM t1,t2 WHERE c=a
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 1.5
+
+  SELECT * FROM t1, t2 CROSS JOIN t3 WHERE t2.c = +t1.b AND t3.e=t2.d
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== 1.6
+
+  SELECT * FROM t1, t2, t3 WHERE t2.c = +t1.b AND t3.e = t2.d
+----
+stmt 0 err 1 -1 63 no such table: t1
 ==== 1.7.1
 
   CREATE TABLE x1(a, b);
 ----
 stmt 0 ok
+==== 1.7.2
+
+  SELECT * FROM x1 CROSS JOIN t1, t2, t3 
+    WHERE t1.a = t2.c AND t1.b = t3.e
+----
+stmt 0 err 1 -1 81 no such table: x1

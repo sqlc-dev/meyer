@@ -17,3 +17,13 @@ stmt 0 err 1 10 49 no such function: int2hex
 stmt 0 ok
 stmt 25 err 1 -1 53 no such table: main.t1
 stmt 53 err 1 -1 208 no such table: t1
+==== 3.1
+
+  SELECT i FROM t1 WHERE (i%2)==0 ORDER BY h DESC;
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 4.2
+
+  SELECT i FROM t1 WHERE (i%2)==0 ORDER BY h ASC;
+----
+stmt 0 err 1 -1 50 no such table: t1

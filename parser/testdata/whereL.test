@@ -9,6 +9,32 @@ stmt 0 ok
 stmt 50 ok
 stmt 100 ok
 stmt 150 ok
+==== 110
+
+  SELECT * FROM t1, v4 WHERE t1.a=?1 AND v4.a=t1.a;
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== 120
+
+  SELECT * FROM t1, t2, t3
+   WHERE t1.a=t2.a AND t2.a=t3.j AND t3.j=5
+  ORDER BY t1.a;
+----
+stmt 0 err 1 -1 88 no such table: t1
+==== 121
+
+  SELECT * FROM t1, t2, t3
+   WHERE t1.a=t2.a AND t2.a=t3.j AND t3.j=abs(5)
+  ORDER BY t1.a;
+----
+stmt 0 err 1 -1 93 no such table: t1
+==== 122
+
+  SELECT * FROM t1, t2, t3
+   WHERE t1.a=t2.a AND t2.a=t3.j AND t3.j=coalesce(5,random())
+  ORDER BY t1.a;
+----
+stmt 0 err 1 -1 107 no such table: t1
 ==== 200
 
   CREATE TABLE c3(x COLLATE binary, y COLLATE nocase, z COLLATE binary);
@@ -179,6 +205,11 @@ stmt 0 ok
 stmt 30 err 1 -1 147 no such table: t1
 stmt 147 err 1 -1 183 no such table: main.t1
 stmt 183 err 1 -1 226 no such table: t1
+==== 710
+
+  SELECT v FROM t1 WHERE abs(v)=1 and v=1;
+----
+stmt 0 err 1 -1 43 no such table: t1
 ==== 800
 
   CREATE TABLE t0(c0, c1);

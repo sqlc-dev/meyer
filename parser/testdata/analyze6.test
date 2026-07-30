@@ -1,0 +1,5 @@
+==== analyze6-1.2
+
+  SELECT count(*) FROM cat, ev WHERE x=y
+----
+stmt 0 err 1 -1 42 no such table: cat

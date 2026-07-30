@@ -20,6 +20,21 @@ stmt 115 err 1 -1 145 no such table: main.t2
 stmt 145 err 1 -1 175 no such table: main.t2
 stmt 175 ok
 stmt 215 ok
+==== indexedby-1.2
+
+  select * from t1 WHERE a = 10;
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== indexedby-1.3
+
+  select * from t1 ;
+----
+stmt 0 err 1 -1 21 no such table: t1
+==== indexedby-1.4
+
+  select * from t1, t2 WHERE c = 10;
+----
+stmt 0 err 1 -1 37 no such table: t1
 ==== indexedby-2.1
  SELECT * FROM t1 NOT INDEXED WHERE a = 'one' AND b = 'two'
 ----
@@ -60,6 +75,31 @@ stmt 0 err 1 29 34 near "WHERE": syntax error
  SELECT * FROM v1 INDEXED BY i1 WHERE a = 'one'
 ----
 stmt 0 err 1 -1 48 no such table: v1
+==== indexedby-3.1
+
+  SELECT * FROM t1 WHERE a = 'one' AND b = 'two'
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== indexedby-3.1.1
+
+  SELECT * FROM t1 NOT INDEXED WHERE a = 'one' AND b = 'two'
+----
+stmt 0 err 1 -1 62 no such table: t1
+==== indexedby-3.1.2
+
+  SELECT * FROM t1 NOT INDEXED WHERE rowid=1
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== indexedby-3.2
+
+  SELECT * FROM t1 INDEXED BY i1 WHERE a = 'one' AND b = 'two'
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== indexedby-3.3
+
+  SELECT * FROM t1 INDEXED BY i2 WHERE a = 'one' AND b = 'two'
+----
+stmt 0 err 1 -1 64 no such table: t1
 ==== indexedby-3.4
  SELECT * FROM t1 INDEXED BY i2 WHERE a = 'one'
 ----
@@ -76,6 +116,16 @@ stmt 0 err 1 -1 48 no such table: t1
  SELECT * FROM t1 INDEXED BY i1 ORDER BY a
 ----
 stmt 0 err 1 -1 43 no such table: t1
+==== indexedby-3.8
+
+  SELECT * FROM t3 INDEXED BY sqlite_autoindex_t3_1 ORDER BY e
+----
+stmt 0 err 1 -1 64 no such table: t3
+==== indexedby-3.9
+
+  SELECT * FROM t3 INDEXED BY sqlite_autoindex_t3_1 WHERE e = 10
+----
+stmt 0 err 1 -1 66 no such table: t3
 ==== indexedby-3.10
  SELECT * FROM t3 INDEXED BY sqlite_autoindex_t3_1 WHERE f = 10
 ----
@@ -84,6 +134,16 @@ stmt 0 err 1 -1 64 no such table: t3
  SELECT * FROM t3 INDEXED BY sqlite_autoindex_t3_2 WHERE f = 10
 ----
 stmt 0 err 1 -1 64 no such table: t3
+==== indexedby-4.1
+
+  SELECT * FROM t1, t2 WHERE a = c
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== indexedby-4.2
+
+  SELECT * FROM t1 INDEXED BY i1, t2 WHERE a = c
+----
+stmt 0 err 1 -1 50 no such table: t1
 ==== indexedby-4.3
 
     SELECT * FROM t1 INDEXED BY i1, t2 INDEXED BY i3 WHERE a=c
@@ -106,10 +166,70 @@ stmt 64 err 1 -1 103 no such table: v2
   EXPLAIN QUERY PLAN SELECT * FROM v2 WHERE b = 10
 ----
 stmt 0 err 1 -1 52 no such table: v2
+==== indexedby-6.1
+
+  SELECT * FROM t1 WHERE b = 10 ORDER BY rowid
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== indexedby-6.2
+
+  SELECT * FROM t1 NOT INDEXED WHERE b = 10 ORDER BY rowid
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== indexedby-7.1
+
+  DELETE FROM t1 WHERE a = 5
+----
+stmt 0 err 1 -1 30 no such table: t1
+==== indexedby-7.2
+
+  DELETE FROM t1 NOT INDEXED WHERE a = 5
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== indexedby-7.3
+
+  DELETE FROM t1 INDEXED BY i1 WHERE a = 5
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== indexedby-7.4
+
+  DELETE FROM t1 INDEXED BY i1 WHERE a = 5 AND b = 10
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== indexedby-7.5
+
+  DELETE FROM t1 INDEXED BY i2 WHERE a = 5 AND b = 10
+----
+stmt 0 err 1 -1 55 no such table: t1
 ==== indexedby-7.6
  DELETE FROM t1 INDEXED BY i2 WHERE a = 5
 ----
 stmt 0 err 1 -1 42 no such table: t1
+==== indexedby-8.1
+
+  UPDATE t1 SET rowid=rowid+1 WHERE a = 5
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== indexedby-8.2
+
+  UPDATE t1 NOT INDEXED SET rowid=rowid+1 WHERE a = 5
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== indexedby-8.3
+
+  UPDATE t1 INDEXED BY i1 SET rowid=rowid+1 WHERE a = 5
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== indexedby-8.4
+
+  UPDATE t1 INDEXED BY i1 SET rowid=rowid+1 WHERE a = 5 AND b = 10
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== indexedby-8.5
+
+  UPDATE t1 INDEXED BY i2 SET rowid=rowid+1 WHERE a = 5 AND b = 10
+----
+stmt 0 err 1 -1 68 no such table: t1
 ==== indexedby-8.6
  UPDATE t1 INDEXED BY i2 SET rowid=rowid+1 WHERE a = 5
 ----
@@ -195,6 +315,11 @@ stmt 0 err 1 -1 75 no such table: x1
   SELECT a,b,rowid FROM x1 INDEXED BY x1i WHERE a=1 AND b=1 AND rowid='3.0';
 ----
 stmt 0 err 1 -1 77 no such table: x1
+==== 11.5
+
+  SELECT a,b,rowid FROM x1 INDEXED BY x1i WHERE a=1 AND b=1 AND rowid='3.0';
+----
+stmt 0 err 1 -1 77 no such table: x1
 ==== 11.6
 
   CREATE TABLE x2(c INTEGER PRIMARY KEY, a, b TEXT);
@@ -221,6 +346,11 @@ stmt 0 err 1 -1 65 no such table: x2
 ----
 stmt 0 err 1 -1 67 no such table: x2
 ==== 11.9
+
+  SELECT a,b,c FROM x2 INDEXED BY x2i WHERE a=1 AND b=1 AND c='3.0';
+----
+stmt 0 err 1 -1 69 no such table: x2
+==== 11.10
 
   SELECT a,b,c FROM x2 INDEXED BY x2i WHERE a=1 AND b=1 AND c='3.0';
 ----

@@ -344,9 +344,32 @@ stmt 27 ok
     (16, 'urtlek' IN(1,2,3));
 ----
 stmt 0 err 1 -1 73 no such table: t1
+==== 15.1
+
+  VALUES(1),(2),(3),(4),(5);
+----
+stmt 0 ok
 ==== 15.2
 
   CREATE TABLE t1(a,b);
+----
+stmt 0 ok
+==== 15.3
+
+  INSERT INTO t1 VALUES
+    (1,2),(3,4),(7,8);
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 15.4
+
+  INSERT INTO t1 VALUES
+    (1,2),(3,4),(7,8),
+    (5,row_number()OVER());
+----
+stmt 0 err 1 -1 75 no such table: t1
+==== 15.5
+
+  SELECT * FROM (VALUES(1),(2),(3),(4),(5),(6)), (VALUES('a'),('b'),('c'));
 ----
 stmt 0 ok
 ==== 15.6
@@ -354,6 +377,11 @@ stmt 0 ok
   CREATE TABLE t2(x,y);
 ----
 stmt 0 ok
+==== 15.7
+
+  SELECT * FROM t2 UNION ALL VALUES(1,2),(3,4),(5,6),(7,8);
+----
+stmt 0 err 1 -1 60 no such table: t2
 ==== 16.1
 
   CREATE TABLE t1(a,b);
@@ -372,6 +400,13 @@ stmt 0 ok
 stmt 9 err 1 -1 120 no such table: t1
 stmt 120 err 1 -1 154 no such table: t1
 stmt 154 ok
+==== 16.3
+
+  INSERT INTO t1 VALUES(1,2),(3,4),(5,6),
+     (7,row_number()OVER()),
+     (9,10), (11,12), (13,14), (15,16);
+----
+stmt 0 err 1 -1 111 no such table: t1
 ==== 16.4
 
   BEGIN;
@@ -385,6 +420,13 @@ stmt 0 ok
 stmt 9 err 1 -1 88 no such table: t1
 stmt 88 err 1 -1 122 no such table: t1
 stmt 122 ok
+==== 16.5
+
+  INSERT INTO t1 VALUES
+     (1,row_number()OVER()),
+     (2,3), (4,5), (6,7);
+----
+stmt 0 err 1 -1 79 no such table: t1
 ==== 16.6
 
   BEGIN;
@@ -401,6 +443,16 @@ stmt 0 ok
 stmt 9 err 1 -1 175 no such table: t1
 stmt 175 err 1 -1 209 no such table: t1
 stmt 209 ok
+==== 16.7
+
+  INSERT INTO t1 VALUES
+     (1,2),(3,4),
+     (5,row_number()OVER()),
+     (7,8),(9,10),(11,12),
+     (13,row_number()OVER()),
+     (15,16),(17,18),(19,20),(21,22);
+----
+stmt 0 err 1 -1 166 no such table: t1
 ==== 17.1
 
   DROP TABLE IF EXISTS t1;

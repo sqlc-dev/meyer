@@ -1009,6 +1009,11 @@ stmt 207 err 1 -1 239 no such table: t1
 stmt 239 err 1 -1 269 no such table: t2
 stmt 269 err 1 -1 299 no such table: t4
 stmt 299 err 1 -1 340 no such table: t4
+==== join-28.2
+
+  SELECT a, b, y FROM t4 JOIN t3 ON a=x;
+----
+stmt 0 err 1 -1 41 no such table: t4
 ==== join-29.1
 
   CREATE TABLE t0(a INT); INSERT INTO t0(a) VALUES (1);
@@ -1181,7 +1186,17 @@ stmt 424 ok
   SELECT a1 FROM vchain ORDER BY a1;
 ----
 stmt 0 err 1 -1 37 no such table: vchain
+==== join-33.2-eqp
+
+  SELECT a1 FROM vchain ORDER BY a1;
+----
+stmt 0 err 1 -1 37 no such table: vchain
 ==== join-33.3
+
+  SELECT a1, b2 FROM vchain ORDER BY a1;
+----
+stmt 0 err 1 -1 41 no such table: vchain
+==== join-33.3-eqp
 
   SELECT a1, b2 FROM vchain ORDER BY a1;
 ----

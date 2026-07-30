@@ -39,6 +39,13 @@ stmt 0 err 1 -1 45 no such table: t1
 ----
 stmt 0 ok
 stmt 25 err 1 -1 56 no such table: main.t1
+==== 3.1.1
+
+  SELECT b FROM t1 WHERE b IS NOT NULL AND a IS NULL 
+  GROUP BY b COLLATE nocase
+  ORDER BY b COLLATE nocase;
+----
+stmt 0 err 1 -1 111 no such table: t1
 ==== 3.2.0
 
   CREATE TABLE t2(x);
@@ -212,6 +219,11 @@ stmt 0 err 1 -1 54 no such table: x1
 ----
 stmt 0 err 1 -1 48 no such table: main.x1
 stmt 48 err 1 -1 102 no such table: x1
+==== 6.1.3
+
+  SELECT a, b FROM x1 WHERE CAST(b AS INTEGER) = 123;
+----
+stmt 0 err 1 -1 54 no such table: x1
 ==== 6.2.1
 
   SELECT a, b FROM x1 WHERE CAST(b AS TEXT) = 123;
@@ -224,6 +236,11 @@ stmt 0 err 1 -1 51 no such table: x1
 ----
 stmt 0 err 1 -1 46 no such table: main.x1
 stmt 46 err 1 -1 97 no such table: x1
+==== 6.2.3
+
+  SELECT a, b FROM x1 WHERE CAST(b AS TEXT) = 123;
+----
+stmt 0 err 1 -1 51 no such table: x1
 ==== 7.0
 
   CREATE TABLE IF NOT EXISTS t0(c0);

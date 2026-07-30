@@ -67,6 +67,26 @@ stmt 29 ok
 stmt 84 err 1 -1 117 no such table: main.t1
 stmt 117 ok
 stmt 164 ok
+==== fts3query-4.2
+
+  SELECT t1.number FROM t1, ft WHERE t1.number=ft.rowid ORDER BY t1.date
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== fts3query-4.3
+
+  SELECT t1.number FROM ft, t1 WHERE t1.number=ft.rowid ORDER BY t1.date
+----
+stmt 0 err 1 -1 74 no such table: ft
+==== fts3query-4.4
+
+  SELECT t1.number FROM t1, bt WHERE t1.number=bt.rowid ORDER BY t1.date
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== fts3query-4.5
+
+  SELECT t1.number FROM bt, t1 WHERE t1.number=bt.rowid ORDER BY t1.date
+----
+stmt 0 err 1 -1 74 no such table: bt
 ==== 5.1
 
   CREATE VIRTUAL TABLE t2 USING FTS4;

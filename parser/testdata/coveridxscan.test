@@ -1,0 +1,10 @@
+==== 5.1.1
+
+  SELECT * FROM t1 ORDER BY c1, c2;
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== 5.1.2
+
+  SELECT * FROM t2 ORDER BY c1, c2;
+----
+stmt 0 err 1 -1 36 no such table: t2

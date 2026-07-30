@@ -448,6 +448,13 @@ stmt 141 ok
 stmt 166 err 1 -1 243 no such table: sqlite_stat1
 stmt 243 err 1 -1 319 no such table: sqlite_stat1
 stmt 319 ok
+==== subquery-10.2
+
+  WITH v1(aa,cc,bb) AS (SELECT aa, cc, bb FROM t1 WHERE bb=12345),
+       v2(aa,mx)    AS (SELECT aa, max(xx) FROM t2 GROUP BY aa)
+  SELECT * FROM v1 JOIN v2 ON v1.aa=v2.aa;
+----
+stmt 0 err 1 -1 174 no such table: t1
 ==== 10.3
 
   CREATE TABLE blob(
@@ -464,6 +471,17 @@ stmt 319 ok
 stmt 0 ok
 stmt 83 ok
 stmt 153 err 1 -1 194 no such table: main.delta
+==== subquery-10.4
+
+  WITH RECURSIVE deltasof(rid) AS (
+    SELECT rid FROM delta WHERE srcid=125020
+    UNION
+    SELECT delta.rid FROM deltasof, delta
+     WHERE delta.srcid=deltasof.rid)
+  SELECT deltasof.rid, blob.uuid FROM deltasof, blob
+   WHERE blob.rid=deltasof.rid;
+----
+stmt 0 err 1 -1 255 no such table: delta
 ==== subquery-11.1
 
   CREATE TABLE t1(ix INT, rx REAL, bx BLOB, tx TEXT, ax);

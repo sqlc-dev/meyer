@@ -316,6 +316,13 @@ stmt 0 ok
 stmt 28 err 1 -1 61 no such table: main.t2
 stmt 61 err 1 -1 183 no such table: t2
 stmt 183 ok
+==== 7.2
+
+  SELECT * FROM t1 LEFT JOIN t2 ON (
+    t2.x = t1.x AND (t2.y=? OR (t2.y=? AND t2.z IS NOT NULL))
+  );
+----
+stmt 0 err 1 -1 104 no such table: t1
 ==== 7.3
 
   CREATE TABLE t3(x);
@@ -343,6 +350,26 @@ stmt 177 err 1 -1 290 no such table: t4
 stmt 290 ok
 stmt 302 err 1 -1 365 no such table: sqlite_stat1
 stmt 365 ok
+==== 7.4
+
+  SELECT * FROM t3 LEFT JOIN t4 ON (t4.x = t3.x) WHERE (t4.y = ? OR t4.z = ?);
+----
+stmt 0 err 1 -1 79 no such table: t3
+==== 7.4b
+
+  SELECT * FROM t3 LEFT JOIN t4 ON (t4.x = t3.x) WHERE (t4.y = ? OR t3.x = ?);
+----
+stmt 0 err 1 -1 79 no such table: t3
+==== 7.4c
+
+  SELECT * FROM t3 LEFT JOIN t4 ON (t4.x = t3.x) WHERE (t3.x = ? OR t4.z = ?);
+----
+stmt 0 err 1 -1 79 no such table: t3
+==== 7.4d
+
+  SELECT * FROM t3 CROSS JOIN t4 ON (t4.x = t3.x) WHERE (+t4.y = ? OR t4.z = ?);
+----
+stmt 0 err 1 -1 81 no such table: t3
 ==== 8.0
 
   CREATE TABLE t0 (c0, c1, PRIMARY KEY (c0, c1));

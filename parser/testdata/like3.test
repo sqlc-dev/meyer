@@ -130,7 +130,17 @@ stmt 0 err 1 -1 62 no such table: t4
 stmt 0 ok
 stmt 49 err 1 -1 99 no such table: t5a
 stmt 99 err 1 -1 138 no such table: t5a
+==== like3-5.101
+
+  SELECT x FROM t5a WHERE x LIKE '/%';
+----
+stmt 0 err 1 -1 39 no such table: t5a
 ==== like3-5.110
+
+  SELECT x FROM t5a WHERE x LIKE '/a%';
+----
+stmt 0 err 1 -1 40 no such table: t5a
+==== like3-5.111
 
   SELECT x FROM t5a WHERE x LIKE '/a%';
 ----
@@ -140,9 +150,19 @@ stmt 0 err 1 -1 40 no such table: t5a
   SELECT x FROM t5a WHERE x LIKE '^12%' ESCAPE '^';
 ----
 stmt 0 err 1 -1 52 no such table: t5a
+==== like3-5.121
+
+  SELECT x FROM t5a WHERE x LIKE '^12%' ESCAPE '^';
+----
+stmt 0 err 1 -1 52 no such table: t5a
 ==== like3-5.122
 
   SELECT x FROM t5a WHERE x LIKE '^-2%' ESCAPE '^';
+----
+stmt 0 err 1 -1 52 no such table: t5a
+==== like3-5.123
+
+  SELECT x FROM t5a WHERE x LIKE '^12%' ESCAPE '^';
 ----
 stmt 0 err 1 -1 52 no such table: t5a
 ==== like3-5.200
@@ -154,7 +174,17 @@ stmt 0 err 1 -1 52 no such table: t5a
 stmt 0 ok
 stmt 49 err 1 -1 99 no such table: t5b
 stmt 99 err 1 -1 138 no such table: t5b
+==== like3-5.201
+
+  SELECT x FROM t5b WHERE x GLOB '/*';
+----
+stmt 0 err 1 -1 39 no such table: t5b
 ==== like3-5.210
+
+  SELECT x FROM t5b WHERE x GLOB '/a*';
+----
+stmt 0 err 1 -1 40 no such table: t5b
+==== like3-5.211
 
   SELECT x FROM t5b WHERE x GLOB '/a*';
 ----
@@ -215,6 +245,16 @@ stmt 0 err 1 -1 34 no such table: t0
 ----
 stmt 0 ok
 stmt 27 ok
+==== like3-6.110
+
+  SELECT * FROM t1 WHERE path LIKE 'a%';
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== like3-6.120
+
+  SELECT * FROM t1 WHERE path LIKE 'a%' ESCAPE 'x';
+----
+stmt 0 err 1 -1 52 no such table: t1
 ==== like3-6.200
 
   DROP TABLE IF EXISTS t2;
@@ -226,6 +266,16 @@ stmt 0 ok
 stmt 27 ok
 stmt 63 err 1 -1 113 no such table: main.t2
 stmt 113 err 1 -1 149 no such table: main.t2
+==== like3-6.210
+
+  SELECT * FROM t2 WHERE path LIKE 'a%';
+----
+stmt 0 err 1 -1 41 no such table: t2
+==== like3-6.230
+
+  SELECT * FROM t2 WHERE path LIKE 'a%';
+----
+stmt 0 err 1 -1 41 no such table: t2
 ==== like3-7.0
 
     PRAGMA encoding = 'UTF-16be';

@@ -67,6 +67,27 @@ stmt 1576 err 1 -1 1654 no such table: main.package_notes
 stmt 1654 err 1 -1 1754 no such table: main.package_notes
 stmt 1754 ok
 stmt 1888 ok
+==== autoindex5-1.1
+
+  SELECT
+    st.bug_name,
+    (SELECT ALL debian_cve.bug FROM debian_cve
+      WHERE debian_cve.bug_name = st.bug_name
+      ORDER BY debian_cve.bug),
+    sp.release
+  FROM
+     source_package_status AS st,
+     source_packages AS sp,
+     bugs
+  WHERE
+     sp.rowid = st.package
+     AND st.bug_name = bugs.name
+     AND ( st.bug_name LIKE 'CVE-%' OR st.bug_name LIKE 'TEMP-%' )
+     AND ( sp.release = 'sid' OR sp.release = 'stretch' OR sp.release = 'jessie'
+            OR sp.release = 'wheezy' OR sp.release = 'squeeze' )
+  ORDER BY sp.name, st.bug_name, sp.release, sp.subrelease;
+----
+stmt 0 err 1 -1 586 no such table: source_package_status
 ==== 2.1
 
   CREATE TABLE one(o);

@@ -240,16 +240,31 @@ stmt 0 err 1 -1 63 no such table: t1
   SELECT count(*) FROM t1 WHERE a IN (0, 1)
 ----
 stmt 0 err 1 -1 45 no such table: t1
+==== 5.3.1
+
+  SELECT count(*) FROM t2 WHERE y = 'j';
+----
+stmt 0 err 1 -1 41 no such table: t2
 ==== 5.3.2
 
   SELECT count(*) FROM t2 WHERE y = 'j';
 ----
 stmt 0 err 1 -1 41 no such table: t2
+==== 5.4.1
+
+    SELECT count(*) FROM t1, t2 WHERE y = c;
+----
+stmt 0 err 1 -1 45 no such table: t1
 ==== 5.4.2
 
     SELECT count(*) FROM t1, t2 WHERE y = c;
 ----
 stmt 0 err 1 -1 45 no such table: t1
+==== 5.5.1
+
+  SELECT count(*) FROM t1, t3 WHERE y = c;
+----
+stmt 0 err 1 -1 43 no such table: t1
 ==== 5.5.2
 
   SELECT count(*) FROM t1, t3 WHERE y = c;

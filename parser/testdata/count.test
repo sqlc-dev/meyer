@@ -144,6 +144,26 @@ stmt 95 err 1 -1 167 no such table: t1
 stmt 167 ok
 stmt 178 err 1 -1 239 no such table: sqlite_stat1
 stmt 239 ok
+==== count-7.2
+
+  SELECT count(1) FROM t1;
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== count-7.3
+
+  SELECT count(1) FROM t1 NOT INDEXED
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== count-7.3.dup1
+
+  SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== count-7.4
+
+  SELECT count(*) FROM t1 NOT INDEXED
+----
+stmt 0 err 1 -1 39 no such table: t1
 ==== count-8.0
 
   CREATE TABLE t7(a INT,b TEXT,c BLOB,d REAL);

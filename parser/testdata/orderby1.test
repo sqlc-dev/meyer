@@ -1,3 +1,8 @@
+==== 5.0
+
+  SELECT 5 ORDER BY 1
+----
+stmt 0 ok
 ==== 5.1
 
   EXPLAIN QUERY PLAN SELECT 5 UNION ALL SELECT 3 ORDER BY 1
@@ -52,6 +57,11 @@ stmt 85 err 1 -1 152 no such table: t7
 stmt 0 ok
 stmt 25 ok
 stmt 50 err 1 -1 78 no such table: main.t1
+==== 8.1
+
+  SELECT * FROM t1 ORDER BY a, b;
+----
+stmt 0 err 1 -1 34 no such table: t1
 ==== 8.2
 
   WITH cnt(i) AS (

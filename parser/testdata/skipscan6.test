@@ -231,3 +231,13 @@ stmt 308 err 1 -1 345 no such table: main.t2
 stmt 345 err 1 -1 380 no such table: t2
 stmt 380 ok
 stmt 392 err 1 -1 436 no such table: sqlite_stat1
+==== 3.1
+
+  SELECT * FROM t3 WHERE a = ? AND c = ?
+----
+stmt 0 err 1 -1 42 no such table: t3
+==== 3.2
+
+  SELECT * FROM t2 WHERE a = ? AND c = ?
+----
+stmt 0 err 1 -1 42 no such table: t2

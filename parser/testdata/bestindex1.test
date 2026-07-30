@@ -3,6 +3,16 @@
   CREATE VIRTUAL TABLE x1 USING tcl(vtab_command);
 ----
 stmt 0 ok
+==== 1.1
+
+  SELECT * FROM x1 WHERE a = 'abc'
+----
+stmt 0 err 1 -1 36 no such table: x1
+==== 1.2
+
+  SELECT * FROM x1 WHERE a IN ('abc', 'def');
+----
+stmt 0 err 1 -1 46 no such table: x1
 ==== 2.1
 
   CREATE TABLE t1x(i INTEGER PRIMARY KEY, a, b);
@@ -33,6 +43,11 @@ stmt 0 err 1 -1 35 no such table: t1
     SELECT rowid FROM t1 WHERE a IN ('one', 'four') ORDER BY +rowid
 ----
 stmt 0 err 1 -1 69 no such table: t1
+==== bestindex1-generated.dup4
+ 
+    SELECT rowid FROM t1 WHERE a IN ('one', 'four') ORDER BY +rowid
+----
+stmt 0 err 1 -1 70 no such table: t1
 ==== 3.2
 
   CREATE VIRTUAL TABLE VirtualTableA USING tcl(vtab_command);

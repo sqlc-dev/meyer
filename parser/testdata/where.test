@@ -1,3 +1,53 @@
+==== where-1.1.2
+
+  SELECT x, y, w FROM t1 WHERE w=10
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== where-1.1.2b
+
+  SELECT x, y, w FROM t1 WHERE w IS 10
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== where-1.1.6
+
+  SELECT x, y, w FROM t1 WHERE +w=10
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== where-1.1.8
+
+  SELECT x, y, w AS abc FROM t1 WHERE abc=10
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== where-1.4.2
+
+  SELECT w, x, y FROM t1 WHERE 11=w AND x>2
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== where-1.4.2b
+
+  SELECT w, x, y FROM t1 WHERE 11 IS w AND x>2
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== where-1.4.4
+
+  SELECT w AS a, x AS b, y FROM t1 WHERE 11=a AND b>2
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== where-1.5.2
+
+  SELECT x, y FROM t1 WHERE y<200 AND w=11 AND x>2
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== where-1.8.2
+
+  SELECT x, y FROM t1 WHERE w>10 AND y=144 AND x=3
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== where-1.8.3
+
+  SELECT x, y FROM t1 WHERE y=144 AND x=3
+----
+stmt 0 err 1 -1 43 no such table: t1
 ==== where-4.3
 
     SELECT 99 WHERE 0

@@ -21,6 +21,25 @@ stmt 47 ok
 stmt 94 err 1 -1 166 no such table: sqlite_stat1
 stmt 166 err 1 -1 235 no such table: sqlite_stat1
 stmt 235 ok
+==== autoindex1-500.1
+
+  SELECT b FROM t501
+   WHERE t501.a IN (SELECT x FROM t502 WHERE y=?);
+----
+stmt 0 err 1 -1 72 no such table: t501
+==== autoindex1-501
+
+  SELECT b FROM t501
+   WHERE t501.a IN (SELECT x FROM t502 WHERE y=t501.b);
+----
+stmt 0 err 1 -1 77 no such table: t501
+==== autoindex1-502
+
+  SELECT b FROM t501
+   WHERE t501.a=123
+     AND t501.a IN (SELECT x FROM t502 WHERE y=t501.b);
+----
+stmt 0 err 1 -1 97 no such table: t501
 ==== autoindex1-600
 
   CREATE TABLE flock_owner(
@@ -75,11 +94,35 @@ stmt 1108 err 1 -1 1202 no such table: main.flock_owner
 stmt 1202 err 1 -1 1292 no such table: main.flock_owner
 stmt 1292 err 1 -1 1372 no such table: main.sheep
 stmt 1372 err 1 -1 1452 no such table: main.sheep
+==== autoindex1-600a
+
+  SELECT x.sheep_no, x.registering_flock, x.date_of_registration
+   FROM sheep x LEFT JOIN
+       (SELECT s.sheep_no, prev.flock_no, prev.owner_person_id,
+       s.date_of_registration, prev.owner_change_date
+       FROM sheep s JOIN flock_owner prev ON s.registering_flock =
+   prev.flock_no
+       AND (prev.owner_change_date <= s.date_of_registration || ' 00:00:00')
+       WHERE NOT EXISTS
+           (SELECT 'x' FROM flock_owner later
+           WHERE prev.flock_no = later.flock_no
+           AND later.owner_change_date > prev.owner_change_date
+           AND later.owner_change_date <= s.date_of_registration||' 00:00:00')
+       ) y ON x.sheep_no = y.sheep_no
+   WHERE y.sheep_no IS NULL
+   ORDER BY x.registering_flock;
+----
+stmt 0 err 1 -1 730 no such table: sheep
 ==== autoindex1-700
 
   CREATE TABLE t5(a, b, c);
 ----
 stmt 0 ok
+==== autoindex1-700a
+
+  SELECT a FROM t5 WHERE b=10 ORDER BY c;
+----
+stmt 0 err 1 -1 42 no such table: t5
 ==== autoindex1-800
 
   CREATE TABLE accounts(

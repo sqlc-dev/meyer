@@ -118,6 +118,16 @@ stmt 0 ok
 stmt 51 ok
 stmt 98 ok
 stmt 310 ok
+==== 3.1
+
+  SELECT v2 FROM t1 LEFT JOIN t2 USING (k2) LEFT JOIN t3_1 USING (k3);
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== 3.2
+
+  SELECT v2 FROM t1 LEFT JOIN t2 USING (k2) LEFT JOIN t3_2 USING (k3);
+----
+stmt 0 err 1 -1 71 no such table: t1
 ==== 4.0
 
   CREATE TABLE c1(k INTEGER PRIMARY KEY, v1);
@@ -161,6 +171,16 @@ stmt 0 err 1 -1 75 no such table: c1
   SELECT v1, v3 FROM c1 LEFT JOIN c2 LEFT JOIN c3 ON (c3.k=v1+1);
 ----
 stmt 0 err 1 -1 66 no such table: c1
+==== 4.1.5
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v2);
+----
+stmt 0 err 1 -1 77 no such table: c1
+==== 4.1.6
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v1+1);
+----
+stmt 0 err 1 -1 79 no such table: c1
 ==== 4.2.0
 
   DROP TABLE c1;
@@ -210,6 +230,16 @@ stmt 0 err 1 -1 75 no such table: c1
   SELECT v1, v3 FROM c1 LEFT JOIN c2 LEFT JOIN c3 ON (c3.k=v1+1);
 ----
 stmt 0 err 1 -1 66 no such table: c1
+==== 4.2.5
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v2);
+----
+stmt 0 err 1 -1 77 no such table: c1
+==== 4.2.6
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v1+1);
+----
+stmt 0 err 1 -1 79 no such table: c1
 ==== 4.3.0
 
   DROP TABLE IF EXISTS t1;
@@ -250,6 +280,16 @@ stmt 0 ok
 stmt 43 ok
 stmt 86 ok
 stmt 117 err 1 -1 153 no such table: main.s3
+==== 5.1
+
+  SELECT s1.a FROM s1 left join s2 using (a);
+----
+stmt 0 err 1 -1 46 no such table: s1
+==== 5.2
+
+  SELECT s1.a FROM s1 left join s3 using (a);
+----
+stmt 0 err 1 -1 46 no such table: s1
 ==== 6.0
 
   CREATE TABLE u1(a INTEGER PRIMARY KEY, b, c);
@@ -259,6 +299,11 @@ stmt 117 err 1 -1 153 no such table: main.s3
 stmt 0 ok
 stmt 48 ok
 stmt 96 err 1 -1 129 no such table: main.u1
+==== 6.1
+
+  SELECT u2.* FROM u2 LEFT JOIN u1 ON( u1.a=u2.a AND u1.b=u2.b AND u1.c=u2.c );
+----
+stmt 0 err 1 -1 80 no such table: u2
 ==== 7.0
 
   CREATE TABLE t1(a,b);  INSERT INTO t1 VALUES(1,2),(3,4),(5,6);
@@ -417,6 +462,11 @@ stmt 34 err 1 -1 50 no such view: t3
 stmt 50 ok
 stmt 92 err 1 -1 208 no such table: t1
 stmt 208 ok
+==== 12.3
+
+  SELECT * FROM t1 LEFT JOIN t2 ON a=b LIMIT 10 OFFSET 98;
+----
+stmt 0 err 1 -1 59 no such table: t1
 ==== 13.0
 
   CREATE TABLE t1(a1 INTEGER PRIMARY KEY, b1 INT);

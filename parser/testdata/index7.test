@@ -275,6 +275,11 @@ stmt 42 err 1 -1 118 no such table: t5
 stmt 0 ok
 stmt 38 err 1 -1 77 no such table: t4
 stmt 77 err 1 -1 123 no such table: v4
+==== index7-6.4
+
+  SELECT * FROM v4 WHERE d='xyz' AND c='def'
+----
+stmt 0 err 1 -1 46 no such table: v4
 ==== index7-6.5
 
   CREATE INDEX t5a ON t5(a) WHERE a=#1;

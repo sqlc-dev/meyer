@@ -630,6 +630,22 @@ stmt 0 err 1 -1 54 no such table: t1
 stmt 0 err 1 -1 35 no such table: main.t1
 stmt 35 err 1 -1 66 no such table: main.t1
 stmt 66 ok
+==== 3.4
+
+  SELECT * FROM t1 WHERE 
+    a = 4 AND b BETWEEN 20 AND 80           -- Matches 80 rows
+      AND
+    c BETWEEN 150 AND 160                   -- Matches 10 rows
+----
+stmt 0 err 1 -1 163 no such table: t1
+==== 3.5
+
+  SELECT * FROM t1 WHERE 
+    a = 5 AND b BETWEEN 20 AND 80           -- Matches 1 row
+      AND
+    c BETWEEN 150 AND 160                   -- Matches 10 rows
+----
+stmt 0 err 1 -1 161 no such table: t1
 ==== 4.1
 
   CREATE TABLE le(

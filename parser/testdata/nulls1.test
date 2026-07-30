@@ -122,7 +122,17 @@ stmt 0 err 1 -1 66 no such table: t4
 ----
 stmt 0 err 1 -1 33 no such table: main.t4
 stmt 33 err 1 -1 99 no such table: t4
+==== 5.3
+
+  SELECT * FROM t4 WHERE a IN (1, 2, 3) ORDER BY a, b NULLS LAST
+----
+stmt 0 err 1 -1 66 no such table: t4
 ==== 5.4
+
+  SELECT * FROM t4 WHERE a IN (1, 2, 3) ORDER BY a DESC, b DESC NULLS FIRST
+----
+stmt 0 err 1 -1 77 no such table: t4
+==== 5.5
 
   SELECT * FROM t4 WHERE a IN (1, 2, 3) ORDER BY a DESC, b DESC NULLS FIRST
 ----
@@ -144,7 +154,17 @@ stmt 28 err 1 -1 185 no such table: t5
 ----
 stmt 0 err 1 -1 36 no such table: main.t5
 stmt 36 err 1 -1 93 no such table: t5
+==== 6.1.2
+
+  SELECT a,b FROM t5 WHERE a=1 ORDER BY b NULLS LAST, c;
+----
+stmt 0 err 1 -1 57 no such table: t5
 ==== 6.2.1
+
+  SELECT a,b FROM t5 WHERE a=1 ORDER BY b DESC NULLS FIRST, c DESC
+----
+stmt 0 err 1 -1 68 no such table: t5
+==== 6.2.2
 
   SELECT a,b FROM t5 WHERE a=1 ORDER BY b DESC NULLS FIRST, c DESC
 ----
@@ -205,6 +225,12 @@ stmt 84 ok
 ----
 stmt 0 err 1 -1 268 no such table: v0
 ==== 9.3
+
+  SELECT c1, c2, ifnull(c3, 'NULL') FROM v0 
+  WHERE c2=10 ORDER BY c1, c3 NULLS LAST
+----
+stmt 0 err 1 -1 87 no such table: v0
+==== 9.4
 
   SELECT c1, c2, ifnull(c3, 'NULL') FROM v0 
   WHERE c2=10 ORDER BY c1, c3 NULLS LAST

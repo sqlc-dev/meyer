@@ -75,6 +75,16 @@ stmt 115 ok
 stmt 126 err 1 -1 154 no such table: sqlite_stat1
 stmt 154 err 1 -1 229 no such table: sqlite_stat1
 stmt 229 ok
+==== 2.1
+
+  WITH RECURSIVE transit(x) AS (
+     SELECT s FROM objs WHERE p=9 AND o=32805
+     UNION
+     SELECT objs.s FROM objs, transit WHERE objs.p=9 AND objs.o=transit.x
+  )
+  SELECT x FROM transit;
+----
+stmt 0 err 1 -1 193 no such table: objs
 ==== 3.1
 
   CREATE TABLE t0(x TEXT COLLATE rtrim);
@@ -86,6 +96,11 @@ stmt 0 ok
 stmt 41 err 1 -1 89 no such table: t0
 stmt 89 ok
 stmt 139 err 1 -1 183 no such table: t0
+==== 3.2
+
+  SELECT count(*) FROM t0, v0 WHERE x='b ';
+----
+stmt 0 err 1 -1 44 no such table: t0
 ==== 3.3
 
   CREATE TABLE t1(x INT COLLATE rtrim);
@@ -97,6 +112,11 @@ stmt 0 ok
 stmt 40 err 1 -1 88 no such table: t1
 stmt 88 ok
 stmt 138 err 1 -1 182 no such table: t1
+==== 3.4
+
+  SELECT count(*) FROM t1, v1 WHERE x='b ';
+----
+stmt 0 err 1 -1 44 no such table: t1
 ==== 4.1
 
   CREATE TABLE t1(x TEXT, y INT, z TEXT);

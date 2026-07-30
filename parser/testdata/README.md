@@ -11,8 +11,8 @@ own goldens; they never outrank the accept/reject corpus below.
 
 - **Source of the SQL**: SQLite's own test suite from the pinned release
   below — every `test/*.test` TCL script, not a curated subset. SQL blocks
-  are extracted verbatim from `do_execsql_test` / `do_catchsql_test`
-  invocations whose SQL argument is a literal TCL brace block (cases using
+  are extracted verbatim from `do_execsql_test`, `do_catchsql_test` and
+  `do_eqp_test` invocations whose SQL argument is a literal TCL brace block (cases using
   TCL substitution are skipped, as are the few whose oracle message spans
   more than one line, which the file format cannot hold). Scripts that yield
   no such block — the C-level tokenizer tests, the VFS and WAL harnesses —

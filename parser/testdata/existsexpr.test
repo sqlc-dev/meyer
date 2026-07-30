@@ -84,6 +84,11 @@ stmt 0 err 1 -1 41 no such table: t1
   SELECT count(*) FROM t1 WHERE EXISTS (SELECT 1 FROM t2 WHERE c=a)
 ----
 stmt 0 err 1 -1 69 no such table: t1
+==== 2.4
+
+  SELECT count(*) FROM t1 WHERE EXISTS (SELECT 1 FROM t2 WHERE c=a)
+----
+stmt 0 err 1 -1 69 no such table: t1
 ==== 2.4.0
 
   CREATE UNIQUE INDEX t2c ON t2(c);
@@ -91,11 +96,21 @@ stmt 0 err 1 -1 69 no such table: t1
 ----
 stmt 0 err 1 -1 36 no such table: main.t2
 stmt 36 err 1 -1 72 no such table: main.t1
+==== 2.4.1
+
+  SELECT count(*) FROM t1 WHERE EXISTS (SELECT 1 FROM t2 WHERE c=a);
+----
+stmt 0 err 1 -1 69 no such table: t1
 ==== 2.4.2
 
   ANALYZE;
 ----
 stmt 0 ok
+==== 2.4.3
+
+  SELECT count(*) FROM t1 WHERE EXISTS (SELECT 1 FROM t2 WHERE c=a);
+----
+stmt 0 err 1 -1 69 no such table: t1
 ==== 2.4.4
 
   SELECT count(*) FROM t1 WHERE EXISTS (SELECT 1 FROM t2 WHERE c=a);

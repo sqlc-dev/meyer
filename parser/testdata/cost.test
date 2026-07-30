@@ -9,6 +9,11 @@ stmt 0 ok
 stmt 55 ok
 stmt 83 err 1 -1 118 no such table: main.t3
 stmt 118 err 1 -1 156 no such table: main.t4
+==== 1.2
+
+  SELECT e FROM t3, t4 WHERE b=c ORDER BY b, d;
+----
+stmt 0 err 1 -1 48 no such table: t3
 ==== 2.1
 
   CREATE TABLE t1(a, b);
@@ -16,6 +21,11 @@ stmt 118 err 1 -1 156 no such table: main.t4
 ----
 stmt 0 ok
 stmt 25 err 1 -1 53 no such table: main.t1
+==== 2.2
+
+  SELECT * FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 31 no such table: t1
 ==== 3.1
 
   CREATE TABLE t5(a INTEGER PRIMARY KEY,b,c,d,e,f,g);
@@ -33,6 +43,13 @@ stmt 112 err 1 -1 141 no such table: main.t5
 stmt 141 err 1 -1 170 no such table: main.t5
 stmt 170 err 1 -1 199 no such table: main.t5
 stmt 199 err 1 -1 228 no such table: main.t5
+==== 3.2
+
+  SELECT a FROM t5 
+  WHERE b IS NULL OR c IS NULL OR d IS NULL 
+  ORDER BY a;
+----
+stmt 0 err 1 -1 79 no such table: t5
 ==== 4.1
 
   CREATE TABLE t1(a, b);
@@ -42,6 +59,16 @@ stmt 199 err 1 -1 228 no such table: main.t5
 stmt 0 ok
 stmt 25 err 1 -1 53 no such table: main.t1
 stmt 53 err 1 -1 81 no such table: main.t1
+==== 4.2
+
+  SELECT * FROM t1 WHERE likelihood(a=?, 0.014) AND b BETWEEN ? AND ?;
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== 4.3
+
+  SELECT * FROM t1 WHERE likelihood(a=?, 0.016) AND b BETWEEN ? AND ?;
+----
+stmt 0 err 1 -1 71 no such table: t1
 ==== 5.1
 
   CREATE TABLE t2(x, y);
@@ -49,6 +76,16 @@ stmt 53 err 1 -1 81 no such table: main.t1
 ----
 stmt 0 ok
 stmt 25 err 1 -1 55 no such table: main.t2
+==== 5.2
+
+  SELECT * FROM t2 ORDER BY x, y;
+----
+stmt 0 err 1 -1 34 no such table: t2
+==== 5.3
+
+  SELECT * FROM t2 WHERE x BETWEEN ? AND ? ORDER BY rowid;
+----
+stmt 0 err 1 -1 59 no such table: t2
 ==== 6.1
 
   CREATE TABLE t3(a INTEGER PRIMARY KEY, b, c);
@@ -58,6 +95,11 @@ stmt 25 err 1 -1 55 no such table: main.t2
 stmt 0 ok
 stmt 48 err 1 -1 78 no such table: main.t3
 stmt 78 err 1 -1 108 no such table: main.t3
+==== 6.2
+
+  SELECT a FROM t3 WHERE (b BETWEEN 2 AND 4) OR c=100 ORDER BY a
+----
+stmt 0 err 1 -1 66 no such table: t3
 ==== 7.1
 
   CREATE TABLE t1(a INTEGER PRIMARY KEY,b,c,d,e,f,g);
@@ -75,6 +117,26 @@ stmt 112 err 1 -1 141 no such table: main.t1
 stmt 141 err 1 -1 170 no such table: main.t1
 stmt 170 err 1 -1 199 no such table: main.t1
 stmt 199 err 1 -1 228 no such table: main.t1
+==== 7.2
+
+  SELECT a FROM t1
+     WHERE (b>=950 AND b<=1010) OR (b IS NULL AND c NOT NULL)
+  ORDER BY a
+----
+stmt 0 err 1 -1 95 no such table: t1
+==== 7.3
+
+  SELECT rowid FROM t1
+  WHERE (+b IS NULL AND c NOT NULL AND d NOT NULL)
+        OR (b NOT NULL AND c IS NULL AND d NOT NULL)
+        OR (b NOT NULL AND c NOT NULL AND d IS NULL)
+----
+stmt 0 err 1 -1 181 no such table: t1
+==== 7.4
+
+  SELECT rowid FROM t1 WHERE (+b IS NULL AND c NOT NULL) OR c IS NULL
+----
+stmt 0 err 1 -1 71 no such table: t1
 ==== 8.1
 
   CREATE TABLE composer(
@@ -99,6 +161,15 @@ stmt 74 ok
 stmt 145 ok
 stmt 287 err 1 -1 326 no such table: main.track
 stmt 326 err 1 -1 365 no such table: main.track
+==== 8.2
+
+  SELECT DISTINCT aname
+    FROM album, composer, track
+   WHERE cname LIKE '%bach%'
+     AND unlikely(composer.cid=track.cid)
+     AND unlikely(album.aid=track.aid);
+----
+stmt 0 err 1 -1 167 no such table: album
 ==== 9.1
 
   CREATE TABLE t1(
@@ -118,3 +189,23 @@ stmt 75 err 1 -1 121 no such table: main.t1
 stmt 0 ok
 stmt 30 err 1 -1 65 no such table: main.t6
 stmt 65 err 1 -1 97 no such table: main.t6
+==== 10.3
+
+    SELECT rowid FROM t6 WHERE a=0 AND c=0
+----
+stmt 0 err 1 -1 44 no such table: t6
+==== 10.4
+
+    SELECT rowid FROM t6 WHERE a=0 AND b='xyz' AND c=0
+----
+stmt 0 err 1 -1 56 no such table: t6
+==== 10.5
+
+    SELECT rowid FROM t6 WHERE likelihood(a=0, 0.1) AND c=0
+----
+stmt 0 err 1 -1 61 no such table: t6
+==== 10.6
+
+    SELECT rowid FROM t6 WHERE likelihood(a=0, 0.1) AND b='xyz' AND c=0
+----
+stmt 0 err 1 -1 73 no such table: t6

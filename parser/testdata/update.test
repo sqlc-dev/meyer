@@ -620,6 +620,12 @@ stmt 138 ok
 stmt 0 err 1 -1 17 no such table: t1
 stmt 17 ok
 stmt 66 ok
+==== update-21.12
+
+  WITH t3(x,y) AS (SELECT d, row_number()OVER() FROM t2)
+    UPDATE t1 SET b=(SELECT y FROM t3 WHERE t1.a=t3.x);
+----
+stmt 0 err 1 -1 113 no such table: t1
 ==== update-22.0
 
   DROP TABLE IF EXISTS t1;

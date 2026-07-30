@@ -99,6 +99,17 @@ stmt 264 ok
 stmt 457 err 1 -1 493 no such table: main.t302
 stmt 493 err 1 -1 536 no such table: main.t302
 stmt 536 err 1 -1 572 no such table: main.t302
+==== where7-3.2
+
+  SELECT t302.c1 
+    FROM t302 JOIN t301 ON t302.c8 = +t301.c8
+    WHERE t302.c2 = 19571
+      AND t302.c3 > 1287603136
+      AND (t301.c4 = 1407449685622784
+           OR t301.c8 = 1407424651264000)
+   ORDER BY t302.c5 LIMIT 200;
+----
+stmt 0 err 1 -1 232 no such table: t302
 ==== 4.1
 
   CREATE TABLE t0(w);

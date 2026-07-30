@@ -100,3 +100,11 @@ stmt 0 err 1 -1 53 no such table: tt
 stmt 0 ok
 stmt 42 ok
 stmt 67 err 1 -1 96 no such table: main.t1
+==== 4.2
+
+  SELECT * FROM t4 LEFT JOIN (
+      SELECT docid, * FROM ft4 WHERE ft4 MATCH ?
+  ) AS rr ON t4.rowid=rr.docid 
+  WHERE t4.y = ?;
+----
+stmt 0 err 1 -1 130 no such table: t4

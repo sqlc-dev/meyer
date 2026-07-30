@@ -502,6 +502,12 @@ stmt 205 ok
 stmt 230 err 1 -1 305 no such table: sqlite_stat1
 stmt 305 ok
 stmt 330 err 1 -1 425 no such table: t1
+==== skipscan1-3.2.dup1
+
+  SELECT DISTINCT quote(c1), quote(c2), quote(c3), quote(c4), '|'
+    FROM t1 WHERE t1.c3 = 1;
+----
+stmt 0 err 1 -1 95 no such table: t1
 ==== skipscan1-4.10
 
   CREATE TABLE t1(a,b INT);
