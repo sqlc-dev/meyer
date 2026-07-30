@@ -27,6 +27,21 @@
 ** carry no <tail>.
 **
 ** SQLite error messages never contain newlines, so the line format is safe.
+** (An error message can still span lines when the offending token does --
+** an unterminated string, say -- because the token text is interpolated.)
+**
+** With -batch, scripts are read from stdin as a stream of records, each a
+** decimal byte count on its own line followed by exactly that many bytes.
+** The results of each record are followed by a line reading "==". This
+** exists so that a caller checking many thousands of small inputs does not
+** pay to start a process for each one.
+**
+** Each record still gets a brand new connection. Preparing a statement is
+** not supposed to change anything, but sqlite3Pragma runs at prepare time,
+** so a "PRAGMA writable_schema=ON" in one script would otherwise decide
+** whether a later one may write to sqlite_master. Reusing the connection
+** also perturbs sqlite3_error_offset. Opening :memory: is cheap next to
+** starting a process, which is the cost this mode exists to avoid.
 */
 #include "sqlite3.h"
 #include <stdio.h>
@@ -74,22 +89,9 @@ static int onlyWhitespace(const char *z, size_t n){
   return 1;
 }
 
-int main(int argc, char **argv){
-  FILE *in = stdin;
-  if( argc>1 ){
-    in = fopen(argv[1], "rb");
-    if( in==0 ){ fprintf(stderr, "cannot open %s\n", argv[1]); return 2; }
-  }
-  size_t n = 0;
-  char *sql = readAll(in, &n);
-  if( sql==0 ){ fprintf(stderr, "out of memory\n"); return 2; }
-
-  sqlite3 *db = 0;
-  if( sqlite3_open(":memory:", &db)!=SQLITE_OK ){
-    fprintf(stderr, "cannot open :memory:\n");
-    return 2;
-  }
-
+/* Classify every statement of one script, writing the result lines to
+** stdout. sql must be NUL terminated at sql[n]. */
+static void runScript(sqlite3 *db, char *sql, size_t n){
   size_t pos = 0;
   while( pos<n ){
     /* Find the end of the next statement: the first ";" at which the prefix
@@ -130,7 +132,50 @@ int main(int argc, char **argv){
     free(stmtText);
     pos = end;
   }
+}
 
+int main(int argc, char **argv){
+  sqlite3 *db = 0;
+
+  if( argc>1 && strcmp(argv[1], "-batch")==0 ){
+    char line[64];
+    while( fgets(line, sizeof(line), stdin) ){
+      long want = strtol(line, 0, 10);
+      if( want<0 ){ fprintf(stderr, "bad record length\n"); return 2; }
+      char *sql = malloc((size_t)want+1);
+      if( sql==0 ){ fprintf(stderr, "out of memory\n"); return 2; }
+      if( want>0 && fread(sql, 1, (size_t)want, stdin)!=(size_t)want ){
+        fprintf(stderr, "short record\n");
+        return 2;
+      }
+      sql[want] = 0;
+      if( sqlite3_open(":memory:", &db)!=SQLITE_OK ){
+        fprintf(stderr, "cannot open :memory:\n");
+        return 2;
+      }
+      runScript(db, sql, (size_t)want);
+      sqlite3_close(db);
+      printf("==\n");
+      fflush(stdout);
+      free(sql);
+    }
+    return 0;
+  }
+
+  if( sqlite3_open(":memory:", &db)!=SQLITE_OK ){
+    fprintf(stderr, "cannot open :memory:\n");
+    return 2;
+  }
+
+  FILE *in = stdin;
+  if( argc>1 ){
+    in = fopen(argv[1], "rb");
+    if( in==0 ){ fprintf(stderr, "cannot open %s\n", argv[1]); return 2; }
+  }
+  size_t n = 0;
+  char *sql = readAll(in, &n);
+  if( sql==0 ){ fprintf(stderr, "out of memory\n"); return 2; }
+  runScript(db, sql, n);
   sqlite3_close(db);
   free(sql);
   return 0;

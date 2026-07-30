@@ -42,7 +42,19 @@ const (
 func (p *parser) parseExpr(min int) ast.Expr {
 	p.enter()
 	defer p.leave()
-	return p.parseOperators(p.parsePrefix(), min)
+	return p.parseOperators(p.parsePrefix(), min, false)
+}
+
+// parseBetweenBound parses the lower bound of a BETWEEN, which ends at the
+// AND that belongs to the BETWEEN rule itself. That AND is only the one at
+// the top level: SQLite shifts it because the rule's own precedence beats
+// AND's, but inside the right operand of a weaker operator the ordinary
+// precedence applies, so "x BETWEEN a OR b AND c" reads the whole of
+// "a OR (b AND c)" as the lower bound and then still wants an AND.
+func (p *parser) parseBetweenBound() ast.Expr {
+	p.enter()
+	defer p.leave()
+	return p.parseOperators(p.parsePrefix(), precOr, true)
 }
 
 // parsePrefix handles the prefix operators and then a primary expression.
@@ -73,7 +85,7 @@ func (p *parser) parsePrefix() ast.Expr {
 
 // parseOperators is the climbing loop: it extends x with every infix or
 // postfix operator whose precedence is at least min.
-func (p *parser) parseOperators(x ast.Expr, min int) ast.Expr {
+func (p *parser) parseOperators(x ast.Expr, min int, stopAtAnd bool) ast.Expr {
 	for {
 		t := p.cur()
 		switch t.Kind {
@@ -83,7 +95,7 @@ func (p *parser) parseOperators(x ast.Expr, min int) ast.Expr {
 			}
 			x = p.binary(x, ast.OpOr, precOr)
 		case token.AND:
-			if precAnd < min {
+			if stopAtAnd || precAnd < min {
 				return x
 			}
 			x = p.binary(x, ast.OpAnd, precAnd)
@@ -281,7 +293,7 @@ func (p *parser) parseLike(x ast.Expr, not bool) ast.Expr {
 func (p *parser) parseBetween(x ast.Expr, not bool) ast.Expr {
 	p.advance() // BETWEEN
 	n := &ast.BetweenExpr{Not: not, X: x}
-	n.Lo = p.parseExpr(precAnd + 1)
+	n.Lo = p.parseBetweenBound()
 	p.expect(token.AND)
 	n.Hi = p.parseExpr(precCompare + 1)
 	n.Span = ast.Span{Start: x.Pos(), Stop: n.Hi.End()}
@@ -347,28 +359,9 @@ func (p *parser) parsePrimary() ast.Expr {
 	case token.LP:
 		return p.parseParenExpr()
 
-	case token.NULL:
-		p.advance()
-		return &ast.Literal{Span: spanOf(t), Kind: ast.LitNull, Value: t.Text, Raw: t.Text}
-	case token.INTEGER:
-		p.advance()
-		return &ast.Literal{Span: spanOf(t), Kind: ast.LitInteger, Value: t.Text, Raw: t.Text}
-	case token.FLOAT:
-		p.advance()
-		return &ast.Literal{Span: spanOf(t), Kind: ast.LitFloat, Value: t.Text, Raw: t.Text}
-	case token.BLOB:
-		p.advance()
-		return &ast.Literal{Span: spanOf(t), Kind: ast.LitBlob, Value: t.Text, Raw: t.Text}
-	case token.QNUMBER:
-		// term ::= QNUMBER. The grammar action dequotes the digit
-		// separators and rejects misplaced ones.
-		p.advance()
-		value := p.dequoteNumber(t)
-		kind := ast.LitInteger
-		if strings.ContainsAny(value, ".eE") && !strings.HasPrefix(strings.ToLower(value), "0x") {
-			kind = ast.LitFloat
-		}
-		return &ast.Literal{Span: spanOf(t), Kind: kind, Value: value, Raw: t.Text}
+	case token.NULL, token.INTEGER, token.FLOAT, token.BLOB, token.QNUMBER,
+		token.CTIME_KW:
+		return p.parseTerm()
 
 	case token.STRING:
 		// STRING is both a literal and a member of "nm", so "'a'.'b'" is a
@@ -376,24 +369,7 @@ func (p *parser) parsePrimary() ast.Expr {
 		if p.peek(1).Kind == token.DOT {
 			return p.parseQualifiedRef()
 		}
-		p.advance()
-		return &ast.Literal{
-			Span: spanOf(t), Kind: ast.LitString,
-			Value: dequote(t.Text, '\''), Raw: t.Text,
-		}
-
-	case token.CTIME_KW:
-		// term ::= CTIME_KW. CTIME_KW falls back to ID elsewhere, but here
-		// it has a shift action, so it is always the keyword.
-		p.advance()
-		kind := ast.LitCurrentTimestamp
-		switch strings.ToUpper(t.Text) {
-		case "CURRENT_DATE":
-			kind = ast.LitCurrentDate
-		case "CURRENT_TIME":
-			kind = ast.LitCurrentTime
-		}
-		return &ast.Literal{Span: spanOf(t), Kind: kind, Value: t.Text, Raw: t.Text}
+		return p.parseTerm()
 
 	case token.VARIABLE:
 		p.advance()
@@ -439,6 +415,60 @@ func (p *parser) parsePrimary() ast.Expr {
 }
 
 func spanOf(t token.Token) ast.Span { return ast.Span{Start: t.Pos, Stop: t.End} }
+
+// parseTerm implements the literal alternatives of "term". It is separate
+// from parsePrimary because DEFAULT takes a bare term: in
+// "b DEFAULT 'xyzzy'. c" the dot is a syntax error, not the start of a
+// qualified reference.
+//
+//	term ::= NULL|FLOAT|BLOB. / STRING. / INTEGER. / QNUMBER. / CTIME_KW.
+func (p *parser) parseTerm() ast.Expr {
+	t := p.cur()
+	switch t.Kind {
+	case token.NULL:
+		p.advance()
+		return &ast.Literal{Span: spanOf(t), Kind: ast.LitNull, Value: t.Text, Raw: t.Text}
+	case token.INTEGER:
+		p.advance()
+		return &ast.Literal{Span: spanOf(t), Kind: ast.LitInteger, Value: t.Text, Raw: t.Text}
+	case token.FLOAT:
+		p.advance()
+		return &ast.Literal{Span: spanOf(t), Kind: ast.LitFloat, Value: t.Text, Raw: t.Text}
+	case token.BLOB:
+		p.advance()
+		return &ast.Literal{Span: spanOf(t), Kind: ast.LitBlob, Value: t.Text, Raw: t.Text}
+	case token.STRING:
+		p.advance()
+		return &ast.Literal{
+			Span: spanOf(t), Kind: ast.LitString,
+			Value: dequote(t.Text, '\''), Raw: t.Text,
+		}
+	case token.QNUMBER:
+		// The grammar action dequotes the digit separators and rejects a
+		// misplaced one.
+		p.advance()
+		value := p.dequoteNumber(t)
+		kind := ast.LitInteger
+		if strings.ContainsAny(value, ".eE") && !strings.HasPrefix(strings.ToLower(value), "0x") {
+			kind = ast.LitFloat
+		}
+		return &ast.Literal{Span: spanOf(t), Kind: kind, Value: value, Raw: t.Text}
+	case token.CTIME_KW:
+		// CTIME_KW falls back to ID elsewhere, but here it has a shift
+		// action, so it is always the keyword.
+		p.advance()
+		kind := ast.LitCurrentTimestamp
+		switch strings.ToUpper(t.Text) {
+		case "CURRENT_DATE":
+			kind = ast.LitCurrentDate
+		case "CURRENT_TIME":
+			kind = ast.LitCurrentTime
+		}
+		return &ast.Literal{Span: spanOf(t), Kind: kind, Value: t.Text, Raw: t.Text}
+	}
+	p.syntaxError()
+	return nil
+}
 
 // parseParenExpr distinguishes the three parenthesised forms.
 //
@@ -652,9 +682,15 @@ func (p *parser) parseSignedNumber() string {
 //	expr ::= VARIABLE.
 func (p *parser) bindParam(t token.Token) ast.Expr {
 	// "#NNN" is a VDBE register reference, legal only during a nested
-	// parse. User-facing SQLite reports a plain syntax error for it.
+	// parse. User-facing SQLite reports a plain syntax error for it -- but
+	// from a grammar action, which does not stop the LALR parser: it
+	// finishes handling the token it was given, and any syntax error that
+	// falls out of that overwrites the message and its offset. So
+	// "SELECT #1 #1" is reported at the second reference, not the first.
+	// Deferring the error reproduces that, since a real syntax error later
+	// in the statement aborts the parse and wins on its own.
 	if len(t.Text) >= 2 && t.Text[0] == '#' && t.Text[1] >= '0' && t.Text[1] <= '9' {
-		p.syntaxErrorAt(t)
+		p.defer_(`near "`+t.Text+`": syntax error`, t.Pos)
 	}
 	n := &ast.BindParam{Span: spanOf(t), Raw: t.Text}
 	switch {

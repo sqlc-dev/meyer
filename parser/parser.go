@@ -121,6 +121,7 @@ func ParseExpr(src string) (expr ast.Expr, err error) {
 	if !p.at(token.EOF) {
 		p.syntaxError()
 	}
+	p.flushDeferred()
 	return e, nil
 }
 
@@ -136,6 +137,14 @@ type parser struct {
 	varNums map[string]int // named parameters already assigned a number
 
 	depth int // current nesting depth, guarded by enter/leave
+
+	// deferred holds an error raised by a grammar action, which does not
+	// stop SQLite's parser immediately: it finishes handling the token it
+	// was given and stops before reading another. deferIndex is that token,
+	// so a syntax error at it overtakes the deferred error, and moving past
+	// it makes the deferred error final.
+	deferred   *Error
+	deferIndex int
 }
 
 // maxDepth bounds recursion. Unlike SQLite, whose LALR stack is heap
@@ -184,6 +193,12 @@ func (p *parser) advance() token.Token {
 	t := p.toks[p.i]
 	if p.i < len(p.toks)-1 {
 		p.i++
+	}
+	// A deferred error becomes final once its token has been consumed:
+	// SQLite never reads the one after it. This is checked before
+	// checkIllegal for the same reason -- the tokenizer never runs again.
+	if p.deferred != nil && p.i > p.deferIndex {
+		panic(bail{p.deferred})
 	}
 	p.checkIllegal()
 	return t
@@ -239,6 +254,23 @@ func (p *parser) fail(msg string, offset int) {
 	panic(bail{&Error{Message: msg, Offset: offset, SQL: p.src}})
 }
 
+// defer_ records an error raised by a grammar action, to be reported once
+// the current lookahead has been consumed. Only the first is kept.
+func (p *parser) defer_(msg string, offset int) {
+	if p.deferred == nil {
+		p.deferred = &Error{Message: msg, Offset: offset, SQL: p.src}
+		p.deferIndex = p.i
+	}
+}
+
+// flushDeferred reports a deferred error whose token was never consumed,
+// which happens when the input ends on it.
+func (p *parser) flushDeferred() {
+	if p.deferred != nil {
+		panic(bail{p.deferred})
+	}
+}
+
 // parseScript implements the top-level rules.
 //
 //	input ::= cmdlist. / cmdlist ::= cmdlist ecmd. / cmdlist ::= ecmd.
@@ -260,6 +292,7 @@ func (p *parser) parseScript() []ast.Stmt {
 		} else if !p.at(token.EOF) {
 			p.syntaxError()
 		}
+		p.flushDeferred()
 		setStmtSpan(stmt, start, end)
 		stmts = append(stmts, stmt)
 	}

@@ -60,9 +60,11 @@ so conformance is defined three ways, in decreasing order of authority:
    `parser/testdata/ast`, reviewed in diffs. These are meyer's own goldens
    and never outrank the oracle.
 
-Plus a fuzz target asserting that arbitrary bytes terminate without
-panicking, that a rejection is always a `*parser.Error`, and that anything
-accepted survives the round trip.
+Plus two searches for cases the corpus does not contain: a fuzz target
+asserting that arbitrary bytes terminate without panicking, that a rejection
+is always a `*parser.Error`, and that anything accepted survives the round
+trip; and `cmd/difftest`, which mutates corpus SQL one token at a time and
+checks meyer against a live SQLite build, message and byte offset included.
 
 ## Acknowledgments
 

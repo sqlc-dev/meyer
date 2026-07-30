@@ -104,6 +104,11 @@ func runCase(c testfile.Case) error {
 	if !errors.As(err, &pe) {
 		return fmt.Errorf("expected *parser.Error %q, got %T: %v", exp.Message, err, err)
 	}
+	// An earlier statement may have been abandoned part-way through; a
+	// failure inside the text that left unverified says nothing either.
+	if exp.IsUnreached(pe.Offset) {
+		return nil
+	}
 	if pe.Message != exp.Message {
 		return fmt.Errorf("error message mismatch:\n  got:  %s\n  want: %s", pe.Message, exp.Message)
 	}

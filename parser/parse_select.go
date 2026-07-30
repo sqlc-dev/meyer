@@ -308,16 +308,7 @@ func (p *parser) parseTableRef(join *ast.JoinOperator) *ast.TableRef {
 		return n
 	}
 	n.Alias, n.HasAs = p.parseAlias()
-	// indexed_by ::= INDEXED BY nm. / indexed_by ::= NOT INDEXED.
-	if p.at(token.INDEXED) {
-		p.advance()
-		p.expect(token.BY)
-		n.IndexedBy = p.expectName()
-	} else if p.at(token.NOT) && p.peek(1).Kind == token.INDEXED {
-		p.advance()
-		p.advance()
-		n.NotIndexed = true
-	}
+	n.IndexedBy, n.NotIndexed = p.parseIndexedOpt()
 	p.parseOnUsing(n)
 	n.Span = p.span(start)
 	return n
@@ -442,12 +433,14 @@ func (p *parser) parseCTE() *ast.CTE {
 		p.expect(token.RP)
 	}
 	p.expect(token.AS)
+	// wqas ::= AS. / AS MATERIALIZED. / AS NOT MATERIALIZED. NOT can only
+	// begin the third, so it is consumed before MATERIALIZED is checked --
+	// SQLite shifts it too, and reports "AS NOT (" at the paren.
 	switch {
 	case p.accept(token.MATERIALIZED):
 		n.Materialized = ast.MaterializedYes
-	case p.at(token.NOT) && p.peek(1).Kind == token.MATERIALIZED:
-		p.advance()
-		p.advance()
+	case p.accept(token.NOT):
+		p.expect(token.MATERIALIZED)
 		n.Materialized = ast.MaterializedNo
 	}
 	p.expect(token.LP)

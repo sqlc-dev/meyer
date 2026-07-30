@@ -117,7 +117,12 @@ func (p *parser) parseColumnAndConstraintList(n *ast.CreateTableStmt) {
 			c.Name, pending = pending, nil
 			n.Constraints = append(n.Constraints, c)
 		}
-		p.accept(token.COMMA) // tconscomma ::= COMMA. / tconscomma ::= .
+		// tconscomma ::= COMMA. / tconscomma ::= . The comma is optional
+		// between constraints, but a comma that is there must be followed
+		// by one: "CREATE TABLE t(a, PRIMARY KEY(a), )" is an error.
+		if p.accept(token.COMMA) {
+			continue
+		}
 		if !p.atTableConstraint() {
 			return
 		}
@@ -176,23 +181,20 @@ func (p *parser) parseColumnConstraint(start int) *ast.ColumnConstraint {
 		c.Kind = ast.ColumnNull
 		c.OnConflict = p.parseOnConflict()
 	case token.NOT:
-		// NOT introduces either "NOT NULL" or "NOT DEFERRABLE".
-		switch p.peek(1).Kind {
-		case token.NULL:
-			p.advance()
-			p.advance()
+		// NOT introduces either "NOT NULL" or "NOT DEFERRABLE". Which one
+		// is settled after consuming it, as SQLite does: it shifts the NOT
+		// and reports whatever cannot follow, so "NOT LEFT" names LEFT.
+		notPos := p.advance().Pos
+		if p.accept(token.NULL) {
 			c.Kind = ast.ColumnNotNull
 			c.OnConflict = p.parseOnConflict()
-		case token.DEFERRABLE:
-			c.Kind = ast.ColumnDeferrable
-			c.Deferrable = p.parseDeferClause()
-		default:
-			p.advance() // SQLite shifts NOT and fails on what follows
-			p.syntaxError()
+			break
 		}
+		c.Kind = ast.ColumnDeferrable
+		c.Deferrable = p.parseDeferClause(notPos, true)
 	case token.DEFERRABLE:
 		c.Kind = ast.ColumnDeferrable
-		c.Deferrable = p.parseDeferClause()
+		c.Deferrable = p.parseDeferClause(p.cur().Pos, false)
 	case token.PRIMARY:
 		p.advance()
 		p.expect(token.KEY)
@@ -286,15 +288,6 @@ func (p *parser) atTerm() bool {
 	return false
 }
 
-// parseTerm parses a literal constant. It reuses parsePrimary, which handles
-// every "term" alternative.
-func (p *parser) parseTerm() ast.Expr {
-	if !p.atTerm() {
-		p.syntaxError()
-	}
-	return p.parsePrimary()
-}
-
 // parseGenerated implements the "generated" nonterminal.
 //
 //	generated ::= LP expr RP. / generated ::= LP expr RP ID.
@@ -325,15 +318,14 @@ func (p *parser) parseOnConflict() ast.ConflictAction {
 
 // parseDeferClause implements "defer_subclause".
 //
+// The caller has already consumed any leading NOT, because that decision
+// belongs to it: NOT also begins "NOT NULL".
+//
 //	defer_subclause ::= NOT DEFERRABLE init_deferred_pred_opt.
 //	defer_subclause ::= DEFERRABLE init_deferred_pred_opt.
 //	init_deferred_pred_opt ::= . / INITIALLY DEFERRED. / INITIALLY IMMEDIATE.
-func (p *parser) parseDeferClause() *ast.DeferClause {
-	start := p.cur().Pos
-	d := &ast.DeferClause{}
-	if p.accept(token.NOT) {
-		d.Not = true
-	}
+func (p *parser) parseDeferClause(start int, not bool) *ast.DeferClause {
+	d := &ast.DeferClause{Not: not}
 	p.expect(token.DEFERRABLE)
 	if p.accept(token.INITIALLY) {
 		d.HasInitially = true
@@ -459,8 +451,12 @@ func (p *parser) parseTableConstraint(start int) *ast.TableConstraint {
 		c.FKColumns = p.parseIndexedColumnList()
 		p.expect(token.RP)
 		c.References = p.parseReferences()
-		if p.at(token.DEFERRABLE) || (p.at(token.NOT) && p.peek(1).Kind == token.DEFERRABLE) {
-			c.Deferrable = p.parseDeferClause()
+		// Nothing else that may follow a REFERENCES clause here starts with
+		// NOT, so it always begins a defer_subclause.
+		if start := p.cur().Pos; p.at(token.DEFERRABLE) {
+			c.Deferrable = p.parseDeferClause(start, false)
+		} else if p.accept(token.NOT) {
+			c.Deferrable = p.parseDeferClause(start, true)
 		}
 	default:
 		p.syntaxError()
@@ -473,19 +469,26 @@ func (p *parser) parseTableConstraint(start int) *ast.TableConstraint {
 // grammar-action error ("unknown table option: %s"), not a parse error, so
 // any name is accepted here.
 //
+// The first option may be missing while later ones are present, because
+// table_option_set recurses on a possibly empty prefix: "CREATE TABLE t(a),
+// STRICT" parses. A comma must be followed by an option, though.
+//
 //	table_option_set ::= . / table_option. / table_option_set COMMA table_option.
 //	table_option ::= WITHOUT nm. / table_option ::= nm.
 func (p *parser) parseTableOptions(n *ast.CreateTableStmt) {
-	if !p.at(token.WITHOUT) && !token.IsName(p.cur().Kind) {
-		return
-	}
-	for {
+	option := func() {
 		without := p.accept(token.WITHOUT)
 		n.Options = append(n.Options, p.expectName())
 		n.WithoutOpt = append(n.WithoutOpt, without)
-		if !p.accept(token.COMMA) {
-			return
-		}
+	}
+	switch {
+	case p.at(token.WITHOUT) || token.IsName(p.cur().Kind):
+		option()
+	case !p.at(token.COMMA):
+		return
+	}
+	for p.accept(token.COMMA) {
+		option()
 	}
 }
 

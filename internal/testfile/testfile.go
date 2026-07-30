@@ -39,7 +39,6 @@ import (
 // StmtResult is one raw oracle observation for a single statement.
 type StmtResult struct {
 	Offset    int    // byte offset of the statement within the case SQL
-	End       int    // byte offset one past the statement, within the case SQL
 	OK        bool   // sqlite3_prepare_v2 returned SQLITE_OK
 	RC        int    // prepare result code when !OK
 	ErrOffset int    // sqlite3_error_offset within the case SQL; -1 if unknown
@@ -64,7 +63,9 @@ type Expectation struct {
 	// never looked at, because a grammar action failed part-way through a
 	// statement and sqlite3RunParser abandoned the rest of it. The corpus
 	// says nothing about whether that text is valid SQL, so a parser under
-	// test may fail inside one of these ranges without being wrong.
+	// test may fail inside one of these ranges without being wrong. A range
+	// that reaches the end of the input includes the offset one past it,
+	// which is where a parser reports running out of input.
 	Unreached []Range
 }
 
@@ -89,9 +90,12 @@ func (e Expectation) IsUnreached(offset int) bool {
 // proper, as opposed to post-parse semantic analysis. Statements failing with
 // any other message (no such table, ambiguous column, ...) parsed
 // successfully and must be accepted by meyer.
+// The (?s) flag matters: the offending token is interpolated into the
+// message, and a token can contain a newline -- an unterminated string runs
+// to the end of the input, newline and all.
 var syntaxFamily = []*regexp.Regexp{
-	regexp.MustCompile(`^near ".*": syntax error$`),
-	regexp.MustCompile(`^unrecognized token: ".*"$`),
+	regexp.MustCompile(`(?s)^near ".*": syntax error$`),
+	regexp.MustCompile(`(?s)^unrecognized token: ".*"$`),
 	regexp.MustCompile(`^incomplete input$`),
 }
 
@@ -111,18 +115,35 @@ func IsSyntaxError(msg string) bool {
 // reached.
 func (c *Case) Expected() Expectation {
 	var unreached []Range
-	for _, r := range c.Results {
+	for i, r := range c.Results {
 		if r.OK {
 			continue
 		}
 		if IsSyntaxError(r.Message) {
-			return Expectation{OK: false, Message: r.Message, Offset: r.ErrOffset}
+			// Ranges collected from earlier statements still apply: a
+			// parser that trips over unverified text never reaches this.
+			return Expectation{
+				OK: false, Message: r.Message, Offset: r.ErrOffset,
+				Unreached: unreached,
+			}
 		}
 		// A semantic failure means the statement parsed -- but only as far
-		// as the parser had got when the grammar action raised it.
-		if r.Tail < r.End {
-			unreached = append(unreached, Range{Start: r.Tail, End: r.End})
+		// as the parser had got when the grammar action raised it. A
+		// statement runs to the start of the next one, or to the end of the
+		// case for the last.
+		end := len(c.SQL)
+		if i+1 < len(c.Results) {
+			end = c.Results[i+1].Offset
 		}
+		if r.Tail >= end {
+			continue
+		}
+		if end == len(c.SQL) {
+			// Running out of input is reported at the offset one past the
+			// last byte, so the final range has to include it.
+			end++
+		}
+		unreached = append(unreached, Range{Start: r.Tail, End: end})
 	}
 	return Expectation{OK: true, Offset: -1, Unreached: unreached}
 }
@@ -169,15 +190,6 @@ func Read(path string) ([]Case, error) {
 			}
 			c.Results = append(c.Results, r)
 			i++
-		}
-		// Statement ends are implied by the next statement's offset, and by
-		// the end of the case SQL for the last one.
-		for j := range c.Results {
-			if j+1 < len(c.Results) {
-				c.Results[j].End = c.Results[j+1].Offset
-			} else {
-				c.Results[j].End = len(c.SQL)
-			}
 		}
 		cases = append(cases, c)
 	}

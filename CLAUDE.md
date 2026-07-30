@@ -62,6 +62,31 @@ cannot produce:
   hand-written and meant to be edited; their `.tree` goldens are rewritten
   with `go test ./parser -update` and reviewed in the diff.
 
+## Differential testing
+
+The corpus is whatever SQLite's test suite happens to contain, which is
+overwhelmingly valid SQL: fewer than three hundred of its 20,971 cases are
+rejections, so error fidelity is barely exercised by it. `cmd/difftest`
+covers that gap by mutating corpus SQL — truncate, delete, duplicate,
+replace or insert one token — and checking that meyer and a live SQLite
+build still agree on the verdict, the message and the offset.
+
+```sh
+go run ./cmd/difftest                        # sweep the whole corpus
+go run ./cmd/difftest -files select1,expr    # a few files
+go run ./cmd/difftest -per 60 -seed 7        # dig harder, reproducibly
+```
+
+It needs the oracle, so it is a development tool rather than a CI test. What
+it finds belongs in `parser/errors_test.go`, whose expectations are taken
+from the oracle rather than written by hand.
+
+Two situations it deliberately skips, because the harness cannot compare
+them rather than because meyer might be wrong: a `;` inside parentheses,
+where `sqlite3_complete` splits statements differently from a real parse,
+and a semantic failure on a statement's last token, which leaves `pzTail` at
+the end of the input with nothing to mark the parse as abandoned.
+
 ## The loop
 
 ```sh

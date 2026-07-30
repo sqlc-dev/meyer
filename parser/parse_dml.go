@@ -194,6 +194,11 @@ func (p *parser) parseDelete(with *ast.With, start int) ast.Stmt {
 
 // parseIndexedOpt implements "indexed_opt".
 //
+// NOT here can only begin "NOT INDEXED": nothing else that may follow a
+// table reference starts with it. So NOT is consumed before the check, which
+// is what SQLite does -- it shifts the NOT and only then discovers there is
+// no INDEXED, so "FROM t NOT NOT INDEXED" is reported at the second NOT.
+//
 //	indexed_opt ::= . / indexed_by ::= INDEXED BY nm. / indexed_by ::= NOT INDEXED.
 func (p *parser) parseIndexedOpt() (*ast.Ident, bool) {
 	switch {
@@ -201,9 +206,9 @@ func (p *parser) parseIndexedOpt() (*ast.Ident, bool) {
 		p.advance()
 		p.expect(token.BY)
 		return p.expectName(), false
-	case p.at(token.NOT) && p.peek(1).Kind == token.INDEXED:
+	case p.at(token.NOT):
 		p.advance()
-		p.advance()
+		p.expect(token.INDEXED)
 		return nil, true
 	}
 	return nil, false
