@@ -11,7 +11,7 @@
    (7, 'N', NULL);
 ----
 stmt 0 ok
-stmt 62 err 1 -1 no such table: t1
+stmt 62 err 1 -1 219 no such table: t1
 ==== 1.1
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -20,7 +20,7 @@ stmt 62 err 1 -1 no such table: t1
       RANGE BETWEEN 2.50 PRECEDING AND 2.25 FOLLOWING)
   ORDER BY +d DESC NULLS LAST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 199 no such table: t1
 ==== 1.2
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -29,7 +29,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN 2.50 PRECEDING AND 2.25 FOLLOWING)
   ORDER BY +d DESC NULLS FIRST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 201 no such table: t1
 ==== 1.3
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -38,7 +38,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN 2.50 PRECEDING AND UNBOUNDED FOLLOWING)
   ORDER BY +d DESC NULLS LAST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 204 no such table: t1
 ==== 1.4
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -47,7 +47,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN 2.50 PRECEDING AND UNBOUNDED FOLLOWING)
   ORDER BY +d DESC NULLS FIRST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 206 no such table: t1
 ==== 1.5
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -56,7 +56,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN 2.50 PRECEDING AND CURRENT ROW)
   ORDER BY +d DESC NULLS LAST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 196 no such table: t1
 ==== 1.6
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -65,7 +65,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN 2.50 PRECEDING AND CURRENT ROW)
   ORDER BY +d DESC NULLS FIRST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 198 no such table: t1
 ==== 2.1
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -74,7 +74,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN UNBOUNDED PRECEDING AND 2.25 FOLLOWING)
   ORDER BY +d DESC NULLS LAST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 204 no such table: t1
 ==== 2.2
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -83,7 +83,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN UNBOUNDED PRECEDING AND 2.25 FOLLOWING)
   ORDER BY +d DESC NULLS FIRST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 206 no such table: t1
 ==== 2.3
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -92,7 +92,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
   ORDER BY +d DESC NULLS LAST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 209 no such table: t1
 ==== 2.4
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -101,7 +101,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
   ORDER BY +d DESC NULLS FIRST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 211 no such table: t1
 ==== 2.5
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -110,7 +110,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   ORDER BY +d DESC NULLS LAST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 201 no such table: t1
 ==== 2.6
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -119,7 +119,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   ORDER BY +d DESC NULLS FIRST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 203 no such table: t1
 ==== 3.1
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -128,7 +128,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN CURRENT ROW AND 2.25 FOLLOWING)
   ORDER BY +d DESC NULLS LAST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 196 no such table: t1
 ==== 3.2
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -137,7 +137,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN CURRENT ROW AND 2.25 FOLLOWING)
   ORDER BY +d DESC NULLS FIRST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 198 no such table: t1
 ==== 3.3
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -146,7 +146,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   ORDER BY +d DESC NULLS LAST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 201 no such table: t1
 ==== 3.4
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -155,7 +155,7 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   ORDER BY +d DESC NULLS FIRST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 203 no such table: t1
 ==== 4.0
 
   SELECT a, b, quote(d), group_concat(b,'') OVER w1 FROM t1
@@ -164,4 +164,4 @@ stmt 0 err 1 -1 no such table: t1
       RANGE BETWEEN 2.50 PRECEDING AND 0.5 PRECEDING)
   ORDER BY +d DESC NULLS FIRST, +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 200 no such table: t1

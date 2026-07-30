@@ -27,44 +27,44 @@
 ----
 stmt 0 ok
 stmt 11 ok
-stmt 38 err 1 -1 no such table: t1
-stmt 70 err 1 -1 no such table: t1
-stmt 102 err 1 -1 no such table: t1
-stmt 134 err 1 -1 no such table: t1
-stmt 166 err 1 -1 no such table: t1
-stmt 198 err 1 -1 no such table: t1
-stmt 230 err 1 -1 no such table: t1
-stmt 262 err 1 -1 no such table: t1
-stmt 294 err 1 -1 no such table: t1
-stmt 326 err 1 -1 no such table: t1
-stmt 359 err 1 -1 no such table: t1
-stmt 392 err 1 -1 no such table: t1
-stmt 425 err 1 -1 no such table: t1
-stmt 458 err 1 -1 no such table: t1
-stmt 491 err 1 -1 no such table: t1
-stmt 524 err 1 -1 no such table: t1
-stmt 557 err 1 -1 no such table: t1
-stmt 590 err 1 -1 no such table: t1
-stmt 623 err 1 -1 no such table: t1
-stmt 656 err 1 -1 no such table: t1
+stmt 38 err 1 -1 70 no such table: t1
+stmt 70 err 1 -1 102 no such table: t1
+stmt 102 err 1 -1 134 no such table: t1
+stmt 134 err 1 -1 166 no such table: t1
+stmt 166 err 1 -1 198 no such table: t1
+stmt 198 err 1 -1 230 no such table: t1
+stmt 230 err 1 -1 262 no such table: t1
+stmt 262 err 1 -1 294 no such table: t1
+stmt 294 err 1 -1 326 no such table: t1
+stmt 326 err 1 -1 359 no such table: t1
+stmt 359 err 1 -1 392 no such table: t1
+stmt 392 err 1 -1 425 no such table: t1
+stmt 425 err 1 -1 458 no such table: t1
+stmt 458 err 1 -1 491 no such table: t1
+stmt 491 err 1 -1 524 no such table: t1
+stmt 524 err 1 -1 557 no such table: t1
+stmt 557 err 1 -1 590 no such table: t1
+stmt 590 err 1 -1 623 no such table: t1
+stmt 623 err 1 -1 656 no such table: t1
+stmt 656 err 1 -1 689 no such table: t1
 stmt 689 ok
-stmt 701 err 1 -1 no such table: t1
+stmt 701 err 1 -1 743 no such table: t1
 ==== select6-1.2
 SELECT count(*) FROM (SELECT y FROM t1)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 40 no such table: t1
 ==== select6-1.3
 SELECT count(*) FROM (SELECT DISTINCT y FROM t1)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 49 no such table: t1
 ==== select6-1.4
 SELECT count(*) FROM (SELECT DISTINCT * FROM (SELECT y FROM t1))
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 65 no such table: t1
 ==== select6-1.5
 SELECT count(*) FROM (SELECT * FROM (SELECT DISTINCT y FROM t1))
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 65 no such table: t1
 ==== select6-1.6
 
     SELECT * 
@@ -72,7 +72,7 @@ stmt 0 err 1 -1 no such table: t1
          (SELECT max(x),y FROM t1 GROUP BY y) as b
     WHERE a.y=b.y ORDER BY a.y
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 151 no such table: t1
 ==== select6-1.8
 
     SELECT q, p, r
@@ -80,7 +80,7 @@ stmt 0 err 1 -1 no such table: t1
          (SELECT max(x) as r, y as s FROM t1 GROUP BY y) as b
     WHERE q=s ORDER BY s
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 173 no such table: t1
 ==== select6-2.0
 
     CREATE TABLE t2(a INTEGER PRIMARY KEY, b);
@@ -88,24 +88,24 @@ stmt 0 err 1 -1 no such table: t1
     SELECT DISTINCT b FROM t2 ORDER BY b;
 ----
 stmt 0 ok
-stmt 47 err 1 -1 no such table: t2
-stmt 84 err 1 -1 no such table: t2
+stmt 47 err 1 -1 84 no such table: t2
+stmt 84 err 1 -1 126 no such table: t2
 ==== select6-2.2
 SELECT count(*) FROM (SELECT b FROM t2)
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 40 no such table: t2
 ==== select6-2.3
 SELECT count(*) FROM (SELECT DISTINCT b FROM t2)
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 49 no such table: t2
 ==== select6-2.4
 SELECT count(*) FROM (SELECT DISTINCT * FROM (SELECT b FROM t2))
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 65 no such table: t2
 ==== select6-2.5
 SELECT count(*) FROM (SELECT * FROM (SELECT DISTINCT b FROM t2))
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 65 no such table: t2
 ==== select6-2.6
 
     SELECT * 
@@ -113,7 +113,7 @@ stmt 0 err 1 -1 no such table: t2
          (SELECT max(a),b FROM t2 GROUP BY b) as b
     WHERE a.b=b.b ORDER BY a.b
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 151 no such table: t2
 ==== select6-2.8
 
     SELECT q, p, r
@@ -121,7 +121,7 @@ stmt 0 err 1 -1 no such table: t2
          (SELECT max(a) as r, b as s FROM t2 GROUP BY b) as b
     WHERE q=s ORDER BY s
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 173 no such table: t2
 ==== select6-2.9
 
     SELECT a.q, a.p, b.r
@@ -129,7 +129,7 @@ stmt 0 err 1 -1 no such table: t2
          (SELECT max(a) as r, b as s FROM t2 GROUP BY s) as b
     WHERE a.q=b.s ORDER BY a.q
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 185 no such table: t2
 ==== select6-3.2
 
     SELECT * FROM
@@ -138,100 +138,100 @@ stmt 0 err 1 -1 no such table: t2
             (SELECT max(a) as r, b as s FROM t2 GROUP BY s) as b
        WHERE a.q=b.s ORDER BY a.q)
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 216 no such table: t2
 ==== select6-3.3
 
     SELECT a,b,a+b FROM (SELECT avg(x) as 'a', avg(y) as 'b' FROM t1)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 71 no such table: t1
 ==== select6-3.4
 
     SELECT a,b,a+b FROM (SELECT avg(x) as 'a', avg(y) as 'b' FROM t1 WHERE y=4)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 81 no such table: t1
 ==== select6-3.5
 
     SELECT x,y,x+y FROM (SELECT avg(a) as 'x', avg(b) as 'y' FROM t2 WHERE a=4)
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 81 no such table: t2
 ==== select6-3.6
 
     SELECT a,b,a+b FROM (SELECT avg(x) as 'a', avg(y) as 'b' FROM t1)
     WHERE a>10
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 86 no such table: t1
 ==== select6-3.7
 
     SELECT a,b,a+b FROM (SELECT avg(x) as 'a', avg(y) as 'b' FROM t1)
     WHERE a<10
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 86 no such table: t1
 ==== select6-3.8
 
     SELECT a,b,a+b FROM (SELECT avg(x) as 'a', avg(y) as 'b' FROM t1 WHERE y=4)
     WHERE a>10
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 96 no such table: t1
 ==== select6-3.9
 
     SELECT a,b,a+b FROM (SELECT avg(x) as 'a', avg(y) as 'b' FROM t1 WHERE y=4)
     WHERE a<10
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 96 no such table: t1
 ==== select6-3.10
 
     SELECT a,b,a+b FROM (SELECT avg(x) as 'a', y as 'b' FROM t1 GROUP BY b)
     ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 92 no such table: t1
 ==== select6-3.11
 
     SELECT a,b,a+b FROM 
        (SELECT avg(x) as 'a', y as 'b' FROM t1 GROUP BY b)
     WHERE b<4 ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 110 no such table: t1
 ==== select6-3.12
 
     SELECT a,b,a+b FROM 
        (SELECT avg(x) as 'a', y as 'b' FROM t1 GROUP BY b HAVING a>1)
     WHERE b<4 ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 121 no such table: t1
 ==== select6-3.13
 
     SELECT a,b,a+b FROM 
        (SELECT avg(x) as 'a', y as 'b' FROM t1 GROUP BY b HAVING a>1)
     ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 111 no such table: t1
 ==== select6-4.1
 
     SELECT a,b,c FROM 
       (SELECT x AS 'a', y AS 'b', x+y AS 'c' FROM t1 WHERE y=4)
     WHERE a<10 ORDER BY a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 114 no such table: t1
 ==== select6-4.2
 
     SELECT y FROM (SELECT DISTINCT y FROM t1) WHERE y<5 ORDER BY y
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 68 no such table: t1
 ==== select6-4.3
 
     SELECT DISTINCT y FROM (SELECT y FROM t1) WHERE y<5 ORDER BY y
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 68 no such table: t1
 ==== select6-4.4
 
     SELECT avg(y) FROM (SELECT DISTINCT y FROM t1) WHERE y<5 ORDER BY y
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 73 no such table: t1
 ==== select6-4.5
 
     SELECT avg(y) FROM (SELECT DISTINCT y FROM t1 WHERE y<5) ORDER BY y
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 73 no such table: t1
 ==== select6-5.1
 
     SELECT a,x,b FROM
@@ -240,7 +240,7 @@ stmt 0 err 1 -1 no such table: t1
     WHERE a=b
     ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 156 no such table: t1
 ==== select6-5.2
 
     SELECT a,x,b FROM
@@ -249,49 +249,49 @@ stmt 0 err 1 -1 no such table: t1
     WHERE a=b
     ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 142 no such table: t1
 ==== select6-6.1
 
     DELETE FROM t1 WHERE x>4;
     SELECT * FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 30 err 1 -1 no such table: t1
+stmt 0 err 1 -1 30 no such table: t1
+stmt 30 err 1 -1 52 no such table: t1
 ==== select6-6.2
 
       SELECT * FROM (
         SELECT x AS 'a' FROM t1 UNION ALL SELECT x+10 AS 'a' FROM t1
       ) ORDER BY a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 111 no such table: t1
 ==== select6-6.3
 
       SELECT * FROM (
         SELECT x AS 'a' FROM t1 UNION ALL SELECT x+1 AS 'a' FROM t1
       ) ORDER BY a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 110 no such table: t1
 ==== select6-6.4
 
       SELECT * FROM (
         SELECT x AS 'a' FROM t1 UNION SELECT x+1 AS 'a' FROM t1
       ) ORDER BY a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 106 no such table: t1
 ==== select6-6.5
 
       SELECT * FROM (
         SELECT x AS 'a' FROM t1 INTERSECT SELECT x+1 AS 'a' FROM t1
       ) ORDER BY a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 110 no such table: t1
 ==== select6-6.6
 
       SELECT * FROM (
         SELECT x AS 'a' FROM t1 EXCEPT SELECT x*2 AS 'a' FROM t1
       ) ORDER BY a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 107 no such table: t1
 ==== select6-7.1
 
     SELECT * FROM (SELECT 1)
@@ -321,13 +321,13 @@ stmt 0 ok
 ----
 stmt 0 ok
 stmt 11 ok
-stmt 37 err 1 -1 no such table: t3
-stmt 70 err 1 -1 no such table: t3
+stmt 37 err 1 -1 70 no such table: t3
+stmt 70 err 1 -1 103 no such table: t3
 stmt 103 ok
-stmt 129 err 1 -1 no such table: t4
-stmt 164 err 1 -1 no such table: t4
+stmt 129 err 1 -1 164 no such table: t4
+stmt 164 err 1 -1 199 no such table: t4
 stmt 199 ok
-stmt 211 err 1 -1 no such table: t3
+stmt 211 err 1 -1 249 no such table: t3
 ==== select6-8.2
 
     SELECT y, p, q, r FROM
@@ -335,7 +335,7 @@ stmt 211 err 1 -1 no such table: t3
        (SELECT t3.p AS p, t3.q AS q, t4.r AS r FROM t3 NATURAL JOIN t4) as n
     WHERE  y=p
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 191 no such table: t1
 ==== select6-8.4
 
     SELECT DISTINCT y, p, q, r FROM
@@ -343,7 +343,7 @@ stmt 0 err 1 -1 no such table: t1
        (SELECT t3.p AS p, t3.q AS q, t4.r AS r FROM t3 NATURAL JOIN t4) as n
     WHERE  y=p
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 200 no such table: t1
 ==== select6-8.5
 
     SELECT * FROM 
@@ -354,63 +354,63 @@ stmt 0 err 1 -1 no such table: t1
       (SELECT r AS z FROM t4 WHERE q=11) AS f
     WHERE e.r=f.z
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 290 no such table: t1
 ==== select6-9.1
 
     SELECT a.x, b.x FROM t1 AS a, (SELECT x FROM t1 LIMIT 2) AS b
      ORDER BY 1, 2
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 86 no such table: t1
 ==== select6-9.2
 
     SELECT x FROM (SELECT x FROM t1 LIMIT 2);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 46 no such table: t1
 ==== select6-9.3
 
     SELECT x FROM (SELECT x FROM t1 LIMIT 2 OFFSET 1);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 55 no such table: t1
 ==== select6-9.4
 
     SELECT x FROM (SELECT x FROM t1) LIMIT 2;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 46 no such table: t1
 ==== select6-9.5
 
     SELECT x FROM (SELECT x FROM t1) LIMIT 2 OFFSET 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 55 no such table: t1
 ==== select6-9.6
 
     SELECT x FROM (SELECT x FROM t1 LIMIT 2) LIMIT 3;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 54 no such table: t1
 ==== select6-9.7
 
     SELECT x FROM (SELECT x FROM t1 LIMIT -1) LIMIT 3;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 55 no such table: t1
 ==== select6-9.8
 
     SELECT x FROM (SELECT x FROM t1 LIMIT -1);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 47 no such table: t1
 ==== select6-9.9
 
     SELECT x FROM (SELECT x FROM t1 LIMIT -1 OFFSET 1);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 56 no such table: t1
 ==== select6-9.10
 
     SELECT x, y FROM (SELECT x, (SELECT 10+x) y FROM t1 LIMIT -1 OFFSET 1);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 76 no such table: t1
 ==== select6-9.11
 
     SELECT x, y FROM (SELECT x, (SELECT 10)+x y FROM t1 LIMIT -1 OFFSET 1);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 76 no such table: t1
 ==== 10.1
 
   CREATE TABLE t(i,j,k);
@@ -424,27 +424,27 @@ stmt 48 ok
 
   SELECT * FROM (SELECT * FROM t), j;
 ----
-stmt 0 err 1 -1 no such table: t
+stmt 0 err 1 -1 38 no such table: t
 ==== 10.3
 
   SELECT * FROM t UNION ALL SELECT * FROM j
 ----
-stmt 0 err 1 -1 no such table: j
+stmt 0 err 1 -1 45 no such table: j
 ==== 10.4
 
   SELECT * FROM (SELECT i FROM t UNION ALL SELECT l, m FROM j)
 ----
-stmt 0 err 1 -1 no such table: j
+stmt 0 err 1 -1 64 no such table: j
 ==== 10.5
 
   SELECT * FROM (SELECT j FROM t UNION ALL SELECT * FROM j)
 ----
-stmt 0 err 1 -1 no such table: j
+stmt 0 err 1 -1 61 no such table: j
 ==== 10.6
 
   SELECT * FROM (SELECT * FROM t UNION ALL SELECT * FROM j)
 ----
-stmt 0 err 1 -1 no such table: j
+stmt 0 err 1 -1 61 no such table: j
 ==== 10.7
 
   SELECT * FROM (
@@ -453,7 +453,7 @@ stmt 0 err 1 -1 no such table: j
     SELECT * FROM k
   )
 ----
-stmt 0 err 1 -1 no such table: k
+stmt 0 err 1 -1 108 no such table: k
 ==== 10.8
 
   SELECT * FROM (
@@ -462,7 +462,7 @@ stmt 0 err 1 -1 no such table: k
     SELECT l,m,l FROM j 
   )
 ----
-stmt 0 err 1 -1 no such table: j
+stmt 0 err 1 -1 109 no such table: j
 ==== 11.1
 
   DROP TABLE IF EXISTS t1;
@@ -484,20 +484,20 @@ stmt 0 err 1 -1 no such table: j
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 60 err 1 -1 no such table: t1
-stmt 154 err 1 -1 no such table: main.t1
+stmt 60 err 1 -1 154 no such table: t1
+stmt 154 err 1 -1 186 no such table: main.t1
 stmt 186 ok
 stmt 214 ok
-stmt 254 err 1 -1 no such table: t2
-stmt 326 err 1 -1 no such table: main.t2
-stmt 358 err 1 -1 no such table: t1
+stmt 254 err 1 -1 326 no such table: t2
+stmt 326 err 1 -1 358 no such table: main.t2
+stmt 358 err 1 -1 499 no such table: t1
 ==== 11.2
 
   SELECT cnt, xyz, lower((SELECT y FROM t2 WHERE w=cnt)), '|'
     FROM (SELECT count(*) AS cnt, w AS xyz FROM t1 GROUP BY 2)
    ORDER BY cnt, xyz;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 147 no such table: t1
 ==== 11.3
 
   SELECT cnt, xyz, '|'
@@ -505,14 +505,14 @@ stmt 0 err 1 -1 no such table: t1
    WHERE (SELECT y FROM t2 WHERE w=cnt)!='two'
    ORDER BY cnt, xyz;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 155 no such table: t1
 ==== 11.4
 
   SELECT cnt, xyz, '|'
     FROM (SELECT count(*) AS cnt, w AS xyz FROM t1 GROUP BY 2)
    ORDER BY lower((SELECT y FROM t2 WHERE w=cnt));
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 137 no such table: t1
 ==== 11.5
 
   SELECT cnt, xyz, 
@@ -522,7 +522,7 @@ stmt 0 err 1 -1 no such table: t1
     FROM (SELECT count(*) AS cnt, w AS xyz FROM t1 GROUP BY 2)
    ORDER BY +cnt;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 213 no such table: t1
 ==== 11.100
 
   DROP TABLE t1;
@@ -532,11 +532,11 @@ stmt 0 err 1 -1 no such table: t1
   SELECT ( SELECT y FROM t2 WHERE z = cnt )
     FROM ( SELECT count(*) AS cnt FROM t1 );
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 17 err 1 -1 no such table: t2
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 err 1 -1 34 no such table: t2
 stmt 34 ok
 stmt 56 ok
-stmt 81 err 1 -1 no such table: t1
+stmt 81 err 1 -1 170 no such table: t1
 ==== 12.100
 
   DROP TABLE t1;
@@ -551,14 +551,14 @@ stmt 81 err 1 -1 no such table: t1
     UNION ALL
     SELECT * from t2);
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 17 err 1 -1 no such table: t2
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 err 1 -1 34 no such table: t2
 stmt 34 ok
-stmt 56 err 1 -1 no such table: t1
-stmt 84 err 1 -1 no such table: t1
+stmt 56 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 112 no such table: t1
 stmt 112 ok
-stmt 134 err 1 -1 no such table: t2
-stmt 162 err 1 -1 no such table: t2
+stmt 134 err 1 -1 162 no such table: t2
+stmt 162 err 1 -1 262 no such table: t2
 ==== 13.100
 
 
@@ -571,9 +571,9 @@ stmt 162 err 1 -1 no such table: t2
   CREATE  TABLE  empty1(z);
 ----
 stmt 0 ok
-stmt 29 err 1 -1 no such table: t1
+stmt 29 err 1 -1 62 no such table: t1
 stmt 62 ok
-stmt 95 err 1 -1 no such table: t2
+stmt 95 err 1 -1 123 no such table: t2
 stmt 123 ok
 ==== 13.110
 
@@ -587,7 +587,7 @@ stmt 123 ok
     , t1
     RIGHT JOIN (SELECT 'BBB' FROM ( SELECT 'CCC' ))
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 226 no such table: t2
 ==== 13.120
 
   SELECT t1.y 
@@ -601,4 +601,4 @@ stmt 0 err 1 -1 no such table: t2
     RIGHT JOIN (SELECT 'BBB' FROM ( SELECT 'CCC' ))
     WHERE t1.y
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 241 no such table: t2

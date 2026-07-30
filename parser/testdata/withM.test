@@ -4,4 +4,4 @@
   INSERT INTO t1 VALUES(123, 456);
 ----
 stmt 0 ok
-stmt 41 err 1 -1 no such table: t1
+stmt 41 err 1 -1 76 no such table: t1

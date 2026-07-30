@@ -9,10 +9,10 @@
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 285 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 285 no such table: t1
+stmt 285 err 1 -1 315 no such table: t1
 ==== upsert5-generated.dup1
 
     DELETE FROM t1;
@@ -24,10 +24,10 @@ stmt 285 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 286 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 286 no such table: t1
+stmt 286 err 1 -1 316 no such table: t1
 ==== upsert5-generated.dup2
 
     DELETE FROM t1;
@@ -39,10 +39,10 @@ stmt 286 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 287 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 287 no such table: t1
+stmt 287 err 1 -1 317 no such table: t1
 ==== upsert5-generated.dup3
 
     DELETE FROM t1;
@@ -54,10 +54,10 @@ stmt 287 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 288 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 288 no such table: t1
+stmt 288 err 1 -1 318 no such table: t1
 ==== upsert5-generated.dup4
 
     DELETE FROM t1;
@@ -69,10 +69,10 @@ stmt 288 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 288 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 288 no such table: t1
+stmt 288 err 1 -1 318 no such table: t1
 ==== upsert5-generated.dup5
 
     DELETE FROM t1;
@@ -84,10 +84,10 @@ stmt 288 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 287 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 287 no such table: t1
+stmt 287 err 1 -1 317 no such table: t1
 ==== upsert5-generated.dup6
 
     DELETE FROM t1;
@@ -99,10 +99,10 @@ stmt 287 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 285 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 285 no such table: t1
+stmt 285 err 1 -1 315 no such table: t1
 ==== upsert5-generated.dup7
 
     DELETE FROM t1;
@@ -114,10 +114,10 @@ stmt 285 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 287 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 287 no such table: t1
+stmt 287 err 1 -1 317 no such table: t1
 ==== upsert5-generated.dup8
 
     DELETE FROM t1;
@@ -129,10 +129,10 @@ stmt 287 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 287 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 287 no such table: t1
+stmt 287 err 1 -1 317 no such table: t1
 ==== upsert5-generated.dup9
 
     DELETE FROM t1;
@@ -144,10 +144,10 @@ stmt 287 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 288 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 288 no such table: t1
+stmt 288 err 1 -1 318 no such table: t1
 ==== upsert5-generated.dup10
 
     DELETE FROM t1;
@@ -159,10 +159,10 @@ stmt 288 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 287 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 287 no such table: t1
+stmt 287 err 1 -1 317 no such table: t1
 ==== upsert5-generated.dup11
 
     DELETE FROM t1;
@@ -174,10 +174,10 @@ stmt 287 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 287 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 287 no such table: t1
+stmt 287 err 1 -1 317 no such table: t1
 ==== upsert5-generated.dup12
 
     DELETE FROM t1;
@@ -189,10 +189,10 @@ stmt 287 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 288 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 288 no such table: t1
+stmt 288 err 1 -1 318 no such table: t1
 ==== upsert5-generated.dup13
 
     DELETE FROM t1;
@@ -204,10 +204,10 @@ stmt 288 err 1 -1 no such table: t1
       ON CONFLICT(a) DO UPDATE SET b='a';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 288 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 288 no such table: t1
+stmt 288 err 1 -1 318 no such table: t1
 ==== upsert5-generated.dup14
 
     DELETE FROM t1;
@@ -219,10 +219,10 @@ stmt 288 err 1 -1 no such table: t1
       ON CONFLICT(a) DO UPDATE SET b='a';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 287 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 287 no such table: t1
+stmt 287 err 1 -1 317 no such table: t1
 ==== upsert5-generated.dup15
 
     DELETE FROM t1;
@@ -234,10 +234,10 @@ stmt 287 err 1 -1 no such table: t1
       ON CONFLICT(a) DO UPDATE SET b='a';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 288 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 288 no such table: t1
+stmt 288 err 1 -1 318 no such table: t1
 ==== upsert5-generated.dup16
 
     DELETE FROM t1;
@@ -253,10 +253,10 @@ stmt 288 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 457 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 457 no such table: t1
+stmt 457 err 1 -1 487 no such table: t1
 ==== upsert5-generated.dup17
 
     DELETE FROM t1;
@@ -272,10 +272,10 @@ stmt 457 err 1 -1 no such table: t1
       ON CONFLICT(e) DO UPDATE SET b='e';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 457 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 457 no such table: t1
+stmt 457 err 1 -1 487 no such table: t1
 ==== upsert5-generated.dup18
 
     DELETE FROM t1;
@@ -286,10 +286,10 @@ stmt 457 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 244 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 244 no such table: t1
+stmt 244 err 1 -1 274 no such table: t1
 ==== upsert5-generated.dup19
 
     DELETE FROM t1;
@@ -300,10 +300,10 @@ stmt 244 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 244 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 244 no such table: t1
+stmt 244 err 1 -1 274 no such table: t1
 ==== upsert5-generated.dup20
 
     DELETE FROM t1;
@@ -314,10 +314,10 @@ stmt 244 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 244 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 244 no such table: t1
+stmt 244 err 1 -1 274 no such table: t1
 ==== upsert5-generated.dup21
 
     DELETE FROM t1;
@@ -328,10 +328,10 @@ stmt 244 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 244 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 244 no such table: t1
+stmt 244 err 1 -1 274 no such table: t1
 ==== upsert5-generated.dup22
 
     DELETE FROM t1;
@@ -342,10 +342,10 @@ stmt 244 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 243 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 243 no such table: t1
+stmt 243 err 1 -1 273 no such table: t1
 ==== upsert5-generated.dup23
 
     DELETE FROM t1;
@@ -356,10 +356,10 @@ stmt 243 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 242 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 242 no such table: t1
+stmt 242 err 1 -1 272 no such table: t1
 ==== upsert5-generated.dup24
 
     DELETE FROM t1;
@@ -368,10 +368,10 @@ stmt 242 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 162 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 162 no such table: t1
+stmt 162 err 1 -1 192 no such table: t1
 ==== upsert5-generated.dup25
 
     DELETE FROM t1;
@@ -380,10 +380,10 @@ stmt 162 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 162 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 162 no such table: t1
+stmt 162 err 1 -1 192 no such table: t1
 ==== upsert5-generated.dup26
 
     DELETE FROM t1;
@@ -392,10 +392,10 @@ stmt 162 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 162 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 162 no such table: t1
+stmt 162 err 1 -1 192 no such table: t1
 ==== upsert5-generated.dup27
 
     DELETE FROM t1;
@@ -404,10 +404,10 @@ stmt 162 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 162 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 162 no such table: t1
+stmt 162 err 1 -1 192 no such table: t1
 ==== upsert5-generated.dup28
 
     DELETE FROM t1;
@@ -418,10 +418,10 @@ stmt 162 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 226 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 226 no such table: t1
+stmt 226 err 1 -1 256 no such table: t1
 ==== upsert5-generated.dup29
 
     DELETE FROM t1;
@@ -432,10 +432,10 @@ stmt 226 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 226 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 226 no such table: t1
+stmt 226 err 1 -1 256 no such table: t1
 ==== upsert5-generated.dup30
 
     DELETE FROM t1;
@@ -446,10 +446,10 @@ stmt 226 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 226 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 226 no such table: t1
+stmt 226 err 1 -1 256 no such table: t1
 ==== upsert5-generated.dup31
 
     DELETE FROM t1;
@@ -460,10 +460,10 @@ stmt 226 err 1 -1 no such table: t1
       ON CONFLICT DO UPDATE set b='x';
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 226 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 226 no such table: t1
+stmt 226 err 1 -1 256 no such table: t1
 ==== upsert5-generated.dup32
 
     DELETE FROM t1;
@@ -474,10 +474,10 @@ stmt 226 err 1 -1 no such table: t1
       ON CONFLICT DO NOTHING;
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 235 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 235 no such table: t1
+stmt 235 err 1 -1 265 no such table: t1
 ==== upsert5-generated.dup33
 
     DELETE FROM t1;
@@ -488,10 +488,10 @@ stmt 235 err 1 -1 no such table: t1
       ON CONFLICT DO NOTHING;
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 235 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 235 no such table: t1
+stmt 235 err 1 -1 265 no such table: t1
 ==== upsert5-generated.dup34
 
     DELETE FROM t1;
@@ -502,10 +502,10 @@ stmt 235 err 1 -1 no such table: t1
       ON CONFLICT DO NOTHING;
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 235 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 235 no such table: t1
+stmt 235 err 1 -1 265 no such table: t1
 ==== upsert5-generated.dup35
 
     DELETE FROM t1;
@@ -516,10 +516,10 @@ stmt 235 err 1 -1 no such table: t1
       ON CONFLICT DO NOTHING;
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 235 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 235 no such table: t1
+stmt 235 err 1 -1 265 no such table: t1
 ==== upsert5-generated.dup36
 
     DELETE FROM t1;
@@ -530,10 +530,10 @@ stmt 235 err 1 -1 no such table: t1
       ON CONFLICT DO NOTHING;
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 234 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 234 no such table: t1
+stmt 234 err 1 -1 264 no such table: t1
 ==== upsert5-generated.dup37
 
     DELETE FROM t1;
@@ -544,24 +544,24 @@ stmt 234 err 1 -1 no such table: t1
       ON CONFLICT DO NOTHING;
     SELECT a,b,c,d,e FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 20 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
-stmt 233 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 233 no such table: t1
+stmt 233 err 1 -1 263 no such table: t1
 ==== 2.0
 
   CREATE TABLE t2(a, b, c REAL, d, e, PRIMARY KEY(a,b)) WITHOUT ROWID;
   CREATE UNIQUE INDEX t2c ON t2(c);
 ----
 stmt 0 ok
-stmt 71 err 1 -1 no such table: main.t2
+stmt 71 err 1 -1 107 no such table: main.t2
 ==== 2.1
 
   INSERT INTO t2(a,b,c,e,d) VALUES(1,2,3,4,5)
       ON CONFLICT(c) DO UPDATE SET b=''
       ON CONFLICT((SELECT t2 FROM nosuchtable)) DO NOTHING;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 146 no such table: t2
 ==== 3.0
 
   CREATE TABLE t1(aa INTEGER PRIMARY KEY, bb INT);
@@ -573,20 +573,20 @@ stmt 0 err 1 -1 no such table: t2
   PRAGMA integrity_check;
 ----
 stmt 0 ok
-stmt 51 err 1 -1 no such table: t1
-stmt 83 err 1 -1 no such table: main.t1
-stmt 121 err 1 -1 no such table: t1
+stmt 51 err 1 -1 83 no such table: t1
+stmt 83 err 1 -1 121 no such table: main.t1
+stmt 121 err 1 -1 238 no such table: t1
 stmt 238 ok
 ==== 3.1
 
   SELECT * FROM t1 NOT INDEXED;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== 3.2
 
   SELECT * FROM t1 INDEXED BY t1bb;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 36 no such table: t1
 ==== 3.3
 
   DROP TABLE t1;
@@ -600,64 +600,64 @@ stmt 0 err 1 -1 no such table: t1
     ON CONFLICT(bb) DO UPDATE SET aa = 99;
   PRAGMA integrity_check;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 17 no such table: t1
 stmt 17 ok
-stmt 76 err 1 -1 no such table: t1
-stmt 133 err 1 -1 no such table: main.t1
-stmt 171 err 1 -1 no such table: main.t1
-stmt 209 err 1 -1 no such table: t1
+stmt 76 err 1 -1 133 no such table: t1
+stmt 133 err 1 -1 171 no such table: main.t1
+stmt 171 err 1 -1 209 no such table: main.t1
+stmt 209 err 1 -1 371 no such table: t1
 stmt 371 ok
 ==== 3.4
 
   SELECT * FROM t1 NOT INDEXED ORDER BY +aa;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 45 no such table: t1
 ==== 3.5
 
   SELECT * FROM t1 INDEXED BY t1bb ORDER BY +aa;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 49 no such table: t1
 ==== 3.6
 
   SELECT * FROM t1 INDEXED BY t1cc ORDER BY +aa;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 49 no such table: t1
 ==== upsert5-generated.dup38
 
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 22 no such table: t1
 ==== upsert5-generated.dup39
 
     INSERT INTO t1(c, d, e) VALUES(22, 555, 4) 
       ON CONFLICT(d) DO UPDATE SET b=excluded.c;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 97 no such table: t1
 ==== upsert5-generated.dup40
 
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 22 no such table: t1
 ==== 4.3.0
 
   CREATE TABLE t2(a, b GENERATED ALWAYS AS (a+1) VIRTUAL, c REAL, d UNIQUE);
   INSERT INTO t2(a, c, d) VALUES(555, 555, 555);
 ----
 stmt 0 ok
-stmt 77 err 1 -1 no such table: t2
+stmt 77 err 1 -1 126 no such table: t2
 ==== 4.3.1
 
   SELECT * FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 20 no such table: t2
 ==== 4.3.2
 
   INSERT INTO t2(c, d) VALUES(22, 555)
     ON CONFLICT(d) DO UPDATE SET a = excluded.c;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 88 no such table: t2
 ==== 4.3.3
 
   SELECT * FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 20 no such table: t2

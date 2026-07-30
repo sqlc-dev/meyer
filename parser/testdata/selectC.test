@@ -10,52 +10,52 @@
      WHERE y IN ('aaabbb','xxx');
 ----
 stmt 0 ok
-stmt 30 err 1 -1 no such table: t1
-stmt 72 err 1 -1 no such table: t1
-stmt 109 err 1 -1 no such table: t1
-stmt 151 err 1 -1 no such table: t1
+stmt 30 err 1 -1 72 no such table: t1
+stmt 72 err 1 -1 109 no such table: t1
+stmt 109 err 1 -1 151 no such table: t1
+stmt 151 err 1 -1 238 no such table: t1
 ==== selectC-1.2
 
     SELECT DISTINCT a AS x, b||c AS y
       FROM t1
      WHERE b||c IN ('aaabbb','xxx');
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 89 no such table: t1
 ==== selectC-1.3
 
     SELECT DISTINCT a AS x, b||c AS y
       FROM t1
      WHERE y='aaabbb'
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 75 no such table: t1
 ==== selectC-1.4
 
     SELECT DISTINCT a AS x, b||c AS y
       FROM t1
      WHERE b||c='aaabbb'
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 78 no such table: t1
 ==== selectC-1.5
 
     SELECT DISTINCT a AS x, b||c AS y
       FROM t1
      WHERE x=2
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 68 no such table: t1
 ==== selectC-1.6
 
     SELECT DISTINCT a AS x, b||c AS y
       FROM t1
      WHERE a=2
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 68 no such table: t1
 ==== selectC-1.7
 
     SELECT DISTINCT a AS x, b||c AS y
       FROM t1
      WHERE +y='aaabbb'
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 76 no such table: t1
 ==== selectC-1.8
 
     SELECT a AS x, b||c AS y
@@ -63,7 +63,7 @@ stmt 0 err 1 -1 no such table: t1
      GROUP BY x, y
     HAVING y='aaabbb'
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 85 no such table: t1
 ==== selectC-1.9
 
     SELECT a AS x, b||c AS y
@@ -71,7 +71,7 @@ stmt 0 err 1 -1 no such table: t1
      GROUP BY x, y
     HAVING b||c='aaabbb'
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 88 no such table: t1
 ==== selectC-1.10
 
     SELECT a AS x, b||c AS y
@@ -79,7 +79,7 @@ stmt 0 err 1 -1 no such table: t1
      WHERE y='aaabbb'
      GROUP BY x, y
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 85 no such table: t1
 ==== selectC-1.11
 
     SELECT a AS x, b||c AS y
@@ -87,21 +87,21 @@ stmt 0 err 1 -1 no such table: t1
      WHERE b||c='aaabbb'
      GROUP BY x, y
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 88 no such table: t1
 ==== selectC-1.12.1
 
     SELECT DISTINCT upper(b) AS x
       FROM t1
      ORDER BY x
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 65 no such table: t1
 ==== selectC-1.12.2
 
     SELECT DISTINCT uppercaseconversionfunctionwithaverylongname(b) AS x
       FROM t1
      ORDER BY x
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 104 no such table: t1
 ==== selectC-1.13.1
 
     SELECT upper(b) AS x
@@ -109,7 +109,7 @@ stmt 0 err 1 -1 no such table: t1
      GROUP BY x
      ORDER BY x
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 72 no such table: t1
 ==== selectC-1.13.2
 
     SELECT uppercaseconversionfunctionwithaverylongname(b) AS x
@@ -117,21 +117,21 @@ stmt 0 err 1 -1 no such table: t1
      GROUP BY x
      ORDER BY x
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 111 no such table: t1
 ==== selectC-1.14.1
 
     SELECT upper(b) AS x
       FROM t1
      ORDER BY x DESC
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 61 no such table: t1
 ==== selectC-1.14.2
 
     SELECT uppercaseconversionfunctionwithaverylongname(b) AS x
       FROM t1
      ORDER BY x DESC
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 100 no such table: t1
 ==== selectC-2.1
 
       CREATE TABLE t21a(a,b);
@@ -144,10 +144,10 @@ stmt 0 err 1 -1 no such table: t1
       INSERT INTO t21b VALUES(6);
 ----
 stmt 0 ok
-stmt 30 err 1 -1 no such table: t21a
+stmt 30 err 1 -1 66 no such table: t21a
 stmt 66 ok
-stmt 94 err 1 -1 no such table: main.t21b
-stmt 269 err 1 -1 no such table: t21b
+stmt 94 err 1 -1 146 no such table: main.t21b
+stmt 269 err 1 -1 303 no such table: t21b
 ==== selectC-3.1
 
     CREATE TABLE person (
@@ -176,17 +176,17 @@ stmt 269 err 1 -1 no such table: t21b
     GROUP BY 1;
 ----
 stmt 0 ok
-stmt 256 err 1 -1 no such table: person
-stmt 316 err 1 -1 no such table: person
-stmt 376 err 1 -1 no such table: person
-stmt 435 err 1 -1 no such table: person
-stmt 488 err 1 -1 no such table: person
-stmt 546 err 1 -1 no such table: person
-stmt 604 err 1 -1 no such table: person
-stmt 665 err 1 -1 no such table: person
-stmt 721 err 1 -1 no such table: person
-stmt 778 err 1 -1 no such table: person
-stmt 837 err 1 -1 no such table: person
+stmt 256 err 1 -1 316 no such table: person
+stmt 316 err 1 -1 376 no such table: person
+stmt 376 err 1 -1 435 no such table: person
+stmt 435 err 1 -1 488 no such table: person
+stmt 488 err 1 -1 546 no such table: person
+stmt 546 err 1 -1 604 no such table: person
+stmt 604 err 1 -1 665 no such table: person
+stmt 665 err 1 -1 721 no such table: person
+stmt 721 err 1 -1 778 no such table: person
+stmt 778 err 1 -1 837 no such table: person
+stmt 837 err 1 -1 1021 no such table: person
 ==== selectC-3.2
 
     CREATE TABLE t2(a PRIMARY KEY, b);
@@ -195,14 +195,14 @@ stmt 837 err 1 -1 no such table: person
     SELECT a, max(b || a) FROM t2 WHERE (b||b||b)!='value' GROUP BY a;
 ----
 stmt 0 ok
-stmt 39 err 1 -1 no such table: t2
-stmt 80 err 1 -1 no such table: t2
-stmt 121 err 1 -1 no such table: t2
+stmt 39 err 1 -1 80 no such table: t2
+stmt 80 err 1 -1 121 no such table: t2
+stmt 121 err 1 -1 192 no such table: t2
 ==== selectC-3.3
 
     SELECT b, max(a || b) FROM t2 WHERE (b||b||b)!='value' GROUP BY a;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 71 no such table: t2
 ==== selectC-4.1
 
   create table t_distinct_bug (a, b, c);
@@ -214,29 +214,29 @@ stmt 0 err 1 -1 no such table: t2
   insert into t_distinct_bug values ('1', '3', 'f');
 ----
 stmt 0 ok
-stmt 41 err 1 -1 no such table: t_distinct_bug
-stmt 94 err 1 -1 no such table: t_distinct_bug
-stmt 147 err 1 -1 no such table: t_distinct_bug
-stmt 200 err 1 -1 no such table: t_distinct_bug
-stmt 253 err 1 -1 no such table: t_distinct_bug
-stmt 306 err 1 -1 no such table: t_distinct_bug
+stmt 41 err 1 -1 94 no such table: t_distinct_bug
+stmt 94 err 1 -1 147 no such table: t_distinct_bug
+stmt 147 err 1 -1 200 no such table: t_distinct_bug
+stmt 200 err 1 -1 253 no such table: t_distinct_bug
+stmt 253 err 1 -1 306 no such table: t_distinct_bug
+stmt 306 err 1 -1 359 no such table: t_distinct_bug
 ==== selectC-4.2
 
   select a from (select distinct a, b from t_distinct_bug)
 ----
-stmt 0 err 1 -1 no such table: t_distinct_bug
+stmt 0 err 1 -1 60 no such table: t_distinct_bug
 ==== selectC-4.2b
 
   CREATE VIEW v42b AS SELECT DISTINCT a, b FROM t_distinct_bug;
   SELECT a FROM v42b;
 ----
 stmt 0 ok
-stmt 64 err 1 -1 no such table: v42b
+stmt 64 err 1 -1 86 no such table: v42b
 ==== selectC-4.3
 
   select a, udf() from (select distinct a, b from t_distinct_bug)
 ----
-stmt 0 err 1 -1 no such table: t_distinct_bug
+stmt 0 err 1 -1 67 no such table: t_distinct_bug
 ==== 5.0
 
   CREATE TABLE x1(a);
@@ -252,23 +252,23 @@ stmt 0 ok
 stmt 22 ok
 stmt 44 ok
 stmt 66 ok
-stmt 116 err 1 -1 no such table: x1
-stmt 154 err 1 -1 no such table: x2
-stmt 207 err 1 -1 no such table: x3
+stmt 116 err 1 -1 154 no such table: x1
+stmt 154 err 1 -1 207 no such table: x2
+stmt 207 err 1 -1 251 no such table: x3
 ==== 5.1
 
   CREATE TABLE x4 AS SELECT b FROM vvv UNION ALL SELECT c from x3;
   SELECT * FROM x4;
 ----
-stmt 0 err 1 -1 no such table: x3
-stmt 67 err 1 -1 no such table: x4
+stmt 0 err 1 -1 67 no such table: x3
+stmt 67 err 1 -1 87 no such table: x4
 ==== 5.2
 
   SELECT * FROM x1, x4
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 24 no such table: x1
 ==== 5.3
 
   SELECT * FROM x1, (SELECT b FROM vvv UNION ALL SELECT c from x3) ORDER BY 1,2;
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 81 no such table: x1

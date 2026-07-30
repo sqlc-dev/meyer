@@ -4,35 +4,35 @@
   CREATE UNIQUE INDEX x1 ON t1(k, v);
 ----
 stmt 0 ok
-stmt 34 err 1 -1 no such table: main.t1
+stmt 34 err 1 -1 72 no such table: main.t1
 ==== upsert3-110
 
   INSERT INTO t1 VALUES(0,'abcdefghij')
      ON CONFLICT(k) DO NOTHING;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 72 no such table: t1
 ==== upsert3-120
 
   INSERT INTO t1 VALUES(0,'abcdefghij')
      ON CONFLICT(v) DO NOTHING;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 72 no such table: t1
 ==== upsert3-130
 
   INSERT INTO t1 VALUES(0, 'abcdefghij')
       ON CONFLICT(k,v) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 76 err 1 -1 no such table: t1
+stmt 0 err 1 -1 76 no such table: t1
+stmt 76 err 1 -1 96 no such table: t1
 ==== upsert3-140
 
   INSERT INTO t1 VALUES(0, 'abcdefghij')
       ON CONFLICT(v,k) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 76 err 1 -1 no such table: t1
+stmt 0 err 1 -1 76 no such table: t1
+stmt 76 err 1 -1 96 no such table: t1
 ==== upsert3-200
 
   CREATE TABLE excluded(a INT, b INT, c INT DEFAULT 0);
@@ -42,14 +42,14 @@ stmt 76 err 1 -1 no such table: t1
   SELECT *, 'x' FROM excluded ORDER BY a;
 ----
 stmt 0 ok
-stmt 56 err 1 -1 no such table: main.excluded
-stmt 107 err 1 -1 no such table: excluded
-stmt 228 err 1 -1 no such table: excluded
+stmt 56 err 1 -1 107 no such table: main.excluded
+stmt 107 err 1 -1 228 no such table: excluded
+stmt 228 err 1 -1 270 no such table: excluded
 ==== upsert3-210
 
   INSERT INTO excluded AS base(a,b,c) VALUES(1,2,8),(1,2,3)
     ON CONFLICT(b,a) DO UPDATE SET c=excluded.c+1 WHERE base.c<excluded.c;
   SELECT *, 'x' FROM excluded ORDER BY a;
 ----
-stmt 0 err 1 -1 no such table: excluded
-stmt 135 err 1 -1 no such table: excluded
+stmt 0 err 1 -1 135 no such table: excluded
+stmt 135 err 1 -1 177 no such table: excluded

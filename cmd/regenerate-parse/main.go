@@ -238,16 +238,19 @@ func parseOracleLine(line string) (testfile.StmtResult, error) {
 	if fields[2] == "ok" {
 		return testfile.StmtResult{Offset: off, OK: true}, nil
 	}
-	rest := strings.SplitN(strings.TrimPrefix(fields[2], "err "), " ", 3)
-	if !strings.HasPrefix(fields[2], "err ") || len(rest) != 3 {
+	rest := strings.SplitN(strings.TrimPrefix(fields[2], "err "), " ", 4)
+	if !strings.HasPrefix(fields[2], "err ") || len(rest) != 4 {
 		return testfile.StmtResult{}, fmt.Errorf("malformed oracle line %q", line)
 	}
 	rc, err1 := strconv.Atoi(rest[0])
 	erroff, err2 := strconv.Atoi(rest[1])
-	if err1 != nil || err2 != nil {
+	tail, err3 := strconv.Atoi(rest[2])
+	if err1 != nil || err2 != nil || err3 != nil {
 		return testfile.StmtResult{}, fmt.Errorf("malformed oracle line %q", line)
 	}
-	return testfile.StmtResult{Offset: off, RC: rc, ErrOffset: erroff, Message: rest[2]}, nil
+	return testfile.StmtResult{
+		Offset: off, RC: rc, ErrOffset: erroff, Tail: tail, Message: rest[3],
+	}, nil
 }
 
 // mergeMetadata reconciles the sidecar with the regenerated case list:

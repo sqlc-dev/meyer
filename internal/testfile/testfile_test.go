@@ -7,20 +7,23 @@ import (
 )
 
 func TestRoundTrip(t *testing.T) {
+	// Statement ends are derived on read from the following statement's
+	// offset (and the length of the SQL for the last one), so they are
+	// spelled out here even though Write does not emit them.
 	cases := []Case{
 		{
 			Name: "a-1.1",
 			SQL:  "CREATE TABLE t1(a int);\nSELECT * FROM t1;\n",
 			Results: []StmtResult{
-				{Offset: 0, OK: true},
-				{Offset: 24, RC: 1, ErrOffset: -1, Message: "no such table: t1"},
+				{Offset: 0, End: 24, OK: true},
+				{Offset: 24, End: 42, RC: 1, ErrOffset: -1, Tail: 42, Message: "no such table: t1"},
 			},
 		},
 		{
 			Name: "a-1.2",
 			SQL:  "SELEC 1;\n",
 			Results: []StmtResult{
-				{Offset: 0, RC: 1, ErrOffset: 0, Message: `near "SELEC": syntax error`},
+				{Offset: 0, End: 9, RC: 1, ErrOffset: 0, Tail: 5, Message: `near "SELEC": syntax error`},
 			},
 		},
 	}
@@ -39,23 +42,43 @@ func TestRoundTrip(t *testing.T) {
 
 func TestExpected(t *testing.T) {
 	tests := []struct {
-		name    string
-		results []StmtResult
-		wantOK  bool
-		wantMsg string
+		name          string
+		results       []StmtResult
+		wantOK        bool
+		wantMsg       string
+		wantUnreached []Range
 	}{
-		{"all ok", []StmtResult{{OK: true}, {OK: true}}, true, ""},
-		{"semantic only", []StmtResult{{RC: 1, ErrOffset: -1, Message: "no such table: t1"}}, true, ""},
+		{"all ok", []StmtResult{{OK: true}, {OK: true}}, true, "", nil},
+		{
+			"semantic only",
+			[]StmtResult{{End: 30, RC: 1, ErrOffset: -1, Tail: 30, Message: "no such table: t1"}},
+			true, "", nil,
+		},
 		{
 			"syntax after semantic",
 			[]StmtResult{
-				{Offset: 0, RC: 1, ErrOffset: -1, Message: "no such table: t1"},
-				{Offset: 20, RC: 1, ErrOffset: 21, Message: `near "WHERE": syntax error`},
+				{Offset: 0, End: 20, RC: 1, ErrOffset: -1, Tail: 20, Message: "no such table: t1"},
+				{Offset: 20, End: 40, RC: 1, ErrOffset: 21, Tail: 21, Message: `near "WHERE": syntax error`},
 			},
-			false, `near "WHERE": syntax error`,
+			false, `near "WHERE": syntax error`, nil,
 		},
-		{"unrecognized token", []StmtResult{{RC: 1, ErrOffset: 3, Message: `unrecognized token: "0x"`}}, false, `unrecognized token: "0x"`},
-		{"incomplete", []StmtResult{{RC: 1, ErrOffset: -1, Message: "incomplete input"}}, false, "incomplete input"},
+		{
+			"unrecognized token",
+			[]StmtResult{{End: 10, RC: 1, ErrOffset: 3, Tail: 3, Message: `unrecognized token: "0x"`}},
+			false, `unrecognized token: "0x"`, nil,
+		},
+		{
+			"incomplete",
+			[]StmtResult{{End: 10, RC: 1, ErrOffset: -1, Tail: 10, Message: "incomplete input"}},
+			false, "incomplete input", nil,
+		},
+		{
+			// sqlite3BeginTrigger fails at the trigger_decl reduce, so
+			// everything after BEGIN is never parsed.
+			"semantic failure part-way through a statement",
+			[]StmtResult{{Offset: 0, End: 62, RC: 1, ErrOffset: -1, Tail: 42, Message: "no such table: main.t1"}},
+			true, "", []Range{{Start: 42, End: 62}},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -63,6 +86,17 @@ func TestExpected(t *testing.T) {
 			exp := c.Expected()
 			if exp.OK != tt.wantOK || exp.Message != tt.wantMsg {
 				t.Fatalf("Expected() = %+v, want ok=%v msg=%q", exp, tt.wantOK, tt.wantMsg)
+			}
+			if !reflect.DeepEqual(exp.Unreached, tt.wantUnreached) {
+				t.Fatalf("Unreached = %+v, want %+v", exp.Unreached, tt.wantUnreached)
+			}
+			for _, r := range tt.wantUnreached {
+				if !exp.IsUnreached(r.Start) || exp.IsUnreached(r.End) {
+					t.Fatalf("IsUnreached disagrees with %+v", r)
+				}
+			}
+			if exp.IsUnreached(-1) {
+				t.Fatal("IsUnreached(-1) should be false")
 			}
 		})
 	}

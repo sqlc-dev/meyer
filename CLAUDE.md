@@ -32,6 +32,12 @@ stored; the harness derives the expectation from them:
 - Otherwise meyer must accept the whole case. This includes statements that
   failed **semantically** in SQLite (`no such table: …`) — those parsed
   successfully; meyer does no semantic analysis.
+- …except in text SQLite's parser never reached. A grammar action can fail
+  in the middle of a statement — `sqlite3BeginTrigger` raising `no such
+  table` at the `trigger_decl` reduce, before the trigger body is looked at
+  — and `sqlite3RunParser` then abandons the rest of the statement. The
+  oracle records `pzTail` on every failing statement, so the harness knows
+  which byte ranges are unverified and lets meyer fail inside them.
 
 Known looseness: messages produced by grammar *actions* (e.g. `ORDER BY
 clause should come after UNION not before`) are currently classified as

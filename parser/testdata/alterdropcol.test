@@ -12,19 +12,19 @@
 stmt 0 ok
 stmt 28 ok
 stmt 66 ok
-stmt 122 err 1 -1 no such table: main.t2
+stmt 122 err 1 -1 151 no such table: main.t2
 stmt 151 ok
-stmt 180 err 1 -1 no such table: main.t3
+stmt 180 err 1 -1 212 no such table: main.t3
 ==== 1.1
 
   ALTER TABLE nosuch DROP COLUMN z;
 ----
-stmt 0 err 1 -1 no such table: nosuch
+stmt 0 err 1 -1 36 no such table: nosuch
 ==== 1.2
 
   ALTER TABLE v1 DROP COLUMN c;
 ----
-stmt 0 err 1 -1 no such table: v1
+stmt 0 err 1 -1 32 no such table: v1
 ==== 1.3.1
 
     CREATE VIRTUAL TABLE ft1 USING fts5(one, two);
@@ -34,22 +34,22 @@ stmt 0 ok
 
     ALTER TABLE ft1 DROP COLUMN two;
 ----
-stmt 0 err 1 -1 no such table: ft1
+stmt 0 err 1 -1 37 no such table: ft1
 ==== 1.4
 
   ALTER TABLE sqlite_schema DROP COLUMN sql;
 ----
-stmt 0 err 1 -1 table sqlite_master may not be altered
+stmt 0 err 1 -1 45 table sqlite_master may not be altered
 ==== 1.5
 
   ALTER TABLE t1 DROP COLUMN d;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== 1.6.1
 
   ALTER TABLE t1 DROP COLUMN b;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== 1.6.2
 
   SELECT sql FROM sqlite_schema WHERE name = 't1'
@@ -59,7 +59,7 @@ stmt 0 ok
 
   ALTER TABLE t1 DROP COLUMN c;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== 1.7.2
 
   SELECT sql FROM sqlite_schema WHERE name = 't1'
@@ -69,27 +69,27 @@ stmt 0 ok
 
   ALTER TABLE t1 DROP COLUMN a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== 1.8
 
   ALTER TABLE t2 DROP COLUMN z
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 32 no such table: t2
 ==== 1.9
 
   ALTER TABLE t2 DROP COLUMN x
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 32 no such table: t2
 ==== 1.10
 
   ALTER TABLE t2 DROP COLUMN y
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 32 no such table: t2
 ==== 1.11
 
   ALTER TABLE t3 DROP COLUMN s
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 32 no such table: t3
 ==== 2.%TN%.0
 
     CREATE TABLE t1(x, y INTEGER PRIMARY KEY, z) %WO% ;
@@ -97,24 +97,24 @@ stmt 0 err 1 -1 no such table: t3
     INSERT INTO t1 VALUES(4, 5, 6);
     INSERT INTO t1 VALUES(7, 8, 9);
 ----
-stmt 0 err 1 50 near "%": syntax error
-stmt 56 err 1 -1 no such table: t1
-stmt 92 err 1 -1 no such table: t1
-stmt 128 err 1 -1 no such table: t1
+stmt 0 err 1 50 51 near "%": syntax error
+stmt 56 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 128 no such table: t1
+stmt 128 err 1 -1 164 no such table: t1
 ==== 2.%TN%.1
 
     ALTER TABLE t1 DROP COLUMN x;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 34 err 1 -1 no such table: t1
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 err 1 -1 56 no such table: t1
 ==== 2.%TN%.2
 
     ALTER TABLE t1 DROP COLUMN z;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 34 err 1 -1 no such table: t1
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 err 1 -1 56 no such table: t1
 ==== 3.0
 
   CREATE TABLE t12(a, b, c, CHECK(c>10));
@@ -126,12 +126,12 @@ stmt 42 ok
 
   ALTER TABLE t12 DROP COLUMN c;
 ----
-stmt 0 err 1 -1 no such table: t12
+stmt 0 err 1 -1 33 no such table: t12
 ==== 3.2
 
   ALTER TABLE t13 DROP COLUMN c;
 ----
-stmt 0 err 1 -1 no such table: t13
+stmt 0 err 1 -1 33 no such table: t13
 ==== alterdropcol-generated
 
     INSERT INTO "my table"(a, b, d) VALUES(1, 2, 'hello');
@@ -139,19 +139,19 @@ stmt 0 err 1 -1 no such table: t13
 
     SELECT * FROM "my table"
 ----
-stmt 0 err 1 -1 no such table: my table
-stmt 59 err 1 -1 no such table: my table
-stmt 118 err 1 -1 no such table: my table
+stmt 0 err 1 -1 59 no such table: my table
+stmt 59 err 1 -1 118 no such table: my table
+stmt 118 err 1 -1 149 no such table: my table
 ==== alterdropcol-generated.dup1
 
     ALTER TABLE "my table" DROP COLUMN c;
 ----
-stmt 0 err 1 -1 no such table: my table
+stmt 0 err 1 -1 42 no such table: my table
 ==== alterdropcol-generated.dup2
 
     SELECT * FROM "my table"
 ----
-stmt 0 err 1 -1 no such table: my table
+stmt 0 err 1 -1 30 no such table: my table
 ==== alterdropcol-generated.dup3
 
     INSERT INTO x1(a, b, c, e) VALUES(1, 2, 3, 4);
@@ -159,30 +159,30 @@ stmt 0 err 1 -1 no such table: my table
     INSERT INTO x1(a, b, c, e) VALUES(9, 10, 11, 12);
     SELECT * FROM x1;
 ----
-stmt 0 err 1 -1 no such table: x1
-stmt 51 err 1 -1 no such table: x1
-stmt 102 err 1 -1 no such table: x1
-stmt 156 err 1 -1 no such table: x1
+stmt 0 err 1 -1 51 no such table: x1
+stmt 51 err 1 -1 102 no such table: x1
+stmt 102 err 1 -1 156 no such table: x1
+stmt 156 err 1 -1 178 no such table: x1
 ==== alterdropcol-generated.dup4
 
     ALTER TABLE x1 DROP COLUMN a
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 34 no such table: x1
 ==== alterdropcol-generated.dup5
 
     SELECT * FROM x1
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 22 no such table: x1
 ==== alterdropcol-generated.dup6
 
     ALTER TABLE x1 DROP COLUMN e
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 34 no such table: x1
 ==== alterdropcol-generated.dup7
 
     SELECT * FROM x1
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 22 no such table: x1
 ==== 5.0
 
   CREATE TABLE p1(a PRIMARY KEY, b UNIQUE);
@@ -198,8 +198,8 @@ stmt 89 ok
   ALTER TABLE c2 DROP COLUMN z;
   SELECT sql FROM sqlite_schema WHERE name IN ('c1', 'c2');
 ----
-stmt 0 err 1 -1 no such table: c1
-stmt 32 err 1 -1 no such table: c2
+stmt 0 err 1 -1 32 no such table: c1
+stmt 32 err 1 -1 64 no such table: c2
 stmt 64 ok
 ==== 5.2.1
 
@@ -210,31 +210,31 @@ stmt 0 ok
 
   ALTER TABLE c1 DROP COLUMN x
 ----
-stmt 0 err 1 -1 no such table: c1
+stmt 0 err 1 -1 32 no such table: c1
 ==== 5.3.1
 
   DROP VIEW v1;
   CREATE VIEW v1 AS SELECT x, y FROM c1;
 ----
-stmt 0 err 1 -1 no such view: v1
+stmt 0 err 1 -1 16 no such view: v1
 stmt 16 ok
 ==== 5.3.2
 
   ALTER TABLE c1 DROP COLUMN x
 ----
-stmt 0 err 1 -1 no such table: c1
+stmt 0 err 1 -1 32 no such table: c1
 ==== 5.4.1
 
   CREATE TRIGGER tr AFTER INSERT ON c1 BEGIN
     INSERT INTO p1 VALUES(new.y, new.xyz);
   END;
 ----
-stmt 0 err 1 -1 no such table: main.c1
+stmt 0 err 1 -1 45 no such table: main.c1
 ==== 5.4.2
 
   ALTER TABLE c1 DROP COLUMN y
 ----
-stmt 0 err 1 -1 no such table: c1
+stmt 0 err 1 -1 32 no such table: c1
 ==== 5.5.1
 
   DROP TRIGGER tr;
@@ -242,13 +242,13 @@ stmt 0 err 1 -1 no such table: c1
     INSERT INTO p1 VALUES(new.y, new.z);
   END;
 ----
-stmt 0 err 1 -1 no such trigger: tr
-stmt 19 err 1 -1 no such table: main.c1
+stmt 0 err 1 -1 19 no such trigger: tr
+stmt 19 err 1 -1 64 no such table: main.c1
 ==== 5.5.2
 
   ALTER TABLE c1 DROP COLUMN y
 ----
-stmt 0 err 1 -1 no such table: c1
+stmt 0 err 1 -1 32 no such table: c1
 ==== 6.0
 
   CREATE TABLE t1(a,b,c);
@@ -263,7 +263,7 @@ stmt 26 ok
 stmt 52 ok
 stmt 81 ok
 stmt 157 ok
-stmt 187 err 1 -1 no such table: t2
+stmt 187 err 1 -1 219 no such table: t2
 ==== 6.1
 
   CREATE TABLE t1(a,b,c);
@@ -279,7 +279,7 @@ stmt 26 ok
 stmt 52 ok
 stmt 81 ok
 stmt 180 ok
-stmt 210 err 1 -1 no such table: t2
+stmt 210 err 1 -1 242 no such table: t2
 ==== 7.0
 
   CREATE TABLE t1(a, b, c, PRIMARY KEY(a COLLATE nocase, a)) WITHOUT ROWID;
@@ -287,13 +287,13 @@ stmt 210 err 1 -1 no such table: t2
   INSERT INTO t1 VALUES(4, 5, 6);
 ----
 stmt 0 ok
-stmt 76 err 1 -1 no such table: t1
-stmt 110 err 1 -1 no such table: t1
+stmt 76 err 1 -1 110 no such table: t1
+stmt 110 err 1 -1 144 no such table: t1
 ==== 7.1
 
   ALTER TABLE t1 DROP COLUMN c;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== 7.2
 
   SELECT sql FROM sqlite_schema;
@@ -303,7 +303,7 @@ stmt 0 ok
 
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
 ==== 8.0
 
   CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
@@ -318,7 +318,7 @@ stmt 75 ok
 
   ALTER TABLE t1 DROP COLUMN b;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== 8.2
 
   SELECT sql FROM sqlite_schema;
@@ -331,14 +331,14 @@ stmt 0 ok
     )
     INSERT INTO t1(a, b, c) SELECT i, 123, 456 FROM s;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 139 no such table: t1
 ==== alterdropcol-generated.dup9
 
     ALTER TABLE t1 DROP COLUMN b;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 34 no such table: t1
 ==== alterdropcol-generated.dup10
 
     SELECT count(*), c FROM t1 GROUP BY c;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 43 no such table: t1

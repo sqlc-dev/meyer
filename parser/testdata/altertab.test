@@ -7,7 +7,7 @@
 ----
 stmt 0 ok
 stmt 46 ok
-stmt 72 err 1 -1 no such table: main.t2
+stmt 72 err 1 -1 117 no such table: main.t2
 ==== 1.1
 
   SELECT sql FROM sqlite_master
@@ -17,7 +17,7 @@ stmt 0 ok
 
   ALTER TABLE t1 RENAME TO t1new;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 34 no such table: t1
 ==== 1.3
 
   CREATE TABLE t3(c, d);
@@ -25,8 +25,8 @@ stmt 0 err 1 -1 no such table: t1
   DROP TABLE t3new;
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: t3
-stmt 59 err 1 -1 no such table: t3new
+stmt 25 err 1 -1 59 no such table: t3
+stmt 59 err 1 -1 79 no such table: t3new
 ==== 1.4
 
   SELECT sql FROM sqlite_master
@@ -36,7 +36,7 @@ stmt 0 ok
 
   ALTER TABLE t2 RENAME TO t2new;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 34 no such table: t2
 ==== 1.4.dup1
 
   SELECT sql FROM sqlite_master
@@ -50,21 +50,21 @@ stmt 0 ok
     SELECT * FROM eee;
 ----
 stmt 0 ok
-stmt 31 err 1 -1 no such table: abc
+stmt 31 err 1 -1 68 no such table: abc
 stmt 68 ok
-stmt 116 err 1 -1 no such table: eee
+stmt 116 err 1 -1 139 no such table: eee
 ==== 2.1
 
     ALTER TABLE eee RENAME TO fff;
     SELECT * FROM fff;
 ----
-stmt 0 err 1 -1 no such table: eee
-stmt 35 err 1 -1 no such table: fff
+stmt 0 err 1 -1 35 no such table: eee
+stmt 35 err 1 -1 58 no such table: fff
 ==== 2.2
 
     ALTER TABLE fff RENAME TO ggg;
 ----
-stmt 0 err 1 -1 no such table: fff
+stmt 0 err 1 -1 35 no such table: fff
 ==== 3.0
 
   CREATE TABLE txx(a, b, c);
@@ -74,7 +74,7 @@ stmt 0 err 1 -1 no such table: fff
   CREATE VIEW temp.ttt AS SELECT main.txx.a, txx.b, one.b, main.one.a FROM txx AS one, txx;
 ----
 stmt 0 ok
-stmt 29 err 1 -1 no such table: txx
+stmt 29 err 1 -1 64 no such table: txx
 stmt 64 ok
 stmt 123 ok
 stmt 189 ok
@@ -82,14 +82,14 @@ stmt 189 ok
 
   SELECT * FROM vvv;
 ----
-stmt 0 err 1 -1 no such table: vvv
+stmt 0 err 1 -1 21 no such table: vvv
 ==== 3.1.2
 
   ALTER TABLE txx RENAME TO "t xx";
   SELECT * FROM vvv;
 ----
-stmt 0 err 1 -1 no such table: txx
-stmt 36 err 1 -1 no such table: vvv
+stmt 0 err 1 -1 36 no such table: txx
+stmt 36 err 1 -1 57 no such table: vvv
 ==== 3.1.3
 
   SELECT sql FROM sqlite_master WHERE name='vvv';
@@ -99,7 +99,7 @@ stmt 0 ok
 
   SELECT * FROM uuu;
 ----
-stmt 0 err 1 -1 no such table: uuu
+stmt 0 err 1 -1 21 no such table: uuu
 ==== 3.2.2
 
   SELECT sql FROM sqlite_master WHERE name='uuu';;
@@ -110,7 +110,7 @@ stmt 50 ok
 
   SELECT * FROM ttt;
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 21 no such table: ttt
 ==== 3.3.2
 
   SELECT sql FROM sqlite_temp_master WHERE name='ttt';
@@ -128,7 +128,7 @@ stmt 0 ok
 ----
 stmt 0 ok
 stmt 25 ok
-stmt 50 err 1 -1 no such table: main.t1
+stmt 50 err 1 -1 97 no such table: main.t1
 ==== 4.1
 
   INSERT INTO t1 VALUES(1, 1);
@@ -137,15 +137,15 @@ stmt 50 err 1 -1 no such table: main.t1
   ALTER TABLE t2 RENAME TO t22;
   INSERT INTO t11 VALUES(3, 3);
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 31 err 1 -1 no such table: t1
-stmt 63 err 1 -1 no such table: t11
-stmt 95 err 1 -1 no such table: t2
-stmt 127 err 1 -1 no such table: t11
+stmt 0 err 1 -1 31 no such table: t1
+stmt 31 err 1 -1 63 no such table: t1
+stmt 63 err 1 -1 95 no such table: t11
+stmt 95 err 1 -1 127 no such table: t2
+stmt 127 err 1 -1 159 no such table: t11
 ==== 4.2
  SELECT squish(sql) FROM sqlite_master WHERE name = 'tr1'
 ----
-stmt 0 err 1 8 no such function: squish
+stmt 0 err 1 8 58 no such function: squish
 ==== 5.0
 
   CREATE TABLE t9(a, b, c);
@@ -162,14 +162,14 @@ stmt 0 err 1 8 no such function: squish
 stmt 0 ok
 stmt 28 ok
 stmt 57 ok
-stmt 90 err 1 -1 no such table: temp.t9
-stmt 203 err 1 -1 no such table: temp.t9
-stmt 243 err 1 -1 no such table: t10
+stmt 90 err 1 -1 147 no such table: temp.t9
+stmt 203 err 1 -1 243 no such table: temp.t9
+stmt 243 err 1 -1 264 no such table: t10
 ==== 5.1
 
   ALTER TABLE temp.t9 RENAME TO 't1234567890'
 ----
-stmt 0 err 1 -1 no such table: temp.t9
+stmt 0 err 1 -1 47 no such table: temp.t9
 ==== 5.2
 
   CREATE TABLE t1(a, b);
@@ -181,34 +181,34 @@ stmt 0 err 1 -1 no such table: temp.t9
 ----
 stmt 0 ok
 stmt 25 ok
-stmt 50 err 1 -1 no such table: t1
-stmt 81 err 1 -1 no such table: t2
+stmt 50 err 1 -1 81 no such table: t1
+stmt 81 err 1 -1 112 no such table: t2
 stmt 112 ok
-stmt 183 err 1 -1 no such table: v
+stmt 183 err 1 -1 202 no such table: v
 ==== 5.3
 
   ALTER TABLE t2 RENAME TO one;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 32 no such table: t2
 ==== 5.4
 
   SELECT  *  FROM v
 ----
-stmt 0 err 1 -1 no such table: v
+stmt 0 err 1 -1 21 no such table: v
 ==== 5.5
 
   DROP VIEW v;
   CREATE VIEW temp.vv AS SELECT one.a, one.b, t2.a, t2.b FROM t1 AS one, t2;
   SELECT * FROM vv;
 ----
-stmt 0 err 1 -1 no such view: v
+stmt 0 err 1 -1 15 no such view: v
 stmt 15 ok
-stmt 92 err 1 -1 no such table: vv
+stmt 92 err 1 -1 112 no such table: vv
 ==== 5.6
 
   ALTER TABLE t2 RENAME TO one;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 32 no such table: t2
 ==== 6.0
 
     CREATE VIRTUAL TABLE x1 USING tcl(tcl_command);
@@ -219,7 +219,7 @@ stmt 0 ok
     ALTER TABLE x1 RENAME TO x2;
     SELECT sql FROM sqlite_master WHERE name = 'x2'
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 33 no such table: x1
 stmt 33 ok
 ==== 7.1
 
@@ -233,14 +233,14 @@ stmt 33 ok
     );
 ----
 stmt 0 ok
-stmt 50 err 1 -1 no such table: ddd
+stmt 50 err 1 -1 279 no such table: ddd
 ==== 7.2
 
     SELECT 
     sqlite_rename_table(db, 0, 0, sql, zOld, zNew, bTemp)
     FROM ddd;
 ----
-stmt 0 err 1 -1 no such table: ddd
+stmt 0 err 1 -1 84 no such table: ddd
 ==== 8.1
 
   ATTACH 'test.db2' AS aux;
@@ -254,24 +254,24 @@ stmt 0 err 1 -1 no such table: ddd
 ----
 stmt 0 ok
 stmt 28 ok
-stmt 56 err 1 72 unknown database aux
-stmt 105 err 1 121 unknown database aux
-stmt 171 err 1 -1 no such table: aux.p1
-stmt 206 err 1 -1 no such table: aux.p1
-stmt 241 err 1 -1 no such table: aux.c1
-stmt 279 err 1 295 unknown database aux
+stmt 56 err 1 72 79 unknown database aux
+stmt 105 err 1 121 128 unknown database aux
+stmt 171 err 1 -1 206 no such table: aux.p1
+stmt 206 err 1 -1 241 no such table: aux.p1
+stmt 241 err 1 -1 279 no such table: aux.c1
+stmt 279 err 1 295 302 unknown database aux
 ==== 8.2
 
   ALTER TABLE aux.p1 RENAME TO ppp;
 ----
-stmt 0 err 1 -1 no such table: aux.p1
+stmt 0 err 1 -1 36 no such table: aux.p1
 ==== 8.2.dup1
 
   INSERT INTO aux.c1 VALUES(NULL, 1);
   SELECT sql FROM aux.sqlite_master WHERE name = 'c1';
 ----
-stmt 0 err 1 -1 no such table: aux.c1
-stmt 38 err 1 -1 no such table: aux.sqlite_master
+stmt 0 err 1 -1 38 no such table: aux.c1
+stmt 38 err 1 -1 93 no such table: aux.sqlite_master
 ==== 9.0
 
   CREATE TABLE t1(a, b, c);
@@ -283,7 +283,7 @@ stmt 28 ok
 
   ALTER TABLE t1 RENAME TO t3;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 31 no such table: t1
 ==== 9.2
 
   DROP VIEW v1;
@@ -291,13 +291,13 @@ stmt 0 err 1 -1 no such table: t1
     INSERT INTO t2 VALUES(new.a);
   END;
 ----
-stmt 0 err 1 -1 no such view: v1
-stmt 16 err 1 -1 no such table: main.t1
+stmt 0 err 1 -1 16 no such view: v1
+stmt 16 err 1 -1 61 no such table: main.t1
 ==== 9.3
 
   ALTER TABLE t1 RENAME TO t3;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 31 no such table: t1
 ==== 9.4
 
   DROP TRIGGER tr;
@@ -308,16 +308,16 @@ stmt 0 err 1 -1 no such table: t1
   CREATE TABLE aux.t1(x);
   CREATE TEMP TRIGGER tr AFTER INSERT ON aux.t1 BEGIN SELECT 1, 2, 3; END;
 ----
-stmt 0 err 1 -1 no such trigger: tr
+stmt 0 err 1 -1 19 no such trigger: tr
 stmt 19 ok
-stmt 48 err 1 -1 no such table: main.t1
-stmt 133 err 1 150 unknown database aux
-stmt 160 err 1 -1 no such table: aux.t1
+stmt 48 err 1 -1 112 no such table: main.t1
+stmt 133 err 1 150 157 unknown database aux
+stmt 160 err 1 -1 214 no such table: aux.t1
 ==== 9.5
 
   ALTER TABLE main.t1 RENAME TO t3;
 ----
-stmt 0 err 1 -1 no such table: main.t1
+stmt 0 err 1 -1 36 no such table: main.t1
 ==== 9.6
 
   SELECT sql FROM sqlite_temp_master;
@@ -338,14 +338,14 @@ stmt 0 ok
     COMMIT;
 ----
 stmt 0 ok
-stmt 11 err 1 -1 no such table: fff
-stmt 56 err 1 -1 no such table: fff
+stmt 11 err 1 -1 56 no such table: fff
+stmt 56 err 1 -1 93 no such table: fff
 stmt 93 ok
 ==== 10.2
 
     SELECT * FROM ggg;
 ----
-stmt 0 err 1 -1 no such table: ggg
+stmt 0 err 1 -1 23 no such table: ggg
 ==== 11.0
 
   ATTACH 'test.db2' AS aux;
@@ -356,16 +356,16 @@ stmt 0 err 1 -1 no such table: ggg
   END;
 ----
 stmt 0 ok
-stmt 28 err 1 44 unknown database aux
+stmt 28 err 1 44 51 unknown database aux
 stmt 60 ok
-stmt 93 err 1 -1 no such table: aux.t1
+stmt 93 err 1 -1 147 no such table: aux.t1
 ==== 11.1
 
   INSERT INTO main.t1 VALUES(1, 2, 3);
   INSERT INTO aux.t1 VALUES(4, 5, 6);
 ----
-stmt 0 err 1 -1 no such table: main.t1
-stmt 39 err 1 -1 no such table: aux.t1
+stmt 0 err 1 -1 39 no such table: main.t1
+stmt 39 err 1 -1 77 no such table: aux.t1
 ==== 11.3
 
   SELECT name, tbl_name FROM sqlite_temp_master;
@@ -376,20 +376,20 @@ stmt 0 ok
   ALTER TABLE main.t1 RENAME TO t2;
   SELECT name, tbl_name FROM sqlite_temp_master;
 ----
-stmt 0 err 1 -1 no such table: main.t1
+stmt 0 err 1 -1 36 no such table: main.t1
 stmt 36 ok
 ==== 11.5
 
   ALTER TABLE aux.t1 RENAME TO t2;
   SELECT name, tbl_name FROM sqlite_temp_master;
 ----
-stmt 0 err 1 -1 no such table: aux.t1
+stmt 0 err 1 -1 35 no such table: aux.t1
 stmt 35 ok
 ==== 11.6
 
   INSERT INTO aux.t2 VALUES(7, 8, 9);
 ----
-stmt 0 err 1 -1 no such table: aux.t2
+stmt 0 err 1 -1 38 no such table: aux.t2
 ==== 12.0
 
   CREATE TABLE t1(a);
@@ -401,20 +401,20 @@ stmt 0 err 1 -1 no such table: aux.t2
 ----
 stmt 0 ok
 stmt 22 ok
-stmt 44 err 1 -1 no such table: main.t2
+stmt 44 err 1 -1 99 no such table: main.t2
 stmt 143 ok
 ==== 12.1
 
   ALTER TABLE main.t2 RENAME TO t3;
 ----
-stmt 0 err 1 -1 no such table: main.t2
+stmt 0 err 1 -1 36 no such table: main.t2
 ==== 12.2
 
   INSERT INTO t3 VALUES('WWW');
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t3
-stmt 32 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t3
+stmt 32 err 1 -1 52 no such table: t1
 ==== 13.0
 
   CREATE TABLE t1(x, y);
@@ -427,17 +427,17 @@ stmt 32 err 1 -1 no such table: t1
 stmt 0 ok
 stmt 25 ok
 stmt 50 ok
-stmt 73 err 1 -1 no such table: main.t1
+stmt 73 err 1 -1 119 no such table: main.t1
 ==== 13.1
 
   INSERT INTO t1 VALUES(1, 2);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 31 no such table: t1
 ==== 13.2
 
   ALTER TABLE t2 RENAME b TO y;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 32 no such table: t2
 ==== 14.0
 
     CREATE VIRTUAL TABLE rt USING rtree(id, minx, maxx, miny, maxy);
@@ -453,30 +453,30 @@ stmt 0 err 1 -1 no such table: t2
 ----
 stmt 0 ok
 stmt 69 ok
-stmt 140 err 1 -1 no such table: main.mytable
-stmt 321 err 1 -1 no such table: mytable
+stmt 140 err 1 -1 267 no such table: main.mytable
+stmt 321 err 1 -1 366 no such table: mytable
 ==== 14.1
 
     UPDATE mytable SET geom = X'1234'
 ----
-stmt 0 err 1 -1 no such table: mytable
+stmt 0 err 1 -1 39 no such table: mytable
 ==== 14.2
 
     ALTER TABLE mytable RENAME TO mytable_renamed;
 ----
-stmt 0 err 1 -1 no such table: mytable
+stmt 0 err 1 -1 51 no such table: mytable
 ==== 14.3
 
     CREATE TRIGGER tr2 AFTER INSERT ON mytable_renamed BEGIN
       DELETE FROM rt WHERE id=(SELECT min(id) FROM rt);
     END;
 ----
-stmt 0 err 1 -1 no such table: main.mytable_renamed
+stmt 0 err 1 -1 61 no such table: main.mytable_renamed
 ==== 14.4
 
     ALTER TABLE mytable_renamed RENAME TO mytable2;
 ----
-stmt 0 err 1 -1 no such table: mytable_renamed
+stmt 0 err 1 -1 52 no such table: mytable_renamed
 ==== 14.5
 
   CREATE TABLE t1(a, b, c);
@@ -487,12 +487,12 @@ stmt 0 err 1 -1 no such table: mytable_renamed
 ----
 stmt 0 ok
 stmt 28 ok
-stmt 66 err 1 -1 no such table: main.t1
+stmt 66 err 1 -1 112 no such table: main.t1
 ==== 14.6
 
   ALTER TABLE t1 RENAME TO tt1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== 15.0
 
   CREATE TABLE t1(a integer NOT NULL PRIMARY KEY);
@@ -507,16 +507,16 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 51 ok
-stmt 89 err 1 -1 no such table: main.v1
-stmt 177 err 1 -1 no such table: main.v1
+stmt 89 err 1 -1 140 no such table: main.v1
+stmt 177 err 1 -1 228 no such table: main.v1
 stmt 254 ok
 ==== 15.1
 
   INSERT INTO v1 VALUES(1);
   ALTER TABLE t2 RENAME TO t3;
 ----
-stmt 0 err 1 -1 no such table: v1
-stmt 28 err 1 -1 no such table: t2
+stmt 0 err 1 -1 28 no such table: v1
+stmt 28 err 1 -1 59 no such table: t2
 ==== 15.2
 
   CREATE TABLE x(f1 integer NOT NULL);
@@ -529,25 +529,25 @@ stmt 28 err 1 -1 no such table: t2
 ----
 stmt 0 ok
 stmt 39 ok
-stmt 82 err 1 -1 no such table: main.y
+stmt 82 err 1 -1 136 no such table: main.y
 stmt 175 ok
-stmt 227 err 1 -1 no such table: z
+stmt 227 err 1 -1 257 no such table: z
 ==== 15.3
 
   INSERT INTO x VALUES(1), (2), (3);
   ALTER TABLE x RENAME f1 TO f2;
   SELECT * FROM x;
 ----
-stmt 0 err 1 -1 no such table: x
-stmt 37 err 1 -1 no such table: x
-stmt 70 err 1 -1 no such table: x
+stmt 0 err 1 -1 37 no such table: x
+stmt 37 err 1 -1 70 no such table: x
+stmt 70 err 1 -1 89 no such table: x
 ==== 15.4
 
   UPDATE y SET f1 = 'x' WHERE f1 = 1;
   SELECT * FROM x;
 ----
-stmt 0 err 1 -1 no such table: y
-stmt 38 err 1 -1 no such table: x
+stmt 0 err 1 -1 38 no such table: y
+stmt 38 err 1 -1 57 no such table: x
 ==== 15.5
 
   SELECT sql FROM sqlite_master WHERE name = 'y';
@@ -564,27 +564,27 @@ stmt 40 ok
 
     INSERT INTO y1_segments VALUES(1, X'1234567890');
 ----
-stmt 0 err 1 -1 no such table: y1_segments
+stmt 0 err 1 -1 54 no such table: y1_segments
 ==== 16.20
 
     DROP TABLE y1_segments;
 ----
-stmt 0 err 1 -1 no such table: y1_segments
+stmt 0 err 1 -1 28 no such table: y1_segments
 ==== 16.20.dup1
 
     ALTER TABLE y1_segments RENAME TO abc;
 ----
-stmt 0 err 1 -1 no such table: y1_segments
+stmt 0 err 1 -1 43 no such table: y1_segments
 ==== 16.22
 
     ALTER TABLE y1_segments RENAME TO abc;
 ----
-stmt 0 err 1 -1 no such table: y1_segments
+stmt 0 err 1 -1 43 no such table: y1_segments
 ==== 16.23
 
     CREATE TABLE y1_segments AS SELECT * FROM abc;
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 51 no such table: abc
 ==== 16.24
 
     CREATE VIEW y1_segments AS SELECT * FROM abc;
@@ -594,17 +594,17 @@ stmt 0 ok
 
     ALTER TABLE abc RENAME TO y1_segments;
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 43 no such table: abc
 ==== 16.30
 
     ALTER TABLE y1 RENAME TO z1;
 ----
-stmt 0 err 1 -1 no such table: y1
+stmt 0 err 1 -1 33 no such table: y1
 ==== 16.40
 
     SELECT * FROM z1_segments;
 ----
-stmt 0 err 1 -1 no such table: z1_segments
+stmt 0 err 1 -1 31 no such table: z1_segments
 ==== 17.0
 
   CREATE TABLE sqlite1234 (id integer);
@@ -612,7 +612,7 @@ stmt 0 err 1 -1 no such table: z1_segments
   SELECT name, sql FROM sqlite_master WHERE sql IS NOT NULL;
 ----
 stmt 0 ok
-stmt 40 err 1 -1 no such table: sqlite1234
+stmt 40 err 1 -1 81 no such table: sqlite1234
 stmt 81 ok
 ==== 18.1.0
 
@@ -623,7 +623,7 @@ stmt 0 ok
 
   ALTER TABLE t0 RENAME COLUMN c0 TO c1;
 ----
-stmt 0 err 1 -1 no such table: t0
+stmt 0 err 1 -1 41 no such table: t0
 ==== 18.1.2
 
   SELECT sql FROM sqlite_master;
@@ -638,7 +638,7 @@ stmt 0 ok
 
   ALTER TABLE t0 RENAME COLUMN c0 TO c1;
 ----
-stmt 0 err 1 -1 no such table: t0
+stmt 0 err 1 -1 41 no such table: t0
 ==== 18.2.2
 
   SELECT sql FROM sqlite_master;
@@ -653,22 +653,22 @@ stmt 0 ok
 ----
 stmt 0 ok
 stmt 22 ok
-stmt 76 err 1 -1 no such table: t1
+stmt 76 err 1 -1 107 no such table: t1
 stmt 107 ok
 ==== 19.110
 
   INSERT INTO t3(x) VALUES(123);
   SELECT * FROM t2;
 ----
-stmt 0 err 1 -1 no such table: t3
-stmt 33 err 1 -1 no such table: t2
+stmt 0 err 1 -1 33 no such table: t3
+stmt 33 err 1 -1 53 no such table: t2
 ==== 19.120
 
   INSERT INTO t3(x) VALUES('xyz');
   SELECT * FROM t2;
 ----
-stmt 0 err 1 -1 no such table: t3
-stmt 35 err 1 -1 no such table: t2
+stmt 0 err 1 -1 35 no such table: t3
+stmt 35 err 1 -1 55 no such table: t2
 ==== 20.0
 
   CREATE TABLE a(a);
@@ -680,7 +680,7 @@ stmt 21 ok
 
   ALTER TABLE a RENAME a TO e;
 ----
-stmt 0 err 1 -1 no such table: a
+stmt 0 err 1 -1 31 no such table: a
 ==== 21.0
 
   CREATE TABLE a(b);
@@ -695,17 +695,17 @@ stmt 21 ok
 
   SELECT likelihood(NULL, (d, (SELECT c)));
 ----
-stmt 0 err 1 10 second argument to likelihood() must be a constant between 0.0 and 1.0
+stmt 0 err 1 10 44 second argument to likelihood() must be a constant between 0.0 and 1.0
 ==== 21.2
 
   SELECT * FROM c;
 ----
-stmt 0 err 1 -1 no such table: c
+stmt 0 err 1 -1 19 no such table: c
 ==== 21.3
 
   ALTER TABLE a RENAME TO e;
 ----
-stmt 0 err 1 -1 no such table: a
+stmt 0 err 1 -1 29 no such table: a
 ==== 22.0
 
   CREATE TABLE t1(a INT, b TEXT NOT NULL);
@@ -718,7 +718,7 @@ stmt 0 err 1 -1 no such table: a
   PRAGMA integrity_check;
 ----
 stmt 0 ok
-stmt 43 err 1 -1 no such table: t1
+stmt 43 err 1 -1 83 no such table: t1
 stmt 83 ok
 stmt 92 ok
 stmt 121 ok
@@ -730,8 +730,8 @@ stmt 247 ok
   ALTER TABLE t1 ADD COLUMN c INT DEFAULT 78;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 46 err 1 -1 no such table: t1
+stmt 0 err 1 -1 42 no such table: t1
+stmt 46 err 1 -1 66 no such table: t1
 ==== 23.1
 
   CREATE TABLE gigo(a text);
@@ -739,15 +739,15 @@ stmt 46 err 1 -1 no such table: t1
   CREATE VIEW v1 AS SELECT * FROM idx WHERE x='abc';
 ----
 stmt 0 ok
-stmt 29 err 1 -1 no such collation sequence: compare64
+stmt 29 err 1 -1 74 no such collation sequence: compare64
 stmt 75 ok
 ==== 23.2
 
   alter table gigo rename to ggiiggoo;
   alter table idx rename to idx2;
 ----
-stmt 0 err 1 -1 no such table: gigo
-stmt 39 err 1 -1 no such table: idx
+stmt 0 err 1 -1 39 no such table: gigo
+stmt 39 err 1 -1 73 no such table: idx
 ==== 23.3
 
   SELECT sql FROM sqlite_master;
@@ -758,7 +758,7 @@ stmt 0 ok
   ALTER TABLE idx2 RENAME x TO y;
   SELECT sql FROM sqlite_master;
 ----
-stmt 0 err 1 -1 no such table: idx2
+stmt 0 err 1 -1 34 no such table: idx2
 stmt 34 ok
 ==== 24.1.0
 
@@ -768,12 +768,12 @@ stmt 34 ok
   END;
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: main.t1
+stmt 25 err 1 -1 67 no such table: main.t1
 ==== 24.1.1
 
   ALTER TABLE t1 RENAME TO t2;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 31 no such table: t1
 ==== 24.2.0
 
   CREATE TABLE t1(a, b);
@@ -783,13 +783,13 @@ stmt 0 err 1 -1 no such table: t1
   CREATE VIEW v1 AS SELECT * FROM nosuchtable;
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: main.t1
+stmt 25 err 1 -1 67 no such table: main.t1
 stmt 134 ok
 ==== 24.2.1
 
   ALTER TABLE t1 RENAME TO t2;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 31 no such table: t1
 ==== 25.1
 
   CREATE TABLE xx(x);
@@ -801,7 +801,7 @@ stmt 22 ok
 
     ALTER TABLE json_each RENAME TO t4;
 ----
-stmt 0 err 1 -1 table json_each may not be altered
+stmt 0 err 1 -1 40 table json_each may not be altered
 ==== 26.1
 
   CREATE TABLE t1(k,v);
@@ -819,11 +819,11 @@ stmt 0 err 1 -1 table json_each may not be altered
 stmt 0 ok
 stmt 24 ok
 stmt 50 ok
-stmt 90 err 1 -1 no such table: main.t1
-stmt 242 err 1 -1 no such table: t1
-stmt 274 err 1 -1 no such table: t2_a
-stmt 306 err 1 -1 no such table: t1x
-stmt 339 err 1 -1 no such table: t1x
+stmt 90 err 1 -1 135 no such table: main.t1
+stmt 242 err 1 -1 274 no such table: t1
+stmt 274 err 1 -1 306 no such table: t2_a
+stmt 306 err 1 -1 339 no such table: t1x
+stmt 339 err 1 -1 360 no such table: t1x
 ==== 27.1
 
 
@@ -844,12 +844,12 @@ stmt 339 err 1 -1 no such table: t1x
 ----
 stmt 0 ok
 stmt 66 ok
-stmt 93 err 1 -1 no such table: main.t_sa
+stmt 93 err 1 -1 145 no such table: main.t_sa
 ==== 27.2
 
   alter table t_sa rename column c_muyat to c_dg;
 ----
-stmt 0 err 1 -1 no such table: t_sa
+stmt 0 err 1 -1 50 no such table: t_sa
 ==== 29.1
 
   CREATE TABLE t1(a, b, c);
@@ -861,18 +861,18 @@ stmt 0 err 1 -1 no such table: t_sa
     SELECT 1 FROM g;
 ----
 stmt 0 ok
-stmt 28 err 1 -1 no such table: t1
+stmt 28 err 1 -1 68 no such table: t1
 stmt 68 ok
 ==== 29.2
 
   SELECT * FROM v0
 ----
-stmt 0 err 1 -1 no such table: v0
+stmt 0 err 1 -1 20 no such table: v0
 ==== 29.2.dup1
 
   ALTER TABLE t1 RENAME TO t2
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 31 no such table: t1
 ==== 29.3
 
   SELECT sql FROM sqlite_schema WHERE name='v0'
@@ -894,12 +894,12 @@ stmt 0 ok
 
     SELECT * FROM v2;
 ----
-stmt 0 err 1 -1 no such table: v2
+stmt 0 err 1 -1 22 no such table: v2
 ==== 29.5
 
   ALTER TABLE t2 RENAME TO t3;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 31 no such table: t2
 ==== 29.5.dup1
 
   SELECT sql FROM sqlite_schema WHERE name='v2'
@@ -924,24 +924,24 @@ stmt 0 ok
 stmt 0 ok
 stmt 22 ok
 stmt 46 ok
-stmt 70 err 1 -1 no such table: t2
-stmt 112 err 1 -1 no such table: t4
+stmt 70 err 1 -1 112 no such table: t2
+stmt 112 err 1 -1 154 no such table: t4
 stmt 154 ok
 ==== 28.2
 
   SELECT * FROM v3
 ----
-stmt 0 err 1 -1 no such table: v3
+stmt 0 err 1 -1 20 no such table: v3
 ==== 28.3
 
   ALTER TABLE t1 RENAME a TO a2; -- fails in v3
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 33 no such table: t1
 ==== 28.4
 
   ALTER TABLE t2 RENAME TO t5;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 31 no such table: t2
 ==== 28.5
 
   SELECT sql FROM sqlite_schema WHERE name='v3'
@@ -973,14 +973,14 @@ stmt 0 ok
 ----
 stmt 0 ok
 stmt 32 ok
-stmt 58 err 1 -1 no such table: main.t1
+stmt 58 err 1 -1 97 no such table: main.t1
 stmt 97 ok
-stmt 220 err 1 -1 no such table: main.t1
+stmt 220 err 1 -1 284 no such table: main.t1
 ==== 30.1
 
   ALTER TABLE t1 RENAME TO t1x;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== 30.2
 
   SELECT sql FROM sqlite_schema ORDER BY rowid
@@ -997,17 +997,17 @@ stmt 22 ok
 
   SELECT * FROM vvv;
 ----
-stmt 0 err 1 -1 no such table: vvv
+stmt 0 err 1 -1 21 no such table: vvv
 ==== 31.2
 
   ALTER TABLE t1 RENAME TO t1x;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== 31.3
 
   ALTER TABLE t1x RENAME q TO x;
 ----
-stmt 0 err 1 -1 no such table: t1x
+stmt 0 err 1 -1 33 no such table: t1x
 ==== 32.0
 
   CREATE TABLE t1(x);
@@ -1017,8 +1017,8 @@ stmt 0 err 1 -1 no such table: t1x
   ALTER TABLE t1 RENAME TO x;
 ----
 stmt 0 ok
-stmt 22 err 1 -1 no such table: main.t1
-stmt 114 err 1 -1 no such table: t1
+stmt 22 err 1 -1 68 no such table: main.t1
+stmt 114 err 1 -1 144 no such table: t1
 ==== 33.0
 
   CREATE TABLE t1(a TEXT);
@@ -1029,16 +1029,16 @@ stmt 114 err 1 -1 no such table: t1
   END;
 ----
 stmt 0 ok
-stmt 27 err 1 -1 no such table: t1
+stmt 27 err 1 -1 77 no such table: t1
 stmt 77 ok
-stmt 104 err 1 -1 no such table: main.t1
+stmt 104 err 1 -1 149 no such table: main.t1
 ==== 33.1
 
   ALTER TABLE t1 RENAME COLUMN a TO b;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 39 no such table: t1
 ==== 33.2
 
   SELECT quote(a) FROM t1 ORDER BY +a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 39 no such table: t1

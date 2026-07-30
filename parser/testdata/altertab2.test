@@ -10,21 +10,21 @@
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 73 err 1 -1 no such table: main.rr
-stmt 173 err 1 -1 no such table: rr
-stmt 218 err 1 -1 no such table: ff
+stmt 73 err 1 -1 121 no such table: main.rr
+stmt 173 err 1 -1 218 no such table: rr
+stmt 218 err 1 -1 240 no such table: ff
 ==== 1.1
 
     ALTER TABLE ff RENAME TO ffff;
 ----
-stmt 0 err 1 -1 no such table: ff
+stmt 0 err 1 -1 35 no such table: ff
 ==== 1.2
 
     INSERT INTO rr VALUES('in', 'tcl');
     SELECT * FROM ffff;
 ----
-stmt 0 err 1 -1 no such table: rr
-stmt 40 err 1 -1 no such table: ffff
+stmt 0 err 1 -1 40 no such table: rr
+stmt 40 err 1 -1 64 no such table: ffff
 ==== 2.0
 
   CREATE TABLE p1(a PRIMARY KEY, b);
@@ -41,7 +41,7 @@ stmt 126 ok
   ALTER TABLE p1 RENAME TO p2;
   SELECT sql FROM sqlite_master WHERE name LIKE 'c%';
 ----
-stmt 0 err 1 -1 no such table: p1
+stmt 0 err 1 -1 31 no such table: p1
 stmt 31 ok
 ==== 2.2
 
@@ -50,7 +50,7 @@ stmt 31 ok
   SELECT sql FROM sqlite_master WHERE name LIKE 'c%';
 ----
 stmt 0 ok
-stmt 33 err 1 -1 no such table: p2
+stmt 33 err 1 -1 64 no such table: p2
 stmt 64 ok
 ==== 2.3
 
@@ -59,23 +59,23 @@ stmt 64 ok
   ALTER TABLE p2 RENAME TO p3;
   SELECT sql FROM sqlite_master WHERE name LIKE 'c%';
 ----
-stmt 0 err 1 -1 no such table: p3
+stmt 0 err 1 -1 31 no such table: p3
 stmt 31 ok
-stmt 58 err 1 -1 no such table: p2
+stmt 58 err 1 -1 89 no such table: p2
 stmt 89 ok
 ==== altertab2-generated
 
     ALTER TABLE log_entry RENAME TO newname;
     SELECT sql FROM sqlite_master;
 ----
-stmt 0 err 1 -1 no such table: log_entry
+stmt 0 err 1 -1 45 no such table: log_entry
 stmt 45 ok
 ==== altertab2-generated.dup1
 
     ALTER TABLE log_entry RENAME col1 TO newname;
     SELECT sql FROM sqlite_master;
 ----
-stmt 0 err 1 -1 no such table: log_entry
+stmt 0 err 1 -1 50 no such table: log_entry
 stmt 50 ok
 ==== 4.0
 
@@ -85,27 +85,27 @@ stmt 50 ok
   END;
 ----
 stmt 0 ok
-stmt 32 err 1 -1 no such table: main.t1
+stmt 32 err 1 -1 97 no such table: main.t1
 ==== 4.1
 
   ALTER TABLE t1 RENAME TO t1x;
   SELECT sql FROM sqlite_master WHERE type = 'trigger';
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 stmt 32 ok
 ==== 4.2
 
   ALTER TABLE t1x RENAME a TO aaa;
   SELECT sql FROM sqlite_master WHERE type = 'trigger';
 ----
-stmt 0 err 1 -1 no such table: t1x
+stmt 0 err 1 -1 35 no such table: t1x
 stmt 35 ok
 ==== 4.3
 
   ALTER TABLE t1x RENAME d TO ddd;
   SELECT sql FROM sqlite_master WHERE type = 'trigger';
 ----
-stmt 0 err 1 -1 no such table: t1x
+stmt 0 err 1 -1 35 no such table: t1x
 stmt 35 ok
 ==== 5.0
 
@@ -123,31 +123,31 @@ stmt 35 ok
   END;
 ----
 stmt 0 ok
-stmt 22 err 1 -1 no such table: main.t2
+stmt 22 err 1 -1 87 no such table: main.t2
 ==== 5.0.1
 
   INSERT INTO t2 VALUES(1);
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 28 no such table: t2
 ==== 5.1
 
   ALTER TABLE t2 RENAME TO t2x;
   SELECT sql FROM sqlite_master WHERE name = 'r2';
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 32 no such table: t2
 stmt 32 ok
 ==== 5.2
 
   ALTER TABLE t2x RENAME a TO aaaa;
   SELECT sql FROM sqlite_master WHERE name = 'r2';
 ----
-stmt 0 err 1 -1 no such table: t2x
+stmt 0 err 1 -1 36 no such table: t2x
 stmt 36 ok
 ==== 5.3
 
   INSERT INTO t2x VALUES(1);
 ----
-stmt 0 err 1 -1 no such table: t2x
+stmt 0 err 1 -1 29 no such table: t2x
 ==== 6.0
 
   CREATE TABLE t3(a,b,c,d);
@@ -157,20 +157,20 @@ stmt 0 err 1 -1 no such table: t2x
   END;
 ----
 stmt 0 ok
-stmt 28 err 1 -1 no such table: main.t3
+stmt 28 err 1 -1 93 no such table: main.t3
 ==== 6.1
 
   ALTER TABLE t3 RENAME TO t3x;
   SELECT sql FROM sqlite_master WHERE name = 'r3';
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 32 no such table: t3
 stmt 32 ok
 ==== 6.2
 
   ALTER TABLE t3x RENAME a TO abcd;
   SELECT sql FROM sqlite_master WHERE name = 'r3';
 ----
-stmt 0 err 1 -1 no such table: t3x
+stmt 0 err 1 -1 36 no such table: t3x
 stmt 36 ok
 ==== 7.0
 
@@ -179,13 +179,13 @@ stmt 36 ok
   CREATE TABLE t2(x,y,z);
 ----
 stmt 0 ok
-stmt 32 err 1 -1 no such table: t1
+stmt 32 err 1 -1 70 no such table: t1
 stmt 70 ok
 ==== 7.1
 
   SELECT a,b,c FROM t1 UNION SELECT d,e,f FROM t1 ORDER BY b,c;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 64 no such table: t1
 ==== 7.2
 
   CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN
@@ -195,22 +195,22 @@ stmt 0 err 1 -1 no such table: t1
   INSERT INTO t1 VALUES(2,3,4,5,6,7);
   SELECT * FROM t2;
 ----
-stmt 0 err 1 -1 no such table: main.t1
-stmt 137 err 1 -1 no such table: t1
-stmt 175 err 1 -1 no such table: t2
+stmt 0 err 1 -1 45 no such table: main.t1
+stmt 137 err 1 -1 175 no such table: t1
+stmt 175 err 1 -1 195 no such table: t2
 ==== 7.3
 
   ALTER TABLE t1 RENAME TO xyzzy;
   SELECT sql FROM sqlite_master WHERE name='r1'
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 34 no such table: t1
 stmt 34 ok
 ==== 7.3.dup1
 
   ALTER TABLE xyzzy RENAME c TO ccc;
   SELECT sql FROM sqlite_master WHERE name='r1'
 ----
-stmt 0 err 1 -1 no such table: xyzzy
+stmt 0 err 1 -1 37 no such table: xyzzy
 stmt 37 ok
 ==== 8.0
 
@@ -227,22 +227,22 @@ stmt 0 ok
 stmt 28 ok
 stmt 57 ok
 stmt 86 ok
-stmt 124 err 1 -1 no such table: main.t3
+stmt 124 err 1 -1 169 no such table: main.t3
 ==== 8.1
 
   INSERT INTO t3 VALUES(1, 2, 3);
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 34 no such table: t3
 ==== 8.2
 
   ALTER TABLE t1 RENAME a TO aaa;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 34 no such table: t1
 ==== 8.3
 
   INSERT INTO t3 VALUES(4, 5, 6);
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 34 no such table: t3
 ==== 8.4
 
   CREATE TABLE t4(a, b);
@@ -255,7 +255,7 @@ stmt 25 ok
   ALTER TABLE t4 RENAME a TO c;
   SELECT sql FROM sqlite_master WHERE name = 'v4'
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 32 no such table: t4
 stmt 32 ok
 ==== 8.6
 
@@ -265,8 +265,8 @@ stmt 32 ok
   SELECT sql FROM sqlite_master WHERE name='i0';
 ----
 stmt 0 ok
-stmt 23 err 1 -1 no such table: main.t0
-stmt 71 err 1 -1 no such table: t0
+stmt 23 err 1 -1 71 no such table: main.t0
+stmt 71 err 1 -1 102 no such table: t0
 stmt 102 ok
 ==== 9.0
 
@@ -285,9 +285,9 @@ stmt 102 ok
 ----
 stmt 0 ok
 stmt 28 ok
-stmt 58 err 1 -1 no such table: main.t2
+stmt 58 err 1 -1 101 no such table: main.t2
 ==== 9.1
 
   ALTER TABLE t2 RENAME TO newname;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 36 no such table: t2

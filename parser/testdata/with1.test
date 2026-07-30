@@ -14,17 +14,17 @@ stmt 0 ok
 
   WITH x(a) AS ( SELECT * FROM t1) INSERT INTO t1 VALUES(1,2);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 63 no such table: t1
 ==== 1.3
 
   WITH x(a) AS ( SELECT * FROM t1) DELETE FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 51 no such table: t1
 ==== 1.4
 
   WITH x(a) AS ( SELECT * FROM t1) UPDATE t1 SET x = y;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 56 no such table: t1
 ==== 2.1
 
   DROP TABLE IF EXISTS t1;
@@ -35,42 +35,42 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 49 err 1 -1 no such table: t1
-stmt 77 err 1 -1 no such table: t1
-stmt 105 err 1 -1 no such table: t1
+stmt 49 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 105 no such table: t1
+stmt 105 err 1 -1 159 no such table: t1
 ==== 2.2
 
   WITH tmp(a) AS ( SELECT * FROM t1 ) SELECT a FROM tmp;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 57 no such table: t1
 ==== 2.3
 
   SELECT * FROM (
     WITH tmp(a) AS ( SELECT * FROM t1 ) SELECT a FROM tmp
   );
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 81 no such table: t1
 ==== 2.4
 
   WITH tmp1(a) AS ( SELECT * FROM t1 ),
        tmp2(x) AS ( SELECT * FROM tmp1)
   SELECT * FROM tmp2;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 102 no such table: t1
 ==== 2.5
 
   WITH tmp2(x) AS ( SELECT * FROM tmp1),
        tmp1(a) AS ( SELECT * FROM t1 )
   SELECT * FROM tmp2;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 102 no such table: t1
 ==== 3.1
 
   WITH tmp2(x) AS ( SELECT * FROM tmp1 ),
        tmp1(a) AS ( SELECT * FROM tmp2 )
   SELECT * FROM tmp1;
 ----
-stmt 0 err 1 -1 circular reference: tmp1
+stmt 0 err 1 -1 105 circular reference: tmp1
 ==== 3.2
 
   CREATE TABLE t2(x INTEGER);
@@ -79,7 +79,7 @@ stmt 0 err 1 -1 circular reference: tmp1
   SELECT * FROM tmp;
 ----
 stmt 0 ok
-stmt 30 err 1 -1 duplicate WITH table name: tmp
+stmt 30 err 1 -1 112 duplicate WITH table name: tmp
 ==== 3.3
 
   CREATE TABLE t3(x);
@@ -93,29 +93,29 @@ stmt 30 err 1 -1 duplicate WITH table name: tmp
 ----
 stmt 0 ok
 stmt 22 ok
-stmt 44 err 1 -1 no such table: t3
-stmt 76 err 1 -1 no such table: t4
-stmt 107 err 1 -1 no such table: t4
+stmt 44 err 1 -1 76 no such table: t3
+stmt 76 err 1 -1 107 no such table: t4
+stmt 107 err 1 -1 163 no such table: t4
 ==== 3.4
 
   WITH tmp  AS ( SELECT * FROM t3 ),
        tmp2 AS ( WITH tmp AS ( SELECT * FROM t4 ) SELECT * FROM tmp )
   SELECT * FROM tmp2;
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 129 no such table: t4
 ==== 3.5
 
   WITH tmp  AS ( SELECT * FROM t3 ),
        tmp2 AS ( WITH xxxx AS ( SELECT * FROM t4 ) SELECT * FROM tmp )
   SELECT * FROM tmp2;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 130 no such table: t3
 ==== 3.6
 
   WITH tmp AS ( SELECT * FROM t3 ),
   SELECT * FROM tmp;
 ----
-stmt 0 err 1 39 near "SELECT": syntax error
+stmt 0 err 1 39 45 near "SELECT": syntax error
 ==== 4.1
 
   DROP TABLE IF EXISTS t1;
@@ -131,28 +131,28 @@ stmt 0 err 1 39 near "SELECT": syntax error
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 49 err 1 -1 no such table: t1
-stmt 77 err 1 -1 no such table: t1
-stmt 105 err 1 -1 no such table: t1
-stmt 133 err 1 -1 no such table: t1
-stmt 161 err 1 -1 no such table: t1
-stmt 243 err 1 -1 no such table: t1
+stmt 49 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 105 no such table: t1
+stmt 105 err 1 -1 133 no such table: t1
+stmt 133 err 1 -1 161 no such table: t1
+stmt 161 err 1 -1 243 no such table: t1
+stmt 243 err 1 -1 263 no such table: t1
 ==== 4.2
 
   WITH iset AS ( SELECT 2 UNION ALL SELECT 4 )
   INSERT INTO t1 SELECT * FROM iset;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 84 err 1 -1 no such table: t1
+stmt 0 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 104 no such table: t1
 ==== 4.3
 
   WITH uset(a, b) AS ( SELECT 2, 8 UNION ALL SELECT 4, 9 )
   UPDATE t1 SET x = COALESCE( (SELECT b FROM uset WHERE a=x), x );
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 126 err 1 -1 no such table: t1
+stmt 0 err 1 -1 126 no such table: t1
+stmt 126 err 1 -1 146 no such table: t1
 ==== 5.1
 
   WITH i(x) AS ( VALUES(1) UNION ALL SELECT x+1 FROM i)
@@ -192,19 +192,19 @@ stmt 0 ok
   SELECT * FROM ancest;
 ----
 stmt 0 ok
-stmt 77 err 1 -1 no such table: edge
-stmt 114 err 1 -1 no such table: edge
-stmt 151 err 1 -1 no such table: edge
-stmt 188 err 1 -1 no such table: edge
-stmt 225 err 1 -1 no such table: edge
-stmt 262 err 1 -1 no such table: edge
-stmt 299 err 1 -1 no such table: edge
-stmt 336 err 1 -1 no such table: edge
-stmt 373 err 1 -1 no such table: edge
-stmt 410 err 1 -1 no such table: edge
-stmt 447 err 1 -1 no such table: edge
-stmt 484 err 1 -1 no such table: edge
-stmt 521 err 1 -1 no such table: edge
+stmt 77 err 1 -1 114 no such table: edge
+stmt 114 err 1 -1 151 no such table: edge
+stmt 151 err 1 -1 188 no such table: edge
+stmt 188 err 1 -1 225 no such table: edge
+stmt 225 err 1 -1 262 no such table: edge
+stmt 262 err 1 -1 299 no such table: edge
+stmt 299 err 1 -1 336 no such table: edge
+stmt 336 err 1 -1 373 no such table: edge
+stmt 373 err 1 -1 410 no such table: edge
+stmt 410 err 1 -1 447 no such table: edge
+stmt 447 err 1 -1 484 no such table: edge
+stmt 484 err 1 -1 521 no such table: edge
+stmt 521 err 1 -1 736 no such table: edge
 ==== 5.2.2
 
   WITH RECURSIVE
@@ -217,7 +217,7 @@ stmt 521 err 1 -1 no such table: edge
       )
   SELECT * FROM ancest;
 ----
-stmt 0 err 1 -1 no such table: edge
+stmt 0 err 1 -1 216 no such table: edge
 ==== 5.2.3
 
   WITH RECURSIVE
@@ -230,7 +230,7 @@ stmt 0 err 1 -1 no such table: edge
       )
   SELECT * FROM ancest;
 ----
-stmt 0 err 1 -1 no such table: edge
+stmt 0 err 1 -1 233 no such table: edge
 ==== 5.3
 
   WITH i(x) AS ( VALUES(1) UNION ALL SELECT x+1 FROM i LIMIT 5)
@@ -254,13 +254,13 @@ stmt 0 ok
   WITH i(x, y) AS ( VALUES(1) )
   SELECT * FROM i;
 ----
-stmt 0 err 1 -1 table i has 1 values for 2 columns
+stmt 0 err 1 -1 51 table i has 1 values for 2 columns
 ==== 5.6.2
 
   WITH i(x) AS ( VALUES(1,2) )
   SELECT * FROM i;
 ----
-stmt 0 err 1 -1 table i has 2 values for 1 columns
+stmt 0 err 1 -1 50 table i has 2 values for 1 columns
 ==== 5.6.3
 
   CREATE TABLE t5(a, b);
@@ -268,31 +268,31 @@ stmt 0 err 1 -1 table i has 2 values for 1 columns
   SELECT * FROM i;
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: t5
+stmt 25 err 1 -1 80 no such table: t5
 ==== 5.6.4
 
   WITH i(x) AS ( SELECT 1, 2 UNION ALL SELECT 1 )
   SELECT * FROM i;
 ----
-stmt 0 err 1 -1 table i has 2 values for 1 columns
+stmt 0 err 1 -1 69 table i has 2 values for 1 columns
 ==== 5.6.5
 
   WITH i(x) AS ( SELECT 1 UNION ALL SELECT 1, 2 )
   SELECT * FROM i;
 ----
-stmt 0 err 1 -1 SELECTs to the left and right of UNION ALL do not have the same number of result columns
+stmt 0 err 1 -1 69 SELECTs to the left and right of UNION ALL do not have the same number of result columns
 ==== 5.6.6
 
   WITH i(x) AS ( SELECT 1 UNION ALL SELECT x+1, x*2 FROM i )
   SELECT * FROM i;
 ----
-stmt 0 err 1 -1 SELECTs to the left and right of UNION ALL do not have the same number of result columns
+stmt 0 err 1 -1 80 SELECTs to the left and right of UNION ALL do not have the same number of result columns
 ==== 5.6.7
 
   WITH i(x) AS ( SELECT 1, 2 UNION SELECT x+1 FROM i )
   SELECT * FROM i;
 ----
-stmt 0 err 1 -1 table i has 2 values for 1 columns
+stmt 0 err 1 -1 74 table i has 2 values for 1 columns
 ==== 6.1
 
   CREATE TABLE f(
@@ -316,21 +316,21 @@ stmt 0 err 1 -1 table i has 2 values for 1 columns
           INSERT INTO f VALUES(14, 13, 'logo.gif');
 ----
 stmt 0 ok
-stmt 86 err 1 -1 no such table: f
-stmt 124 err 1 -1 no such table: f
-stmt 161 err 1 -1 no such table: f
-stmt 201 err 1 -1 no such table: f
-stmt 242 err 1 -1 no such table: f
-stmt 280 err 1 -1 no such table: f
-stmt 320 err 1 -1 no such table: f
-stmt 357 err 1 -1 no such table: f
-stmt 397 err 1 -1 no such table: f
-stmt 444 err 1 -1 no such table: f
-stmt 490 err 1 -1 no such table: f
-stmt 529 err 1 -1 no such table: f
-stmt 570 err 1 -1 no such table: f
-stmt 621 err 1 -1 no such table: f
-stmt 673 err 1 -1 no such table: f
+stmt 86 err 1 -1 124 no such table: f
+stmt 124 err 1 -1 161 no such table: f
+stmt 161 err 1 -1 201 no such table: f
+stmt 201 err 1 -1 242 no such table: f
+stmt 242 err 1 -1 280 no such table: f
+stmt 280 err 1 -1 320 no such table: f
+stmt 320 err 1 -1 357 no such table: f
+stmt 357 err 1 -1 397 no such table: f
+stmt 397 err 1 -1 444 no such table: f
+stmt 444 err 1 -1 490 no such table: f
+stmt 490 err 1 -1 529 no such table: f
+stmt 529 err 1 -1 570 no such table: f
+stmt 570 err 1 -1 621 no such table: f
+stmt 621 err 1 -1 673 no such table: f
+stmt 673 err 1 -1 725 no such table: f
 ==== 6.2
 
   WITH flat(fid, fpath) AS (
@@ -340,7 +340,7 @@ stmt 673 err 1 -1 no such table: f
   )
   SELECT fpath FROM flat WHERE fpath!='' ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: f
+stmt 0 err 1 -1 216 no such table: f
 ==== 6.3
 
   WITH flat(fid, fpath) AS (
@@ -350,7 +350,7 @@ stmt 0 err 1 -1 no such table: f
   )
   SELECT count(*) FROM flat;
 ----
-stmt 0 err 1 -1 no such table: f
+stmt 0 err 1 -1 192 no such table: f
 ==== 6.4
 
   WITH x(i) AS (
@@ -371,11 +371,11 @@ stmt 0 ok
   INSERT INTO tree VALUES(5, 4);
 ----
 stmt 0 ok
-stmt 27 err 1 -1 no such table: tree
-stmt 63 err 1 -1 no such table: tree
-stmt 96 err 1 -1 no such table: tree
-stmt 129 err 1 -1 no such table: tree
-stmt 162 err 1 -1 no such table: tree
+stmt 27 err 1 -1 63 no such table: tree
+stmt 63 err 1 -1 96 no such table: tree
+stmt 96 err 1 -1 129 no such table: tree
+stmt 129 err 1 -1 162 no such table: tree
+stmt 162 err 1 -1 195 no such table: tree
 ==== 7.2
 
   WITH t(id, path) AS (
@@ -385,7 +385,7 @@ stmt 162 err 1 -1 no such table: tree
   ) 
   SELECT path FROM t;
 ----
-stmt 0 err 1 -1 no such table: tree
+stmt 0 err 1 -1 165 no such table: tree
 ==== 7.3
 
   WITH t(id) AS (
@@ -395,7 +395,7 @@ stmt 0 err 1 -1 no such table: tree
   ) 
   SELECT id FROM t;
 ----
-stmt 0 err 1 -1 no such table: tree
+stmt 0 err 1 -1 110 no such table: tree
 ==== 7.4
 
   WITH t(id) AS (
@@ -405,7 +405,7 @@ stmt 0 err 1 -1 no such table: tree
   ) 
   SELECT id FROM t;
 ----
-stmt 0 err 1 -1 no such table: tree
+stmt 0 err 1 -1 124 no such table: tree
 ==== 7.5
 
   WITH t(id) AS (
@@ -415,7 +415,7 @@ stmt 0 err 1 -1 no such table: tree
   ) 
   SELECT id FROM t;
 ----
-stmt 0 err 1 -1 no such table: tree
+stmt 0 err 1 -1 138 no such table: tree
 ==== 7.6
 
   WITH t(id) AS (
@@ -425,7 +425,7 @@ stmt 0 err 1 -1 no such table: tree
   ) 
   SELECT id FROM t;
 ----
-stmt 0 err 1 -1 no such table: tree
+stmt 0 err 1 -1 149 no such table: tree
 ==== 8.1-mandelbrot
 
   WITH RECURSIVE
@@ -499,7 +499,7 @@ stmt 29 ok
   )
   SELECT p FROM flat ORDER BY p;
 ----
-stmt 0 err 1 -1 no such table: tree
+stmt 0 err 1 -1 209 no such table: tree
 ==== 10.7.1
 
   WITH t(a) AS (
@@ -507,7 +507,7 @@ stmt 0 err 1 -1 no such table: tree
   ) 
   SELECT * FROM t
 ----
-stmt 0 err 1 -1 1st ORDER BY term does not match any column in the result set
+stmt 0 err 1 -1 113 1st ORDER BY term does not match any column in the result set
 ==== 10.7.2
 
   WITH t(a) AS (
@@ -534,7 +534,7 @@ stmt 0 ok
   )
   SELECT p FROM flat;
 ----
-stmt 0 err 1 -1 no such table: tree
+stmt 0 err 1 -1 246 no such table: tree
 ==== 10.8.2
 
   WITH flat(fid, depth, p) AS (
@@ -547,7 +547,7 @@ stmt 0 err 1 -1 no such table: tree
   )
   SELECT p FROM flat;
 ----
-stmt 0 err 1 -1 no such table: tree
+stmt 0 err 1 -1 267 no such table: tree
 ==== 10.8.3
 
   WITH flat(fid, depth, p) AS (
@@ -560,7 +560,7 @@ stmt 0 err 1 -1 no such table: tree
   )
   SELECT p FROM flat;
 ----
-stmt 0 err 1 -1 no such table: tree
+stmt 0 err 1 -1 267 no such table: tree
 ==== 10.8.4.1
 
   CREATE TABLE tst(a,b);
@@ -570,20 +570,20 @@ stmt 0 err 1 -1 no such table: tree
   SELECT a COLLATE nocase FROM tst UNION ALL SELECT b FROM tst ORDER BY 1;
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: tst
-stmt 61 err 1 -1 no such table: tst
-stmt 97 err 1 -1 no such table: tst
-stmt 133 err 1 -1 no such table: tst
+stmt 25 err 1 -1 61 no such table: tst
+stmt 61 err 1 -1 97 no such table: tst
+stmt 97 err 1 -1 133 no such table: tst
+stmt 133 err 1 -1 208 no such table: tst
 ==== 10.8.4.2
 
   SELECT a FROM tst UNION ALL SELECT b COLLATE nocase FROM tst ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: tst
+stmt 0 err 1 -1 75 no such table: tst
 ==== 10.8.4.3
 
   SELECT a||'' FROM tst UNION ALL SELECT b COLLATE nocase FROM tst ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: tst
+stmt 0 err 1 -1 79 no such table: tst
 ==== 11.1
 
   CREATE TABLE org(
@@ -625,26 +625,26 @@ stmt 0 err 1 -1 no such table: tst
     FROM under_alice;
 ----
 stmt 0 ok
-stmt 95 err 1 -1 no such table: org
-stmt 135 err 1 -1 no such table: org
-stmt 176 err 1 -1 no such table: org
-stmt 219 err 1 -1 no such table: org
-stmt 259 err 1 -1 no such table: org
-stmt 299 err 1 -1 no such table: org
-stmt 341 err 1 -1 no such table: org
-stmt 383 err 1 -1 no such table: org
-stmt 425 err 1 -1 no such table: org
-stmt 468 err 1 -1 no such table: org
-stmt 508 err 1 -1 no such table: org
-stmt 549 err 1 -1 no such table: org
-stmt 591 err 1 -1 no such table: org
-stmt 632 err 1 -1 no such table: org
-stmt 675 err 1 -1 no such table: org
-stmt 718 err 1 -1 no such table: org
-stmt 900 err 1 -1 no such table: org
-stmt 942 err 1 -1 no such table: org
-stmt 987 err 1 -1 no such table: org
-stmt 1027 err 1 -1 no such table: org
+stmt 95 err 1 -1 135 no such table: org
+stmt 135 err 1 -1 176 no such table: org
+stmt 176 err 1 -1 219 no such table: org
+stmt 219 err 1 -1 259 no such table: org
+stmt 259 err 1 -1 299 no such table: org
+stmt 299 err 1 -1 341 no such table: org
+stmt 341 err 1 -1 383 no such table: org
+stmt 383 err 1 -1 425 no such table: org
+stmt 425 err 1 -1 468 no such table: org
+stmt 468 err 1 -1 508 no such table: org
+stmt 508 err 1 -1 549 no such table: org
+stmt 549 err 1 -1 591 no such table: org
+stmt 591 err 1 -1 632 no such table: org
+stmt 632 err 1 -1 675 no such table: org
+stmt 675 err 1 -1 718 no such table: org
+stmt 718 err 1 -1 900 no such table: org
+stmt 900 err 1 -1 942 no such table: org
+stmt 942 err 1 -1 987 no such table: org
+stmt 987 err 1 -1 1027 no such table: org
+stmt 1027 err 1 -1 1417 no such table: org
 ==== 11.2
 
   WITH RECURSIVE
@@ -659,7 +659,7 @@ stmt 1027 err 1 -1 no such table: org
   SELECT group_concat(substr('...............',1,level*3) || name,x'0a')
     FROM under_alice;
 ----
-stmt 0 err 1 -1 no such table: org
+stmt 0 err 1 -1 334 no such table: org
 ==== 11.3
 
   WITH RECURSIVE
@@ -673,7 +673,7 @@ stmt 0 err 1 -1 no such table: org
   SELECT group_concat(substr('...............',1,level*3) || name,x'0a')
     FROM under_alice;
 ----
-stmt 0 err 1 -1 no such table: org
+stmt 0 err 1 -1 310 no such table: org
 ==== 12.1
 
 WITH RECURSIVE
@@ -687,19 +687,19 @@ stmt 0 ok
   WITH RECURSIVE c(i) AS (SELECT * UNION ALL SELECT i+1 FROM c WHERE i<10)
   SELECT i FROM c;
 ----
-stmt 0 err 1 -1 no tables specified
+stmt 0 err 1 -1 94 no tables specified
 ==== 13.2
 
   WITH RECURSIVE c(i) AS (SELECT 5,* UNION ALL SELECT i+1 FROM c WHERE i<10)
   SELECT i FROM c;
 ----
-stmt 0 err 1 -1 no tables specified
+stmt 0 err 1 -1 96 no tables specified
 ==== 13.3
 
   WITH RECURSIVE c(i,j) AS (SELECT 5,* UNION ALL SELECT i+1,11 FROM c WHERE i<10)
   SELECT i FROM c;
 ----
-stmt 0 err 1 -1 table c has 1 values for 2 columns
+stmt 0 err 1 -1 101 table c has 1 values for 2 columns
 ==== 14.1
 
   WITH x AS (SELECT * FROM t) SELECT 0 EXCEPT SELECT 0 ORDER BY 1 COLLATE binary;
@@ -711,21 +711,21 @@ stmt 0 ok
     d(x) AS (VALUES(1) UNION ALL SELECT rowid+1 FROM d WHERE rowid<10)
   SELECT x FROM d;
 ----
-stmt 0 err 1 58 no such column: rowid
+stmt 0 err 1 58 107 no such column: rowid
 ==== 16.1
 
   WITH RECURSIVE
     i(x) AS (VALUES(1) UNION SELECT count(*) FROM i)
   SELECT * FROM i;
 ----
-stmt 0 err 1 -1 recursive aggregate queries not supported
+stmt 0 err 1 -1 89 recursive aggregate queries not supported
 ==== 16.2
 
     WITH RECURSIVE
       i(x) AS (VALUES(1) UNION SELECT count(*) OVER () FROM i)
       SELECT * FROM i;
 ----
-stmt 0 err 1 -1 cannot use window functions in recursive queries
+stmt 0 err 1 -1 105 cannot use window functions in recursive queries
 ==== 16.3
 
     WITH RECURSIVE
@@ -738,7 +738,7 @@ stmt 0 err 1 -1 cannot use window functions in recursive queries
           )
         SELECT * FROM q;
 ----
-stmt 0 err 1 -1 cannot use window functions in recursive queries
+stmt 0 err 1 -1 272 cannot use window functions in recursive queries
 ==== 17.1
 
   WITH x(a) AS (
@@ -765,7 +765,7 @@ stmt 0 ok
   )
   SELECT * FROM i;
 ----
-stmt 0 err 1 -1 circular reference: i
+stmt 0 err 1 -1 104 circular reference: i
 ==== 17.4
 
   WITH i AS (
@@ -774,7 +774,7 @@ stmt 0 err 1 -1 circular reference: i
   )
   SELECT * FROM i;
 ----
-stmt 0 err 1 -1 no such table: t11
+stmt 0 err 1 -1 107 no such table: t11
 ==== 17.5
 
   WITH 
@@ -921,7 +921,7 @@ stmt 0 ok
   )
   SELECT 4 FROM c,c,c,c,c,c,c,c,c;
 ----
-stmt 0 err 1 -1 too many FROM clause terms, max: 200
+stmt 0 err 1 -1 465 too many FROM clause terms, max: 200
 ==== 23.1
 
   CREATE TABLE t1(id INTEGER NULL PRIMARY KEY, name Text);
@@ -945,14 +945,14 @@ stmt 0 err 1 -1 too many FROM clause terms, max: 200
   SELECT * FROM v3;
 ----
 stmt 0 ok
-stmt 59 err 1 -1 no such table: t1
-stmt 96 err 1 -1 no such table: t1
-stmt 134 err 1 -1 no such table: t1
-stmt 173 err 1 -1 no such table: t1
-stmt 211 err 1 -1 no such table: t1
+stmt 59 err 1 -1 96 no such table: t1
+stmt 96 err 1 -1 134 no such table: t1
+stmt 134 err 1 -1 173 no such table: t1
+stmt 173 err 1 -1 211 no such table: t1
+stmt 211 err 1 -1 249 no such table: t1
 stmt 249 ok
 stmt 342 ok
-stmt 575 err 1 -1 no such table: v3
+stmt 575 err 1 -1 595 no such table: v3
 ==== 24.1
 
   CREATE TABLE t1(a, b, c);
@@ -972,11 +972,11 @@ stmt 28 ok
   SELECT * FROM main.v2 AS a, aux.v2 AS b, aux.v2 AS c, main.v2 AS d;
 ----
 stmt 0 ok
-stmt 20 err 1 35 unknown database aux
+stmt 20 err 1 35 55 unknown database aux
 stmt 55 ok
-stmt 91 err 1 107 unknown database aux
+stmt 91 err 1 107 134 unknown database aux
 stmt 134 ok
-stmt 177 err 1 -1 no such table: main.v2
+stmt 177 err 1 -1 248 no such table: main.v2
 ==== with1-generated
 
     WITH cte1 AS (
@@ -989,7 +989,7 @@ stmt 177 err 1 -1 no such table: main.v2
     )
     SELECT (SELECT 1324 FROM cte1) FROM cte1;
 ----
-stmt 0 err 1 -1 no such table: dual
+stmt 0 err 1 -1 235 no such table: dual
 ==== 26.0
 
   WITH i(x) AS ( 
@@ -997,7 +997,7 @@ stmt 0 err 1 -1 no such table: dual
   )
   SELECT x,O. * O FROM i ¬I,I? 10;
 ----
-stmt 0 err 1 117 near "O": syntax error
+stmt 0 err 1 117 118 near "O": syntax error
 ==== 26.1
 
   CREATE TABLE t (label VARCHAR(10), step INTEGER);
@@ -1012,10 +1012,10 @@ stmt 0 err 1 117 near "O": syntax error
   SELECT * FROM cte ORDER BY +label, +step;
 ----
 stmt 0 ok
-stmt 52 err 1 -1 no such table: T
-stmt 84 err 1 -1 no such table: T
-stmt 116 err 1 -1 no such table: T
-stmt 148 err 1 -1 no such table: t
+stmt 52 err 1 -1 84 no such table: T
+stmt 84 err 1 -1 116 no such table: T
+stmt 116 err 1 -1 148 no such table: T
+stmt 148 err 1 -1 335 no such table: t
 ==== 26.2
 
   WITH RECURSIVE cte(label, step) AS (
@@ -1025,7 +1025,7 @@ stmt 148 err 1 -1 no such table: t
   )
   SELECT * FROM cte ORDER BY +label, +step;
 ----
-stmt 0 err 1 -1 no such table: t
+stmt 0 err 1 -1 173 no such table: t
 ==== 26.3
 
   CREATE TABLE tworow(x);
@@ -1039,9 +1039,9 @@ stmt 0 err 1 -1 no such table: t
   SELECT * FROM cte ORDER BY +label, +step;
 ----
 stmt 0 ok
-stmt 26 err 1 -1 no such table: tworow
-stmt 65 err 1 -1 no such table: t
-stmt 96 err 1 -1 no such table: t
+stmt 26 err 1 -1 65 no such table: tworow
+stmt 65 err 1 -1 96 no such table: t
+stmt 96 err 1 -1 289 no such table: t
 ==== 27.1
 
   CREATE TABLE t1(k);
@@ -1065,11 +1065,11 @@ stmt 96 err 1 -1 no such table: t
 stmt 0 ok
 stmt 22 ok
 stmt 64 ok
-stmt 90 err 1 -1 no such table: map
-stmt 142 err 1 -1 no such table: main.t1
-stmt 400 err 1 -1 no such table: t1
-stmt 431 err 1 -1 no such table: t1
-stmt 459 err 1 -1 no such table: log
+stmt 90 err 1 -1 142 no such table: map
+stmt 142 err 1 -1 191 no such table: main.t1
+stmt 400 err 1 -1 431 no such table: t1
+stmt 431 err 1 -1 459 no such table: t1
+stmt 459 err 1 -1 515 no such table: log
 ==== 28.1
 
   DROP TABLE t1;
@@ -1086,7 +1086,7 @@ stmt 459 err 1 -1 no such table: log
     SELECT 1 FROM t2 WHERE y=x
   ) FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 17 no such table: t1
 stmt 17 ok
-stmt 59 err 1 -1 no such table: t1
-stmt 97 err 1 -1 no such table: t1
+stmt 59 err 1 -1 97 no such table: t1
+stmt 97 err 1 -1 291 no such table: t1

@@ -10,8 +10,8 @@
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 68 err 1 -1 no such table: t1
-stmt 99 err 1 -1 no such table: t1
-stmt 130 err 1 -1 no such table: t1
-stmt 161 err 1 -1 no such table: t1
-stmt 192 err 1 -1 no such table: t1
+stmt 68 err 1 -1 99 no such table: t1
+stmt 99 err 1 -1 130 no such table: t1
+stmt 130 err 1 -1 161 no such table: t1
+stmt 161 err 1 -1 192 no such table: t1
+stmt 192 err 1 -1 223 no such table: t1

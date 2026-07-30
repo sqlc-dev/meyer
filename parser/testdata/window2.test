@@ -11,27 +11,27 @@
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 96 err 1 -1 no such table: t1
-stmt 144 err 1 -1 no such table: t1
-stmt 192 err 1 -1 no such table: t1
-stmt 240 err 1 -1 no such table: t1
-stmt 288 err 1 -1 no such table: t1
-stmt 336 err 1 -1 no such table: t1
+stmt 96 err 1 -1 144 no such table: t1
+stmt 144 err 1 -1 192 no such table: t1
+stmt 192 err 1 -1 240 no such table: t1
+stmt 240 err 1 -1 288 no such table: t1
+stmt 288 err 1 -1 336 no such table: t1
+stmt 336 err 1 -1 384 no such table: t1
 ==== 1.1
 
   SELECT c, sum(d) OVER (PARTITION BY b ORDER BY c) FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 61 no such table: t1
 ==== 1.2
 
   SELECT sum(d) OVER () FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 33 no such table: t1
 ==== 1.3
 
   SELECT sum(d) OVER (PARTITION BY b) FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 47 no such table: t1
 ==== 2.1
 
   SELECT a, sum(d) OVER (
@@ -39,7 +39,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1000 PRECEDING AND 1 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 102 no such table: t1
 ==== 2.2
 
   SELECT a, sum(d) OVER (
@@ -47,7 +47,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1000 PRECEDING AND 1000 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 105 no such table: t1
 ==== 2.3
 
   SELECT a, sum(d) OVER (
@@ -55,7 +55,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 PRECEDING AND 1000 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 102 no such table: t1
 ==== 2.4
 
   SELECT a, sum(d) OVER (
@@ -63,7 +63,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 99 no such table: t1
 ==== 2.5
 
   SELECT a, sum(d) OVER (
@@ -71,7 +71,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 PRECEDING AND 0 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 99 no such table: t1
 ==== 2.6
 
   SELECT a, sum(d) OVER (
@@ -80,7 +80,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 119 no such table: t1
 ==== 2.7
 
   SELECT a, sum(d) OVER (
@@ -89,7 +89,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 0 PRECEDING AND 0 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 119 no such table: t1
 ==== 2.8
 
   SELECT a, sum(d) OVER (
@@ -97,7 +97,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 100 no such table: t1
 ==== 2.9
 
   SELECT a, sum(d) OVER (
@@ -105,7 +105,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN UNBOUNDED PRECEDING AND 2 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 108 no such table: t1
 ==== 2.10
 
   SELECT a, sum(d) OVER (
@@ -113,7 +113,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 100 no such table: t1
 ==== 2.11
 
   SELECT a, sum(d) OVER (
@@ -121,7 +121,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 100 no such table: t1
 ==== 2.13
 
   SELECT a, sum(d) OVER (
@@ -129,7 +129,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 2 PRECEDING AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 108 no such table: t1
 ==== 2.14
 
   SELECT a, sum(d) OVER (
@@ -137,7 +137,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 3 PRECEDING AND 1 PRECEDING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 100 no such table: t1
 ==== 2.15
 
   SELECT a, sum(d) OVER (
@@ -146,7 +146,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 PRECEDING AND 0 PRECEDING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 119 no such table: t1
 ==== 2.16
 
   SELECT a, sum(d) OVER (
@@ -155,7 +155,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 119 no such table: t1
 ==== 2.17
 
   SELECT a, sum(d) OVER (
@@ -164,7 +164,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 PRECEDING AND 2 PRECEDING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 119 no such table: t1
 ==== 2.18
 
   SELECT a, sum(d) OVER (
@@ -173,7 +173,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN UNBOUNDED PRECEDING AND 2 PRECEDING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 127 no such table: t1
 ==== 2.19
 
   SELECT a, sum(d) OVER (
@@ -182,7 +182,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 FOLLOWING AND 3 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 119 no such table: t1
 ==== 2.20
 
   SELECT a, sum(d) OVER (
@@ -190,7 +190,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 FOLLOWING AND 2 FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 100 no such table: t1
 ==== 2.21
 
   SELECT a, sum(d) OVER (
@@ -198,7 +198,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 108 no such table: t1
 ==== 2.22
 
   SELECT a, sum(d) OVER (
@@ -207,7 +207,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN 1 FOLLOWING AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 127 no such table: t1
 ==== 2.23
 
   SELECT a, sum(d) OVER (
@@ -215,7 +215,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 108 no such table: t1
 ==== 2.24
 
   SELECT a, sum(d) OVER (
@@ -224,7 +224,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 129 no such table: t1
 ==== 2.25
 
   SELECT a, sum(d) OVER (
@@ -232,7 +232,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 116 no such table: t1
 ==== 2.26
 
   SELECT a, sum(d) OVER (
@@ -241,7 +241,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 135 no such table: t1
 ==== 2.27
 
   SELECT a, sum(d) OVER (
@@ -249,7 +249,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN CURRENT ROW AND CURRENT ROW
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 100 no such table: t1
 ==== 2.28
 
   SELECT a, sum(d) OVER (
@@ -258,7 +258,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN CURRENT ROW AND CURRENT ROW
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 119 no such table: t1
 ==== 2.29
 
   SELECT a, sum(d) OVER (
@@ -266,7 +266,7 @@ stmt 0 err 1 -1 no such table: t1
     RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 109 no such table: t1
 ==== 2.30
 
   SELECT a, sum(d) OVER (
@@ -274,7 +274,7 @@ stmt 0 err 1 -1 no such table: t1
     RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 109 no such table: t1
 ==== 3.1
 
   SELECT a, sum(d) OVER (
@@ -282,7 +282,7 @@ stmt 0 err 1 -1 no such table: t1
     RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 123 no such table: t1
 ==== 3.2
 
   SELECT a, sum(d) OVER (
@@ -290,7 +290,7 @@ stmt 0 err 1 -1 no such table: t1
     RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 108 no such table: t1
 ==== 3.3
 
   SELECT a, sum(d) OVER (
@@ -298,7 +298,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 115 no such table: t1
 ==== 3.4
 
   SELECT a, sum(d) OVER (
@@ -306,7 +306,7 @@ stmt 0 err 1 -1 no such table: t1
     ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   ) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 109 no such table: t1
 ==== 4.0
 
   DROP TABLE IF EXISTS t2;
@@ -341,7 +341,7 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 80 err 1 -1 no such table: t2
+stmt 80 err 1 -1 2036 no such table: t2
 ==== 4.1
 
   SELECT a, sum(b) OVER (
@@ -349,7 +349,7 @@ stmt 80 err 1 -1 no such table: t2
     ORDER BY b
   ) FROM t2 ORDER BY a;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 89 no such table: t2
 ==== 4.2
 
   SELECT a, sum(b) OVER (
@@ -358,7 +358,7 @@ stmt 0 err 1 -1 no such table: t2
     RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   ) FROM t2 ORDER BY a;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 143 no such table: t2
 ==== 4.3
 
   SELECT b, sum(b) OVER (
@@ -366,7 +366,7 @@ stmt 0 err 1 -1 no such table: t2
     ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   ) FROM t2 ORDER BY b;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 118 no such table: t2
 ==== 4.4
 
   SELECT b, sum(b) OVER (
@@ -374,7 +374,7 @@ stmt 0 err 1 -1 no such table: t2
     RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
   ) FROM t2 ORDER BY b;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 127 no such table: t2
 ==== 4.5
 
   SELECT b, sum(b) OVER (
@@ -382,61 +382,61 @@ stmt 0 err 1 -1 no such table: t2
     RANGE BETWEEN CURRENT ROW AND CURRENT ROW
   ) FROM t2 ORDER BY b;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 111 no such table: t2
 ==== 4.6.1
 
   SELECT b, sum(b) OVER (
     RANGE BETWEEN CURRENT ROW AND CURRENT ROW
   ) FROM t2 ORDER BY b;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 96 no such table: t2
 ==== 4.6.2
 
   SELECT b, sum(b) OVER () FROM t2 ORDER BY b;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 47 no such table: t2
 ==== 4.6.3
 
   SELECT b, sum(b) OVER (
     RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
   ) FROM t2 ORDER BY b;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 112 no such table: t2
 ==== 4.6.4
 
   SELECT b, sum(b) OVER (
     RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM t2 ORDER BY b;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 104 no such table: t2
 ==== 4.7.1
 
   SELECT b, sum(b) OVER (
     ROWS BETWEEN CURRENT ROW AND CURRENT ROW
   ) FROM t2 ORDER BY 1, 2;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 98 no such table: t2
 ==== 4.7.2
 
   SELECT b, sum(b) OVER (
     ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   ) FROM t2 ORDER BY 1, 2;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 106 no such table: t2
 ==== 4.7.3
 
   SELECT b, sum(b) OVER (
     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
   ) FROM t2 ORDER BY 1, 2;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 114 no such table: t2
 ==== 4.7.4
 
   SELECT b, sum(b) OVER (
     ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM t2 ORDER BY 1, 2;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 106 no such table: t2
 ==== 4.8.1
 
   SELECT b, sum(b) OVER (
@@ -444,7 +444,7 @@ stmt 0 err 1 -1 no such table: t2
     ROWS BETWEEN CURRENT ROW AND CURRENT ROW
   ) FROM t2 ORDER BY 1, 2;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 113 no such table: t2
 ==== 4.8.2
 
   SELECT b, sum(b) OVER (
@@ -452,7 +452,7 @@ stmt 0 err 1 -1 no such table: t2
     ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   ) FROM t2 ORDER BY 1, 2;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 121 no such table: t2
 ==== 4.8.3
 
   SELECT b, sum(b) OVER (
@@ -460,7 +460,7 @@ stmt 0 err 1 -1 no such table: t2
     ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
   ) FROM t2 ORDER BY 1, 2;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 129 no such table: t2
 ==== 4.8.4
 
   SELECT b, sum(b) OVER (
@@ -468,17 +468,17 @@ stmt 0 err 1 -1 no such table: t2
     ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM t2 ORDER BY 1, 2;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 121 no such table: t2
 ==== 4.10
 
   SELECT count(*) OVER (ORDER BY b) FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 45 no such table: t1
 ==== 4.11
 
   SELECT count(distinct a) FILTER (WHERE b='odd') FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 59 no such table: t1
 ==== 5.0
 
   DROP TABLE IF EXISTS t1;
@@ -491,11 +491,11 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 68 err 1 -1 no such table: t1
-stmt 100 err 1 -1 no such table: t1
-stmt 132 err 1 -1 no such table: t1
-stmt 163 err 1 -1 no such table: t1
-stmt 194 err 1 -1 no such table: t1
+stmt 68 err 1 -1 100 no such table: t1
+stmt 100 err 1 -1 132 no such table: t1
+stmt 132 err 1 -1 163 no such table: t1
+stmt 163 err 1 -1 194 no such table: t1
+stmt 194 err 1 -1 225 no such table: t1
 ==== 6.0
 
   DROP TABLE IF EXISTS t0;
@@ -504,18 +504,18 @@ stmt 194 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 65 err 1 -1 no such table: t0
+stmt 65 err 1 -1 93 no such table: t0
 ==== 6.1
 
   SELECT DENSE_RANK() OVER(), LAG(0) OVER() FROM t0;
 ----
-stmt 0 err 1 -1 no such table: t0
+stmt 0 err 1 -1 53 no such table: t0
 ==== 6.2
 
   SELECT * FROM t0 WHERE 
       (0, t0.c0) IN (SELECT DENSE_RANK() OVER(), LAG(0) OVER() FROM t0);
 ----
-stmt 0 err 1 -1 no such table: t0
+stmt 0 err 1 -1 99 no such table: t0
 ==== 7.0
 
   DROP TABLE IF EXISTS t1;
@@ -527,25 +527,25 @@ stmt 0 err 1 -1 no such table: t0
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 79 err 1 -1 no such table: t1
-stmt 113 err 1 -1 no such table: t1
-stmt 147 err 1 -1 no such table: t1
-stmt 181 err 1 -1 no such table: t1
+stmt 79 err 1 -1 113 no such table: t1
+stmt 113 err 1 -1 147 no such table: t1
+stmt 147 err 1 -1 181 no such table: t1
+stmt 181 err 1 -1 215 no such table: t1
 ==== 7.1
 
   SELECT c, sum(c) OVER win1 FROM t1 
   WINDOW win1 AS (ORDER BY b)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 69 no such table: t1
 ==== 7.2
 
   SELECT c, sum(c) OVER win1 FROM t1 
   WINDOW win1 AS (PARTITION BY 1 ORDER BY b)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 84 no such table: t1
 ==== 7.3
 
   SELECT c, sum(c) OVER win1 FROM t1 
   WINDOW win1 AS (ORDER BY 1)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 69 no such table: t1

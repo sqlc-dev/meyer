@@ -2,11 +2,11 @@
 
   SELECT 1 IS #1;
 ----
-stmt 0 err 1 -1 near "#1": syntax error
+stmt 0 err 1 -1 18 near "#1": syntax error
 ==== expr-7.1
 SELECT * FROM test1 ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: test1
+stmt 0 err 1 -1 31 no such table: test1
 ==== expr-8.1
 SELECT CURRENT_TIME
 ----
@@ -95,12 +95,12 @@ stmt 0 ok
 
     SELECT (CASE a>4 THEN 1 ELSE 0 END) FROM test1;
 ----
-stmt 0 err 1 22 near "THEN": syntax error
+stmt 0 err 1 22 26 near "THEN": syntax error
 ==== expr-12.2
 
     SELECT (CASE WHEN a>4 THEN 1 ELSE 0) FROM test1;
 ----
-stmt 0 err 1 40 near ")": syntax error
+stmt 0 err 1 40 41 near ")": syntax error
 ==== expr-13.2
 
       SELECT 0+'9223372036854775807'
@@ -131,26 +131,26 @@ stmt 0 ok
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 49 err 1 -1 no such table: t1
-stmt 108 err 1 -1 no such table: t1
+stmt 49 err 1 -1 108 no such table: t1
+stmt 108 err 1 -1 193 no such table: t1
 ==== expr-14.2
 
   SELECT count(*) FROM t1
    WHERE (x OR (8==9)) != (NOT NOT x);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 65 no such table: t1
 ==== expr-14.3
 
   SELECT sum(NOT x) FROM t1
    WHERE x
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 40 no such table: t1
 ==== expr-14.4
 
   SELECT sum(CASE WHEN x THEN 0 ELSE 1 END) FROM t1
    WHERE x
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 64 no such table: t1
 ==== expr-generated
 
     DROP TABLE IF EXISTS t1;
@@ -159,31 +159,31 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 29 ok
-stmt 53 err 1 -1 no such table: t1
+stmt 53 err 1 -1 114 no such table: t1
 ==== expr-generated.dup1
 
     SELECT count(*) FROM t1
      WHERE (x OR (8==9)) != (CASE WHEN x THEN 1 ELSE 0 END);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 89 no such table: t1
 ==== expr-generated.dup2
 
     SELECT count(*) FROM t1
      WHERE (x OR (8==9)) != (NOT NOT x);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 69 no such table: t1
 ==== expr-generated.dup3
 
     SELECT sum(NOT x) FROM t1
      WHERE x
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 44 no such table: t1
 ==== expr-generated.dup4
 
     SELECT sum(CASE WHEN x THEN 0 ELSE 1 END) FROM t1
      WHERE x
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 68 no such table: t1
 ==== expr-16.1
 
   CREATE TABLE t1(a,b,c);
@@ -192,22 +192,22 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 26 ok
-stmt 54 err 1 -1 no such table: dual
+stmt 54 err 1 -1 86 no such table: dual
 ==== expr-16.100
 
   SELECT implies_nonnull_row( (b=1 AND 0)>(b=3 AND 0),a)
   FROM dual LEFT JOIN t1;
 ----
-stmt 0 err 1 -1 no such table: dual
+stmt 0 err 1 -1 83 no such table: dual
 ==== expr-16.101
 
   SELECT implies_nonnull_row( (b=1 AND 0)>(b=3 AND a=4),a)
   FROM dual LEFT JOIN t1;
 ----
-stmt 0 err 1 -1 no such table: dual
+stmt 0 err 1 -1 85 no such table: dual
 ==== expr-16.102
 
   SELECT implies_nonnull_row( (b=1 AND a=2)>(b=3 AND a=4),a)
   FROM dual LEFT JOIN t1;
 ----
-stmt 0 err 1 -1 no such table: dual
+stmt 0 err 1 -1 87 no such table: dual

@@ -11,11 +11,20 @@
 ** Output: one line per non-empty statement:
 **
 **   stmt <offset> ok
-**   stmt <offset> err <rc> <erroff> <message to end of line>
+**   stmt <offset> err <rc> <erroff> <tail> <message to end of line>
 **
 ** <offset>  byte offset of the statement within the input script
 ** <rc>      sqlite3_prepare_v2 result code
 ** <erroff>  sqlite3_error_offset relative to the whole script (-1 if unknown)
+** <tail>    pzTail relative to the whole script: how far the parser got
+**
+** <tail> matters because a grammar action can fail in the middle of a
+** statement -- sqlite3BeginTrigger raising "no such table" at the
+** trigger_decl reduce, say -- and sqlite3RunParser then abandons the rest
+** of the statement unparsed. When that happens <tail> stops short of the
+** end of the statement, marking the text SQLite never looked at. A
+** successful prepare always consumes the whole statement, so "ok" lines
+** carry no <tail>.
 **
 ** SQLite error messages never contain newlines, so the line format is safe.
 */
@@ -105,13 +114,17 @@ int main(int argc, char **argv){
     stmtText[len] = 0;
 
     sqlite3_stmt *pStmt = 0;
-    int rc = sqlite3_prepare_v2(db, stmtText, (int)len, &pStmt, 0);
+    const char *zTail = 0;
+    int rc = sqlite3_prepare_v2(db, stmtText, (int)len, &pStmt, &zTail);
     if( rc==SQLITE_OK ){
       printf("stmt %zu ok\n", pos);
     }else{
       int erroff = sqlite3_error_offset(db);
+      size_t tail = zTail ? (size_t)(zTail-stmtText) : len;
       if( erroff>=0 ) erroff += (int)pos;
-      printf("stmt %zu err %d %d %s\n", pos, rc, erroff, sqlite3_errmsg(db));
+      if( tail>len ) tail = len;
+      printf("stmt %zu err %d %d %zu %s\n", pos, rc, erroff, pos+tail,
+             sqlite3_errmsg(db));
     }
     sqlite3_finalize(pStmt);
     free(stmtText);
