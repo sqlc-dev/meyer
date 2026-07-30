@@ -1,0 +1,39 @@
+# Differential testing against a real SQLite build.
+#
+# This is separate from CI because it downloads the pinned SQLite release
+# and compiles it, which the ordinary test run must not depend on. It is the
+# only thing that exercises error fidelity at scale: the vendored corpus is
+# almost all valid SQL, so mutating it is how divergent messages and offsets
+# get found.
+name: difftest
+
+on:
+  schedule:
+    - cron: "17 4 * * 1" # Mondays, early
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: "PRNG seed"
+        default: "1"
+      per:
+        description: "mutations per corpus case"
+        default: "20"
+
+jobs:
+  difftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Cache the pinned SQLite artifacts
+        uses: actions/cache@v4
+        with:
+          path: .sqlite
+          key: sqlite-${{ hashFiles('internal/sqlitesrc/sqlitesrc.go', 'internal/sqlitesrc/oracle/oracle.c') }}
+      - run: >
+          go run ./cmd/difftest
+          -per ${{ github.event.inputs.per || '20' }}
+          -depth 2
+          -seed ${{ github.event.inputs.seed || '1' }}

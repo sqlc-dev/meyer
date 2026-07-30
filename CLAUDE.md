@@ -77,9 +77,10 @@ go run ./cmd/difftest -files select1,expr    # a few files
 go run ./cmd/difftest -per 60 -seed 7        # dig harder, reproducibly
 ```
 
-It needs the oracle, so it is a development tool rather than a CI test. What
-it finds belongs in `parser/errors_test.go`, whose expectations are taken
-from the oracle rather than written by hand.
+It needs the oracle, so it is not part of `go test ./...`; a separate
+workflow (`.github/workflows/difftest.yml`) runs it weekly and on demand.
+What it finds belongs in `parser/errors_test.go`, whose expectations are
+taken from the oracle rather than written by hand.
 
 Two situations it deliberately skips, because the harness cannot compare
 them rather than because meyer might be wrong: a `;` inside parentheses,
