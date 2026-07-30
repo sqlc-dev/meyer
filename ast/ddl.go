@@ -148,12 +148,12 @@ func (n *TableConstraint) Children() []Node {
 //	eidlist ::= eidlist COMMA nm collate sortorder.
 type IndexedColumn struct {
 	Span
-	Name    *Ident    `json:"name"`
-	Collate bool      `json:"collate,omitempty"`
-	Order   SortOrder `json:"order,omitempty"`
+	Name      *Ident    `json:"name"`
+	Collation *Ident    `json:"collation,omitempty"`
+	Order     SortOrder `json:"order,omitempty"`
 }
 
-func (n *IndexedColumn) Children() []Node { return nodes(n.Name) }
+func (n *IndexedColumn) Children() []Node { return nodes(n.Name, n.Collation) }
 
 // ForeignKeyAction is the action of an ON DELETE / ON UPDATE clause.
 type ForeignKeyAction int

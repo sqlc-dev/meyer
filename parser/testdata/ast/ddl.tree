@@ -1,0 +1,956 @@
+CreateTableStmt{
+  Span: 27:618
+  Temp: true
+  IfNotExists: true
+  Name: QualifiedName{
+    Span: 59:64
+    Schema: Ident{
+      Span: 59:62
+      Name: "sch"
+      Raw: "sch"
+    }
+    Name: Ident{
+      Span: 63:64
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Columns: [
+    ColumnDef{
+      Span: 69:126
+      Name: Ident{
+        Span: 69:70
+        Name: "a"
+        Raw: "a"
+      }
+      Type: TypeName{
+        Span: 71:78
+        Name: "INTEGER"
+        Raw: "INTEGER"
+      }
+      Constraints: [
+        ColumnConstraint{
+          Span: 79:126
+          Kind: ColumnConstraintKind(PRIMARY KEY)
+          OnConflict: ConflictAction(FAIL)
+          Order: SortOrder(DESC)
+          AutoIncrement: true
+        }
+      ]
+    }
+    ColumnDef{
+      Span: 130:191
+      Name: Ident{
+        Span: 130:131
+        Name: "b"
+        Raw: "b"
+      }
+      Type: TypeName{
+        Span: 132:136
+        Name: "TEXT"
+        Raw: "TEXT"
+      }
+      Constraints: [
+        ColumnConstraint{
+          Span: 137:164
+          Kind: ColumnConstraintKind(NOT NULL)
+          OnConflict: ConflictAction(IGNORE)
+        }
+        ColumnConstraint{
+          Span: 165:176
+          Kind: ColumnConstraintKind(DEFAULT)
+          Expr: Literal{
+            Span: 173:176
+            Kind: LiteralKind(STRING)
+            Value: "x"
+            Raw: "'x'"
+          }
+        }
+        ColumnConstraint{
+          Span: 177:191
+          Kind: ColumnConstraintKind(COLLATE)
+          Collation: Ident{
+            Span: 185:191
+            Name: "nocase"
+            Raw: "nocase"
+          }
+        }
+      ]
+    }
+    ColumnDef{
+      Span: 195:233
+      Name: Ident{
+        Span: 195:196
+        Name: "c"
+        Raw: "c"
+      }
+      Type: TypeName{
+        Span: 197:201
+        Name: "REAL"
+        Raw: "REAL"
+      }
+      Constraints: [
+        ColumnConstraint{
+          Span: 202:212
+          Kind: ColumnConstraintKind(DEFAULT)
+          Expr: UnaryExpr{
+            Span: 210:212
+            Op: Operator(-)
+            X: Literal{
+              Span: 211:212
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+          }
+        }
+        ColumnConstraint{
+          Span: 213:226
+          Kind: ColumnConstraintKind(CHECK)
+          Expr: BinaryExpr{
+            Span: 220:225
+            Op: Operator(>)
+            X: Ident{
+              Span: 220:221
+              Name: "c"
+              Raw: "c"
+            }
+            Y: Literal{
+              Span: 224:225
+              Kind: LiteralKind(INTEGER)
+              Value: "0"
+              Raw: "0"
+            }
+          }
+        }
+        ColumnConstraint{
+          Span: 227:233
+          Kind: ColumnConstraintKind(UNIQUE)
+        }
+      ]
+    }
+    ColumnDef{
+      Span: 237:352
+      Name: Ident{
+        Span: 237:238
+        Name: "d"
+        Raw: "d"
+      }
+      Constraints: [
+        ColumnConstraint{
+          Span: 239:254
+          Kind: ColumnConstraintKind(DEFAULT)
+          Expr: ParenExpr{
+            Span: 247:254
+            X: BinaryExpr{
+              Span: 248:253
+              Op: Operator(+)
+              X: Literal{
+                Span: 248:249
+                Kind: LiteralKind(INTEGER)
+                Value: "1"
+                Raw: "1"
+              }
+              Y: Literal{
+                Span: 252:253
+                Kind: LiteralKind(INTEGER)
+                Value: "2"
+                Raw: "2"
+              }
+            }
+          }
+        }
+        ColumnConstraint{
+          Span: 255:318
+          Kind: ColumnConstraintKind(REFERENCES)
+          References: ForeignKeyClause{
+            Span: 255:318
+            Table: Ident{
+              Span: 266:267
+              Name: "u"
+              Raw: "u"
+            }
+            Columns: [
+              IndexedColumn{
+                Span: 268:269
+                Name: Ident{
+                  Span: 268:269
+                  Name: "v"
+                  Raw: "v"
+                }
+              }
+            ]
+            Args: [
+              ForeignKeyArg{
+                Span: 271:288
+                Event: "DELETE"
+                Action: ForeignKeyAction(CASCADE)
+              }
+              ForeignKeyArg{
+                Span: 289:307
+                Event: "UPDATE"
+                Action: ForeignKeyAction(SET NULL)
+              }
+              ForeignKeyArg{
+                Span: 308:318
+                Match: Ident{
+                  Span: 314:318
+                  Name: "full"
+                  Raw: "full"
+                }
+              }
+            ]
+          }
+        }
+        ColumnConstraint{
+          Span: 323:352
+          Kind: ColumnConstraintKind(DEFERRABLE)
+          Deferrable: DeferClause{
+            Span: 323:352
+            InitiallyDeferred: true
+            HasInitially: true
+          }
+        }
+      ]
+    }
+    ColumnDef{
+      Span: 356:375
+      Name: Ident{
+        Span: 356:357
+        Name: "e"
+        Raw: "e"
+      }
+      Constraints: [
+        ColumnConstraint{
+          Span: 358:375
+          Kind: ColumnConstraintKind(GENERATED)
+          Expr: BinaryExpr{
+            Span: 362:367
+            Op: Operator(+)
+            X: Ident{
+              Span: 362:363
+              Name: "a"
+              Raw: "a"
+            }
+            Y: Literal{
+              Span: 366:367
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+          }
+          GeneratedKind: Ident{
+            Span: 369:375
+            Name: "STORED"
+            Raw: "STORED"
+          }
+        }
+      ]
+    }
+    ColumnDef{
+      Span: 379:416
+      Name: Ident{
+        Span: 379:380
+        Name: "f"
+        Raw: "f"
+      }
+      Type: TypeName{
+        Span: 381:397
+        Name: "GENERATED ALWAYS"
+        Raw: "GENERATED ALWAYS"
+      }
+      Constraints: [
+        ColumnConstraint{
+          Span: 398:416
+          Kind: ColumnConstraintKind(GENERATED)
+          Expr: BinaryExpr{
+            Span: 402:407
+            Op: Operator(+)
+            X: Ident{
+              Span: 402:403
+              Name: "a"
+              Raw: "a"
+            }
+            Y: Literal{
+              Span: 406:407
+              Kind: LiteralKind(INTEGER)
+              Value: "2"
+              Raw: "2"
+            }
+          }
+          GeneratedKind: Ident{
+            Span: 409:416
+            Name: "VIRTUAL"
+            Raw: "VIRTUAL"
+          }
+        }
+      ]
+    }
+  ]
+  Constraints: [
+    TableConstraint{
+      Span: 434:475
+      Name: Ident{
+        Span: 431:433
+        Name: "pk"
+        Raw: "pk"
+      }
+      Columns: [
+        OrderingTerm{
+          Span: 447:448
+          Expr: Ident{
+            Span: 447:448
+            Name: "a"
+            Raw: "a"
+          }
+        }
+        OrderingTerm{
+          Span: 450:456
+          Expr: Ident{
+            Span: 450:451
+            Name: "b"
+            Raw: "b"
+          }
+          Order: SortOrder(DESC)
+        }
+      ]
+      OnConflict: ConflictAction(ABORT)
+    }
+    TableConstraint{
+      Span: 479:510
+      Kind: TableConstraintKind(UNIQUE)
+      Columns: [
+        OrderingTerm{
+          Span: 487:488
+          Expr: Ident{
+            Span: 487:488
+            Name: "c"
+            Raw: "c"
+          }
+        }
+      ]
+      OnConflict: ConflictAction(ROLLBACK)
+    }
+    TableConstraint{
+      Span: 514:523
+      Kind: TableConstraintKind(CHECK)
+      Expr: Ident{
+        Span: 521:522
+        Name: "d"
+        Raw: "d"
+      }
+    }
+    TableConstraint{
+      Span: 527:593
+      Kind: TableConstraintKind(FOREIGN KEY)
+      FKColumns: [
+        IndexedColumn{
+          Span: 540:560
+          Name: Ident{
+            Span: 540:541
+            Name: "e"
+            Raw: "e"
+          }
+          Collation: Ident{
+            Span: 550:556
+            Name: "binary"
+            Raw: "binary"
+          }
+          Order: SortOrder(ASC)
+        }
+      ]
+      References: ForeignKeyClause{
+        Span: 562:578
+        Table: Ident{
+          Span: 573:574
+          Name: "u"
+          Raw: "u"
+        }
+        Columns: [
+          IndexedColumn{
+            Span: 576:577
+            Name: Ident{
+              Span: 576:577
+              Name: "v"
+              Raw: "v"
+            }
+          }
+        ]
+      }
+      Deferrable: DeferClause{
+        Span: 579:593
+        Not: true
+      }
+    }
+  ]
+  Options: [
+    Ident{
+      Span: 604:609
+      Name: "ROWID"
+      Raw: "ROWID"
+    }
+    Ident{
+      Span: 611:617
+      Name: "STRICT"
+      Raw: "STRICT"
+    }
+  ]
+  WithoutOpt: [
+    true
+    false
+  ]
+}
+CreateTableStmt{
+  Span: 619:647
+  Name: QualifiedName{
+    Span: 632:634
+    Name: Ident{
+      Span: 632:634
+      Name: "t2"
+      Raw: "t2"
+    }
+  }
+  Select: SelectStmt{
+    Span: 638:646
+    Cores: [
+      SelectQuery{
+        Span: 638:646
+        Columns: [
+          ResultColumn{
+            Span: 645:646
+            Expr: Literal{
+              Span: 645:646
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+CreateIndexStmt{
+  Span: 648:728
+  Unique: true
+  IfNotExists: true
+  Name: QualifiedName{
+    Span: 682:687
+    Schema: Ident{
+      Span: 682:685
+      Name: "sch"
+      Raw: "sch"
+    }
+    Name: Ident{
+      Span: 686:687
+      Name: "i"
+      Raw: "i"
+    }
+  }
+  Table: Ident{
+    Span: 691:692
+    Name: "t"
+    Raw: "t"
+  }
+  Columns: [
+    OrderingTerm{
+      Span: 694:710
+      Expr: CollateExpr{
+        Span: 694:710
+        X: Ident{
+          Span: 694:695
+          Name: "a"
+          Raw: "a"
+        }
+        Name: Ident{
+          Span: 704:710
+          Name: "nocase"
+          Raw: "nocase"
+        }
+      }
+    }
+    OrderingTerm{
+      Span: 712:718
+      Expr: Ident{
+        Span: 712:713
+        Name: "b"
+        Raw: "b"
+      }
+      Order: SortOrder(DESC)
+    }
+  ]
+  Where: Ident{
+    Span: 726:727
+    Name: "a"
+    Raw: "a"
+  }
+}
+CreateViewStmt{
+  Span: 729:765
+  Name: QualifiedName{
+    Span: 741:742
+    Name: Ident{
+      Span: 741:742
+      Name: "v"
+      Raw: "v"
+    }
+  }
+  Columns: [
+    IndexedColumn{
+      Span: 744:745
+      Name: Ident{
+        Span: 744:745
+        Name: "x"
+        Raw: "x"
+      }
+    }
+    IndexedColumn{
+      Span: 747:748
+      Name: Ident{
+        Span: 747:748
+        Name: "y"
+        Raw: "y"
+      }
+    }
+  ]
+  Select: SelectStmt{
+    Span: 753:764
+    Cores: [
+      SelectQuery{
+        Span: 753:764
+        Columns: [
+          ResultColumn{
+            Span: 760:761
+            Expr: Literal{
+              Span: 760:761
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+          }
+          ResultColumn{
+            Span: 763:764
+            Expr: Literal{
+              Span: 763:764
+              Kind: LiteralKind(INTEGER)
+              Value: "2"
+              Raw: "2"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+CreateVirtualTableStmt{
+  Span: 766:849
+  IfNotExists: true
+  Name: QualifiedName{
+    Span: 801:807
+    Schema: Ident{
+      Span: 801:804
+      Name: "sch"
+      Raw: "sch"
+    }
+    Name: Ident{
+      Span: 805:807
+      Name: "vt"
+      Raw: "vt"
+    }
+  }
+  Module: Ident{
+    Span: 814:817
+    Name: "mod"
+    Raw: "mod"
+  }
+  HasArgs: true
+  Args: [
+    "a b c"
+    "\"d e\""
+    "(nested, list)"
+  ]
+}
+CreateTriggerStmt{
+  Span: 850:1101
+  IfNotExists: true
+  Name: QualifiedName{
+    Span: 879:881
+    Name: Ident{
+      Span: 879:881
+      Name: "tr"
+      Raw: "tr"
+    }
+  }
+  Time: TriggerTime(INSTEAD OF)
+  HasTime: true
+  Event: "UPDATE"
+  UpdateOf: [
+    Ident{
+      Span: 903:904
+      Name: "a"
+      Raw: "a"
+    }
+    Ident{
+      Span: 906:907
+      Name: "b"
+      Raw: "b"
+    }
+  ]
+  Table: QualifiedName{
+    Span: 911:916
+    Schema: Ident{
+      Span: 911:914
+      Name: "sch"
+      Raw: "sch"
+    }
+    Name: Ident{
+      Span: 915:916
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  ForEachRow: true
+  When: Ident{
+    Span: 935:936
+    Name: "x"
+    Raw: "x"
+  }
+  Body: [
+    UpdateStmt{
+      Span: 945:971
+      Table: QualifiedName{
+        Span: 952:953
+        Name: Ident{
+          Span: 952:953
+          Name: "t"
+          Raw: "t"
+        }
+      }
+      Set: [
+        SetPair{
+          Span: 958:963
+          Columns: [
+            Ident{
+              Span: 958:959
+              Name: "a"
+              Raw: "a"
+            }
+          ]
+          Value: Literal{
+            Span: 962:963
+            Kind: LiteralKind(INTEGER)
+            Value: "1"
+            Raw: "1"
+          }
+        }
+      ]
+      Where: Ident{
+        Span: 970:971
+        Name: "b"
+        Raw: "b"
+      }
+    }
+    InsertStmt{
+      Span: 975:1022
+      Table: QualifiedName{
+        Span: 987:988
+        Name: Ident{
+          Span: 987:988
+          Name: "t"
+          Raw: "t"
+        }
+      }
+      Select: SelectStmt{
+        Span: 989:999
+        Cores: [
+          ValuesClause{
+            Span: 989:999
+            Rows: [
+              [
+                Literal{
+                  Span: 997:998
+                  Kind: LiteralKind(INTEGER)
+                  Value: "1"
+                  Raw: "1"
+                }
+              ]
+            ]
+          }
+        ]
+      }
+      Upserts: [
+        Upsert{
+          Span: 1000:1022
+          DoNothing: true
+        }
+      ]
+    }
+    DeleteStmt{
+      Span: 1026:1047
+      Table: QualifiedName{
+        Span: 1038:1039
+        Name: Ident{
+          Span: 1038:1039
+          Name: "t"
+          Raw: "t"
+        }
+      }
+      Where: Ident{
+        Span: 1046:1047
+        Name: "a"
+        Raw: "a"
+      }
+    }
+    SelectStmt{
+      Span: 1051:1095
+      Cores: [
+        SelectQuery{
+          Span: 1051:1095
+          Columns: [
+            ResultColumn{
+              Span: 1058:1080
+              Expr: RaiseExpr{
+                Span: 1058:1080
+                Action: "ROLLBACK"
+                Message: Literal{
+                  Span: 1074:1079
+                  Kind: LiteralKind(STRING)
+                  Value: "msg"
+                  Raw: "'msg'"
+                }
+              }
+            }
+            ResultColumn{
+              Span: 1082:1095
+              Expr: RaiseExpr{
+                Span: 1082:1095
+                Action: "IGNORE"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+AlterTableStmt{
+  Span: 1102:1128
+  Table: QualifiedName{
+    Span: 1114:1115
+    Name: Ident{
+      Span: 1114:1115
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  NewName: Ident{
+    Span: 1126:1127
+    Name: "u"
+    Raw: "u"
+  }
+}
+AlterTableStmt{
+  Span: 1129:1164
+  Table: QualifiedName{
+    Span: 1141:1142
+    Name: Ident{
+      Span: 1141:1142
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Action: AlterAction(RENAME COLUMN)
+  ColumnKeyword: true
+  Column: Ident{
+    Span: 1157:1158
+    Name: "a"
+    Raw: "a"
+  }
+  NewName: Ident{
+    Span: 1162:1163
+    Name: "b"
+    Raw: "b"
+  }
+}
+AlterTableStmt{
+  Span: 1165:1206
+  Table: QualifiedName{
+    Span: 1177:1178
+    Name: Ident{
+      Span: 1177:1178
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Action: AlterAction(ADD COLUMN)
+  ColumnKeyword: true
+  Column: Ident{
+    Span: 1190:1191
+    Name: "c"
+    Raw: "c"
+  }
+  ColumnDef: ColumnDef{
+    Span: 1190:1205
+    Name: Ident{
+      Span: 1190:1191
+      Name: "c"
+      Raw: "c"
+    }
+    Type: TypeName{
+      Span: 1192:1196
+      Name: "TEXT"
+      Raw: "TEXT"
+    }
+    Constraints: [
+      ColumnConstraint{
+        Span: 1197:1205
+        Kind: ColumnConstraintKind(NOT NULL)
+      }
+    ]
+  }
+}
+AlterTableStmt{
+  Span: 1207:1235
+  Table: QualifiedName{
+    Span: 1219:1220
+    Name: Ident{
+      Span: 1219:1220
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Action: AlterAction(DROP COLUMN)
+  ColumnKeyword: true
+  Column: Ident{
+    Span: 1233:1234
+    Name: "c"
+    Raw: "c"
+  }
+}
+AlterTableStmt{
+  Span: 1236:1268
+  Table: QualifiedName{
+    Span: 1248:1249
+    Name: Ident{
+      Span: 1248:1249
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Action: AlterAction(DROP CONSTRAINT)
+  ConstraintName: Ident{
+    Span: 1266:1267
+    Name: "k"
+    Raw: "k"
+  }
+}
+AlterTableStmt{
+  Span: 1269:1312
+  Table: QualifiedName{
+    Span: 1281:1282
+    Name: Ident{
+      Span: 1281:1282
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Action: AlterAction(DROP NOT NULL)
+  ColumnKeyword: true
+  Column: Ident{
+    Span: 1296:1297
+    Name: "a"
+    Raw: "a"
+  }
+}
+AlterTableStmt{
+  Span: 1313:1372
+  Table: QualifiedName{
+    Span: 1325:1326
+    Name: Ident{
+      Span: 1325:1326
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Action: AlterAction(SET NOT NULL)
+  ColumnKeyword: true
+  Column: Ident{
+    Span: 1340:1341
+    Name: "a"
+    Raw: "a"
+  }
+  OnConflict: ConflictAction(FAIL)
+}
+AlterTableStmt{
+  Span: 1373:1432
+  Table: QualifiedName{
+    Span: 1385:1386
+    Name: Ident{
+      Span: 1385:1386
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Action: AlterAction(ADD CHECK)
+  ConstraintName: Ident{
+    Span: 1402:1403
+    Name: "k"
+    Raw: "k"
+  }
+  Expr: Ident{
+    Span: 1411:1412
+    Name: "a"
+    Raw: "a"
+  }
+  OnConflict: ConflictAction(ABORT)
+}
+DropTableStmt{
+  Span: 1433:1460
+  IfExists: true
+  Name: QualifiedName{
+    Span: 1454:1459
+    Schema: Ident{
+      Span: 1454:1457
+      Name: "sch"
+      Raw: "sch"
+    }
+    Name: Ident{
+      Span: 1458:1459
+      Name: "t"
+      Raw: "t"
+    }
+  }
+}
+DropViewStmt{
+  Span: 1461:1473
+  Name: QualifiedName{
+    Span: 1471:1472
+    Name: Ident{
+      Span: 1471:1472
+      Name: "v"
+      Raw: "v"
+    }
+  }
+}
+DropIndexStmt{
+  Span: 1474:1487
+  Name: QualifiedName{
+    Span: 1485:1486
+    Name: Ident{
+      Span: 1485:1486
+      Name: "i"
+      Raw: "i"
+    }
+  }
+}
+DropTriggerStmt{
+  Span: 1488:1504
+  Name: QualifiedName{
+    Span: 1501:1503
+    Name: Ident{
+      Span: 1501:1503
+      Name: "tr"
+      Raw: "tr"
+    }
+  }
+}

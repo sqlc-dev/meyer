@@ -51,7 +51,8 @@ func (p *parser) parsePrefix() ast.Expr {
 	switch t.Kind {
 	case token.NOT:
 		p.advance()
-		return &ast.UnaryExpr{Span: p.span(t.Pos), Op: ast.OpNot, X: p.parseExpr(precNot + 1)}
+		x := p.parseExpr(precNot + 1)
+		return &ast.UnaryExpr{Span: ast.Span{Start: t.Pos, Stop: x.End()}, Op: ast.OpNot, X: x}
 	case token.BITNOT:
 		p.advance()
 		x := p.parseExpr(precUnary + 1)

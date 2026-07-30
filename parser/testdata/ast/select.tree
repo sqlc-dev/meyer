@@ -1,0 +1,1038 @@
+SelectStmt{
+  Span: 52:98
+  Cores: [
+    SelectQuery{
+      Span: 52:97
+      Distinct: Distinct(DISTINCT)
+      Columns: [
+        ResultColumn{
+          Span: 68:69
+          Expr: Ident{
+            Span: 68:69
+            Name: "a"
+            Raw: "a"
+          }
+        }
+        ResultColumn{
+          Span: 71:77
+          Expr: Ident{
+            Span: 71:72
+            Name: "b"
+            Raw: "b"
+          }
+          Alias: Ident{
+            Span: 76:77
+            Name: "x"
+            Raw: "x"
+          }
+          HasAs: true
+        }
+        ResultColumn{
+          Span: 79:82
+          Expr: Ident{
+            Span: 79:80
+            Name: "c"
+            Raw: "c"
+          }
+          Alias: Ident{
+            Span: 81:82
+            Name: "d"
+            Raw: "d"
+          }
+        }
+        ResultColumn{
+          Span: 84:87
+          Expr: Star{
+            Span: 84:87
+            Table: Ident{
+              Span: 84:85
+              Name: "t"
+              Raw: "t"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 89:90
+          Expr: Star{
+            Span: 89:90
+          }
+        }
+      ]
+      From: [
+        TableRef{
+          Span: 96:97
+          Name: QualifiedName{
+            Span: 96:97
+            Name: Ident{
+              Span: 96:97
+              Name: "t"
+              Raw: "t"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 99:177
+  Cores: [
+    SelectQuery{
+      Span: 99:107
+      Columns: [
+        ResultColumn{
+          Span: 106:107
+          Expr: Literal{
+            Span: 106:107
+            Kind: LiteralKind(INTEGER)
+            Value: "1"
+            Raw: "1"
+          }
+        }
+      ]
+    }
+    SelectQuery{
+      Span: 114:122
+      Columns: [
+        ResultColumn{
+          Span: 121:122
+          Expr: Literal{
+            Span: 121:122
+            Kind: LiteralKind(INTEGER)
+            Value: "2"
+            Raw: "2"
+          }
+        }
+      ]
+    }
+    SelectQuery{
+      Span: 133:141
+      Columns: [
+        ResultColumn{
+          Span: 140:141
+          Expr: Literal{
+            Span: 140:141
+            Kind: LiteralKind(INTEGER)
+            Value: "3"
+            Raw: "3"
+          }
+        }
+      ]
+    }
+    SelectQuery{
+      Span: 149:157
+      Columns: [
+        ResultColumn{
+          Span: 156:157
+          Expr: Literal{
+            Span: 156:157
+            Kind: LiteralKind(INTEGER)
+            Value: "4"
+            Raw: "4"
+          }
+        }
+      ]
+    }
+    SelectQuery{
+      Span: 168:176
+      Columns: [
+        ResultColumn{
+          Span: 175:176
+          Expr: Literal{
+            Span: 175:176
+            Kind: LiteralKind(INTEGER)
+            Value: "5"
+            Raw: "5"
+          }
+        }
+      ]
+    }
+  ]
+  Ops: [
+    CompoundOp{
+      Span: 108:113
+      Op: "UNION"
+    }
+    CompoundOp{
+      Span: 123:132
+      Op: "UNION"
+      All: true
+    }
+    CompoundOp{
+      Span: 142:148
+      Op: "EXCEPT"
+    }
+    CompoundOp{
+      Span: 158:167
+      Op: "INTERSECT"
+    }
+  ]
+}
+SelectStmt{
+  Span: 178:200
+  Cores: [
+    ValuesClause{
+      Span: 178:199
+      Rows: [
+        [
+          Literal{
+            Span: 186:187
+            Kind: LiteralKind(INTEGER)
+            Value: "1"
+            Raw: "1"
+          }
+          Literal{
+            Span: 189:190
+            Kind: LiteralKind(INTEGER)
+            Value: "2"
+            Raw: "2"
+          }
+        ]
+        [
+          Literal{
+            Span: 194:195
+            Kind: LiteralKind(INTEGER)
+            Value: "3"
+            Raw: "3"
+          }
+          Literal{
+            Span: 197:198
+            Kind: LiteralKind(INTEGER)
+            Value: "4"
+            Raw: "4"
+          }
+        ]
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 201:281
+  With: With{
+    Span: 201:264
+    Recursive: true
+    CTEs: [
+      CTE{
+        Span: 216:264
+        Name: Ident{
+          Span: 216:217
+          Name: "c"
+          Raw: "c"
+        }
+        Columns: [
+          Ident{
+            Span: 218:219
+            Name: "x"
+            Raw: "x"
+          }
+        ]
+        Select: SelectStmt{
+          Span: 225:263
+          Cores: [
+            SelectQuery{
+              Span: 225:233
+              Columns: [
+                ResultColumn{
+                  Span: 232:233
+                  Expr: Literal{
+                    Span: 232:233
+                    Kind: LiteralKind(INTEGER)
+                    Value: "1"
+                    Raw: "1"
+                  }
+                }
+              ]
+            }
+            SelectQuery{
+              Span: 244:263
+              Columns: [
+                ResultColumn{
+                  Span: 251:256
+                  Expr: BinaryExpr{
+                    Span: 251:256
+                    Op: Operator(+)
+                    X: Ident{
+                      Span: 251:252
+                      Name: "x"
+                      Raw: "x"
+                    }
+                    Y: Literal{
+                      Span: 255:256
+                      Kind: LiteralKind(INTEGER)
+                      Value: "1"
+                      Raw: "1"
+                    }
+                  }
+                }
+              ]
+              From: [
+                TableRef{
+                  Span: 262:263
+                  Name: QualifiedName{
+                    Span: 262:263
+                    Name: Ident{
+                      Span: 262:263
+                      Name: "c"
+                      Raw: "c"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+          Ops: [
+            CompoundOp{
+              Span: 234:243
+              Op: "UNION"
+              All: true
+            }
+          ]
+        }
+      }
+    ]
+  }
+  Cores: [
+    SelectQuery{
+      Span: 265:280
+      Columns: [
+        ResultColumn{
+          Span: 272:273
+          Expr: Star{
+            Span: 272:273
+          }
+        }
+      ]
+      From: [
+        TableRef{
+          Span: 279:280
+          Name: QualifiedName{
+            Span: 279:280
+            Name: Ident{
+              Span: 279:280
+              Name: "c"
+              Raw: "c"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 282:359
+  With: With{
+    Span: 282:349
+    CTEs: [
+      CTE{
+        Span: 287:315
+        Name: Ident{
+          Span: 287:288
+          Name: "a"
+          Raw: "a"
+        }
+        Materialized: Materialized(MATERIALIZED)
+        Select: SelectStmt{
+          Span: 306:314
+          Cores: [
+            SelectQuery{
+              Span: 306:314
+              Columns: [
+                ResultColumn{
+                  Span: 313:314
+                  Expr: Literal{
+                    Span: 313:314
+                    Kind: LiteralKind(INTEGER)
+                    Value: "1"
+                    Raw: "1"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+      CTE{
+        Span: 317:349
+        Name: Ident{
+          Span: 317:318
+          Name: "b"
+          Raw: "b"
+        }
+        Materialized: Materialized(NOT MATERIALIZED)
+        Select: SelectStmt{
+          Span: 340:348
+          Cores: [
+            SelectQuery{
+              Span: 340:348
+              Columns: [
+                ResultColumn{
+                  Span: 347:348
+                  Expr: Literal{
+                    Span: 347:348
+                    Kind: LiteralKind(INTEGER)
+                    Value: "2"
+                    Raw: "2"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+  Cores: [
+    SelectQuery{
+      Span: 350:358
+      Columns: [
+        ResultColumn{
+          Span: 357:358
+          Expr: Literal{
+            Span: 357:358
+            Kind: LiteralKind(INTEGER)
+            Value: "1"
+            Raw: "1"
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 360:447
+  Cores: [
+    SelectQuery{
+      Span: 360:446
+      Columns: [
+        ResultColumn{
+          Span: 367:368
+          Expr: Star{
+            Span: 367:368
+          }
+        }
+      ]
+      From: [
+        TableRef{
+          Span: 374:375
+          Name: QualifiedName{
+            Span: 374:375
+            Name: Ident{
+              Span: 374:375
+              Name: "a"
+              Raw: "a"
+            }
+          }
+        }
+        TableRef{
+          Span: 375:378
+          Join: JoinOperator{
+            Span: 375:376
+            Type: JoinType(,|INNER)
+          }
+          Name: QualifiedName{
+            Span: 377:378
+            Name: Ident{
+              Span: 377:378
+              Name: "b"
+              Raw: "b"
+            }
+          }
+        }
+        TableRef{
+          Span: 379:398
+          Join: JoinOperator{
+            Span: 379:383
+            Type: JoinType(INNER)
+            Words: [
+              "JOIN"
+            ]
+          }
+          Name: QualifiedName{
+            Span: 384:385
+            Name: Ident{
+              Span: 384:385
+              Name: "c"
+              Raw: "c"
+            }
+          }
+          On: BinaryExpr{
+            Span: 389:398
+            Op: Operator(=)
+            X: QualifiedRef{
+              Span: 389:392
+              Parts: [
+                Ident{
+                  Span: 389:390
+                  Name: "a"
+                  Raw: "a"
+                }
+                Ident{
+                  Span: 391:392
+                  Name: "x"
+                  Raw: "x"
+                }
+              ]
+            }
+            Y: QualifiedRef{
+              Span: 395:398
+              Parts: [
+                Ident{
+                  Span: 395:396
+                  Name: "c"
+                  Raw: "c"
+                }
+                Ident{
+                  Span: 397:398
+                  Name: "x"
+                  Raw: "x"
+                }
+              ]
+            }
+          }
+        }
+        TableRef{
+          Span: 399:426
+          Join: JoinOperator{
+            Span: 399:414
+            Type: JoinType(LEFT|OUTER)
+            Words: [
+              "LEFT"
+              "OUTER"
+              "JOIN"
+            ]
+          }
+          Name: QualifiedName{
+            Span: 415:416
+            Name: Ident{
+              Span: 415:416
+              Name: "d"
+              Raw: "d"
+            }
+          }
+          Using: [
+            Ident{
+              Span: 424:425
+              Name: "x"
+              Raw: "x"
+            }
+          ]
+        }
+        TableRef{
+          Span: 427:446
+          Join: JoinOperator{
+            Span: 427:444
+            Type: JoinType(NATURAL|LEFT|RIGHT|OUTER)
+            Words: [
+              "NATURAL"
+              "FULL"
+              "JOIN"
+            ]
+          }
+          Name: QualifiedName{
+            Span: 445:446
+            Name: Ident{
+              Span: 445:446
+              Name: "e"
+              Raw: "e"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 448:534
+  Cores: [
+    SelectQuery{
+      Span: 448:533
+      Columns: [
+        ResultColumn{
+          Span: 455:456
+          Expr: Star{
+            Span: 455:456
+          }
+        }
+      ]
+      From: [
+        TableRef{
+          Span: 462:472
+          List: [
+            TableRef{
+              Span: 463:464
+              Name: QualifiedName{
+                Span: 463:464
+                Name: Ident{
+                  Span: 463:464
+                  Name: "a"
+                  Raw: "a"
+                }
+              }
+            }
+            TableRef{
+              Span: 465:471
+              Join: JoinOperator{
+                Span: 465:469
+                Type: JoinType(INNER)
+                Words: [
+                  "JOIN"
+                ]
+              }
+              Name: QualifiedName{
+                Span: 470:471
+                Name: Ident{
+                  Span: 470:471
+                  Name: "b"
+                  Raw: "b"
+                }
+              }
+            }
+          ]
+        }
+        TableRef{
+          Span: 472:489
+          Join: JoinOperator{
+            Span: 472:473
+            Type: JoinType(,|INNER)
+          }
+          Select: SelectStmt{
+            Span: 475:483
+            Cores: [
+              SelectQuery{
+                Span: 475:483
+                Columns: [
+                  ResultColumn{
+                    Span: 482:483
+                    Expr: Literal{
+                      Span: 482:483
+                      Kind: LiteralKind(INTEGER)
+                      Value: "1"
+                      Raw: "1"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+          Alias: Ident{
+            Span: 488:489
+            Name: "s"
+            Raw: "s"
+          }
+          HasAs: true
+        }
+        TableRef{
+          Span: 489:502
+          Join: JoinOperator{
+            Span: 489:490
+            Type: JoinType(,|INNER)
+          }
+          Name: QualifiedName{
+            Span: 491:494
+            Name: Ident{
+              Span: 491:494
+              Name: "tvf"
+              Raw: "tvf"
+            }
+          }
+          Args: [
+            Literal{
+              Span: 495:496
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+            Literal{
+              Span: 498:499
+              Kind: LiteralKind(INTEGER)
+              Value: "2"
+              Raw: "2"
+            }
+          ]
+          HasArgs: true
+          Alias: Ident{
+            Span: 501:502
+            Name: "f"
+            Raw: "f"
+          }
+        }
+        TableRef{
+          Span: 502:518
+          Join: JoinOperator{
+            Span: 502:503
+            Type: JoinType(,|INNER)
+          }
+          Name: QualifiedName{
+            Span: 504:505
+            Name: Ident{
+              Span: 504:505
+              Name: "t"
+              Raw: "t"
+            }
+          }
+          IndexedBy: Ident{
+            Span: 517:518
+            Name: "i"
+            Raw: "i"
+          }
+        }
+        TableRef{
+          Span: 518:533
+          Join: JoinOperator{
+            Span: 518:519
+            Type: JoinType(,|INNER)
+          }
+          Name: QualifiedName{
+            Span: 520:521
+            Name: Ident{
+              Span: 520:521
+              Name: "u"
+              Raw: "u"
+            }
+          }
+          NotIndexed: true
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 535:634
+  Cores: [
+    SelectQuery{
+      Span: 535:633
+      Columns: [
+        ResultColumn{
+          Span: 542:543
+          Expr: Star{
+            Span: 542:543
+          }
+        }
+      ]
+      From: [
+        TableRef{
+          Span: 549:550
+          Name: QualifiedName{
+            Span: 549:550
+            Name: Ident{
+              Span: 549:550
+              Name: "t"
+              Raw: "t"
+            }
+          }
+        }
+      ]
+      Where: Ident{
+        Span: 557:558
+        Name: "a"
+        Raw: "a"
+      }
+      GroupBy: [
+        Ident{
+          Span: 568:569
+          Name: "b"
+          Raw: "b"
+        }
+        Ident{
+          Span: 571:572
+          Name: "c"
+          Raw: "c"
+        }
+      ]
+      Having: Ident{
+        Span: 580:581
+        Name: "d"
+        Raw: "d"
+      }
+      OrderBy: [
+        OrderingTerm{
+          Span: 591:608
+          Expr: Ident{
+            Span: 591:592
+            Name: "e"
+            Raw: "e"
+          }
+          Order: SortOrder(ASC)
+          Nulls: NullsOrder(NULLS FIRST)
+        }
+        OrderingTerm{
+          Span: 610:616
+          Expr: Ident{
+            Span: 610:611
+            Name: "f"
+            Raw: "f"
+          }
+          Order: SortOrder(DESC)
+        }
+      ]
+      Limit: Limit{
+        Span: 617:633
+        Count: Literal{
+          Span: 623:624
+          Kind: LiteralKind(INTEGER)
+          Value: "1"
+          Raw: "1"
+        }
+        Offset: Literal{
+          Span: 632:633
+          Kind: LiteralKind(INTEGER)
+          Value: "2"
+          Raw: "2"
+        }
+      }
+    }
+  ]
+}
+SelectStmt{
+  Span: 635:662
+  Cores: [
+    SelectQuery{
+      Span: 635:661
+      Columns: [
+        ResultColumn{
+          Span: 642:643
+          Expr: Star{
+            Span: 642:643
+          }
+        }
+      ]
+      From: [
+        TableRef{
+          Span: 649:650
+          Name: QualifiedName{
+            Span: 649:650
+            Name: Ident{
+              Span: 649:650
+              Name: "t"
+              Raw: "t"
+            }
+          }
+        }
+      ]
+      Limit: Limit{
+        Span: 651:661
+        Count: Literal{
+          Span: 660:661
+          Kind: LiteralKind(INTEGER)
+          Value: "2"
+          Raw: "2"
+        }
+        Offset: Literal{
+          Span: 657:658
+          Kind: LiteralKind(INTEGER)
+          Value: "1"
+          Raw: "1"
+        }
+        Comma: true
+      }
+    }
+  ]
+}
+SelectStmt{
+  Span: 663:896
+  Cores: [
+    SelectQuery{
+      Span: 663:895
+      Columns: [
+        ResultColumn{
+          Span: 670:690
+          Expr: FuncCall{
+            Span: 670:690
+            Name: Ident{
+              Span: 670:680
+              Name: "row_number"
+              Raw: "row_number"
+            }
+            Over: WindowDef{
+              Span: 683:690
+            }
+          }
+        }
+        ResultColumn{
+          Span: 692:705
+          Expr: FuncCall{
+            Span: 692:705
+            Name: Ident{
+              Span: 692:695
+              Name: "sum"
+              Raw: "sum"
+            }
+            Args: [
+              Ident{
+                Span: 696:697
+                Name: "a"
+                Raw: "a"
+              }
+            ]
+            Over: WindowDef{
+              Span: 699:705
+              Base: Ident{
+                Span: 704:705
+                Name: "w"
+                Raw: "w"
+              }
+              NameOnly: true
+            }
+          }
+        }
+        ResultColumn{
+          Span: 707:754
+          Expr: FuncCall{
+            Span: 707:754
+            Name: Ident{
+              Span: 707:712
+              Name: "count"
+              Raw: "count"
+            }
+            Star: true
+            Filter: Ident{
+              Span: 730:731
+              Name: "a"
+              Raw: "a"
+            }
+            Over: WindowDef{
+              Span: 733:754
+              Partition: [
+                Ident{
+                  Span: 752:753
+                  Name: "b"
+                  Raw: "b"
+                }
+              ]
+            }
+          }
+        }
+      ]
+      From: [
+        TableRef{
+          Span: 762:763
+          Name: QualifiedName{
+            Span: 762:763
+            Name: Ident{
+              Span: 762:763
+              Name: "t"
+              Raw: "t"
+            }
+          }
+        }
+      ]
+      Windows: [
+        WindowDef{
+          Span: 771:856
+          Name: Ident{
+            Span: 771:772
+            Name: "w"
+            Raw: "w"
+          }
+          Base: Ident{
+            Span: 777:781
+            Name: "base"
+            Raw: "base"
+          }
+          OrderBy: [
+            OrderingTerm{
+              Span: 791:792
+              Expr: Ident{
+                Span: 791:792
+                Name: "a"
+                Raw: "a"
+              }
+            }
+          ]
+          Frame: FrameType(RANGE)
+          StartBound: FrameBound{
+            Span: 807:826
+          }
+          EndBound: FrameBound{
+            Span: 831:842
+            Type: FrameBoundType(CURRENT ROW)
+          }
+          Exclude: FrameExclude(EXCLUDE TIES)
+        }
+        WindowDef{
+          Span: 872:895
+          Name: Ident{
+            Span: 872:873
+            Name: "v"
+            Raw: "v"
+          }
+          Frame: FrameType(ROWS)
+          StartBound: FrameBound{
+            Span: 883:894
+            Type: FrameBoundType(PRECEDING)
+            Expr: Literal{
+              Span: 883:884
+              Kind: LiteralKind(INTEGER)
+              Value: "3"
+              Raw: "3"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 897:1006
+  Cores: [
+    SelectQuery{
+      Span: 897:1005
+      Columns: [
+        ResultColumn{
+          Span: 904:998
+          Expr: FuncCall{
+            Span: 904:998
+            Name: Ident{
+              Span: 904:908
+              Name: "lead"
+              Raw: "lead"
+            }
+            Args: [
+              Ident{
+                Span: 909:910
+                Name: "a"
+                Raw: "a"
+              }
+            ]
+            Over: WindowDef{
+              Span: 912:998
+              OrderBy: [
+                OrderingTerm{
+                  Span: 927:928
+                  Expr: Ident{
+                    Span: 927:928
+                    Name: "b"
+                    Raw: "b"
+                  }
+                }
+              ]
+              Frame: FrameType(GROUPS)
+              StartBound: FrameBound{
+                Span: 944:955
+                Type: FrameBoundType(CURRENT ROW)
+              }
+              EndBound: FrameBound{
+                Span: 960:979
+                Type: FrameBoundType(UNBOUNDED FOLLOWING)
+              }
+              Exclude: FrameExclude(EXCLUDE NO OTHERS)
+            }
+          }
+        }
+      ]
+      From: [
+        TableRef{
+          Span: 1004:1005
+          Name: QualifiedName{
+            Span: 1004:1005
+            Name: Ident{
+              Span: 1004:1005
+              Name: "t"
+              Raw: "t"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

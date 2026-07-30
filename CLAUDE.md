@@ -13,7 +13,8 @@ https://sqlite.org/lang.html.
 - **Never edit `parser/testdata/*.test` by hand.** Corpus files are produced
   by `cmd/regenerate-parse` from SQLite's own test suite plus a real SQLite
   build (the oracle). `*.metadata.json` sidecars are updated by tooling
-  (`go test ./parser -check-parse`), not by hand.
+  (`go test ./parser -check-parse`), not by hand. The hand-written snapshot
+  inputs under `parser/testdata/ast/` are the exception — see below.
 - Every nontrivial parse function carries a comment naming the `parse.y`
   rule(s) it implements.
 - Error messages must match SQLite's parser byte-for-byte
@@ -46,6 +47,20 @@ clause should come after UNION not before`) are currently classified as
 semantic, so meyer is permitted to accept such statements. The pattern list
 lives in `internal/testfile` (`syntaxFamily`) and can be extended without
 regenerating the corpus, because the corpus stores raw oracle output.
+
+## Tree shape
+
+Accept/reject conformance cannot see a dropped clause or a mis-associated
+operator, so two further checks stand in for the parse-tree goldens SQLite
+cannot produce:
+
+- **Round trip** (`TestRoundTrip`): every corpus case that parses is
+  rendered back to SQL with `ast.Statements`, re-parsed, and the two trees
+  compared structurally with `internal/dump`. Spans and `Raw` fields are
+  excluded — the renderer promises re-parseability and nothing else.
+- **Snapshots** (`TestASTSnapshots`): `parser/testdata/ast/*.sql` are
+  hand-written and meant to be edited; their `.tree` goldens are rewritten
+  with `go test ./parser -update` and reviewed in the diff.
 
 ## The loop
 

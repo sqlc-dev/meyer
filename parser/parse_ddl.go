@@ -263,7 +263,8 @@ func (p *parser) parseDefaultValue() ast.Expr {
 		if t.Kind == token.MINUS {
 			op = ast.OpMinus
 		}
-		return &ast.UnaryExpr{Span: p.span(start), Op: op, X: p.parseTerm()}
+		x := p.parseTerm()
+		return &ast.UnaryExpr{Span: p.span(start), Op: op, X: x}
 	}
 	if p.atTerm() {
 		return p.parseTerm()
@@ -367,7 +368,8 @@ func (p *parser) parseReferences() *ast.ForeignKeyClause {
 		switch p.cur().Kind {
 		case token.MATCH:
 			p.advance()
-			fk.Args = append(fk.Args, &ast.ForeignKeyArg{Span: p.span(aStart), Match: p.expectName()})
+			match := p.expectName()
+			fk.Args = append(fk.Args, &ast.ForeignKeyArg{Span: p.span(aStart), Match: match})
 			continue
 		case token.ON:
 			p.advance()

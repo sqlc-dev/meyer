@@ -466,8 +466,7 @@ func (p *parser) parseIndexedColumnList() []*ast.IndexedColumn {
 		start := p.cur().Pos
 		c := &ast.IndexedColumn{Name: p.expectName()}
 		if p.accept(token.COLLATE) {
-			p.expectIDS()
-			c.Collate = true
+			c.Collation = p.expectIDS()
 		}
 		switch {
 		case p.accept(token.ASC):
