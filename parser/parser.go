@@ -20,6 +20,7 @@ package parser
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"strings"
 
@@ -28,15 +29,44 @@ import (
 	"github.com/sqlc-dev/meyer/token"
 )
 
-// Error is the error type returned for inputs meyer rejects. Message
-// matches SQLite's parser wording (e.g. `near "FROM": syntax error`);
-// Offset is the byte offset of the error in the input, or -1 if unknown.
+// Error is the error type returned for inputs meyer rejects.
+//
+// Message matches SQLite's parser wording byte for byte (`near "FROM":
+// syntax error`), and is the field to compare against when conformance is
+// what matters. Offset is the byte offset of the error, the analogue of
+// sqlite3_error_offset, or -1 when the position is unknown. SQL is the input
+// that failed, so that Error can turn the offset into a line and column.
 type Error struct {
 	Message string
 	Offset  int
+	SQL     string
 }
 
-func (e *Error) Error() string { return e.Message }
+// Error renders the message with a position when there is one, in the
+// "line:column: message" form editors and compilers expect. Positions are
+// stored as byte offsets and converted only here, on demand.
+func (e *Error) Error() string {
+	if e.Offset < 0 || e.Offset > len(e.SQL) {
+		return e.Message
+	}
+	line, col := LineCol(e.SQL, e.Offset)
+	return fmt.Sprintf("%d:%d: %s", line, col, e.Message)
+}
+
+// LineCol converts a byte offset into a 1-based line and column.
+func LineCol(src string, offset int) (line, col int) {
+	if offset < 0 || offset > len(src) {
+		return 0, 0
+	}
+	line, start := 1, 0
+	for i := 0; i < offset; i++ {
+		if src[i] == '\n' {
+			line++
+			start = i + 1
+		}
+	}
+	return line, offset - start + 1
+}
 
 // Parse reads SQL from r and returns one ast.Stmt per statement.
 func Parse(ctx context.Context, r io.Reader) ([]ast.Stmt, error) {
@@ -183,7 +213,7 @@ func (p *parser) expect(k token.Kind) token.Token {
 // same position.
 func (p *parser) checkIllegal() {
 	if t := p.toks[p.i]; t.Kind == token.ILLEGAL {
-		panic(bail{&Error{Message: `unrecognized token: "` + t.Text + `"`, Offset: t.Pos}})
+		p.fail(`unrecognized token: "`+t.Text+`"`, t.Pos)
 	}
 }
 
@@ -199,14 +229,14 @@ func (p *parser) syntaxErrorAt(t token.Token) {
 	if t.Kind == token.EOF {
 		// At the end of input SQLite feeds synthetic SEMI and 0 tokens
 		// whose text is empty, which %syntax_error reports this way.
-		panic(bail{&Error{Message: "incomplete input", Offset: t.Pos}})
+		p.fail("incomplete input", t.Pos)
 	}
-	panic(bail{&Error{Message: `near "` + t.Text + `": syntax error`, Offset: t.Pos}})
+	p.fail(`near "`+t.Text+`": syntax error`, t.Pos)
 }
 
-// fail raises one of SQLite's non-positional parser messages.
+// fail aborts the parse with one of SQLite's messages.
 func (p *parser) fail(msg string, offset int) {
-	panic(bail{&Error{Message: msg, Offset: offset}})
+	panic(bail{&Error{Message: msg, Offset: offset, SQL: p.src}})
 }
 
 // parseScript implements the top-level rules.

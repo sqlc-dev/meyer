@@ -80,39 +80,28 @@ func readSource(file string, args []string) (string, error) {
 	}
 }
 
-// describe renders an error the way a compiler would: the message, then the
-// offending line with a caret under the byte SQLite would point at.
+// describe renders an error the way a compiler would: the message with its
+// position, then the offending line with a caret under the byte SQLite would
+// point at.
 func describe(src string, pe *parser.Error) string {
-	line, col, text := locate(src, pe.Offset)
 	var b strings.Builder
-	fmt.Fprintf(&b, "%d:%d: %s\n", line, col, pe.Message)
-	if text != "" {
-		fmt.Fprintf(&b, "  %s\n  %s^\n", text, strings.Repeat(" ", col-1))
+	fmt.Fprintln(&b, pe)
+	if pe.Offset < 0 || pe.Offset > len(src) {
+		return b.String()
 	}
+	_, col := parser.LineCol(src, pe.Offset)
+	fmt.Fprintf(&b, "  %s\n  %s^\n", lineAt(src, pe.Offset), strings.Repeat(" ", col-1))
 	return b.String()
 }
 
-// locate converts a byte offset into a 1-based line and column plus the text
-// of that line. Positions are stored as offsets precisely so that this
-// conversion happens only when someone asks for it.
-func locate(src string, offset int) (line, col int, text string) {
-	if offset < 0 || offset > len(src) {
-		return 0, 0, ""
-	}
-	line, start := 1, 0
-	for i := 0; i < offset; i++ {
-		if src[i] == '\n' {
-			line++
-			start = i + 1
-		}
-	}
+// lineAt returns the text of the line containing offset.
+func lineAt(src string, offset int) string {
+	start := strings.LastIndexByte(src[:offset], '\n') + 1
 	end := strings.IndexByte(src[start:], '\n')
 	if end < 0 {
-		end = len(src)
-	} else {
-		end += start
+		return src[start:]
 	}
-	return line, offset - start + 1, src[start:end]
+	return src[start : start+end]
 }
 
 func fatal(err error) {

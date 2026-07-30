@@ -364,10 +364,11 @@ meyer/
    fallback tables), lexer with its own unit tests transcribed from
    `tokenize.test`, AST skeleton, `parser.Parse` returning
    not-implemented errors, corpus format + harness with everything `todo`.
-2. **Corpus** — `cmd/regenerate` extraction + oracle; vendor the starter set
-   (`parser1`, `tokenize`, `keyword1`, `select*`, `expr*`, `e_*`, `with*`,
-   `window*`, `trigger1`, `upsert*`, `returning1`, `altertab*`, `alter*`,
-   plus the syntax-error negative subset).
+2. **Corpus** — `cmd/regenerate` extraction + oracle. *(Done, but wider than
+   planned: rather than vendoring a hand-picked starter set, the tool takes
+   every `test/*.test` script in the pinned tree. That costs 4.4 MB and 943
+   files, and yields 20,971 cases instead of 4,685, with no curation to redo
+   when the pin advances.)*
 3. **Expressions + SELECT** — largest single chunk: precedence ladder,
    subqueries, CTEs, compound selects, VALUES, window functions, FROM/joins.
 4. **DML** — INSERT (+upsert/returning/default values), UPDATE (+from),

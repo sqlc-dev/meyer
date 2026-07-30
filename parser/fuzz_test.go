@@ -136,7 +136,8 @@ func TestRecursionLimit(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := parser.ParseString(tt.sql)
-			if err == nil || err.Error() != "Recursion limit" {
+			var pe *parser.Error
+			if !errors.As(err, &pe) || pe.Message != "Recursion limit" {
 				t.Fatalf("got %v, want a Recursion limit rejection", err)
 			}
 		})
