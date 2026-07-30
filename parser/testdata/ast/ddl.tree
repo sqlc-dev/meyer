@@ -289,7 +289,7 @@ CreateTableStmt{
   ]
   Constraints: [
     TableConstraint{
-      Span: 434:475
+      Span: 420:475
       Name: Ident{
         Span: 431:433
         Name: "pk"

@@ -141,12 +141,7 @@ func main() {
 
 // check asks both parsers about one input and records any disagreement.
 func check(r *sqlitesrc.Runner, sql string, rep *report) {
-	// The oracle splits a script into statements the way the sqlite3 shell
-	// does, with sqlite3_complete, which counts no parentheses: a ";" inside
-	// brackets ends a statement for it. meyer parses the script as a whole.
-	// Where the two disagree about the boundaries there is nothing to
-	// compare, and the disagreement is the harness's, not the parser's.
-	if semicolonInsideParens(sql) {
+	if splitDiffers(sql) {
 		rep.skipped.Add(1)
 		return
 	}
@@ -223,9 +218,16 @@ func checkRoundTrip(sql string, rep *report) {
 	}
 }
 
-// semicolonInsideParens reports whether any ";" appears within brackets,
-// skipping the quoting and comment forms the tokenizer knows about.
-func semicolonInsideParens(sql string) bool {
+// splitDiffers reports whether the oracle would cut the script into
+// statements somewhere meyer would not, which makes the two incomparable.
+//
+// The oracle splits the way the sqlite3 shell does, with sqlite3_complete,
+// whose scanner is much cruder than the tokenizer: it understands strings,
+// the four quoting styles and comments, but nothing else. So a ";" ends a
+// statement for it even inside brackets, and even inside a token the real
+// tokenizer would have swallowed whole -- ":v(a;b)" is one bind parameter
+// to the tokenizer and two statements to sqlite3_complete.
+func splitDiffers(sql string) bool {
 	depth := 0
 	for _, t := range lexer.Lex(sql) {
 		switch t.Kind {
@@ -239,6 +241,29 @@ func semicolonInsideParens(sql string) bool {
 			if depth > 0 {
 				return true
 			}
+		default:
+			if strings.Contains(t.Text, ";") && !completeUnderstands(t) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// completeUnderstands reports whether sqlite3_complete skips over a token
+// the same way the tokenizer does. The closed quoted forms it does, blob
+// literals included, since it reads their body as a single-quoted string.
+// An unterminated one it does not: in ":v('(%d)',changes());" the tokenizer
+// swallows the first quote into the bind parameter and finds a string
+// starting at the second, while sqlite3_complete pairs the two.
+func completeUnderstands(t token.Token) bool {
+	switch t.Kind {
+	case token.STRING, token.BLOB:
+		return true
+	case token.ID:
+		switch t.Text[0] {
+		case '"', '`', '[':
+			return true
 		}
 	}
 	return false

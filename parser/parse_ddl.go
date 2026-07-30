@@ -105,16 +105,22 @@ func (p *parser) parseColumnAndConstraintList(n *ast.CreateTableStmt) {
 		}
 	}
 	var pending *ast.Ident
+	pendingStart := 0
 	for {
 		start := p.cur().Pos
 		if p.at(token.CONSTRAINT) {
 			// tcons ::= CONSTRAINT nm names whatever constraint follows,
 			// and is itself a complete tcons: a list may end with one.
-			p.advance()
+			pendingStart = p.advance().Pos
 			pending = p.expectName()
 		} else {
 			c := p.parseTableConstraint(start)
-			c.Name, pending = pending, nil
+			if pending != nil {
+				// The name is part of the constraint it introduces, so the
+				// constraint's span has to start at its CONSTRAINT keyword.
+				c.Name, c.Span.Start = pending, pendingStart
+				pending = nil
+			}
 			n.Constraints = append(n.Constraints, c)
 		}
 		// tconscomma ::= COMMA. / tconscomma ::= . The comma is optional
@@ -145,10 +151,11 @@ func (p *parser) parseColumnDef() *ast.ColumnDef {
 	n := &ast.ColumnDef{Name: p.expectName()}
 	n.Type = p.parseTypeToken()
 	var pending *ast.Ident
+	pendingStart := 0
 	for {
 		cStart := p.cur().Pos
 		if p.at(token.CONSTRAINT) { // ccons ::= CONSTRAINT nm.
-			p.advance()
+			pendingStart = p.advance().Pos
 			pending = p.expectName()
 			continue
 		}
@@ -156,7 +163,12 @@ func (p *parser) parseColumnDef() *ast.ColumnDef {
 		if c == nil {
 			break
 		}
-		c.Name, pending = pending, nil
+		if pending != nil {
+			// As for table constraints, the CONSTRAINT clause belongs to
+			// the constraint that follows it.
+			c.Name, c.Span.Start = pending, pendingStart
+			pending = nil
+		}
 		n.Constraints = append(n.Constraints, c)
 	}
 	n.Span = p.span(start)
