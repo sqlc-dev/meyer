@@ -173,9 +173,11 @@ domain):
 - **Negative subset**: the ~160 `catchsql` assertions whose expected message
   contains `syntax error` / `unrecognized token` — precise must-reject cases
   with expected messages.
-- **Robustness corpus**: `test/fuzzdata{1,2,4,5,6,8}.db` contain ~36k SQL
-  text fuzz inputs (`xsql` tables) — no oracle, invariant is "terminate
-  without panic". Used as fuzz seeds, not vendored wholesale.
+- **Robustness corpus**: `test/fuzzdata{1..8}.db` contain ~36k SQL text fuzz
+  inputs (`xsql` tables). Used as seeds, not vendored wholesale. *(Read out
+  on demand by `sqlitesrc.FuzzSeeds` and fed to `cmd/difftest`, which does
+  have an oracle for them: the invariant is the full differential one, not
+  merely "terminate without panic".)*
 - **sqllogictest** (~millions of statements, license: "no attribution
   required") — bulk smoke corpus; low grammar diversity. Optional, behind an
   env-var-gated test, not vendored.
@@ -342,20 +344,32 @@ meyer/
 │   ├── parse_trigger.go      # trigger decl + restricted body
 │   ├── parse_misc.go         # txn, pragma, attach, vacuum, analyze, …
 │   ├── parser_test.go        # corpus harness (+ -check-parse)
-│   ├── fuzz_test.go          # never-panic, fuzzdata seeds
+│   ├── fuzz_test.go          # never-panic, round-trip under arbitrary bytes
+│   ├── roundtrip_test.go     # render → re-parse over the whole corpus
+│   ├── span_test.go          # byte-offset invariants sqlc slices with
+│   ├── snapshot_test.go      # AST goldens for testdata/ast/*.sql
+│   ├── errors_test.go        # message/offset fidelity
+│   ├── grammar_test.go       # every parse.y nonterminal is named somewhere
 │   ├── bench_test.go
 │   └── testdata/
 │       ├── README.md         # provenance + pinned SQLite version/hash
+│       ├── ast/              # hand-written tour of the node set + goldens
 │       ├── *.test            # consolidated corpus (== / -- format)
 │       └── *.metadata.json   # todo/skip sidecars
 ├── internal/
 │   ├── dump/                 # AST snapshot renderer
+│   ├── roundtrip/            # the round-trip property, stated once
+│   ├── sqlitesrc/            # pinned release: download, oracle, runner
+│   │   └── oracle/oracle.c   # the C oracle (prepare-only classifier)
+│   ├── tclextract/           # TCL brace scanner for the test scripts
 │   ├── testfile/             # corpus file format reader/writer
-│   └── reference/parse.y     # vendored grammar (documentation only)
+│   └── reference/            # vendored parse.y, tokenize.c,
+│                             #   mkkeywordhash.c (checked by tests)
 └── cmd/
     ├── next-test/            # pick next todo case
     ├── debug-parse/          # parse argv SQL, dump tree or error
-    └── regenerate/           # extract TCL corpus + run SQLite oracle
+    ├── difftest/             # mutation differential testing vs the oracle
+    └── regenerate-parse/     # extract TCL corpus + run SQLite oracle
 ```
 
 ## Milestones
@@ -381,7 +395,13 @@ meyer/
    EXPLAIN [QUERY PLAN].
 7. **Hardening** — error-message/offset fidelity pass over the negative
    corpus, fuzzing with fuzzdata seeds, benchmarks, race-clean parallel
-   corpus run, optional sqllogictest smoke gate.
+   corpus run, optional sqllogictest smoke gate. *(Done except the
+   sqllogictest gate. The fuzzdata seeds went to `cmd/difftest` rather than
+   to `FuzzParse`: an oracle that says whether SQLite accepts an input is a
+   far stronger check on them than "does not panic", and mutating them
+   turns 36k inputs into over a million. The corpus harness carries the
+   round trip, the spans and the offsets, so those are checked on every
+   run rather than in a pass.)*
 8. **sqlc integration** (in the sqlc repo, separate effort) — new
    `internal/engine/sqlite/parse.go` calling meyer (mirroring the
    zetajones/googlesql pattern), rewritten `convert.go` (meyer AST →
