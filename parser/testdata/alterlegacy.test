@@ -1,0 +1,515 @@
+==== 1.0
+
+  PRAGMA legacy_alter_table = 1;
+  CREATE TABLE t1(a, b, CHECK(t1.a != t1.b));
+  CREATE TABLE t2(a, b);
+  CREATE INDEX t2expr ON t2(a) WHERE t2.b>0;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 79 ok
+stmt 104 err 1 -1 149 no such table: main.t2
+==== 1.1
+
+  SELECT sql FROM sqlite_master
+----
+stmt 0 ok
+==== 1.2
+
+  ALTER TABLE t1 RENAME TO t1new;
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== 1.3
+
+  CREATE TABLE t3(c, d);
+  ALTER TABLE t3 RENAME TO t3new;
+  DROP TABLE t3new;
+----
+stmt 0 ok
+stmt 25 err 1 -1 59 no such table: t3
+stmt 59 err 1 -1 79 no such table: t3new
+==== 1.4
+
+  SELECT sql FROM sqlite_master
+----
+stmt 0 ok
+==== 1.3.dup1
+
+  ALTER TABLE t2 RENAME TO t2new;
+----
+stmt 0 err 1 -1 34 no such table: t2
+==== 1.4.dup1
+
+  SELECT sql FROM sqlite_master
+----
+stmt 0 ok
+==== 2.0
+
+    PRAGMA legacy_alter_table = 1;
+    CREATE TABLE abc(a, b, c);
+    INSERT INTO abc VALUES(1, 2, 3);
+    CREATE VIRTUAL TABLE eee USING echo('abc');
+    SELECT * FROM eee;
+----
+stmt 0 ok
+stmt 35 ok
+stmt 66 err 1 -1 103 no such table: abc
+stmt 103 ok
+stmt 151 err 1 -1 174 no such table: eee
+==== 2.1
+
+    ALTER TABLE eee RENAME TO fff;
+    SELECT * FROM fff;
+----
+stmt 0 err 1 -1 35 no such table: eee
+stmt 35 err 1 -1 58 no such table: fff
+==== 2.2
+
+    ALTER TABLE fff RENAME TO ggg;
+----
+stmt 0 err 1 -1 35 no such table: fff
+==== 3.0
+
+  PRAGMA legacy_alter_table = 1;
+  CREATE TABLE txx(a, b, c);
+  INSERT INTO txx VALUES(1, 2, 3);
+  CREATE VIEW vvv AS SELECT main.txx.a, txx.b, c FROM txx;
+  CREATE VIEW uuu AS SELECT main.one.a, one.b, c FROM txx AS one;
+  CREATE VIEW temp.ttt AS SELECT main.txx.a, txx.b, one.b, main.one.a FROM txx AS one, txx;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 62 err 1 -1 97 no such table: txx
+stmt 97 ok
+stmt 156 ok
+stmt 222 ok
+==== 3.1.1
+
+  SELECT * FROM vvv;
+----
+stmt 0 err 1 -1 21 no such table: vvv
+==== 3.1.2a
+
+  ALTER TABLE txx RENAME TO "t xx";
+----
+stmt 0 err 1 -1 36 no such table: txx
+==== 3.1.2b
+
+  SELECT * FROM vvv;
+----
+stmt 0 err 1 -1 21 no such table: vvv
+==== 3.1.3
+
+  SELECT sql FROM sqlite_master WHERE name='vvv';
+----
+stmt 0 ok
+==== 3.2.1
+
+  SELECT * FROM uuu;
+----
+stmt 0 err 1 -1 21 no such table: uuu
+==== 3.2.2
+
+  SELECT sql FROM sqlite_master WHERE name='uuu';;
+----
+stmt 0 ok
+==== 3.3.1
+
+  SELECT * FROM ttt;
+----
+stmt 0 err 1 -1 21 no such table: ttt
+==== 3.3.2
+
+  SELECT sql FROM sqlite_temp_master WHERE name='ttt';
+----
+stmt 0 ok
+==== 4.0
+
+  PRAGMA legacy_alter_table = 1;
+  CREATE table t1(x, y);
+  CREATE table t2(a, b);
+
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    SELECT t1.x, * FROM t1, t2;
+    INSERT INTO t2 VALUES(new.x, new.y);
+  END;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 58 ok
+stmt 83 err 1 -1 130 no such table: main.t1
+==== 4.1
+
+  INSERT INTO t1 VALUES(1, 1);
+  ALTER TABLE t1 RENAME TO t11;
+----
+stmt 0 err 1 -1 31 no such table: t1
+stmt 31 err 1 -1 63 no such table: t1
+==== 4.1a
+
+  INSERT INTO t11 VALUES(2, 2);
+----
+stmt 0 err 1 -1 32 no such table: t11
+==== 4.1b
+
+  ALTER TABLE t11 RENAME TO t1;
+  ALTER TABLE t2 RENAME TO t22;
+----
+stmt 0 err 1 -1 32 no such table: t11
+stmt 32 err 1 -1 64 no such table: t2
+==== 4.1c
+
+  INSERT INTO t1 VALUES(3, 3);
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== 4.2
+ SELECT squish(sql) FROM sqlite_master WHERE name = 'tr1'
+----
+stmt 0 err 1 8 58 no such function: squish
+==== 5.0
+
+  PRAGMA legacy_alter_table = 1;
+  CREATE TABLE t9(a, b, c);
+  CREATE TABLE t10(a, b, c);
+  CREATE TEMP TABLE t9(a, b, c);
+
+  CREATE TRIGGER temp.t9t AFTER INSERT ON temp.t9 BEGIN
+    INSERT INTO t10 VALUES(new.a, new.b, new.c);
+  END;
+
+  INSERT INTO temp.t9 VALUES(1, 2, 3);
+  SELECT * FROM t10;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 61 ok
+stmt 90 ok
+stmt 123 err 1 -1 180 no such table: temp.t9
+stmt 236 err 1 -1 276 no such table: temp.t9
+stmt 276 err 1 -1 297 no such table: t10
+==== 5.1
+
+  ALTER TABLE temp.t9 RENAME TO 't1234567890'
+----
+stmt 0 err 1 -1 47 no such table: temp.t9
+==== 5.2
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(a, b);
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t2 VALUES(3, 4);
+  CREATE VIEW v AS SELECT one.a, one.b, t2.a, t2.b FROM t1 AS one, t2;
+  SELECT * FROM v;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 81 no such table: t1
+stmt 81 err 1 -1 112 no such table: t2
+stmt 112 ok
+stmt 183 err 1 -1 202 no such table: v
+==== 5.3
+
+  ALTER TABLE t2 RENAME TO one;
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== 5.4
+
+  SELECT  *  FROM v
+----
+stmt 0 err 1 -1 21 no such table: v
+==== 5.5
+
+  ALTER TABLE one RENAME TO t2;
+  DROP VIEW v;
+  CREATE VIEW temp.vv AS SELECT one.a, one.b, t2.a, t2.b FROM t1 AS one, t2;
+  SELECT * FROM vv;
+----
+stmt 0 err 1 -1 32 no such table: one
+stmt 32 err 1 -1 47 no such view: v
+stmt 47 ok
+stmt 124 err 1 -1 144 no such table: vv
+==== 5.6
+
+  ALTER TABLE t2 RENAME TO one;
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== 5.7
+
+  SELECT  *  FROM vv
+----
+stmt 0 err 1 -1 22 no such table: vv
+==== 6.0
+
+    CREATE VIRTUAL TABLE x1 USING tcl(tcl_command);
+----
+stmt 0 ok
+==== 6.1
+
+    ALTER TABLE x1 RENAME TO x2;
+    SELECT sql FROM sqlite_master WHERE name = 'x2'
+----
+stmt 0 err 1 -1 33 no such table: x1
+stmt 33 ok
+==== 7.1
+
+    CREATE TABLE ddd(db, sql, zOld, zNew, bTemp);
+    INSERT INTO ddd VALUES(
+        'main', 'CREATE TABLE x1(i INTEGER, t TEXT)', 'ddd', NULL, 0
+    ), (
+        'main', 'CREATE TABLE x1(i INTEGER, t TEXT)', NULL, 'eee', 0
+    ), (
+        'main', NULL, 'ddd', 'eee', 0
+    );
+----
+stmt 0 ok
+stmt 50 err 1 -1 279 no such table: ddd
+==== 8.1
+
+  PRAGMA legacy_alter_table = 1;
+  ATTACH 'test.db2' AS aux;
+  PRAGMA foreign_keys = on;
+  CREATE TABLE aux.p1(a INTEGER PRIMARY KEY, b);
+  CREATE TABLE aux.c1(x INTEGER PRIMARY KEY, y REFERENCES p1(a));
+  INSERT INTO aux.p1 VALUES(1, 1);
+  INSERT INTO aux.p1 VALUES(2, 2);
+  INSERT INTO aux.c1 VALUES(NULL, 2);
+  CREATE TABLE aux.c2(x INTEGER PRIMARY KEY, y REFERENCES c1(a));
+----
+stmt 0 ok
+stmt 33 ok
+stmt 61 ok
+stmt 89 err 1 105 112 unknown database aux
+stmt 138 err 1 154 161 unknown database aux
+stmt 204 err 1 -1 239 no such table: aux.p1
+stmt 239 err 1 -1 274 no such table: aux.p1
+stmt 274 err 1 -1 312 no such table: aux.c1
+stmt 312 err 1 328 335 unknown database aux
+==== 8.2
+
+  ALTER TABLE aux.p1 RENAME TO ppp;
+----
+stmt 0 err 1 -1 36 no such table: aux.p1
+==== 8.2.dup1
+
+  INSERT INTO aux.c1 VALUES(NULL, 1);
+  SELECT sql FROM aux.sqlite_master WHERE name = 'c1';
+----
+stmt 0 err 1 -1 38 no such table: aux.c1
+stmt 38 err 1 -1 93 no such table: aux.sqlite_master
+==== 9.0
+
+  PRAGMA legacy_alter_table = 1;
+  CREATE TABLE t1(a, b, c);
+  CREATE VIEW v1 AS SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 61 ok
+==== 9.1
+
+  ALTER TABLE t1 RENAME TO t3;
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== 9.1b
+
+  ALTER TABLE t3 RENAME TO t1;
+----
+stmt 0 err 1 -1 31 no such table: t3
+==== 9.2
+
+  DROP VIEW v1;
+  CREATE TRIGGER tr AFTER INSERT ON t1 BEGIN
+    INSERT INTO t2 VALUES(new.a);
+  END;
+----
+stmt 0 err 1 -1 16 no such view: v1
+stmt 16 err 1 -1 61 no such table: main.t1
+==== 9.3
+
+  ALTER TABLE t1 RENAME TO t3;
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== 9.4
+
+  ALTER TABLE t3 RENAME TO t1;
+  DROP TRIGGER tr;
+
+  ATTACH 'test.db2' AS aux;
+  CREATE TRIGGER tr AFTER INSERT ON t1 WHEN new.a IS NULL BEGIN SELECT 1, 2, 3; END;
+
+  CREATE TABLE aux.t1(x);
+  CREATE TEMP TRIGGER tr AFTER INSERT ON aux.t1 BEGIN SELECT 1, 2, 3; END;
+----
+stmt 0 err 1 -1 31 no such table: t3
+stmt 31 err 1 -1 50 no such trigger: tr
+stmt 50 ok
+stmt 79 err 1 -1 143 no such table: main.t1
+stmt 164 err 1 181 188 unknown database aux
+stmt 191 err 1 -1 245 no such table: aux.t1
+==== 9.5
+
+  ALTER TABLE main.t1 RENAME TO t3;
+----
+stmt 0 err 1 -1 36 no such table: main.t1
+==== 9.6
+
+  SELECT sql FROM sqlite_temp_master;
+  SELECT sql FROM sqlite_master WHERE type='trigger';
+----
+stmt 0 ok
+stmt 38 ok
+==== 10.0
+
+    PRAGMA legacy_alter_table = 1;
+    CREATE VIRTUAL TABLE fff USING fts5(x, y, z);
+----
+stmt 0 ok
+stmt 35 ok
+==== 10.1
+
+    BEGIN;
+      INSERT INTO fff VALUES('a', 'b', 'c');
+      ALTER TABLE fff RENAME TO ggg;
+    COMMIT;
+----
+stmt 0 ok
+stmt 11 err 1 -1 56 no such table: fff
+stmt 56 err 1 -1 93 no such table: fff
+stmt 93 ok
+==== 10.2
+
+    SELECT * FROM ggg;
+----
+stmt 0 err 1 -1 23 no such table: ggg
+==== 11.0
+
+  PRAGMA legacy_alter_table = 1;
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.t1(a, b, c);
+  CREATE TABLE main.t1(a, b, c);
+  CREATE TEMP TRIGGER tr AFTER INSERT ON aux.t1 BEGIN
+    SELECT trigger(new.a, new.b, new.c);
+  END;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 61 err 1 77 84 unknown database aux
+stmt 93 ok
+stmt 126 err 1 -1 180 no such table: aux.t1
+==== 11.1
+
+  INSERT INTO main.t1 VALUES(1, 2, 3);
+  INSERT INTO aux.t1 VALUES(4, 5, 6);
+----
+stmt 0 err 1 -1 39 no such table: main.t1
+stmt 39 err 1 -1 77 no such table: aux.t1
+==== 11.3
+
+  SELECT name, tbl_name FROM sqlite_temp_master;
+----
+stmt 0 ok
+==== 11.4
+
+  ALTER TABLE main.t1 RENAME TO t2;
+  SELECT name, tbl_name FROM sqlite_temp_master;
+----
+stmt 0 err 1 -1 36 no such table: main.t1
+stmt 36 ok
+==== 11.5
+
+  ALTER TABLE aux.t1 RENAME TO t2;
+  SELECT name, tbl_name FROM sqlite_temp_master;
+----
+stmt 0 err 1 -1 35 no such table: aux.t1
+stmt 35 ok
+==== 11.6
+
+  INSERT INTO aux.t2 VALUES(7, 8, 9);
+----
+stmt 0 err 1 -1 38 no such table: aux.t2
+==== 12.0
+
+  PRAGMA legacy_alter_table = 1;
+  CREATE TABLE t1(a);
+  CREATE TABLE t2(w);
+  CREATE TRIGGER temp.r1 AFTER INSERT ON main.t2 BEGIN
+    INSERT INTO t1(a) VALUES(new.w);
+  END;
+  CREATE TEMP TABLE t2(x);
+----
+stmt 0 ok
+stmt 33 ok
+stmt 55 ok
+stmt 77 err 1 -1 132 no such table: main.t2
+stmt 176 ok
+==== 12.1
+
+  ALTER TABLE main.t2 RENAME TO t3;
+----
+stmt 0 err 1 -1 36 no such table: main.t2
+==== 12.2
+
+  INSERT INTO t3 VALUES('WWW');
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 32 no such table: t3
+stmt 32 err 1 -1 52 no such table: t1
+==== 14.0
+
+    PRAGMA legacy_alter_table = 1;
+    CREATE VIRTUAL TABLE rt USING rtree(id, minx, maxx, miny, maxy);
+
+    CREATE TABLE "mytable" ( "fid" INTEGER PRIMARY KEY, "geom" BLOB);
+
+    CREATE TRIGGER tr1 AFTER UPDATE OF "geom" ON "mytable" 
+          WHEN OLD."fid" = NEW."fid" AND NEW."geom" IS NULL BEGIN 
+      DELETE FROM rt WHERE id = OLD."fid"; 
+    END;
+
+    INSERT INTO mytable VALUES(1, X'abcd');
+----
+stmt 0 ok
+stmt 35 ok
+stmt 104 ok
+stmt 175 err 1 -1 302 no such table: main.mytable
+stmt 356 err 1 -1 401 no such table: mytable
+==== 14.1
+
+    UPDATE mytable SET geom = X'1234'
+----
+stmt 0 err 1 -1 39 no such table: mytable
+==== 14.2
+
+    ALTER TABLE mytable RENAME TO mytable_renamed;
+----
+stmt 0 err 1 -1 51 no such table: mytable
+==== 14.3
+
+    CREATE TRIGGER tr2 AFTER INSERT ON mytable_renamed BEGIN
+      DELETE FROM rt WHERE id=(SELECT min(id) FROM rt);
+    END;
+----
+stmt 0 err 1 -1 61 no such table: main.mytable_renamed
+==== 14.4
+
+    ALTER TABLE mytable_renamed RENAME TO mytable2;
+----
+stmt 0 err 1 -1 52 no such table: mytable_renamed
+==== 14.5
+
+  PRAGMA legacy_alter_table = 1;
+  CREATE TABLE t1(a, b, c);
+  CREATE VIEW v1 AS SELECT * FROM t1;
+  CREATE TRIGGER xyz AFTER INSERT ON t1 BEGIN
+    SELECT a, b FROM v1;
+  END;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 61 ok
+stmt 99 err 1 -1 145 no such table: main.t1
+==== 14.6
+
+  ALTER TABLE t1 RENAME TO tt1;
+----
+stmt 0 err 1 -1 32 no such table: t1

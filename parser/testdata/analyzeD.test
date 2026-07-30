@@ -1,0 +1,32 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c);
+----
+stmt 0 ok
+==== 1.2
+
+  SELECT * FROM t1 WHERE a=3001 AND c=150;
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== 1.4
+
+  SELECT * FROM t1 WHERE a=3001 AND c=150;
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== 1.5
+ 
+    UPDATE t1 SET a=13 WHERE a = 3001;
+    ANALYZE;
+----
+stmt 0 err 1 -1 40 no such table: t1
+stmt 40 ok
+==== 1.6
+
+  SELECT * FROM t1 WHERE a=13 AND c=150;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== 1.8
+
+  SELECT * FROM t1 WHERE a=13 AND c=150;
+----
+stmt 0 err 1 -1 41 no such table: t1

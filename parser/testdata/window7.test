@@ -19,65 +19,65 @@
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 68 err 1 -1 no such table: t3
+stmt 68 err 1 -1 1048 no such table: t3
 ==== 1.1
 
   SELECT a, sum(b) FROM t3 GROUP BY a ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 50 no such table: t3
 ==== 1.2
 
   SELECT a, sum(b) OVER (
     ORDER BY a GROUPS BETWEEN CURRENT ROW AND CURRENT ROW
   ) FROM t3 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 108 no such table: t3
 ==== 1.3
 
   SELECT a, sum(b) OVER (
     ORDER BY a GROUPS BETWEEN 0 PRECEDING AND 0 FOLLOWING
   ) FROM t3 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 108 no such table: t3
 ==== 1.4
 
   SELECT a, sum(b) OVER (
     ORDER BY a GROUPS BETWEEN 2 PRECEDING AND 2 FOLLOWING
   ) FROM t3 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 108 no such table: t3
 ==== 1.5
 
   SELECT a, sum(b) OVER (
     ORDER BY a RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING
   ) FROM t3 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 107 no such table: t3
 ==== 1.6
 
   SELECT a, sum(b) OVER (
     ORDER BY a RANGE BETWEEN 2 PRECEDING AND 2 FOLLOWING
   ) FROM t3 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 107 no such table: t3
 ==== 1.7
 
   SELECT a, sum(b) OVER (
     ORDER BY a RANGE BETWEEN 2 PRECEDING AND 1 FOLLOWING
   ) FROM t3 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 107 no such table: t3
 ==== 1.8.1
 
   SELECT a, sum(b) OVER (
     ORDER BY a RANGE BETWEEN 0 PRECEDING AND 1 FOLLOWING
   ) FROM t3 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 107 no such table: t3
 ==== 1.8.2
 
   SELECT a, sum(b) OVER (
     ORDER BY a DESC RANGE BETWEEN 0 PRECEDING AND 1 FOLLOWING
   ) FROM t3 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 112 no such table: t3

@@ -1,0 +1,538 @@
+==== triggerC-1.1
+
+    CREATE TABLE t1(a, b, c);
+    CREATE TABLE log(t, a1, b1, c1, a2, b2, c2);
+    CREATE TRIGGER trig1 BEFORE INSERT ON t1 BEGIN
+      INSERT INTO log VALUES('before', NULL, NULL, NULL, new.a, new.b, new.c);
+    END;
+    CREATE TRIGGER trig2 AFTER INSERT ON t1 BEGIN
+      INSERT INTO log VALUES('after', NULL, NULL, NULL, new.a, new.b, new.c);
+    END;
+    CREATE TRIGGER trig3 BEFORE UPDATE ON t1 BEGIN
+      INSERT INTO log VALUES('before', old.a,old.b,old.c, new.a,new.b,new.c);
+    END;
+    CREATE TRIGGER trig4 AFTER UPDATE ON t1 BEGIN
+      INSERT INTO log VALUES('after', old.a,old.b,old.c, new.a,new.b,new.c);
+    END;
+
+    CREATE TRIGGER trig5 BEFORE DELETE ON t1 BEGIN
+      INSERT INTO log VALUES('before', old.a,old.b,old.c, NULL,NULL,NULL);
+    END;
+    CREATE TRIGGER trig6 AFTER DELETE ON t1 BEGIN
+      INSERT INTO log VALUES('after', old.a,old.b,old.c, NULL,NULL,NULL);
+    END;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 79 err 1 -1 130 no such table: main.t1
+stmt 218 err 1 -1 268 no such table: main.t1
+stmt 355 err 1 -1 406 no such table: main.t1
+stmt 493 err 1 -1 543 no such table: main.t1
+stmt 629 err 1 -1 681 no such table: main.t1
+stmt 765 err 1 -1 815 no such table: main.t1
+==== triggerC-1.2
+
+    INSERT INTO t1 VALUES('A', 'B', 'C');
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 42 no such table: t1
+stmt 42 err 1 -1 65 no such table: log
+==== triggerC-1.3
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== triggerC-1.4
+
+    DELETE FROM log;
+    UPDATE t1 SET a = 'a';
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 21 no such table: log
+stmt 21 err 1 -1 48 no such table: t1
+stmt 48 err 1 -1 71 no such table: log
+==== triggerC-1.5
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== triggerC-1.6
+
+    DELETE FROM log;
+    DELETE FROM t1;
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 21 no such table: log
+stmt 21 err 1 -1 41 no such table: t1
+stmt 41 err 1 -1 64 no such table: log
+==== triggerC-1.7
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== triggerC-1.8
+
+    CREATE TABLE t4(a, b);
+    CREATE TRIGGER t4t AFTER DELETE ON t4 BEGIN
+      SELECT RAISE(ABORT, 'delete is not supported');
+    END;
+----
+stmt 0 ok
+stmt 27 err 1 -1 75 no such table: main.t4
+==== triggerC-1.10
+ SELECT * FROM t4
+----
+stmt 0 err 1 -1 18 no such table: t4
+==== triggerC-1.11
+
+    CREATE TABLE t5 (a primary key, b, c);
+    INSERT INTO t5 values (1, 2, 3);
+    CREATE TRIGGER au_tbl AFTER UPDATE ON t5 BEGIN
+      UPDATE OR IGNORE t5 SET a = new.a, c = 10;
+    END;
+----
+stmt 0 ok
+stmt 43 err 1 -1 80 no such table: t5
+stmt 80 err 1 -1 131 no such table: main.t5
+==== triggerC-1.12
+ UPDATE OR REPLACE t5 SET a = 4 WHERE a = 1
+----
+stmt 0 err 1 -1 44 no such table: t5
+==== triggerC-1.13
+
+    CREATE TABLE t6(a INTEGER PRIMARY KEY, b);
+    INSERT INTO t6 VALUES(1, 2);
+    create trigger r1 after update on t6 for each row begin
+      SELECT 1;
+    end;
+    UPDATE t6 SET a=a;
+----
+stmt 0 ok
+stmt 47 err 1 -1 80 no such table: t6
+stmt 80 err 1 -1 140 no such table: main.t6
+stmt 165 err 1 -1 188 no such table: t6
+==== triggerC-1.14
+
+    DROP TABLE t1;
+    CREATE TABLE cnt(n);
+    INSERT INTO cnt VALUES(0);
+    CREATE TABLE t1(a INTEGER PRIMARY KEY, b UNIQUE, c, d, e);
+    CREATE INDEX t1cd ON t1(c,d);
+    CREATE TRIGGER t1r1 AFTER UPDATE ON t1 BEGIN UPDATE cnt SET n=n+1; END;
+    INSERT INTO t1 VALUES(1,2,3,4,5);
+    INSERT INTO t1 VALUES(6,7,8,9,10);
+    INSERT INTO t1 VALUES(11,12,13,14,15);
+----
+stmt 0 err 1 -1 19 no such table: t1
+stmt 19 ok
+stmt 44 err 1 -1 75 no such table: cnt
+stmt 75 ok
+stmt 138 err 1 -1 172 no such table: main.t1
+stmt 172 err 1 -1 221 no such table: main.t1
+stmt 248 err 1 -1 286 no such table: t1
+stmt 286 err 1 -1 325 no such table: t1
+stmt 325 err 1 -1 368 no such table: t1
+==== triggerC-1.15
+ UPDATE OR ROLLBACK t1 SET a=100
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== triggerC-2.1.0
+
+    CREATE TABLE t2(a PRIMARY KEY);
+----
+stmt 0 ok
+==== triggerC-3.1.1
+
+    CREATE TABLE t3(a, b);
+    CREATE TRIGGER t3i AFTER INSERT ON t3 BEGIN
+      DELETE FROM t3 WHERE rowid = new.rowid;
+    END;
+    CREATE TRIGGER t3d AFTER DELETE ON t3 BEGIN
+      INSERT INTO t3 VALUES(old.a, old.b);
+    END;
+----
+stmt 0 ok
+stmt 27 err 1 -1 75 no such table: main.t3
+stmt 130 err 1 -1 178 no such table: main.t3
+==== triggerC-3.1.2
+ INSERT INTO t3 VALUES(0,0)
+----
+stmt 0 err 1 -1 28 no such table: t3
+==== triggerC-3.1.3
+ SELECT * FROM t3
+----
+stmt 0 err 1 -1 18 no such table: t3
+==== triggerC-5.1.0
+
+    DROP TABLE IF EXISTS t5;
+    CREATE TABLE t5(a INTEGER PRIMARY KEY, b);
+    CREATE UNIQUE INDEX t5i ON t5(b);
+    INSERT INTO t5 VALUES(1, 'a');
+    INSERT INTO t5 VALUES(2, 'b');
+    INSERT INTO t5 VALUES(3, 'c');
+
+    CREATE TABLE t5g(a, b, c);
+    CREATE TRIGGER t5t BEFORE DELETE ON t5 BEGIN
+      INSERT INTO t5g VALUES(old.a, old.b, (SELECT count(*) FROM t5));
+    END;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 76 err 1 -1 114 no such table: main.t5
+stmt 114 err 1 -1 149 no such table: t5
+stmt 149 err 1 -1 184 no such table: t5
+stmt 184 err 1 -1 219 no such table: t5
+stmt 219 ok
+stmt 251 err 1 -1 300 no such table: main.t5
+==== triggerC-5.2.0
+
+    DROP TRIGGER t5t;
+    CREATE TRIGGER t5t AFTER DELETE ON t5 BEGIN
+      INSERT INTO t5g VALUES(old.a, old.b, (SELECT count(*) FROM t5));
+    END;
+----
+stmt 0 err 1 -1 22 no such trigger: t5t
+stmt 22 err 1 -1 70 no such table: main.t5
+==== triggerC-5.3.0
+ PRAGMA recursive_triggers = off
+----
+stmt 0 ok
+==== triggerC-5.3.8
+ PRAGMA recursive_triggers = on
+----
+stmt 0 ok
+==== triggerC-6.1
+ PRAGMA recursive_triggers
+----
+stmt 0 ok
+==== triggerC-6.2
+ 
+    PRAGMA recursive_triggers = off;
+    PRAGMA recursive_triggers;
+----
+stmt 0 ok
+stmt 38 ok
+==== triggerC-6.3
+ 
+    PRAGMA recursive_triggers = on;
+    PRAGMA recursive_triggers;
+----
+stmt 0 ok
+stmt 37 ok
+==== triggerC-7.1
+
+    CREATE TABLE t8(x);
+    CREATE TABLE t7(a, b);
+    INSERT INTO t7 VALUES(1, 2);
+    INSERT INTO t7 VALUES(3, 4);
+    INSERT INTO t7 VALUES(5, 6);
+    CREATE TRIGGER t7t BEFORE UPDATE ON t7 BEGIN
+      DELETE FROM t7 WHERE a = 1;
+    END;
+    CREATE TRIGGER t7ta AFTER UPDATE ON t7 BEGIN
+      INSERT INTO t8 VALUES('after fired ' || old.rowid || '->' || new.rowid);
+    END;
+----
+stmt 0 ok
+stmt 24 ok
+stmt 51 err 1 -1 84 no such table: t7
+stmt 84 err 1 -1 117 no such table: t7
+stmt 117 err 1 -1 150 no such table: t7
+stmt 150 err 1 -1 199 no such table: main.t7
+stmt 242 err 1 -1 291 no such table: main.t7
+==== triggerC-7.2
+
+    BEGIN;
+      UPDATE t7 SET b=7 WHERE a = 5;
+      SELECT * FROM t7;
+      SELECT * FROM t8;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 -1 48 no such table: t7
+stmt 48 err 1 -1 72 no such table: t7
+stmt 72 err 1 -1 96 no such table: t8
+stmt 96 ok
+==== triggerC-7.3
+
+    BEGIN;
+      UPDATE t7 SET b=7 WHERE a = 1;
+      SELECT * FROM t7;
+      SELECT * FROM t8;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 -1 48 no such table: t7
+stmt 48 err 1 -1 72 no such table: t7
+stmt 72 err 1 -1 96 no such table: t8
+stmt 96 ok
+==== triggerC-7.4
+
+    DROP TRIGGER t7t;
+    CREATE TRIGGER t7t BEFORE UPDATE ON t7 WHEN (old.rowid!=1 OR new.rowid!=8)
+    BEGIN
+      UPDATE t7 set rowid = 8 WHERE rowid=1;
+    END;
+----
+stmt 0 err 1 -1 22 no such trigger: t7t
+stmt 22 err 1 -1 111 no such table: main.t7
+==== triggerC-7.5
+
+    BEGIN;
+      UPDATE t7 SET b=7 WHERE a = 5;
+      SELECT rowid, * FROM t7;
+      SELECT * FROM t8;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 -1 48 no such table: t7
+stmt 48 err 1 -1 79 no such table: t7
+stmt 79 err 1 -1 103 no such table: t8
+stmt 103 ok
+==== triggerC-7.6
+
+    BEGIN;
+      UPDATE t7 SET b=7 WHERE a = 1;
+      SELECT rowid, * FROM t7;
+      SELECT * FROM t8;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 -1 48 no such table: t7
+stmt 48 err 1 -1 79 no such table: t7
+stmt 79 err 1 -1 103 no such table: t8
+stmt 103 ok
+==== triggerC-7.7
+
+    DROP TRIGGER t7t;
+    DROP TRIGGER t7ta;
+    CREATE TRIGGER t7t BEFORE DELETE ON t7 BEGIN
+      UPDATE t7 set rowid = 8 WHERE rowid=1;
+    END;
+    CREATE TRIGGER t7ta AFTER DELETE ON t7 BEGIN
+      INSERT INTO t8 VALUES('after fired ' || old.rowid);
+    END;
+----
+stmt 0 err 1 -1 22 no such trigger: t7t
+stmt 22 err 1 -1 45 no such trigger: t7ta
+stmt 45 err 1 -1 94 no such table: main.t7
+stmt 148 err 1 -1 197 no such table: main.t7
+==== triggerC-7.8
+
+    BEGIN;
+      DELETE FROM t7 WHERE a = 3;
+      SELECT rowid, * FROM t7;
+      SELECT * FROM t8;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 -1 45 no such table: t7
+stmt 45 err 1 -1 76 no such table: t7
+stmt 76 err 1 -1 100 no such table: t8
+stmt 100 ok
+==== triggerC-7.9
+
+    BEGIN;
+      DELETE FROM t7 WHERE a = 1;
+      SELECT rowid, * FROM t7;
+      SELECT * FROM t8;
+    ROLLBACK;
+----
+stmt 0 ok
+stmt 11 err 1 -1 45 no such table: t7
+stmt 45 err 1 -1 76 no such table: t7
+stmt 76 err 1 -1 100 no such table: t8
+stmt 100 ok
+==== triggerC-9.1
+
+    CREATE TABLE t9(a,b);
+    CREATE INDEX t9b ON t9(b);
+    INSERT INTO t9 VALUES(1,0);
+    INSERT INTO t9 VALUES(2,1);
+    INSERT INTO t9 VALUES(3,2);
+    INSERT INTO t9 SELECT a+3, a+2 FROM t9;
+    INSERT INTO t9 SELECT a+6, a+5 FROM t9;
+    SELECT a FROM t9 ORDER BY a;
+----
+stmt 0 ok
+stmt 26 err 1 -1 57 no such table: main.t9
+stmt 57 err 1 -1 89 no such table: t9
+stmt 89 err 1 -1 121 no such table: t9
+stmt 121 err 1 -1 153 no such table: t9
+stmt 153 err 1 -1 197 no such table: t9
+stmt 197 err 1 -1 241 no such table: t9
+stmt 241 err 1 -1 274 no such table: t9
+==== triggerC-9.2
+
+    CREATE TRIGGER t9r1 AFTER DELETE ON t9 BEGIN
+      DELETE FROM t9 WHERE b=old.a;
+    END;
+    DELETE FROM t9 WHERE b=4;
+    SELECT a FROM t9 ORDER BY a;
+----
+stmt 0 err 1 -1 49 no such table: main.t9
+stmt 94 err 1 -1 124 no such table: t9
+stmt 124 err 1 -1 157 no such table: t9
+==== triggerC-10.2
+
+    UPDATE t10 SET a = 'tcl', updatecnt = 5;
+    SELECT * FROM t10;
+----
+stmt 0 err 1 -1 45 no such table: t10
+stmt 45 err 1 -1 68 no such table: t10
+==== triggerC-13.1
+
+  PRAGMA recursive_triggers = ON;
+  CREATE TABLE t12(a, b);
+  INSERT INTO t12 VALUES(1, 2);
+  CREATE TRIGGER tr12 AFTER UPDATE ON t12 BEGIN
+    UPDATE t12 SET a=new.a+1, b=new.b+1;
+  END;
+----
+stmt 0 ok
+stmt 34 ok
+stmt 60 err 1 -1 92 no such table: t12
+stmt 92 err 1 -1 140 no such table: main.t12
+==== triggerC-13.2
+
+  UPDATE t12 SET a=a+1, b=b+1;
+----
+stmt 0 err 1 -1 31 no such table: t12
+==== 15.1.1
+
+  PRAGMA recursive_triggers = 1;
+  CREATE TABLE node(
+      id int not null primary key, 
+      pid int not null default 0 references node,
+      key varchar not null, 
+      path varchar default '',
+      unique(pid, key)
+      );
+  CREATE TRIGGER node_delete_referencing AFTER DELETE ON "node"
+    BEGIN
+    DELETE FROM "node" WHERE pid = old."id";
+  END;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 232 err 1 -1 306 no such table: main.node
+==== 15.1.2
+
+  INSERT INTO node(id, pid, key) VALUES(9, 0, 'test');
+  INSERT INTO node(id, pid, key) VALUES(90, 9, 'test1');
+  INSERT INTO node(id, pid, key) VALUES(900, 90, 'test2');
+  DELETE FROM node WHERE id=9;
+  SELECT * FROM node;
+----
+stmt 0 err 1 -1 55 no such table: node
+stmt 55 err 1 -1 112 no such table: node
+stmt 112 err 1 -1 171 no such table: node
+stmt 171 err 1 -1 202 no such table: node
+stmt 202 err 1 -1 224 no such table: node
+==== 15.2.1
+
+  CREATE TABLE   x1  (x);
+
+  CREATE TABLE   x2  (a, b);
+  CREATE TABLE '"x2"'(a, b);
+
+  INSERT INTO x2 VALUES(1, 2);
+  INSERT INTO x2 VALUES(3, 4);
+  INSERT INTO '"x2"' SELECT * FROM x2;
+
+  CREATE TRIGGER x1ai AFTER INSERT ON x1 BEGIN
+    INSERT INTO """x2""" VALUES('x', 'y');
+    DELETE FROM """x2""" WHERE a=1;
+    UPDATE """x2""" SET b = 11 WHERE a = 3;
+  END;
+
+  INSERT INTO x1 VALUES('go!');
+----
+stmt 0 ok
+stmt 26 ok
+stmt 56 ok
+stmt 85 err 1 -1 117 no such table: x2
+stmt 117 err 1 -1 148 no such table: x2
+stmt 148 err 1 -1 187 no such table: "x2"
+stmt 187 err 1 -1 235 no such table: main.x1
+stmt 365 err 1 -1 398 no such table: x1
+==== 15.2.2
+ SELECT * FROM x2;
+----
+stmt 0 err 1 -1 18 no such table: x2
+==== 15.2.3
+ SELECT * FROM """x2""";
+----
+stmt 0 err 1 -1 24 no such table: "x2"
+==== 16.1
+
+  SELECT raise(ABORT, 'msg') FROM sqlite_master 
+  UNION SELECT 1 
+  ORDER BY raise(IGNORE);
+----
+stmt 0 err 1 -1 93 1st ORDER BY term does not match any column in the result set
+==== 16.2
+
+  SELECT count(*) FROM sqlite_master 
+  GROUP BY raise(IGNORE) 
+  HAVING raise(ABORT, 'msg');
+----
+stmt 0 err 1 -1 94 RAISE() may only be used within a trigger-program
+==== 17.0
+
+  CREATE TABLE xyz(x INTEGER PRIMARY KEY, y, z);
+  CREATE TRIGGER xyz_tr BEFORE INSERT ON xyz BEGIN
+    SELECT new.x;
+  END;
+----
+stmt 0 ok
+stmt 49 err 1 -1 100 no such table: main.xyz
+==== 17.1
+
+  INSERT INTO xyz VALUES('hello', 2, 3);
+----
+stmt 0 err 1 -1 41 no such table: xyz
+==== 18.1
+
+  CREATE TABLE t1(a);
+  CREATE TABLE t2(b);
+  CREATE TABLE t3(c);
+  CREATE TABLE t4(d);
+  CREATE TABLE t5(e);
+  CREATE TABLE t6(f);
+  CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t2 VALUES(new.a);
+  END;
+  CREATE TRIGGER r2 AFTER INSERT ON t2 BEGIN
+    INSERT INTO t3 VALUES(new.b);
+  END;
+  CREATE TRIGGER r3 AFTER INSERT ON t3 BEGIN
+    INSERT INTO t4 VALUES(new.c);
+  END;
+  CREATE TRIGGER r4 AFTER INSERT ON t4 BEGIN
+    INSERT INTO t5 VALUES(new.d);
+  END;
+  CREATE TRIGGER r5 AFTER INSERT ON t5 BEGIN
+    INSERT INTO t6 VALUES(new.e);
+  END;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 ok
+stmt 66 ok
+stmt 88 ok
+stmt 110 ok
+stmt 132 err 1 -1 177 no such table: main.t1
+stmt 218 err 1 -1 263 no such table: main.t2
+stmt 304 err 1 -1 349 no such table: main.t3
+stmt 390 err 1 -1 435 no such table: main.t4
+stmt 476 err 1 -1 521 no such table: main.t5
+==== 18.2
+
+  INSERT INTO t1(a) VALUES(1);
+  SELECT f FROM t6;
+----
+stmt 0 err 1 -1 31 no such table: t1
+stmt 31 err 1 -1 51 no such table: t6
+==== 18.3
+
+  INSERT INTO t1(a) VALUES(2);
+----
+stmt 0 err 1 -1 31 no such table: t1

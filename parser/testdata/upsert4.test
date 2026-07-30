@@ -4,84 +4,84 @@
     INSERT INTO t1 VALUES(2, NULL, 'two');
     INSERT INTO t1 VALUES(3, NULL, 'three');
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 43 err 1 -1 no such table: t1
-stmt 86 err 1 -1 no such table: t1
+stmt 0 err 1 -1 43 no such table: t1
+stmt 43 err 1 -1 86 no such table: t1
+stmt 86 err 1 -1 131 no such table: t1
 ==== upsert4-generated.dup1
 
     INSERT INTO t1 VALUES(1, NULL, 'xyz') ON CONFLICT DO NOTHING;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 66 err 1 -1 no such table: t1
+stmt 0 err 1 -1 66 no such table: t1
+stmt 66 err 1 -1 88 no such table: t1
 ==== upsert4-generated.dup2
 
     INSERT INTO t1 VALUES(4, NULL, 'two') ON CONFLICT DO NOTHING;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 66 err 1 -1 no such table: t1
+stmt 0 err 1 -1 66 no such table: t1
+stmt 66 err 1 -1 88 no such table: t1
 ==== upsert4-generated.dup3
 
     INSERT INTO t1 VALUES(4, NULL, 'two') ON CONFLICT (c) DO UPDATE SET b = 1;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 79 err 1 -1 no such table: t1
+stmt 0 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 101 no such table: t1
 ==== upsert4-generated.dup4
 
     INSERT INTO t1 VALUES(2, NULL, 'zero') ON CONFLICT (a) DO UPDATE SET b=2;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 78 err 1 -1 no such table: t1
+stmt 0 err 1 -1 78 no such table: t1
+stmt 78 err 1 -1 100 no such table: t1
 ==== upsert4-generated.dup5
 
     INSERT INTO t1 VALUES(2, NULL, 'zero') ON CONFLICT (a) 
       DO UPDATE SET c = 'one';
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 91 no such table: t1
 ==== upsert4-generated.dup6
 
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 22 no such table: t1
 ==== upsert4-generated.dup7
 
     INSERT INTO t1 VALUES(2, NULL, 'zero') ON CONFLICT (a) 
       DO UPDATE SET (b, c) = (SELECT 'x', 'y');
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 108 err 1 -1 no such table: t1
+stmt 0 err 1 -1 108 no such table: t1
+stmt 108 err 1 -1 130 no such table: t1
 ==== upsert4-generated.dup8
 
     INSERT INTO t1 VALUES(1, NULL, NULL) ON CONFLICT (a) 
       DO UPDATE SET (c, a) = ('four', 4);
     SELECT * FROM t1 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 100 err 1 -1 no such table: t1
+stmt 0 err 1 -1 100 no such table: t1
+stmt 100 err 1 -1 133 no such table: t1
 ==== upsert4-generated.dup9
 
     INSERT INTO xyz VALUES(10, 1, 1, 'one');
 ----
-stmt 0 err 1 -1 no such table: xyz
+stmt 0 err 1 -1 45 no such table: xyz
 ==== upsert4-generated.dup10
 
     SELECT * FROM xyz;
 ----
-stmt 0 err 1 -1 no such table: xyz
+stmt 0 err 1 -1 23 no such table: xyz
 ==== upsert4-generated.dup11
 
     INSERT INTO abc VALUES(1, 'one', 'two');
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 45 no such table: abc
 ==== upsert4-generated.dup12
 
     SELECT * FROM abc
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 23 no such table: abc
 ==== upsert4-generated.dup13
 
     INSERT INTO abc VALUES(1, 'one', 1);
@@ -89,15 +89,15 @@ stmt 0 err 1 -1 no such table: abc
     INSERT INTO abc VALUES(3, 'xyz', 3);
     INSERT INTO abc VALUES(4, 'XYZ', 4);
 ----
-stmt 0 err 1 -1 no such table: abc
-stmt 41 err 1 -1 no such table: abc
-stmt 82 err 1 -1 no such table: abc
-stmt 123 err 1 -1 no such table: abc
+stmt 0 err 1 -1 41 no such table: abc
+stmt 41 err 1 -1 82 no such table: abc
+stmt 82 err 1 -1 123 no such table: abc
+stmt 123 err 1 -1 164 no such table: abc
 ==== upsert4-generated.dup14
 
     SELECT * FROM abc
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 23 no such table: abc
 ==== 5.0
 
   CREATE TABLE w1(a INT PRIMARY KEY, x, y);
@@ -106,8 +106,8 @@ stmt 0 err 1 -1 no such table: abc
     ON CONFLICT (('x' || x) COLLATE nocase) DO NOTHING;
 ----
 stmt 0 ok
-stmt 44 err 1 -1 no such table: main.w1
-stmt 92 err 1 -1 no such table: w1
+stmt 44 err 1 -1 92 no such table: main.w1
+stmt 92 err 1 -1 188 no such table: w1
 ==== upsert4-generated.dup15
 
     INSERT INTO t1 VALUES(1, 1, 'one');
@@ -115,25 +115,25 @@ stmt 92 err 1 -1 no such table: w1
     INSERT OR REPLACE INTO t1 VALUES(1, 2, 'two') ON CONFLICT(b) DO NOTHING;
     PRAGMA integrity_check;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 40 err 1 -1 no such table: t1
-stmt 80 err 1 -1 no such table: t1
+stmt 0 err 1 -1 40 no such table: t1
+stmt 40 err 1 -1 80 no such table: t1
+stmt 80 err 1 -1 157 no such table: t1
 stmt 157 ok
 ==== upsert4-generated.dup16
 
     INSERT INTO t1 VALUES(1, 1, 1);
     INSERT INTO t1 VALUES(2, 2, 2);
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 36 err 1 -1 no such table: t1
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 72 no such table: t1
 ==== upsert4-generated.dup17
 
     INSERT OR REPLACE INTO t1 VALUES(3, 1, 1) ON CONFLICT(b) DO NOTHING;
     SELECT * FROM t1;
     PRAGMA integrity_check;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 73 err 1 -1 no such table: t1
+stmt 0 err 1 -1 73 no such table: t1
+stmt 73 err 1 -1 95 no such table: t1
 stmt 95 ok
 ==== upsert4-generated.dup18
 
@@ -141,8 +141,8 @@ stmt 95 ok
     SELECT * FROM t1;
     PRAGMA integrity_check;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 73 err 1 -1 no such table: t1
+stmt 0 err 1 -1 73 no such table: t1
+stmt 73 err 1 -1 95 no such table: t1
 stmt 95 ok
 ==== upsert4-generated.dup19
 
@@ -151,8 +151,8 @@ stmt 95 ok
     SELECT * FROM t1;
     PRAGMA integrity_check;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 92 err 1 -1 no such table: t1
+stmt 0 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 114 no such table: t1
 stmt 114 ok
 ==== upsert4-generated.dup20
 
@@ -161,63 +161,63 @@ stmt 114 ok
     SELECT * FROM t1;
     PRAGMA integrity_check;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 92 err 1 -1 no such table: t1
+stmt 0 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 114 no such table: t1
 stmt 114 ok
 ==== upsert4-generated.dup21
 
     INSERT INTO t1 VALUES('a', 1, 1, 1);
     INSERT INTO t1 VALUES('b', 2, 2, 2);
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 41 err 1 -1 no such table: t1
+stmt 0 err 1 -1 41 no such table: t1
+stmt 41 err 1 -1 82 no such table: t1
 ==== upsert4-generated.dup22
 
     INSERT INTO t1 VALUES('c', 3, 3, 1) ON CONFLICT(z) 
       DO UPDATE SET w = excluded.w;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 92 err 1 -1 no such table: t1
+stmt 0 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 114 no such table: t1
 ==== upsert4-generated.dup23
 
     INSERT INTO t1 VALUES('c', 2, 2, 3) ON CONFLICT(y, x) 
       DO UPDATE SET w = w||w;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 89 err 1 -1 no such table: t1
+stmt 0 err 1 -1 89 no such table: t1
+stmt 89 err 1 -1 111 no such table: t1
 ==== upsert4-generated.dup24
 
     INSERT INTO t1 VALUES('c', 2, 2, 3) ON CONFLICT(y, x) 
       DO UPDATE SET w = w||t1.w;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 92 err 1 -1 no such table: t1
+stmt 0 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 114 no such table: t1
 ==== upsert4-generated.dup25
 
     INSERT INTO t1 AS tbl VALUES('c', 2, 2, 3) ON CONFLICT(y, x) 
       DO UPDATE SET w = w||tbl.w;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 100 err 1 -1 no such table: t1
+stmt 0 err 1 -1 100 no such table: t1
+stmt 100 err 1 -1 122 no such table: t1
 ==== upsert4-generated.dup26
 
     INSERT INTO excluded VALUES('a', 1, 1, 1);
     INSERT INTO excluded VALUES('b', 2, 2, 2);
 ----
-stmt 0 err 1 -1 no such table: excluded
-stmt 47 err 1 -1 no such table: excluded
+stmt 0 err 1 -1 47 no such table: excluded
+stmt 47 err 1 -1 94 no such table: excluded
 ==== upsert4-generated.dup27
 
     INSERT INTO excluded VALUES('hello', 1, 1, NULL) ON CONFLICT(x, "a b")
       DO UPDATE SET w=excluded.w;
     SELECT * FROM excluded;
 ----
-stmt 0 err 1 -1 no such table: excluded
-stmt 109 err 1 -1 no such table: excluded
+stmt 0 err 1 -1 109 no such table: excluded
+stmt 109 err 1 -1 137 no such table: excluded
 ==== 9.0
 
   CREATE TABLE v(x INTEGER);
@@ -229,11 +229,11 @@ stmt 109 err 1 -1 no such table: excluded
 ----
 stmt 0 ok
 stmt 29 ok
-stmt 86 err 1 -1 no such table: main.v
+stmt 86 err 1 -1 130 no such table: main.v
 ==== 9.1
 
   INSERT INTO v VALUES(1), (4), (1), (5), (5), (8), (9), (1);
   SELECT * FROM hist;
 ----
-stmt 0 err 1 -1 no such table: v
-stmt 62 err 1 -1 no such table: hist
+stmt 0 err 1 -1 62 no such table: v
+stmt 62 err 1 -1 84 no such table: hist

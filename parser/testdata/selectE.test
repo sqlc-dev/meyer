@@ -2,4 +2,4 @@
 
   SELECT 1 EXCEPT SELECT 2 ORDER BY 1 COLLATE nocase EXCEPT SELECT 3;
 ----
-stmt 0 err 1 -1 ORDER BY clause should come after EXCEPT not before
+stmt 0 err 1 -1 70 ORDER BY clause should come after EXCEPT not before

@@ -1,0 +1,69 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(c, d NOT NULL);
+
+  WITH x(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM x WHERE i<1000
+  )
+  INSERT INTO t1 SELECT i, i FROM x;
+  INSERT INTO t2 SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 59 err 1 -1 172 no such table: t1
+stmt 172 err 1 -1 207 no such table: t2
+==== 2.0
+
+  CREATE TABLE T1(a INTEGER PRIMARY KEY, b);
+  CREATE TABLE T3(k, v);
+----
+stmt 0 ok
+stmt 45 ok
+==== 2.1
+
+  SELECT * FROM (SELECT a, b FROM t1) LEFT JOIN t3 ON a IS NULL;
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== 3.0
+
+  CREATE TABLE t0(c0 PRIMARY KEY);
+  INSERT INTO t0(c0) VALUES (0);
+----
+stmt 0 ok
+stmt 35 err 1 -1 68 no such table: t0
+==== 3.1
+
+  SELECT * FROM t0 WHERE ((c0 NOT NULL) AND 1) OR (c0 == NULL);
+----
+stmt 0 err 1 -1 64 no such table: t0
+==== 4.0
+
+  SELECT *, '/'
+  FROM (
+      SELECT NULL val FROM (SELECT 1)
+      UNION ALL
+      SELECT 'missing' FROM (SELECT 1)
+  ) a
+  LEFT JOIN (SELECT 1)
+      ON a.val IS NULL;
+----
+stmt 0 ok
+==== 4.1
+
+  CREATE TABLE t1(a INT);
+  INSERT INTO t1(a) VALUES(1);
+  CREATE TABLE t2(b INT);
+  SELECT * FROM (SELECT 3 AS c FROM t1) AS t3 LEFT JOIN t2 ON c IS NULL;
+----
+stmt 0 ok
+stmt 26 err 1 -1 57 no such table: t1
+stmt 57 ok
+stmt 83 err 1 -1 156 no such table: t1
+==== 5.0
+
+  CREATE TABLE t1(a INT NOT NULL);
+  SELECT a IS NULL, a IS NOT NULL, count(*) FROM t1;
+----
+stmt 0 ok
+stmt 35 err 1 -1 88 no such table: t1

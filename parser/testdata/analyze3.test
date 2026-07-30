@@ -1,0 +1,170 @@
+==== analyze3-1.1.x
+
+  SELECT count(*) FROM t1 WHERE x>200 AND x<300;
+  SELECT count(*) FROM t1 WHERE x>0 AND x<1100;
+----
+stmt 0 err 1 -1 49 no such table: t1
+stmt 49 err 1 -1 97 no such table: t1
+==== analyze3-1.1.2
+
+  SELECT sum(y) FROM t1 WHERE x>200 AND x<300
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== analyze3-1.1.3
+
+  SELECT sum(y) FROM t1 WHERE x>0 AND x<1100
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== analyze3-1.2.1
+
+    BEGIN;
+      CREATE TABLE t2(x TEXT, y);
+      INSERT INTO t2 SELECT * FROM t1;
+      CREATE INDEX i2 ON t2(x);
+    COMMIT;
+    ANALYZE;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 45 err 1 -1 84 no such table: t2
+stmt 84 err 1 -1 116 no such table: main.t2
+stmt 116 ok
+stmt 128 ok
+==== analyze3-2.1.x
+
+  SELECT count(*) FROM t2 WHERE x>1 AND x<2;
+  SELECT count(*) FROM t2 WHERE x>0 AND x<99;
+----
+stmt 0 err 1 -1 45 no such table: t2
+stmt 45 err 1 -1 91 no such table: t2
+==== analyze3-1.2.2
+
+  SELECT sum(y) FROM t2 WHERE x>1 AND x<2
+----
+stmt 0 err 1 -1 43 no such table: t2
+==== analyze3-1.2.3
+
+  SELECT sum(y) FROM t2 WHERE x>0 AND x<99
+----
+stmt 0 err 1 -1 44 no such table: t2
+==== analyze3-1.3.1
+
+    BEGIN;
+      CREATE TABLE t3(y TEXT, x INTEGER);
+      INSERT INTO t3 SELECT y, x FROM t1;
+      CREATE INDEX i3 ON t3(x);
+    COMMIT;
+    ANALYZE;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 53 err 1 -1 95 no such table: t3
+stmt 95 err 1 -1 127 no such table: main.t3
+stmt 127 ok
+stmt 139 ok
+==== analyze3-1.3.x
+
+  SELECT count(*) FROM t3 WHERE x>200 AND x<300;
+  SELECT count(*) FROM t3 WHERE x>0 AND x<1100
+----
+stmt 0 err 1 -1 49 no such table: t3
+stmt 49 err 1 -1 97 no such table: t3
+==== analyze3-1.3.2
+
+  SELECT sum(y) FROM t3 WHERE x>200 AND x<300
+----
+stmt 0 err 1 -1 47 no such table: t3
+==== analyze3-1.3.3
+
+  SELECT sum(y) FROM t3 WHERE x>0 AND x<1100
+----
+stmt 0 err 1 -1 46 no such table: t3
+==== analyze3-2.2
+
+  SELECT count(a) FROM t1 WHERE b LIKE 'a%'
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== analyze3-2.3
+
+  SELECT count(a) FROM t1 WHERE b LIKE '%a'
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== analyze3-3.8.1
+
+    CREATE TABLE t4(x, y TEXT COLLATE NOCASE);
+    CREATE INDEX i4 ON t4(y);
+----
+stmt 0 ok
+stmt 47 err 1 -1 77 no such table: main.t4
+==== analyze3-6-3
+
+  SELECT * FROM t1 WHERE a = 5 AND c = 13;
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== analyze3-6-2
+
+  SELECT * FROM t1 WHERE a = 5 AND b > 'w' AND c = 13;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== analyze-7.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b, c);
+  INSERT INTO t1 VALUES(1,1,'0000');
+  CREATE INDEX t0b ON t1(b);
+  ANALYZE;
+  SELECT c FROM t1 WHERE b=3 AND a BETWEEN 30 AND hex(1);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 75 err 1 -1 112 no such table: t1
+stmt 112 err 1 -1 141 no such table: main.t1
+stmt 141 ok
+stmt 152 err 1 -1 210 no such table: t1
+==== 7.2
+
+  CREATE TABLE t1(a,b,c);
+  CREATE INDEX t1a ON t1(a);
+  ANALYZE;
+  SELECT * FROM sqlite_stat1;
+  INSERT INTO sqlite_stat1(tbl,idx,stat) VALUES('t1','t1a','12000');
+  INSERT INTO sqlite_stat1(tbl,idx,stat) VALUES('t1','t1a','12000');
+  ANALYZE sqlite_master;
+----
+stmt 0 ok
+stmt 26 err 1 -1 55 no such table: main.t1
+stmt 55 ok
+stmt 66 err 1 -1 96 no such table: sqlite_stat1
+stmt 96 err 1 -1 165 no such table: sqlite_stat1
+stmt 165 err 1 -1 234 no such table: sqlite_stat1
+stmt 234 ok
+==== 8.0
+
+  CREATE TABLE t1(a PRIMARY KEY, v) WITHOUT ROWID;
+  ANALYZE sqlite_schema;
+  INSERT INTO sqlite_stat1 VALUES('t1','t1','1 1');
+  INSERT INTO sqlite_stat4 VALUES('t1','t1','1','0','0',X'021b76657273696f6e');
+  INSERT INTO sqlite_stat4 VALUES('T1','T1','1','0','0',X'021b76657273696f6e');
+  ANALYZE sqlite_schema;
+----
+stmt 0 ok
+stmt 51 ok
+stmt 76 err 1 -1 128 no such table: sqlite_stat1
+stmt 128 err 1 -1 208 no such table: sqlite_stat4
+stmt 208 err 1 -1 288 no such table: sqlite_stat4
+stmt 288 ok
+==== 8.1
+
+  CREATE TABLE t1(a INT PRIMARY KEY, b INT) WITHOUT ROWID;
+  ANALYZE sqlite_schema;
+  INSERT INTO sqlite_stat4 VALUES
+     ('t1','t1','1','2','2',X'03000103'),
+     ('t1','sqlite_autoindex_t1_1','1','2','2',X'03000103');
+  ANALYZE sqlite_schema;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 59 ok
+stmt 84 err 1 -1 221 no such table: sqlite_stat4
+stmt 221 ok
+stmt 246 ok

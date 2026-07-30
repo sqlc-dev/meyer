@@ -1,0 +1,16 @@
+==== tkt4018-1.1
+
+    CREATE TABLE t1(a, b);
+    BEGIN;
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 38 err 1 -1 60 no such table: t1
+==== tkt4018-2.2
+
+    BEGIN;
+    SELECT * FROM t1 ORDER BY a;
+----
+stmt 0 ok
+stmt 11 err 1 -1 44 no such table: t1

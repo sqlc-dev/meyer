@@ -1,0 +1,73 @@
+==== fts3d-1.segments
+
+    SELECT level, idx FROM t1_segdir ORDER BY level, idx;
+----
+stmt 0 err 1 -1 58 no such table: t1_segdir
+==== fts3d-1.matches
+
+    SELECT OFFSETS(t1) FROM t1
+     WHERE t1 MATCH 'this OR that OR was OR a OR is OR test' ORDER BY docid;
+----
+stmt 0 err 1 -1 108 no such table: t1
+==== fts3d-2.segments
+
+    SELECT level, idx FROM t1_segdir ORDER BY level, idx;
+----
+stmt 0 err 1 -1 58 no such table: t1_segdir
+==== fts3d-2.matches
+
+    SELECT OFFSETS(t1) FROM t1
+     WHERE t1 MATCH 'this OR that OR was OR a OR is OR test' ORDER BY docid;
+----
+stmt 0 err 1 -1 108 no such table: t1
+==== fts3d-3.segments
+
+    SELECT level, idx FROM t1_segdir ORDER BY level, idx;
+----
+stmt 0 err 1 -1 58 no such table: t1_segdir
+==== fts3d-3.matches
+
+    SELECT OFFSETS(t1) FROM t1
+     WHERE t1 MATCH 'this OR that OR was OR a OR is OR test' ORDER BY docid;
+----
+stmt 0 err 1 -1 108 no such table: t1
+==== fts3d-4.segments
+
+    SELECT level, idx FROM t1_segdir ORDER BY level, idx;
+----
+stmt 0 err 1 -1 58 no such table: t1_segdir
+==== fts3d-4.matches
+
+    SELECT OFFSETS(t1) FROM t1
+     WHERE t1 MATCH 'this OR that OR was OR a OR is OR test' ORDER BY docid;
+----
+stmt 0 err 1 -1 108 no such table: t1
+==== fts3d-4.5
+
+    SELECT OPTIMIZE(t1) FROM t1 LIMIT 1;
+    SELECT level, idx FROM t1_segdir ORDER BY level, idx;
+----
+stmt 0 err 1 -1 41 no such table: t1
+stmt 41 err 1 -1 99 no such table: t1_segdir
+==== fts3d-4.5.matches
+
+    SELECT OFFSETS(t1) FROM t1
+     WHERE t1 MATCH 'this OR that OR was OR a OR is OR test' ORDER BY docid;
+----
+stmt 0 err 1 -1 108 no such table: t1
+==== fts3d-5.0
+
+    SELECT OPTIMIZE(t1) FROM t1 LIMIT 1;
+    SELECT level, idx FROM t1_segdir ORDER BY level, idx;
+----
+stmt 0 err 1 -1 41 no such table: t1
+stmt 41 err 1 -1 99 no such table: t1_segdir
+==== fts3d-5.1
+
+    UPDATE t1_segdir SET level = 2 WHERE level = 1 AND idx = 0;
+    SELECT OPTIMIZE(t1) FROM t1 LIMIT 1;
+    SELECT level, idx FROM t1_segdir ORDER BY level, idx;
+----
+stmt 0 err 1 -1 64 no such table: t1_segdir
+stmt 64 err 1 -1 105 no such table: t1
+stmt 105 err 1 -1 163 no such table: t1_segdir

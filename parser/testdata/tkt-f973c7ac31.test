@@ -1,0 +1,59 @@
+==== tkt-f973c7ac3-1.0
+
+    CREATE TABLE t(c1 INTEGER, c2 INTEGER);
+    INSERT INTO t VALUES(5, 5);
+    INSERT INTO t VALUES(5, 4);
+----
+stmt 0 ok
+stmt 44 err 1 -1 76 no such table: t
+stmt 76 err 1 -1 108 no such table: t
+==== tkt-f973c7ac31-generated
+ 
+      SELECT * FROM t WHERE c1 = 5 AND c2>0 AND c2<='2' ORDER BY c2 DESC
+----
+stmt 0 err 1 -1 75 no such table: t
+==== tkt-f973c7ac31-generated.dup1
+ 
+      SELECT * FROM t WHERE c1 = 5 AND c2>0 AND c2<=5 ORDER BY c2 DESC
+----
+stmt 0 err 1 -1 73 no such table: t
+==== tkt-f973c7ac31-generated.dup2
+ 
+      SELECT * FROM t WHERE c1 = 5 AND c2>0 AND c2<='5' ORDER BY c2 DESC
+----
+stmt 0 err 1 -1 75 no such table: t
+==== tkt-f973c7ac31-generated.dup3
+ 
+      SELECT * FROM t WHERE c1 = 5 AND c2>'0' AND c2<=5 ORDER BY c2 DESC
+----
+stmt 0 err 1 -1 75 no such table: t
+==== tkt-f973c7ac31-generated.dup4
+ 
+      SELECT * FROM t WHERE c1 = 5 AND c2>'0' AND c2<='5' ORDER BY c2 DESC
+----
+stmt 0 err 1 -1 77 no such table: t
+==== tkt-f973c7ac31-generated.dup5
+ 
+      SELECT * FROM t WHERE c1 = 5 AND c2>0 AND c2<='2' ORDER BY c2 ASC
+----
+stmt 0 err 1 -1 74 no such table: t
+==== tkt-f973c7ac31-generated.dup6
+ 
+      SELECT * FROM t WHERE c1 = 5 AND c2>0 AND c2<=5 ORDER BY c2 ASC
+----
+stmt 0 err 1 -1 72 no such table: t
+==== tkt-f973c7ac31-generated.dup7
+ 
+      SELECT * FROM t WHERE c1 = 5 AND c2>0 AND c2<='5' ORDER BY c2 ASC
+----
+stmt 0 err 1 -1 74 no such table: t
+==== tkt-f973c7ac31-generated.dup8
+ 
+      SELECT * FROM t WHERE c1 = 5 AND c2>'0' AND c2<=5 ORDER BY c2 ASC
+----
+stmt 0 err 1 -1 74 no such table: t
+==== tkt-f973c7ac31-generated.dup9
+ 
+      SELECT * FROM t WHERE c1 = 5 AND c2>'0' AND c2<='5' ORDER BY c2 ASC
+----
+stmt 0 err 1 -1 76 no such table: t

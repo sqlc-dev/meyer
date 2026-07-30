@@ -1,0 +1,30 @@
+==== join4-1.2
+
+    select * from t1 left outer join t2 on t1.a=t2.x and t2.z='ok'
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== join4-1.4
+
+    select * from t1 left outer join t2 on t1.a=t2.x and t2.z='ok'
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== join4-1.5
+
+    select * from t1 left outer join t2 on t1.a=t2.x where t2.z>='ok'
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== join4-1.4.dup1
+
+    select * from t1 left outer join t2 on t1.a=t2.x and t2.z>='ok'
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== join4-1.6
+
+      select * from t1 left outer join t2 on t1.a=t2.x where t2.z IN ('ok')
+----
+stmt 0 err 1 -1 77 no such table: t1
+==== join4-1.7
+
+      select * from t1 left outer join t2 on t1.a=t2.x and t2.z IN ('ok')
+----
+stmt 0 err 1 -1 75 no such table: t1

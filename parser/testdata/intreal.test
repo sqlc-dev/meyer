@@ -1,0 +1,128 @@
+==== 100
+
+  SELECT intreal(5);
+----
+stmt 0 err 1 10 21 no such function: intreal
+==== 110
+
+  SELECT intreal(5)=5, 6=intreal(6);
+----
+stmt 0 err 1 10 37 no such function: intreal
+==== 120
+
+  SELECT intreal(7)=7.0, 8.0=intreal(8);
+----
+stmt 0 err 1 10 41 no such function: intreal
+==== 130
+
+  SELECT typeof(intreal(9));
+----
+stmt 0 err 1 17 29 no such function: intreal
+==== 140
+
+  SELECT 'a'||intreal(11)||'z';
+----
+stmt 0 err 1 15 32 no such function: intreal
+==== 150
+
+  SELECT max(1.0,intreal(2),3.0), max(1,intreal(2),3);
+----
+stmt 0 err 1 18 55 no such function: intreal
+==== 160
+
+  SELECT max(1.0,intreal(4),3.0), max(1,intreal(4),3);
+----
+stmt 0 err 1 18 55 no such function: intreal
+==== 170
+
+  SELECT max(1.0,intreal(2),intreal(3),4.0),
+         max(1,intreal(2),intreal(3),4);
+----
+stmt 0 err 1 29 86 no such function: intreal
+==== 180
+
+  SELECT max(1.0,intreal(5),intreal(3),4.0),
+         max(1,intreal(5),intreal(3),4);
+----
+stmt 0 err 1 29 86 no such function: intreal
+==== 2.1
+
+  CREATE TABLE t2(a REAL);
+  INSERT INTO t2 VALUES( 836627109860825358 );
+  SELECT substr(a,1,4) FROM t2 WHERE a = CAST(836627109860825358 AS REAL);
+----
+stmt 0 ok
+stmt 27 err 1 -1 74 no such table: t2
+stmt 74 err 1 -1 149 no such table: t2
+==== 2.2
+
+  CREATE INDEX i2 ON t2(a);
+  SELECT substr(a,1,4) FROM t2 WHERE a = CAST(836627109860825358 AS REAL);
+----
+stmt 0 err 1 -1 28 no such table: main.t2
+stmt 28 err 1 -1 103 no such table: t2
+==== 2.3
+
+  CREATE TABLE t0 (c0);
+  CREATE TABLE t1 (c1 REAL);
+  INSERT INTO t1(c1) VALUES (8366271098608253588);
+  INSERT INTO t0(c0) VALUES ('a');
+----
+stmt 0 ok
+stmt 24 ok
+stmt 53 err 1 -1 104 no such table: t1
+stmt 104 err 1 -1 139 no such table: t0
+==== 2.4
+
+  SELECT * FROM t1 WHERE (t1.c1 = CAST(8366271098608253588 AS REAL));
+----
+stmt 0 err 1 -1 70 no such table: t1
+==== 2.5
+
+  SELECT * FROM t0, t1 WHERE (t1.c1 = CAST(8366271098608253588 AS REAL));
+----
+stmt 0 err 1 -1 74 no such table: t0
+==== 2.6
+
+  SELECT * FROM t0, t1 
+  WHERE (
+        t1.c1 >= CAST(8366271098608253588 AS REAL) 
+    AND t1.c1 <= CAST(8366271098608253588 AS REAL)
+  );
+----
+stmt 0 err 1 -1 142 no such table: t0
+==== 3.0
+
+  CREATE TABLE t0 (c0 REAL, c1);
+  CREATE UNIQUE INDEX i0 ON t0(c1, 0 | c0);
+  INSERT INTO t0(c0) VALUES (4750228396194493326), (0);
+  UPDATE OR REPLACE t0 SET c0 = 'a', c1 = '';
+  SELECT * FROM t0 ORDER BY t0.c1;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 33 err 1 -1 77 no such table: main.t0
+stmt 77 err 1 -1 133 no such table: t0
+stmt 133 err 1 -1 179 no such table: t0
+stmt 179 err 1 -1 214 no such table: t0
+stmt 214 ok
+==== 4.0
+
+  CREATE TABLE t1(a REAL, b AS ('expr') );
+----
+stmt 0 ok
+==== 4.1
+
+  INSERT INTO t1 VALUES( REPLACE(0, '', 'expr') );
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 4.2
+
+  INSERT INTO t1 SELECT REPLACE(4, '', 'expr');
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== 4.3
+
+  SELECT typeof(a), a FROM t1;
+----
+stmt 0 err 1 -1 31 no such table: t1

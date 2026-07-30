@@ -1,0 +1,54 @@
+==== atof1-2.10
+
+  PRAGMA encoding = 'UTF16be';
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1(rowid,a) VALUES (1,x'00'),(2,3);
+  SELECT substr(a,',') is true FROM t1 ORDER BY rowid;
+----
+stmt 0 ok
+stmt 31 ok
+stmt 56 err 1 -1 106 no such table: t1
+stmt 106 err 1 -1 161 no such table: t1
+==== atof1-2.20
+
+  SELECT substr(a,',') is true FROM t1 ORDER BY rowid DESC;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== atof1-2.30
+
+  CREATE INDEX i1 ON t1(a);
+  SELECT count(*) FROM t1 WHERE substr(a,',');
+----
+stmt 0 err 1 -1 28 no such table: main.t1
+stmt 28 err 1 -1 75 no such table: t1
+==== atof1-2.40
+
+  SELECT randomblob(0) - 1;
+----
+stmt 0 ok
+==== atof-3.2
+
+  WITH RECURSIVE bigval(i,vtxt) AS (
+    SELECT 0, '18.446744073709550000'
+    UNION ALL
+    SELECT i+1, format('18.44674407370955%04d',i+1) FROM bigval
+     WHERE i+1<=9999
+  )
+  SELECT vtxt, CAST(vtxt AS REAL) FROM bigval
+   WHERE CAST(vtxt AS REAL) NOT GLOB '18.446744073709*';
+----
+stmt 0 ok
+==== atof-3.3
+
+  WITH RECURSIVE exp(n,v1,v2) AS (
+    SELECT -200, '1.8446744073709550592e-200', '1.8446744073709551609e-200'
+    UNION ALL
+    SELECT n+1, ('1.8446744073709550592e'||n),('1.8446744073709551609e'||n)
+      FROM exp WHERE n<200
+  )
+  SELECT n, v1, v2
+    FROM exp
+   WHERE format('%.10e',CAST(v1 AS REAL)) NOT GLOB '1.8446*'
+      OR format('%.10e',CAST(v2 AS REAL)) NOT GLOB '1.8446*';
+----
+stmt 0 ok

@@ -1,0 +1,11 @@
+==== rowhash-1.1
+
+    CREATE TABLE t1(id INTEGER PRIMARY KEY, a, b, c);
+    CREATE INDEX i1 ON t1(a);
+    CREATE INDEX i2 ON t1(b);
+    CREATE INDEX i3 ON t1(c);
+----
+stmt 0 ok
+stmt 54 err 1 -1 84 no such table: main.t1
+stmt 84 err 1 -1 114 no such table: main.t1
+stmt 114 err 1 -1 144 no such table: main.t1

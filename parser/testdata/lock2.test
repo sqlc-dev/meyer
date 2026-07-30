@@ -1,0 +1,26 @@
+==== lock2-1.1.1
+pragma lock_status
+----
+stmt 0 ok
+==== lock2-1.2
+
+    BEGIN;
+    CREATE TABLE abc(a, b, c);
+----
+stmt 0 ok
+stmt 11 ok
+==== lock2-1.5
+
+    COMMIT;
+----
+stmt 0 ok
+==== lock2-1.8
+
+    COMMIT;
+----
+stmt 0 ok
+==== lock2-1.9
+
+    SELECT * FROM sqlite_master;
+----
+stmt 0 ok

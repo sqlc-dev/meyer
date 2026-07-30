@@ -1,0 +1,246 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES(1, 'b1', 'c1');
+  INSERT INTO t1 VALUES(2, 'b2', 'c2');
+  INSERT INTO t1 VALUES(3, 'b3', 'c3');
+  INSERT INTO t1 VALUES(4, 'b4', 'c4');
+  CREATE INDEX i1 ON t1(a, c);
+----
+stmt 0 ok
+stmt 28 err 1 -1 68 no such table: t1
+stmt 68 err 1 -1 108 no such table: t1
+stmt 108 err 1 -1 148 no such table: t1
+stmt 148 err 1 -1 188 no such table: t1
+stmt 188 err 1 -1 219 no such table: main.t1
+==== 1.3
+
+  DROP INDEX i1;
+  CREATE INDEX i1 ON t1(a, b);
+----
+stmt 0 err 1 -1 17 no such index: i1
+stmt 17 err 1 -1 48 no such table: main.t1
+==== 2.0
+
+  CREATE TABLE u1(a, b, c);
+  CREATE TABLE u2(x, y, z);
+
+  INSERT INTO u1 VALUES('a1', 'b1', 'c1');
+  INSERT INTO u2 VALUES('a1', 'b1', 'c1');
+----
+stmt 0 ok
+stmt 28 ok
+stmt 56 err 1 -1 100 no such table: u1
+stmt 100 err 1 -1 143 no such table: u2
+==== 3.1
+
+  CREATE TABLE t0(c0 INT);
+  INSERT INTO t0 VALUES(0);
+  CREATE TABLE t1_a(a INTEGER PRIMARY KEY, b TEXT);
+  INSERT INTO t1_a VALUES(1,'one');
+  CREATE TABLE t1_b(c INTEGER PRIMARY KEY, d TEXT);
+  INSERT INTO t1_b VALUES(2,'two');
+  CREATE VIEW v0 AS SELECT CAST(t0.c0 AS INTEGER) AS c0 FROM t0;
+  CREATE VIEW v1(a,b) AS SELECT a, b FROM t1_a UNION ALL SELECT c, 0 FROM t1_b;
+  SELECT v1.a, quote(v1.b), t0.c0 AS cd FROM t0 LEFT JOIN v0 ON v0.c0!=0,v1;
+----
+stmt 0 ok
+stmt 27 err 1 -1 55 no such table: t0
+stmt 55 ok
+stmt 107 err 1 -1 143 no such table: t1_a
+stmt 143 ok
+stmt 195 err 1 -1 231 no such table: t1_b
+stmt 231 ok
+stmt 296 ok
+stmt 376 err 1 -1 453 no such table: t0
+==== 3.2
+
+  SELECT a, quote(b), cd FROM (
+    SELECT v1.a, v1.b, t0.c0 AS cd FROM t0 LEFT JOIN v0 ON v0.c0!=0, v1
+  ) WHERE a=2 AND b='0' AND cd=0;
+----
+stmt 0 err 1 -1 138 no such table: t0
+==== 3.3
+
+  SELECT a, quote(b), cd FROM (
+    SELECT v1.a, v1.b, t0.c0 AS cd FROM t0 LEFT JOIN v0 ON v0.c0!=0, v1
+  ) WHERE a=1 AND b='one' AND cd=0;
+----
+stmt 0 err 1 -1 140 no such table: t0
+==== 3.4
+
+  SELECT a, quote(b), cd FROM (
+    SELECT v1.a, v1.b, t0.c0 AS cd FROM t0 LEFT JOIN v0 ON v0.c0!=0, v1
+  ) WHERE a=2 AND b=0 AND cd=0;
+----
+stmt 0 err 1 -1 136 no such table: t0
+==== 3.5
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INT, b INT, c TEXT, PRIMARY KEY(a,b)) WITHOUT ROWID;
+  INSERT INTO t1(a,b,c) VALUES
+    (1,100,'abc'),
+    (2,200,'def'),
+    (3,300,'abc');
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t2(a INT, b INT, c TEXT, PRIMARY KEY(a,b)) WITHOUT ROWID;
+  INSERT INTO t2(a,b,c) VALUES
+    (1,110,'efg'),
+    (2,200,'hij'),
+    (3,330,'klm');
+  CREATE VIEW v3 AS
+    SELECT a, b, c FROM t1
+    UNION ALL
+    SELECT a, b, 'xyz' FROM t2;
+  SELECT * FROM v3 WHERE a=2 AND b=200;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 100 err 1 -1 188 no such table: t1
+stmt 188 ok
+stmt 215 ok
+stmt 288 err 1 -1 376 no such table: t2
+stmt 376 ok
+stmt 469 err 1 -1 509 no such table: v3
+==== 3.6
+
+  SELECT * FROM v3 WHERE a=2 AND b=200;
+----
+stmt 0 err 1 -1 40 no such table: v3
+==== 3.7
+
+  SELECT count(*) FROM v3;
+----
+stmt 0 err 1 -1 27 no such table: v3
+==== 3.8
+
+  SELECT count(*) FROM v3;
+----
+stmt 0 err 1 -1 27 no such table: v3
+==== 4.1
+
+  CREATE TABLE t1(a INT);
+  CREATE TABLE t2(b INT);
+  CREATE TABLE t3(c INT);
+  INSERT INTO t3(c) VALUES(3);
+  CREATE TABLE t4(d INT);
+  CREATE TABLE t5(e INT);
+  INSERT INTO t5(e) VALUES(5);
+  CREATE VIEW v6(f,g) AS SELECT d, e FROM t4 RIGHT JOIN t5 ON true;
+  SELECT * FROM  t1 JOIN t2 ON false RIGHT JOIN t3 ON true CROSS JOIN v6;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 52 ok
+stmt 78 err 1 -1 109 no such table: t3
+stmt 109 ok
+stmt 135 ok
+stmt 161 err 1 -1 192 no such table: t5
+stmt 192 ok
+stmt 260 err 1 -1 334 no such table: t1
+==== 4.2
+
+  SELECT * FROM v6 JOIN t5 ON false RIGHT JOIN t3 ON true;
+----
+stmt 0 err 1 -1 59 no such table: v6
+==== 4.3
+
+  SELECT * FROM t1 JOIN t2 ON false JOIN v6 ON true RIGHT JOIN t3 ON true;
+----
+stmt 0 err 1 -1 75 no such table: t1
+==== 5.0
+
+  CREATE TABLE t1(a INT);  INSERT INTO t1 VALUES(1);
+  CREATE TABLE t2(b INT);  INSERT INTO t2 VALUES(2);
+  CREATE TABLE t3(c INT);  INSERT INTO t3 VALUES(3);
+  CREATE TABLE t4(d INT);  INSERT INTO t4 VALUES(4);
+  CREATE TABLE t5(e INT);  INSERT INTO t5 VALUES(5);
+  SELECT *
+    FROM t1 JOIN t2 ON null RIGHT JOIN t3 ON true
+          LEFT JOIN (t4 JOIN t5 ON d+1=e) ON d=4
+   WHERE e>0;
+----
+stmt 0 ok
+stmt 26 err 1 -1 53 no such table: t1
+stmt 53 ok
+stmt 79 err 1 -1 106 no such table: t2
+stmt 106 ok
+stmt 132 err 1 -1 159 no such table: t3
+stmt 159 ok
+stmt 185 err 1 -1 212 no such table: t4
+stmt 212 ok
+stmt 238 err 1 -1 265 no such table: t5
+stmt 265 err 1 -1 389 no such table: t1
+==== 6.0
+
+  CREATE TABLE t01(w,x,y,z);
+  CREATE TABLE t02(w,x,y,z);
+  CREATE VIEW t0(w,x,y,z) AS
+    SELECT w,x,y,z FROM t01 UNION ALL SELECT w,x,y,z FROM t02;
+  CREATE INDEX t01x ON t01(w,x,y);
+  CREATE INDEX t02x ON t02(w,x,y);
+  CREATE VIEW v1(k) AS VALUES(77),(88),(99);
+  CREATE TABLE k1(k);
+  INSERT INTO k1 SELECT * FROM v1;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 58 ok
+stmt 150 err 1 -1 185 no such table: main.t01
+stmt 185 err 1 -1 220 no such table: main.t02
+stmt 220 ok
+stmt 265 ok
+stmt 287 err 1 -1 322 no such table: k1
+==== 6.1
+
+  WITH k(n) AS (VALUES(77),(88),(99))
+  SELECT max(z) FROM t0 WHERE w=123 AND x IN k AND y BETWEEN 44 AND 55;
+----
+stmt 0 err 1 -1 110 no such table: t0
+==== 6.2
+
+  SELECT max(z) FROM t0 WHERE w=123 AND x IN v1 AND y BETWEEN 44 AND 55;
+----
+stmt 0 err 1 -1 73 no such table: t0
+==== 6.3
+
+  SELECT max(z) FROM t0 WHERE w=123 AND x IN k1 AND y BETWEEN 44 AND 55;
+----
+stmt 0 err 1 -1 73 no such table: t0
+==== 7.0
+
+  CREATE  TABLE  t0_1(a INT , b INT, c INT);
+  CREATE  TABLE  t0_2(a INT , b INT, c INT);
+
+  INSERT INTO t0_1 (a, b, c) VALUES (1, 0, 1);
+  INSERT INTO t0_2 (a, b, c) VALUES (1, 0, 1);
+
+  CREATE  TABLE  empty1(x);
+  CREATE  TABLE  empty2(y);
+----
+stmt 0 ok
+stmt 45 ok
+stmt 90 err 1 -1 138 no such table: t0_1
+stmt 138 err 1 -1 185 no such table: t0_2
+stmt 185 ok
+stmt 214 ok
+==== 7.1
+
+  SELECT t0_2.c
+    FROM (SELECT '0000' AS c0 FROM empty2 RIGHT JOIN t0_1 ON 1) AS v0 
+    LEFT JOIN empty1 ON v0.c0, t0_2 
+    RIGHT JOIN (
+           SELECT 5678 AS col0 FROM (SELECT 0)
+    ) AS sub1 ON 1;
+----
+stmt 0 err 1 -1 208 no such table: empty2
+==== 7.2
+
+  SELECT t0_2.c
+    FROM (SELECT '0000' AS c0 FROM empty2 RIGHT JOIN t0_1 ON 1) AS v0 
+    LEFT JOIN empty1 ON v0.c0, t0_2 
+    RIGHT JOIN (
+           SELECT 5678 AS col0 FROM (SELECT 0)
+    ) AS sub1 ON 1 WHERE +t0_2.c;
+----
+stmt 0 err 1 -1 222 no such table: empty2

@@ -1,0 +1,14 @@
+==== gcfault-generated
+
+    CREATE TABLE s(i, s);
+    INSERT INTO s VALUES(1, ',0123456789,');
+    INSERT INTO s VALUES(2, X'2c303132333435363738392c');
+
+    CREATE TABLE e(e);
+    INSERT INTO e VALUES('v1'), ('v2');
+----
+stmt 0 ok
+stmt 26 err 1 -1 71 no such table: s
+stmt 71 err 1 -1 129 no such table: s
+stmt 129 ok
+stmt 153 err 1 -1 193 no such table: e

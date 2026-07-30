@@ -1,0 +1,106 @@
+==== 1.1
+
+  PRAGMA page_size=1024;
+  PRAGMA auto_vacuum=0;
+  CREATE TABLE t1(a);
+  CREATE INDEX i1 ON t1(a);
+  INSERT INTO t1 VALUES('abcdefghijklmnop');
+----
+stmt 0 ok
+stmt 25 ok
+stmt 49 ok
+stmt 71 err 1 -1 99 no such table: main.t1
+stmt 99 err 1 -1 144 no such table: t1
+==== 2.2
+ SELECT * FROM r WHERE x >= 10
+----
+stmt 0 err 1 -1 31 no such table: r
+==== 3.1
+
+     PRAGMA auto_vacuum=0;
+     PRAGMA page_size = 512;
+     CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+     WITH s(a, b) AS (
+       SELECT 2, 'abcdefghij'
+       UNION ALL
+       SELECT a+2, b FROM s WHERe a < 40
+     )
+     INSERT INTO t1 SELECT * FROM s;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 56 ok
+stmt 104 err 1 -1 259 no such table: t1
+==== 3.3
+
+     INSERT INTO t1 VALUES(9, 'klmnopqrst');
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== 4.0
+
+  PRAGMA page_size = 65536;
+  PRAGMA autovacuum = 0;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  INSERT INTO t1 VALUES(-1, 'abcdefghij');
+  INSERT INTO t1 VALUES(0, 'abcdefghij');
+----
+stmt 0 ok
+stmt 28 ok
+stmt 53 ok
+stmt 98 err 1 -1 141 no such table: t1
+stmt 141 err 1 -1 183 no such table: t1
+==== 5.1
+ 
+  PRAGMA page_count
+----
+stmt 0 ok
+==== 6.0
+
+  PRAGMA page_size = 512;
+  PRAGMA auto_vacuum=0;
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(zeroblob(300));
+  INSERT INTO t1 VALUES(zeroblob(600));
+----
+stmt 0 ok
+stmt 26 ok
+stmt 50 ok
+stmt 72 err 1 -1 112 no such table: t1
+stmt 112 err 1 -1 152 no such table: t1
+==== 7.0
+
+  PRAGMA auto_vacuum=0;
+  CREATE TABLE t1(x PRIMARY KEY, y);
+  INSERT INTO t1 VALUES('a', 'A');
+  INSERT INTO t1 VALUES('b', 'A');
+  INSERT INTO t1 VALUES('c', 'A');
+  SELECT name FROM sqlite_master;
+----
+stmt 0 ok
+stmt 24 ok
+stmt 61 err 1 -1 96 no such table: t1
+stmt 96 err 1 -1 131 no such table: t1
+stmt 131 err 1 -1 166 no such table: t1
+stmt 166 ok
+==== 7.1
+
+  PRAGMA writable_schema = 1;
+  DELETE FROM sqlite_master WHERE name = 'sqlite_autoindex_t1_1';
+----
+stmt 0 ok
+stmt 30 ok
+==== 8.0
+
+  PRAGMA auto_vacuum=0;
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(zeroblob(300));
+  INSERT INTO t1 VALUES(zeroblob(300));
+  INSERT INTO t1 VALUES(zeroblob(300));
+  INSERT INTO t1 VALUES(zeroblob(300));
+----
+stmt 0 ok
+stmt 24 ok
+stmt 46 err 1 -1 86 no such table: t1
+stmt 86 err 1 -1 126 no such table: t1
+stmt 126 err 1 -1 166 no such table: t1
+stmt 166 err 1 -1 206 no such table: t1

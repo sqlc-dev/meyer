@@ -1,0 +1,115 @@
+==== autoindex4-1.0
+
+  CREATE TABLE t1(a,b);
+  INSERT INTO t1 VALUES(123,'abc'),(234,'def'),(234,'ghi'),(345,'jkl');
+  CREATE TABLE t2(x,y);
+  INSERT INTO t2 VALUES(987,'zyx'),(654,'wvu'),(987,'rqp');
+
+  SELECT *, '|' FROM t1, t2 WHERE a=234 AND x=987 ORDER BY +b;
+----
+stmt 0 ok
+stmt 24 err 1 -1 96 no such table: t1
+stmt 96 ok
+stmt 120 err 1 -1 180 no such table: t2
+stmt 180 err 1 -1 244 no such table: t1
+==== autoindex4-1.1
+
+  SELECT *, '|' FROM t1, t2 WHERE a=234 AND x=555;
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== autoindex4-1.2
+
+  SELECT *, '|' FROM t1 LEFT JOIN t2 ON a=234 AND x=555;
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== autoindex4-1.2-rj
+
+  SELECT t1.*, t2.*, '|' FROM t2 RIGHT JOIN t1 ON a=234 AND x=555;
+----
+stmt 0 err 1 -1 67 no such table: t2
+==== autoindex4-1.3
+
+  SELECT *, '|' FROM t1 LEFT JOIN t2 ON x=555 WHERE a=234;
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== autoindex4-1.3-rj
+
+  SELECT t1.*, t2.*, '|' FROM t2 RIGHT JOIN t1 ON x=555 WHERE a=234;
+----
+stmt 0 err 1 -1 69 no such table: t2
+==== autoindex4-1.4
+
+  SELECT *, '|' FROM t1 LEFT JOIN t2 WHERE a=234 AND x=555;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== autoindex4-1.4-rj
+
+  SELECT t1.*, t2.*, '|' FROM t2 RIGHT JOIN t1 WHERE a=234 AND x=555;
+----
+stmt 0 err 1 -1 70 no such table: t2
+==== autoindex4-2.0
+
+  CREATE TABLE t3(e,f);
+  INSERT INTO t3 VALUES(123,654),(555,444),(234,987);
+
+  SELECT (SELECT count(*) FROM t1, t2 WHERE a=e AND x=f), e, f, '|'
+    FROM t3
+   ORDER BY rowid;
+----
+stmt 0 ok
+stmt 24 err 1 -1 78 no such table: t3
+stmt 78 err 1 -1 178 no such table: t3
+==== autoindex4-3.0
+
+  CREATE TABLE A(Name text);
+  CREATE TABLE Items(ItemName text , Name text);
+  INSERT INTO Items VALUES('Item1','Parent');
+  INSERT INTO Items VALUES('Item2','Parent');
+  CREATE TABLE B(Name text);
+  
+  SELECT Items.ItemName
+    FROM Items
+      LEFT JOIN A ON (A.Name = Items.ItemName and Items.ItemName = 'dummy')
+      LEFT JOIN B ON (B.Name = Items.ItemName)
+    WHERE Items.Name = 'Parent'
+    ORDER BY Items.ItemName;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 78 err 1 -1 124 no such table: Items
+stmt 124 err 1 -1 170 no such table: Items
+stmt 170 ok
+stmt 199 err 1 -1 425 no such table: Items
+==== autoindex4-3.1
+
+  SELECT Items.ItemName
+    FROM A
+      RIGHT JOIN Items ON (A.Name = Items.ItemName and Items.ItemName = 'dummy')
+      LEFT JOIN B ON (B.Name = Items.ItemName)
+    WHERE Items.Name = 'Parent'
+    ORDER BY Items.ItemName;
+----
+stmt 0 err 1 -1 224 no such table: A
+==== autoindex4-3.10
+
+  CREATE INDEX Items_x1 ON Items(ItemName,Name) WHERE ItemName = 'dummy';
+  
+  SELECT Items.ItemName
+    FROM Items
+      LEFT JOIN A ON (A.Name = Items.ItemName and Items.ItemName = 'dummy')
+      LEFT JOIN B ON (B.Name = Items.ItemName)
+    WHERE Items.Name = 'Parent'
+    ORDER BY Items.ItemName;
+----
+stmt 0 err 1 -1 74 no such table: main.Items
+stmt 74 err 1 -1 300 no such table: Items
+==== autoindex4-3.11
+
+  SELECT Items.ItemName
+    FROM A
+      RIGHT JOIN Items ON (A.Name = Items.ItemName and Items.ItemName = 'dummy')
+      LEFT JOIN B ON (B.Name = Items.ItemName)
+    WHERE Items.Name = 'Parent'
+    ORDER BY Items.ItemName;
+----
+stmt 0 err 1 -1 224 no such table: A

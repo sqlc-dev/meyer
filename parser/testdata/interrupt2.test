@@ -1,0 +1,41 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX t1a ON t1(a);
+  CREATE INDEX t1b ON t1(b);
+  PRAGMA journal_mode = wal;
+
+  WITH ii(i) AS ( VALUES(1) UNION ALL SELECT i+1 FROM ii WHERE i<1000 )
+  INSERT INTO t1 SELECT i, i FROM ii;
+----
+stmt 0 ok
+stmt 25 err 1 -1 54 no such table: main.t1
+stmt 54 err 1 -1 83 no such table: main.t1
+stmt 83 ok
+stmt 112 err 1 -1 223 no such table: t1
+==== interrupt2-generated
+ PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+==== interrupt2-generated.dup1
+ SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 25 no such table: t1
+==== interrupt2-generated.dup2
+ SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 25 no such table: t1
+==== 2.0
+
+  CREATE TEMP TABLE z1(a, b);
+  INSERT INTO z1 SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 30 err 1 -1 65 no such table: z1
+==== 2.0.dup1
+
+  SELECT count(*) FROM t1
+  UNION ALL
+  SELECT count(*) FROM z1
+----
+stmt 0 err 1 -1 65 no such table: z1

@@ -1,0 +1,5 @@
+==== schema2-10.2
+
+    CREATE TABLE t2(a, b, c);
+----
+stmt 0 ok

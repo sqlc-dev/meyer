@@ -1,0 +1,44 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES(1,2.5,'three'),(x'424c4f42',NULL,'Ἀμήν');
+----
+stmt 0 ok
+stmt 28 err 1 -1 99 no such table: t1
+==== 2.0
+
+  DELETE FROM t1;
+  INSERT INTO t1 VALUES(1,2,'The quick fox jumps over the lazy brown dog.');
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 95 no such table: t1
+==== 2.30
+
+  UPDATE t1 SET c='Η γρήγορη αλεπού πηδάει πάνω από το τεμπέλικο καφέ σκυλί';
+  SELECT hex(c) FROM t1;
+----
+stmt 0 err 1 -1 125 no such table: t1
+stmt 125 err 1 -1 150 no such table: t1
+==== 4.0
+
+  DELETE FROM t1;
+  INSERT INTO t1 VALUES(json('{a:5,b:6}'), jsonb('{c:1,d:2}'), 99);
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 86 no such table: t1
+==== 6.0
+
+  DELETE FROM t2;
+  INSERT INTO t2 VALUES
+     (1, 2.5, 'three', x'342028666f757229', null);
+----
+stmt 0 err 1 -1 18 no such table: t2
+stmt 18 err 1 -1 93 no such table: t2
+==== 7.0
+
+  CREATE TABLE t7(a,b);
+  INSERT INTO t7 VALUES('abcdefghijklmnop',
+    'abcぁdefかghiのjklはmnop');
+----
+stmt 0 ok
+stmt 24 err 1 -1 105 no such table: t7

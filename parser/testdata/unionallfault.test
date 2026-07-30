@@ -1,0 +1,7 @@
+==== 1.0
+
+  CREATE TABLE t1(x,y,z);
+  CREATE TABLE t3(x,y,z);
+----
+stmt 0 ok
+stmt 26 ok

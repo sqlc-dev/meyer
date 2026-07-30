@@ -1,0 +1,15 @@
+==== journal1-1.1
+
+    CREATE TABLE t1(a,b);
+    INSERT INTO t1 VALUES(1,randstr(10,400));
+    INSERT INTO t1 VALUES(2,randstr(10,400));
+    INSERT INTO t1 SELECT a+2, a||b FROM t1;
+    INSERT INTO t1 SELECT a+4, a||b FROM t1;
+    SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 26 err 1 -1 72 no such table: t1
+stmt 72 err 1 -1 118 no such table: t1
+stmt 118 err 1 -1 163 no such table: t1
+stmt 163 err 1 -1 208 no such table: t1
+stmt 208 err 1 -1 237 no such table: t1

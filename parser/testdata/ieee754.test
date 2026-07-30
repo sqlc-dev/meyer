@@ -1,0 +1,15 @@
+==== ieee754-112
+
+  SELECT ieee754(4503599627370495,973) is null;
+----
+stmt 0 err 1 10 48 no such function: ieee754
+==== ieee754-200
+
+  SELECT ieee754(0.0), hex(ieee754_to_blob(ieee754(0,-1075)));
+----
+stmt 0 err 1 10 63 no such function: ieee754
+==== ieee754-201
+
+  SELECT ieee754(-0.0), hex(ieee754_to_blob(ieee754(-1,-3071)));
+----
+stmt 0 err 1 10 65 no such function: ieee754

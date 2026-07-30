@@ -1,0 +1,163 @@
+==== join7-generated
+
+    SELECT b, d FROM t1 FULL OUTER JOIN t2 ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== join7-generated.dup1
+
+    SELECT a, c FROM t1 FULL OUTER JOIN t2 ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== join7-generated.dup2
+
+    SELECT * FROM t1 FULL OUTER JOIN t2 ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== join7-generated.dup3
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 69 no such table: t2
+==== join7-generated.dup4
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c
+     WHERE b=c
+     ORDER BY +b;
+----
+stmt 0 err 1 -1 89 no such table: t2
+==== join7-generated.dup5
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c
+     WHERE b>0
+     ORDER BY +b;
+----
+stmt 0 err 1 -1 89 no such table: t2
+==== join7-generated.dup6
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c
+     WHERE b>0 OR b IS NULL
+     ORDER BY +b;
+----
+stmt 0 err 1 -1 102 no such table: t2
+==== join7-generated.dup7
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c AND b>3 AND c>4
+     ORDER BY coalesce(b,c,0);
+----
+stmt 0 err 1 -1 103 no such table: t2
+==== join7-generated.dup8
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c AND b>3 WHERE c>4
+     ORDER BY coalesce(b,c,0);
+----
+stmt 0 err 1 -1 105 no such table: t2
+==== join7-generated.dup9
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c WHERE b>3 AND c>4
+     ORDER BY coalesce(b,c,0);
+----
+stmt 0 err 1 -1 105 no such table: t2
+==== join7-generated.dup10
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c WHERE b>3 OR c>4
+     ORDER BY coalesce(b,c,0);
+----
+stmt 0 err 1 -1 104 no such table: t2
+==== join7-generated.dup11
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c AND (b>3 OR c>4)
+     ORDER BY coalesce(b,c,0);
+----
+stmt 0 err 1 -1 104 no such table: t2
+==== join7-generated.dup12
+
+    SELECT * FROM t1 RIGHT OUTER JOIN t2 ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== join7-generated.dup13
+
+    SELECT t1.*, t2.* FROM t2 LEFT OUTER JOIN t1 ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 69 no such table: t2
+==== join7-generated.dup14
+
+    SELECT * FROM dual JOIN t1 ON true RIGHT OUTER JOIN t2 ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 79 no such table: dual
+==== join7-generated.dup15
+
+    SELECT t1.*, t2.* 
+      FROM t2 LEFT JOIN (dual JOIN t1 ON true) ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 90 no such table: t2
+==== join7-generated.dup16
+
+    SELECT * FROM dual CROSS JOIN t1 RIGHT OUTER JOIN t2 ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 77 no such table: dual
+==== join7-generated.dup17
+
+    SELECT dual.*, t1.*, t2.*
+      FROM t1 CROSS JOIN dual RIGHT OUTER JOIN t2 ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 100 no such table: t1
+==== join7-generated.dup18
+
+    SELECT * FROM t1 LEFT OUTER JOIN t2 ON b=c ORDER BY +b;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== join7-generated.dup19
+
+    SELECT * FROM t1 FULL OUTER JOIN t2 ON b=c AND a=1 ORDER BY +b;
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== join7-generated.dup20
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c AND a=1 ORDER BY +b;
+----
+stmt 0 err 1 -1 77 no such table: t2
+==== join7-generated.dup21
+
+    SELECT * FROM t1 FULL OUTER JOIN t2 ON b=c WHERE a=1 ORDER BY +b;
+----
+stmt 0 err 1 -1 70 no such table: t1
+==== join7-generated.dup22
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c WHERE a=1 ORDER BY +b;
+----
+stmt 0 err 1 -1 79 no such table: t2
+==== join7-generated.dup23
+
+    SELECT * FROM t1 FULL OUTER JOIN t2 ON b=c
+     WHERE a=1 OR a IS NULL ORDER BY +b;
+----
+stmt 0 err 1 -1 88 no such table: t1
+==== join7-generated.dup24
+
+    SELECT t1.*, t2.* FROM t2 FULL OUTER JOIN t1 ON b=c
+     WHERE a=1 OR a IS NULL ORDER BY +b;
+----
+stmt 0 err 1 -1 97 no such table: t2
+==== join7-generated.dup25
+
+    SELECT * FROM t1 FULL OUTER JOIN t2 ON b=c WHERE a IS NULL ORDER BY +d;
+----
+stmt 0 err 1 -1 76 no such table: t1
+==== join7-generated.dup26
+
+    SELECT * FROM t1 FULL OUTER JOIN t2 ON b=c AND d<=0 ORDER BY +b, +d;
+----
+stmt 0 err 1 -1 73 no such table: t1
+==== join7-generated.dup27
+
+    SELECT a, b, c, d
+      FROM t2 FULL OUTER JOIN t1 ON b=c AND d<=0 ORDER BY +b, +d;
+----
+stmt 0 err 1 -1 88 no such table: t2
+==== join7-generated.dup28
+
+    SELECT a, b, c, d
+      FROM t2 FULL OUTER JOIN t1 ON b=c AND d<=0
+     ORDER BY +b, +d LIMIT 2 OFFSET 2
+----
+stmt 0 err 1 -1 110 no such table: t2

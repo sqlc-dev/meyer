@@ -1,0 +1,22 @@
+==== tkt3929-1.0
+
+    PRAGMA page_size = 1024;
+    CREATE TABLE t1(a, b);
+    CREATE INDEX i1 ON t1(a, b);
+    CREATE TRIGGER t1_t1 AFTER INSERT ON t1 BEGIN
+      UPDATE t1 SET b = 'value: ' || a WHERE t1.rowid = new.rowid;
+    END;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 56 err 1 -1 89 no such table: main.t1
+stmt 89 err 1 -1 139 no such table: main.t1
+==== tkt3929-1.1
+
+    INSERT INTO t1(a) VALUES(1);
+    INSERT INTO t1(a) VALUES(2);
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 33 no such table: t1
+stmt 33 err 1 -1 66 no such table: t1
+stmt 66 err 1 -1 88 no such table: t1

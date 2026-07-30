@@ -1,0 +1,38 @@
+==== trigger7-1.2
+
+    CREATE TRIGGER not_a_db.r1 AFTER INSERT ON t1 BEGIN
+      SELECT 'no nothing';
+    END
+----
+stmt 0 err 1 20 56 unknown database not_a_db
+==== trigger7-3.1
+
+    CREATE TABLE t2(x,y,z);
+    CREATE TRIGGER t2r1 AFTER INSERT ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r2 BEFORE INSERT ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r3 AFTER UPDATE ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r4 BEFORE UPDATE ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r5 AFTER DELETE ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r6 BEFORE DELETE ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r7 AFTER INSERT ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r8 BEFORE INSERT ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r9 AFTER UPDATE ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r10 BEFORE UPDATE ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r11 AFTER DELETE ON t2 BEGIN SELECT 1; END;
+    CREATE TRIGGER t2r12 BEFORE DELETE ON t2 BEGIN SELECT 1; END;
+    DROP TRIGGER t2r6;
+----
+stmt 0 ok
+stmt 28 err 1 -1 77 no such table: main.t2
+stmt 92 err 1 -1 142 no such table: main.t2
+stmt 157 err 1 -1 206 no such table: main.t2
+stmt 221 err 1 -1 271 no such table: main.t2
+stmt 286 err 1 -1 335 no such table: main.t2
+stmt 350 err 1 -1 400 no such table: main.t2
+stmt 415 err 1 -1 464 no such table: main.t2
+stmt 479 err 1 -1 529 no such table: main.t2
+stmt 544 err 1 -1 593 no such table: main.t2
+stmt 608 err 1 -1 659 no such table: main.t2
+stmt 674 err 1 -1 724 no such table: main.t2
+stmt 739 err 1 -1 790 no such table: main.t2
+stmt 805 err 1 -1 828 no such trigger: t2r6

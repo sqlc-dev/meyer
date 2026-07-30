@@ -1,0 +1,642 @@
+==== check-1.1
+
+    CREATE TABLE t1(
+      x INTEGER CHECK( x<5 ),
+      y REAL CHECK( y>x )
+    );
+----
+stmt 0 ok
+==== check-1.2
+
+    INSERT INTO t1 VALUES(3,4);
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 32 no such table: t1
+stmt 32 err 1 -1 54 no such table: t1
+==== check-1.3
+
+    INSERT INTO t1 VALUES(6,7);
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== check-1.4
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== check-1.5
+
+    INSERT INTO t1 VALUES(4,3);
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== check-1.6
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== check-1.7
+
+    INSERT INTO t1 VALUES(NULL,6);
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== check-1.8
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== check-1.9
+
+    INSERT INTO t1 VALUES(2,NULL);
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== check-1.10
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== check-1.11
+
+    DELETE FROM t1 WHERE x IS NULL OR x!=3;
+    UPDATE t1 SET x=2 WHERE x==3;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 44 no such table: t1
+stmt 44 err 1 -1 78 no such table: t1
+stmt 78 err 1 -1 100 no such table: t1
+==== check-1.12
+
+    UPDATE t1 SET x=7 WHERE x==2
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== check-1.13
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== check-1.14
+
+    UPDATE t1 SET x=5 WHERE x==2
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== check-1.15
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== check-1.16
+
+    UPDATE t1 SET x=4, y=11 WHERE x==2
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== check-1.17
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== check-2.1
+
+    PRAGMA writable_schema = 1;
+    CREATE TABLE t2(
+      x INTEGER CONSTRAINT one CHECK( typeof(coalesce(x,0))=="integer" ),
+      y REAL CONSTRAINT two CHECK( typeof(coalesce(y,0.1))=='real' ),
+      z TEXT CONSTRAINT three CHECK( typeof(coalesce(z,''))=='text' )
+    );
+    CREATE TABLE t2n(
+      x INTEGER CONSTRAINT one CHECK( typeof(coalesce(x,0))=="integer" ),
+      y NUMERIC CONSTRAINT two CHECK( typeof(coalesce(y,0.1))=='real' ),
+      z TEXT CONSTRAINT three CHECK( typeof(coalesce(z,''))=='text' )
+    );
+    PRAGMA writable_schema = 0;
+----
+stmt 0 ok
+stmt 32 ok
+stmt 274 ok
+stmt 520 ok
+==== check-2.2
+
+    INSERT INTO t2 VALUES(1,2.2,'three');
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 42 no such table: t2
+stmt 42 err 1 -1 64 no such table: t2
+==== check-2.3
+
+    INSERT INTO t2 VALUES(NULL, NULL, NULL);
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 45 no such table: t2
+stmt 45 err 1 -1 67 no such table: t2
+==== check-2.4
+
+    INSERT INTO t2 VALUES(1.1, NULL, NULL);
+----
+stmt 0 err 1 -1 44 no such table: t2
+==== check-2.6
+
+    INSERT INTO t2 VALUES(NULL, NULL, 3.14159);
+----
+stmt 0 err 1 -1 48 no such table: t2
+==== check-2.10
+
+    CREATE TABLE t2b(
+      x INTEGER CHECK( typeof(coalesce(x,0))=='integer' ) CONSTRAINT one,
+      y TEXT PRIMARY KEY constraint two,
+      z INTEGER,
+      UNIQUE(x,z) constraint three
+    );
+----
+stmt 0 ok
+==== check-2.11
+
+    INSERT INTO t2b VALUES('xyzzy','hi',5);
+----
+stmt 0 err 1 -1 44 no such table: t2b
+==== check-2.12
+
+    CREATE TABLE t2c(
+      x INTEGER CONSTRAINT x_one CONSTRAINT x_two
+          CHECK( typeof(coalesce(x,0))=='integer' )
+          CONSTRAINT x_two CONSTRAINT x_three,
+      y INTEGER, z INTEGER,
+      CONSTRAINT u_one UNIQUE(x,y,z) CONSTRAINT u_two
+    );
+----
+stmt 0 ok
+==== check-2.13
+
+    INSERT INTO t2c VALUES('xyzzy',7,8);
+----
+stmt 0 err 1 -1 41 no such table: t2c
+==== check-2.cleanup
+
+    DROP TABLE IF EXISTS t2b;
+    DROP TABLE IF EXISTS t2c;
+    DROP TABLE IF EXISTS t2n;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 60 ok
+==== check-3.1
+
+      CREATE TABLE t3(
+        x, y, z,
+        CHECK( x<(SELECT min(x) FROM t1) )
+      );
+----
+stmt 0 err 1 -1 92 subqueries prohibited in CHECK constraints
+==== check-3.2
+
+    SELECT name FROM sqlite_master ORDER BY name
+----
+stmt 0 ok
+==== check-3.3
+
+    CREATE TABLE t3(
+      x, y, z,
+      CHECK( q<x )
+    );
+----
+stmt 0 err 1 50 62 no such column: q
+==== check-3.4
+
+    SELECT name FROM sqlite_master ORDER BY name
+----
+stmt 0 ok
+==== check-3.5
+
+    CREATE TABLE t3(
+      x, y, z,
+      CHECK( t2.x<x )
+    );
+----
+stmt 0 err 1 50 65 no such column: t2.x
+==== check-3.6
+
+    SELECT name FROM sqlite_master ORDER BY name
+----
+stmt 0 ok
+==== check-3.7
+
+    CREATE TABLE t3(
+      x, y, z,
+      CHECK( t3.x<25 )
+    );
+----
+stmt 0 ok
+==== check-3.8
+
+    INSERT INTO t3 VALUES(1,2,3);
+    SELECT * FROM t3;
+----
+stmt 0 err 1 -1 34 no such table: t3
+stmt 34 err 1 -1 56 no such table: t3
+==== check-3.9
+
+    INSERT INTO t3 VALUES(111,222,333);
+----
+stmt 0 err 1 -1 40 no such table: t3
+==== check-4.1
+
+    CREATE TABLE t4(x, y,
+      CHECK (
+           x+y==11
+        OR x*y==12
+        OR x/y BETWEEN 5 AND 8
+        OR -x==y+10
+      )
+    );
+----
+stmt 0 ok
+==== check-4.2
+
+    INSERT INTO t4 VALUES(1,10);
+    SELECT * FROM t4
+----
+stmt 0 err 1 -1 33 no such table: t4
+stmt 33 err 1 -1 55 no such table: t4
+==== check-4.3
+
+    UPDATE t4 SET x=4, y=3;
+    SELECT * FROM t4
+----
+stmt 0 err 1 -1 28 no such table: t4
+stmt 28 err 1 -1 50 no such table: t4
+==== check-4.4
+
+    UPDATE t4 SET x=12, y=2;
+    SELECT * FROM t4
+----
+stmt 0 err 1 -1 29 no such table: t4
+stmt 29 err 1 -1 51 no such table: t4
+==== check-4.5
+
+    UPDATE t4 SET x=12, y=-22;
+    SELECT * FROM t4
+----
+stmt 0 err 1 -1 31 no such table: t4
+stmt 31 err 1 -1 53 no such table: t4
+==== check-4.6
+
+    UPDATE t4 SET x=0, y=1;
+----
+stmt 0 err 1 -1 28 no such table: t4
+==== check-4.7
+
+    SELECT * FROM t4;
+----
+stmt 0 err 1 -1 22 no such table: t4
+==== check-4.8
+
+    PRAGMA ignore_check_constraints=ON;
+    UPDATE t4 SET x=0, y=1;
+    SELECT * FROM t4;
+    PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 40 err 1 -1 68 no such table: t4
+stmt 68 err 1 -1 90 no such table: t4
+stmt 90 ok
+==== check-4.8.1
+
+  PRAGMA ignore_check_constraints=OFF;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 39 ok
+==== check-4.9
+
+    UPDATE t4 SET x=0, y=2;
+----
+stmt 0 err 1 -1 28 no such table: t4
+==== check_4.10
+
+      VACUUM
+----
+stmt 0 ok
+==== check-5.1
+
+    CREATE TABLE t5(x, y,
+      CHECK( x*y<:abc )
+    );
+----
+stmt 0 err 1 44 57 parameters prohibited in CHECK constraints
+==== check-5.2
+
+    CREATE TABLE t5(x, y,
+      CHECK( x*y<? )
+    );
+----
+stmt 0 err 1 44 54 parameters prohibited in CHECK constraints
+==== check-6.1
+SELECT * FROM t1
+----
+stmt 0 err 1 -1 17 no such table: t1
+==== check-6.2
+
+    UPDATE OR IGNORE t1 SET x=5;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 33 no such table: t1
+stmt 33 err 1 -1 55 no such table: t1
+==== check-6.3
+
+    INSERT OR IGNORE INTO t1 VALUES(5,4.0);
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 44 no such table: t1
+stmt 44 err 1 -1 66 no such table: t1
+==== check-6.4
+
+    INSERT OR IGNORE INTO t1 VALUES(2,20.0);
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 45 no such table: t1
+stmt 45 err 1 -1 67 no such table: t1
+==== check-6.5
+
+    UPDATE OR FAIL t1 SET x=7-x, y=y+1;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== check-6.6
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== check-6.7
+
+    BEGIN;
+    INSERT INTO t1 VALUES(1,30.0);
+    INSERT OR ROLLBACK INTO t1 VALUES(8,40.0);
+----
+stmt 0 ok
+stmt 11 err 1 -1 46 no such table: t1
+stmt 46 err 1 -1 93 no such table: t1
+==== check-6.8
+
+    COMMIT;
+----
+stmt 0 ok
+==== check-6.9
+
+    SELECT * FROM t1
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== check-6.11
+SELECT * FROM t1
+----
+stmt 0 err 1 -1 17 no such table: t1
+==== check-6.12
+
+    REPLACE INTO t1 VALUES(6,7);
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== check-6.13
+SELECT * FROM t1
+----
+stmt 0 err 1 -1 17 no such table: t1
+==== check-6.14
+
+    INSERT OR IGNORE INTO t1 VALUES(6,7);
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== check-6.15
+SELECT * FROM t1
+----
+stmt 0 err 1 -1 17 no such table: t1
+==== 7.1
+ CREATE TABLE t6(a CHECK (myfunc(a)))
+----
+stmt 0 err 1 26 38 no such function: myfunc
+==== 7.2
+ INSERT INTO t6 VALUES(9)
+----
+stmt 0 err 1 -1 26 no such table: t6
+==== 7.3
+ INSERT INTO t6 VALUES(11)
+----
+stmt 0 err 1 -1 27 no such table: t6
+==== 8.1
+
+  CREATE TABLE t810(a, CHECK( main.t810.a>0 ));
+  CREATE TABLE t811(b, CHECK( xyzzy.t811.b BETWEEN 5 AND 10 ));
+----
+stmt 0 ok
+stmt 48 ok
+==== 9.1
+
+  CREATE TABLE t1(
+    a INTEGER PRIMARY KEY,
+    b INTEGER NOT NULL CONSTRAINT 'b-check' CHECK( b>a ),
+    c INTEGER NOT NULL CONSTRAINT 'c-check' CHECK( c>rowid*2 ),
+    d INTEGER NOT NULL CONSTRAINT 'd-check' CHECK( d BETWEEN b AND c )
+  );
+  INSERT INTO t1(a,b,c,d) VALUES(1,2,4,3),(2,4,6,5),(3,10,30,20);
+----
+stmt 0 ok
+stmt 244 err 1 -1 310 no such table: t1
+==== 9.2
+
+  UPDATE t1 SET b=0 WHERE a=1;
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== 9.3
+
+  UPDATE t1 SET c=a*2 WHERE a=1;
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 10.1
+
+  CREATE TABLE t1(x);
+  CREATE VIEW v1(y) AS SELECT x FROM t1;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 63 ok
+==== 11.0
+
+  CREATE TABLE t1 (Col0 CHECK(1 COLLATE BINARY BETWEEN 1 AND 1) ) ;
+----
+stmt 0 ok
+==== 11.1
+
+  INSERT INTO t1 VALUES (NULL);
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== 11.2
+
+  INSERT  INTO t1 VALUES (NULL);
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 11.3
+
+  CREATE TABLE t2(b, a CHECK(
+      CASE 'abc' COLLATE nocase WHEN a THEN 1 ELSE 0 END)
+  );
+----
+stmt 0 ok
+==== 11.4
+
+  INSERT INTO t2(a) VALUES('abc');
+----
+stmt 0 err 1 -1 35 no such table: t2
+==== 11.5
+
+  INSERT INTO t2(b, a) VALUES(1, 'abc'||'');
+----
+stmt 0 err 1 -1 45 no such table: t2
+==== 11.6
+
+  INSERT INTO t2(b, a) VALUES(2, 'abc');
+----
+stmt 0 err 1 -1 41 no such table: t2
+==== 12.10
+
+  CREATE TABLE t1(a TEXT, CHECK(a=+a));
+  INSERT INTO t1(a) VALUES(NULL),('xyz'),(5),(x'303132'),(4.75);
+  SELECT quote(a) FROM t1 ORDER BY rowid;
+----
+stmt 0 ok
+stmt 40 err 1 -1 105 no such table: t1
+stmt 105 err 1 -1 147 no such table: t1
+==== 12.20
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a TEXT, CHECK(a<>+a));
+  INSERT INTO t1(a) VALUES(NULL);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 58 err 1 -1 92 no such table: t1
+==== 12.21
+
+  INSERT INTO t1(a) VALUES('xyz');
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== 12.22
+
+  INSERT INTO t1(a) VALUES(123);
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 12.30
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a TEXT, CHECK(NOT(a=+a)));
+  INSERT INTO t1(a) VALUES(NULL);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 62 err 1 -1 96 no such table: t1
+==== 12.31
+
+  INSERT INTO t1(a) VALUES('xyz');
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== 12.32
+
+  INSERT INTO t1(a) VALUES(123);
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 12.40
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a TEXT, CHECK(NOT(a<>+a)));
+  INSERT INTO t1(a) VALUES(NULL),('xyz'),(5),(x'303132'),(4.75);
+  SELECT quote(a) FROM t1 ORDER BY rowid;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 63 err 1 -1 128 no such table: t1
+stmt 128 err 1 -1 170 no such table: t1
+==== 12.50
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a TEXT, CHECK(a BETWEEN 0 AND +a));
+  INSERT INTO t1(a) VALUES(NULL),('xyz'),(5),(x'303132'),(4.75);
+  SELECT quote(a) FROM t1 ORDER BY rowid;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 71 err 1 -1 136 no such table: t1
+stmt 136 err 1 -1 178 no such table: t1
+==== 12.60
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a TEXT, CHECK(a NOT BETWEEN 0 AND +a));
+  INSERT INTO t1(a) VALUES(NULL);
+  SELECT quote(a) FROM t1 ORDER BY rowid;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 75 err 1 -1 109 no such table: t1
+stmt 109 err 1 -1 151 no such table: t1
+==== 12.61
+
+  INSERT INTO t1(a) VALUES(456);
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 12.70
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a TEXT, CHECK(a BETWEEN +a AND 999999));
+  INSERT INTO t1(a) VALUES(NULL),(5);
+  SELECT quote(a) FROM t1 ORDER BY rowid;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 76 err 1 -1 114 no such table: t1
+stmt 114 err 1 -1 156 no such table: t1
+==== 12.80
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a TEXT, CHECK(a NOT BETWEEN +a AND 999999));
+  INSERT INTO t1(a) VALUES(NULL);
+  SELECT quote(a) FROM t1 ORDER BY rowid;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 80 err 1 -1 114 no such table: t1
+stmt 114 err 1 -1 156 no such table: t1
+==== 12.81
+
+  INSERT INTO t1(a) VALUES(456);
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 13.1.0
+
+  CREATE TABLE Table0 (Col0 , CHECK(Table0.Col0 NOT NULL ) ) ;
+  REPLACE INTO Table0 VALUES (hex(randomblob(100000)));
+----
+stmt 0 ok
+stmt 63 err 1 -1 119 no such table: Table0
+==== 13.1.2
+
+  UPDATE OR REPLACE Table0 SET Col0 = Table0.Col0 ;
+----
+stmt 0 err 1 -1 52 no such table: Table0
+==== 13.1.4
+
+  SELECT length(col0) FROM table0;
+----
+stmt 0 err 1 -1 35 no such table: table0
+==== 13.2.0
+
+  CREATE TABLE t2 (x , CHECK((NOT (x ISNULL) )));
+  REPLACE INTO t2 VALUES (hex(randomblob(100000)));
+----
+stmt 0 ok
+stmt 50 err 1 -1 102 no such table: t2
+==== 13.2.1
+
+  SELECT length(x) FROM t2
+----
+stmt 0 err 1 -1 28 no such table: t2
+==== 13.2.2
+
+  UPDATE OR REPLACE t2 SET x = x;
+----
+stmt 0 err 1 -1 34 no such table: t2
+==== 13.2.3
+
+  SELECT length(x) FROM t2
+----
+stmt 0 err 1 -1 28 no such table: t2

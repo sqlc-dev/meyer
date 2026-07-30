@@ -1,0 +1,179 @@
+==== 1.0
+
+  ATTACH 'test.db2' AS aux;
+
+  CREATE TABLE main.t1(a INTEGER PRIMARY KEY, b TEXT, c BLOB);
+  CREATE TEMP TABLE t1(a INTEGER PRIMARY KEY, b TEXT, c BLOB);
+  CREATE TABLE aux.t1(a INTEGER PRIMARY KEY, b TEXT, c BLOB);
+
+  CREATE TABLE main.x1(a INTEGER PRIMARY KEY, b TEXT, c BLOB);
+  CREATE TEMP TABLE x2(a INTEGER PRIMARY KEY, b TEXT, c BLOB);
+  CREATE TABLE aux.x3(a INTEGER PRIMARY KEY, b TEXT, c BLOB);
+
+  INSERT INTO main.t1 VALUES(1, 'main one', X'0101');
+  INSERT INTO main.t1 VALUES(2, 'main two', X'0102');
+  INSERT INTO main.t1 VALUES(3, 'main three', X'0103');
+  INSERT INTO main.t1 VALUES(4, 'main four', X'0104');
+  INSERT INTO main.t1 VALUES(5, 'main five', X'0105');
+
+  INSERT INTO main.x1 VALUES(1, 'x main one', X'000101');
+  INSERT INTO main.x1 VALUES(2, 'x main two', X'000102');
+  INSERT INTO main.x1 VALUES(3, 'x main three', X'000103');
+  INSERT INTO main.x1 VALUES(4, 'x main four', X'000104');
+  INSERT INTO main.x1 VALUES(5, 'x main five', X'000105');
+
+  INSERT INTO temp.t1 VALUES(1, 'temp one', X'0201');
+  INSERT INTO temp.t1 VALUES(2, 'temp two', X'0202');
+  INSERT INTO temp.t1 VALUES(3, 'temp three', X'0203');
+  INSERT INTO temp.t1 VALUES(4, 'temp four', X'0204');
+  INSERT INTO temp.t1 VALUES(5, 'temp five', X'0205');
+
+  INSERT INTO temp.x2 VALUES(1, 'x temp one', X'000201');
+  INSERT INTO temp.x2 VALUES(2, 'x temp two', X'000202');
+  INSERT INTO temp.x2 VALUES(3, 'x temp three', X'000203');
+  INSERT INTO temp.x2 VALUES(4, 'x temp four', X'000204');
+  INSERT INTO temp.x2 VALUES(5, 'x temp five', X'000205');
+
+  INSERT INTO aux.t1 VALUES(1, 'aux one', X'0301');
+  INSERT INTO aux.t1 VALUES(2, 'aux two', X'0302');
+  INSERT INTO aux.t1 VALUES(3, 'aux three', X'0303');
+  INSERT INTO aux.t1 VALUES(4, 'aux four', X'0304');
+  INSERT INTO aux.t1 VALUES(5, 'aux five', X'0305');
+
+  INSERT INTO aux.x3 VALUES(1, 'x aux one', X'000301');
+  INSERT INTO aux.x3 VALUES(2, 'x aux two', X'000302');
+  INSERT INTO aux.x3 VALUES(3, 'x aux three', X'000303');
+  INSERT INTO aux.x3 VALUES(4, 'x aux four', X'000304');
+  INSERT INTO aux.x3 VALUES(5, 'x aux five', X'000305');
+----
+stmt 0 ok
+stmt 28 ok
+stmt 92 ok
+stmt 155 err 1 171 178 unknown database aux
+stmt 217 ok
+stmt 281 ok
+stmt 344 err 1 360 367 unknown database aux
+stmt 406 err 1 -1 461 no such table: main.t1
+stmt 461 err 1 -1 515 no such table: main.t1
+stmt 515 err 1 -1 571 no such table: main.t1
+stmt 571 err 1 -1 626 no such table: main.t1
+stmt 626 err 1 -1 681 no such table: main.t1
+stmt 681 err 1 -1 740 no such table: main.x1
+stmt 740 err 1 -1 798 no such table: main.x1
+stmt 798 err 1 -1 858 no such table: main.x1
+stmt 858 err 1 -1 917 no such table: main.x1
+stmt 917 err 1 -1 976 no such table: main.x1
+stmt 976 err 1 -1 1031 no such table: temp.t1
+stmt 1031 err 1 -1 1085 no such table: temp.t1
+stmt 1085 err 1 -1 1141 no such table: temp.t1
+stmt 1141 err 1 -1 1196 no such table: temp.t1
+stmt 1196 err 1 -1 1251 no such table: temp.t1
+stmt 1251 err 1 -1 1310 no such table: temp.x2
+stmt 1310 err 1 -1 1368 no such table: temp.x2
+stmt 1368 err 1 -1 1428 no such table: temp.x2
+stmt 1428 err 1 -1 1487 no such table: temp.x2
+stmt 1487 err 1 -1 1546 no such table: temp.x2
+stmt 1546 err 1 -1 1599 no such table: aux.t1
+stmt 1599 err 1 -1 1651 no such table: aux.t1
+stmt 1651 err 1 -1 1705 no such table: aux.t1
+stmt 1705 err 1 -1 1758 no such table: aux.t1
+stmt 1758 err 1 -1 1811 no such table: aux.t1
+stmt 1811 err 1 -1 1868 no such table: aux.x3
+stmt 1868 err 1 -1 1924 no such table: aux.x3
+stmt 1924 err 1 -1 1982 no such table: aux.x3
+stmt 1982 err 1 -1 2039 no such table: aux.x3
+stmt 2039 err 1 -1 2096 no such table: aux.x3
+==== 4.0
+
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES('abcd', 152);
+  INSERT INTO t1 VALUES(NULL, X'00010203');
+  INSERT INTO t1 VALUES('', 154.2);
+
+  CREATE TABLE t2(x PRIMARY KEY, y) WITHOUT ROWID;
+  INSERT INTO t2 VALUES(1, 'blob');
+
+  CREATE TABLE t3(a PRIMARY KEY, b, c, d, e, f, UNIQUE(e, f));
+  INSERT INTO t3 VALUES('aaaa', 'bbbb', 'cccc', 'dddd', 'eeee', 'ffff');
+  CREATE INDEX t3b ON t3(b);
+
+  CREATE TABLE p1(x PRIMARY KEY);
+  INSERT INTO p1 VALUES('abc');
+
+  CREATE TABLE c1(a INTEGER PRIMARY KEY, b REFERENCES p1);
+  INSERT INTO c1 VALUES(45, 'abc');
+----
+stmt 0 ok
+stmt 25 err 1 -1 63 no such table: t1
+stmt 63 err 1 -1 107 no such table: t1
+stmt 107 err 1 -1 143 no such table: t1
+stmt 143 ok
+stmt 195 err 1 -1 231 no such table: t2
+stmt 231 ok
+stmt 295 err 1 -1 368 no such table: t3
+stmt 368 err 1 -1 397 no such table: main.t3
+stmt 397 ok
+stmt 432 err 1 -1 464 no such table: p1
+stmt 464 ok
+stmt 524 err 1 -1 560 no such table: c1
+==== 11.1
+
+  CREATE TABLE b1(a INTEGER PRIMARY KEY, b, c UNIQUE);
+  INSERT INTO b1 VALUES(1, '1234567890', 1);
+  INSERT INTO b1 VALUES(2, '1234567890', 2);
+  INSERT INTO b1 VALUES(3, '1234567890', 3);
+  INSERT INTO b1 VALUES(4, '1234567890', 4);
+  INSERT INTO b1 VALUES(5, '1234567890', 5);
+  INSERT INTO b1 VALUES(6, '1234567890', 6);
+
+  CREATE TABLE b2(a INTEGER PRIMARY KEY, b, c UNIQUE);
+  INSERT INTO b2 VALUES(1, '1234567890', 1);
+  INSERT INTO b2 VALUES(2, '1234567890', 2);
+  INSERT INTO b2 VALUES(3, '1234567890', 3);
+  INSERT INTO b2 VALUES(4, '1234567890', 4);
+  INSERT INTO b2 VALUES(5, '1234567890', 5);
+  INSERT INTO b2 VALUES(6, '1234567890', 6);
+----
+stmt 0 ok
+stmt 55 err 1 -1 100 no such table: b1
+stmt 100 err 1 -1 145 no such table: b1
+stmt 145 err 1 -1 190 no such table: b1
+stmt 190 err 1 -1 235 no such table: b1
+stmt 235 err 1 -1 280 no such table: b1
+stmt 280 err 1 -1 325 no such table: b1
+stmt 325 ok
+stmt 381 err 1 -1 426 no such table: b2
+stmt 426 err 1 -1 471 no such table: b2
+stmt 471 err 1 -1 516 no such table: b2
+stmt 516 err 1 -1 561 no such table: b2
+stmt 561 err 1 -1 606 no such table: b2
+stmt 606 err 1 -1 651 no such table: b2
+==== 12.1
+
+  CREATE TABLE b3(x INTEGER PRIMARY KEY, y TEXT, z INTEGER);
+  INSERT INTO b3 VALUES(22, '..........', NULL);
+----
+stmt 0 ok
+stmt 61 err 1 -1 110 no such table: b3
+==== 12.3
+
+  UPDATE b3 SET z = 'not null';
+----
+stmt 0 err 1 -1 32 no such table: b3
+==== 12.5
+
+  SELECT * FROM b3;
+----
+stmt 0 err 1 -1 20 no such table: b3
+==== 12.6
+
+  SELECT * FROM b3;
+----
+stmt 0 err 1 -1 20 no such table: b3
+==== 13.1
+
+  CREATE TABLE c2(i INTEGER PRIMARY KEY, j);
+  INSERT INTO c2 VALUES(10, zeroblob(24));
+----
+stmt 0 ok
+stmt 45 err 1 -1 88 no such table: c2

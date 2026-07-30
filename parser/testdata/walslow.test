@@ -1,0 +1,13 @@
+==== 4.1
+
+  PRAGMA journal_mode = wal;
+  CREATE TABLE t1(x, y);
+  INSERT INTO "t1" VALUES('A',0);
+  CREATE TABLE t2(x, y);
+  INSERT INTO "t2" VALUES('B',2);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 54 err 1 -1 88 no such table: t1
+stmt 88 ok
+stmt 113 err 1 -1 147 no such table: t2

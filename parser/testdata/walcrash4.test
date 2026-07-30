@@ -1,0 +1,18 @@
+==== 1.0
+
+  PRAGMA autovacuum = 0;
+  PRAGMA page_size = 1024;
+  PRAGMA journal_mode = wal;
+  PRAGMA main.synchronous = full;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 52 ok
+stmt 81 ok
+==== walcrash4-generated
+ 
+      SELECT count(*) FROM t1;
+      PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 32 no such table: t1
+stmt 32 ok

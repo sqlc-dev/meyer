@@ -1,0 +1,19 @@
+==== waloverwrite-generated
+
+    CREATE TABLE t1(x, y);
+    CREATE TABLE t2(x, y);
+    CREATE INDEX i1y ON t1(y);
+  
+    WITH cnt(i) AS (
+      SELECT 1 UNION ALL SELECT i+1 FROM cnt WHERE i<20
+    )
+    INSERT INTO t1 SELECT i, randomblob(800) FROM cnt;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 err 1 -1 85 no such table: main.t1
+stmt 85 err 1 -1 226 no such table: t1
+==== waloverwrite-generated.dup1
+ PRAGMA integrity_check
+----
+stmt 0 ok

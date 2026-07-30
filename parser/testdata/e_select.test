@@ -19,29 +19,29 @@
   INSERT INTO t4 VALUES('b', 2);
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: t1
-stmt 62 err 1 -1 no such table: t1
-stmt 99 err 1 -1 no such table: t1
+stmt 25 err 1 -1 62 no such table: t1
+stmt 62 err 1 -1 99 no such table: t1
+stmt 99 err 1 -1 138 no such table: t1
 stmt 138 ok
-stmt 164 err 1 -1 no such table: t2
-stmt 199 err 1 -1 no such table: t2
-stmt 235 err 1 -1 no such table: t2
+stmt 164 err 1 -1 199 no such table: t2
+stmt 199 err 1 -1 235 no such table: t2
+stmt 235 err 1 -1 272 no such table: t2
 stmt 272 ok
-stmt 298 err 1 -1 no such table: t3
-stmt 331 err 1 -1 no such table: t3
+stmt 298 err 1 -1 331 no such table: t3
+stmt 331 err 1 -1 364 no such table: t3
 stmt 364 ok
-stmt 390 err 1 -1 no such table: t4
-stmt 426 err 1 -1 no such table: t4
+stmt 390 err 1 -1 426 no such table: t4
+stmt 426 err 1 -1 459 no such table: t4
 ==== e_select-0.1.4
 
   SELECT count(*) FROM t1, t2 ON (t1.a=t2.a) USING (a)
 ----
-stmt 0 err 1 46 near "USING": syntax error
+stmt 0 err 1 46 51 near "USING": syntax error
 ==== e_select-0.1.5
 
   SELECT count(*) FROM t1, t2 USING (a) ON (t1.a=t2.a)
 ----
-stmt 0 err 1 41 near "ON": syntax error
+stmt 0 err 1 41 43 near "ON": syntax error
 ==== e_select-1.2.0
 
   CREATE TABLE xx(x, y);
@@ -50,9 +50,9 @@ stmt 0 err 1 41 near "ON": syntax error
   INSERT INTO xx VALUES(-17.89, 'linguistically');
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: xx
-stmt 101 err 1 -1 no such table: xx
-stmt 140 err 1 -1 no such table: xx
+stmt 25 err 1 -1 101 no such table: xx
+stmt 101 err 1 -1 140 no such table: xx
+stmt 140 err 1 -1 191 no such table: xx
 ==== e_select-1.4.0
 
   CREATE TABLE x1(a, b);
@@ -78,24 +78,24 @@ stmt 140 err 1 -1 no such table: xx
 stmt 0 ok
 stmt 25 ok
 stmt 53 ok
-stmt 84 err 1 -1 no such table: x1
-stmt 155 err 1 -1 no such table: x1
-stmt 195 err 1 -1 no such table: x1
-stmt 245 err 1 -1 no such table: x2
-stmt 318 err 1 -1 no such table: x2
-stmt 360 err 1 -1 no such table: x3
-stmt 444 err 1 -1 no such table: x3
-stmt 515 err 1 -1 no such table: x3
-stmt 575 err 1 -1 no such table: x3
-stmt 636 err 1 -1 no such table: x3
+stmt 84 err 1 -1 155 no such table: x1
+stmt 155 err 1 -1 195 no such table: x1
+stmt 195 err 1 -1 245 no such table: x1
+stmt 245 err 1 -1 318 no such table: x2
+stmt 318 err 1 -1 360 no such table: x2
+stmt 360 err 1 -1 444 no such table: x3
+stmt 444 err 1 -1 515 no such table: x3
+stmt 515 err 1 -1 575 no such table: x3
+stmt 575 err 1 -1 636 no such table: x3
+stmt 636 err 1 -1 693 no such table: x3
 ==== e_select-1.4.4.1
  SELECT * FROM t1, t2
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 22 no such table: t1
 ==== e_select-1.4.4.2
  SELECT * FROM t1 AS x, t1 AS y
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== e_select-1.6.0
 
   CREATE TABLE t5(a COLLATE nocase, b COLLATE binary);
@@ -108,13 +108,13 @@ stmt 0 err 1 -1 no such table: t1
   INSERT INTO t6 VALUES(NULL, NULL);
 ----
 stmt 0 ok
-stmt 55 err 1 -1 no such table: t5
-stmt 92 err 1 -1 no such table: t5
-stmt 129 err 1 -1 no such table: t5
+stmt 55 err 1 -1 92 no such table: t5
+stmt 92 err 1 -1 129 no such table: t5
+stmt 129 err 1 -1 166 no such table: t5
 stmt 166 ok
-stmt 221 err 1 -1 no such table: t6
-stmt 258 err 1 -1 no such table: t6
-stmt 295 err 1 -1 no such table: t6
+stmt 221 err 1 -1 258 no such table: t6
+stmt 258 err 1 -1 295 no such table: t6
+stmt 295 err 1 -1 332 no such table: t6
 ==== e_select-1.8.0
 
   CREATE TABLE t7(a, b, c);
@@ -128,10 +128,10 @@ stmt 295 err 1 -1 no such table: t6
 ----
 stmt 0 ok
 stmt 28 ok
-stmt 56 err 1 -1 no such table: t7
-stmt 98 err 1 -1 no such table: t7
-stmt 139 err 1 -1 no such table: t8
-stmt 181 err 1 -1 no such table: t8
+stmt 56 err 1 -1 98 no such table: t7
+stmt 98 err 1 -1 139 no such table: t7
+stmt 139 err 1 -1 181 no such table: t8
+stmt 181 err 1 -1 222 no such table: t8
 ==== e_select-1.11.0
 
   CREATE TABLE t10(x, y);
@@ -139,8 +139,8 @@ stmt 181 err 1 -1 no such table: t8
   INSERT INTO t10 VALUES(0, 'false');
 ----
 stmt 0 ok
-stmt 26 err 1 -1 no such table: t10
-stmt 63 err 1 -1 no such table: t10
+stmt 26 err 1 -1 63 no such table: t10
+stmt 63 err 1 -1 101 no such table: t10
 ==== e_select-3.0
 
   CREATE TABLE x1(k, x, y, z);
@@ -158,66 +158,66 @@ stmt 63 err 1 -1 no such table: t10
   INSERT INTO x2 VALUES(7, 'mistrusted', 'standardized');
 ----
 stmt 0 ok
-stmt 31 err 1 -1 no such table: x1
-stmt 93 err 1 -1 no such table: x1
-stmt 153 err 1 -1 no such table: x1
-stmt 214 err 1 -1 no such table: x1
-stmt 278 err 1 -1 no such table: x1
-stmt 339 err 1 -1 no such table: x1
+stmt 31 err 1 -1 93 no such table: x1
+stmt 93 err 1 -1 153 no such table: x1
+stmt 153 err 1 -1 214 no such table: x1
+stmt 214 err 1 -1 278 no such table: x1
+stmt 278 err 1 -1 339 no such table: x1
+stmt 339 err 1 -1 397 no such table: x1
 stmt 397 ok
-stmt 427 err 1 -1 no such table: x2
-stmt 470 err 1 -1 no such table: x2
-stmt 512 err 1 -1 no such table: x2
-stmt 562 err 1 -1 no such table: x2
+stmt 427 err 1 -1 470 no such table: x2
+stmt 470 err 1 -1 512 no such table: x2
+stmt 512 err 1 -1 562 no such table: x2
+stmt 562 err 1 -1 620 no such table: x2
 ==== e_select-3.1.1
  SELECT k FROM x1 WHERE x
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 26 no such table: x1
 ==== e_select-3.1.2
  SELECT k FROM x1 WHERE y
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 26 no such table: x1
 ==== e_select-3.1.3
  SELECT k FROM x1 WHERE z
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 26 no such table: x1
 ==== e_select-3.1.4
  SELECT k FROM x1 WHERE '1'||z
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 31 no such table: x1
 ==== e_select-3.1.5
  SELECT k FROM x1 WHERE x IS NULL
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 34 no such table: x1
 ==== e_select-3.1.6
  SELECT k FROM x1 WHERE z - 78.43
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 34 no such table: x1
 ==== e_select-3.2.1a
 
   SELECT k FROM x1 LEFT JOIN x2 USING(k)
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 42 no such table: x1
 ==== e_select-3.2.1b
 
   SELECT k FROM x1 LEFT JOIN x2 USING(k) WHERE x2.k ORDER BY +k
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 65 no such table: x1
 ==== e_select-3.2.2
 
   SELECT k FROM x1 LEFT JOIN x2 USING(k) WHERE x2.k IS NULL
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 61 no such table: x1
 ==== e_select-3.2.3
 
   SELECT k FROM x1 NATURAL JOIN x2 WHERE x2.k
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 47 no such table: x1
 ==== e_select-3.2.4
 
   SELECT k FROM x1 NATURAL JOIN x2 WHERE x2.k-3
 ----
-stmt 0 err 1 -1 no such table: x1
+stmt 0 err 1 -1 49 no such table: x1
 ==== e_select-4.0
 
   CREATE TABLE z1(a, b, c);
@@ -240,16 +240,16 @@ stmt 0 err 1 -1 no such table: x1
 stmt 0 ok
 stmt 28 ok
 stmt 53 ok
-stmt 78 err 1 -1 no such table: z1
-stmt 131 err 1 -1 no such table: z1
-stmt 170 err 1 -1 no such table: z1
-stmt 220 err 1 -1 no such table: z1
-stmt 267 err 1 -1 no such table: z1
-stmt 315 err 1 -1 no such table: z1
-stmt 357 err 1 -1 no such table: z2
-stmt 393 err 1 -1 no such table: z2
-stmt 425 err 1 -1 no such table: z3
-stmt 475 err 1 -1 no such table: z3
+stmt 78 err 1 -1 131 no such table: z1
+stmt 131 err 1 -1 170 no such table: z1
+stmt 170 err 1 -1 220 no such table: z1
+stmt 220 err 1 -1 267 no such table: z1
+stmt 267 err 1 -1 315 no such table: z1
+stmt 315 err 1 -1 357 no such table: z1
+stmt 357 err 1 -1 393 no such table: z2
+stmt 393 err 1 -1 425 no such table: z2
+stmt 425 err 1 -1 475 no such table: z3
+stmt 475 err 1 -1 512 no such table: z3
 ==== e_select-4.6.0
 
   CREATE TABLE a1(one PRIMARY KEY, two);
@@ -265,15 +265,15 @@ stmt 475 err 1 -1 no such table: z3
   INSERT INTO a2 VALUES(10, 4);
 ----
 stmt 0 ok
-stmt 41 err 1 -1 no such table: a1
-stmt 72 err 1 -1 no such table: a1
-stmt 103 err 1 -1 no such table: a1
-stmt 134 err 1 -1 no such table: a1
+stmt 41 err 1 -1 72 no such table: a1
+stmt 72 err 1 -1 103 no such table: a1
+stmt 103 err 1 -1 134 no such table: a1
+stmt 134 err 1 -1 166 no such table: a1
 stmt 166 ok
-stmt 210 err 1 -1 no such table: a2
-stmt 241 err 1 -1 no such table: a2
-stmt 272 err 1 -1 no such table: a2
-stmt 303 err 1 -1 no such table: a2
+stmt 210 err 1 -1 241 no such table: a2
+stmt 241 err 1 -1 272 no such table: a2
+stmt 272 err 1 -1 303 no such table: a2
+stmt 303 err 1 -1 335 no such table: a2
 ==== e_select-4.9.0
 
   CREATE TABLE b1(one PRIMARY KEY, two);
@@ -299,24 +299,24 @@ stmt 303 err 1 -1 no such table: a2
   INSERT INTO b3 VALUES('dEF', 'dEF');
 ----
 stmt 0 ok
-stmt 41 err 1 -1 no such table: b1
-stmt 74 err 1 -1 no such table: b1
-stmt 107 err 1 -1 no such table: b1
-stmt 140 err 1 -1 no such table: b1
-stmt 173 err 1 -1 no such table: b1
-stmt 206 err 1 -1 no such table: b1
-stmt 239 err 1 -1 no such table: b1
+stmt 41 err 1 -1 74 no such table: b1
+stmt 74 err 1 -1 107 no such table: b1
+stmt 107 err 1 -1 140 no such table: b1
+stmt 140 err 1 -1 173 no such table: b1
+stmt 173 err 1 -1 206 no such table: b1
+stmt 206 err 1 -1 239 no such table: b1
+stmt 239 err 1 -1 272 no such table: b1
 stmt 272 ok
-stmt 298 err 1 -1 no such table: b2
-stmt 332 err 1 -1 no such table: b2
-stmt 366 err 1 -1 no such table: b2
-stmt 401 err 1 -1 no such table: b2
-stmt 436 err 1 -1 no such table: b2
+stmt 298 err 1 -1 332 no such table: b2
+stmt 332 err 1 -1 366 no such table: b2
+stmt 366 err 1 -1 401 no such table: b2
+stmt 401 err 1 -1 436 no such table: b2
+stmt 436 err 1 -1 471 no such table: b2
 stmt 471 ok
-stmt 527 err 1 -1 no such table: b3
-stmt 566 err 1 -1 no such table: b3
-stmt 605 err 1 -1 no such table: b3
-stmt 644 err 1 -1 no such table: b3
+stmt 527 err 1 -1 566 no such table: b3
+stmt 566 err 1 -1 605 no such table: b3
+stmt 605 err 1 -1 644 no such table: b3
+stmt 644 err 1 -1 683 no such table: b3
 ==== e_select-4.13.0
 
   CREATE TABLE c1(up, down);
@@ -347,29 +347,29 @@ stmt 644 err 1 -1 no such table: b3
   INSERT INTO c3 VALUES(94, 'plutonium');
 ----
 stmt 0 ok
-stmt 29 err 1 -1 no such table: c1
-stmt 62 err 1 -1 no such table: c1
-stmt 95 err 1 -1 no such table: c1
-stmt 128 err 1 -1 no such table: c1
-stmt 161 err 1 -1 no such table: c1
-stmt 195 err 1 -1 no such table: c1
+stmt 29 err 1 -1 62 no such table: c1
+stmt 62 err 1 -1 95 no such table: c1
+stmt 95 err 1 -1 128 no such table: c1
+stmt 128 err 1 -1 161 no such table: c1
+stmt 161 err 1 -1 195 no such table: c1
+stmt 195 err 1 -1 229 no such table: c1
 stmt 229 ok
-stmt 255 err 1 -1 no such table: c2
-stmt 286 err 1 -1 no such table: c2
-stmt 317 err 1 -1 no such table: c2
-stmt 348 err 1 -1 no such table: c2
-stmt 379 err 1 -1 no such table: c2
-stmt 411 err 1 -1 no such table: c2
-stmt 443 err 1 -1 no such table: c2
-stmt 475 err 1 -1 no such table: c2
-stmt 507 err 1 -1 no such table: c2
+stmt 255 err 1 -1 286 no such table: c2
+stmt 286 err 1 -1 317 no such table: c2
+stmt 317 err 1 -1 348 no such table: c2
+stmt 348 err 1 -1 379 no such table: c2
+stmt 379 err 1 -1 411 no such table: c2
+stmt 411 err 1 -1 443 no such table: c2
+stmt 443 err 1 -1 475 no such table: c2
+stmt 475 err 1 -1 507 no such table: c2
+stmt 507 err 1 -1 539 no such table: c2
 stmt 539 ok
-stmt 582 err 1 -1 no such table: c3
-stmt 623 err 1 -1 no such table: c3
-stmt 662 err 1 -1 no such table: c3
-stmt 702 err 1 -1 no such table: c3
-stmt 744 err 1 -1 no such table: c3
-stmt 782 err 1 -1 no such table: c3
+stmt 582 err 1 -1 623 no such table: c3
+stmt 623 err 1 -1 662 no such table: c3
+stmt 662 err 1 -1 702 no such table: c3
+stmt 702 err 1 -1 744 no such table: c3
+stmt 744 err 1 -1 782 no such table: c3
+stmt 782 err 1 -1 824 no such table: c3
 ==== e_select-5.1.0
 
   CREATE TABLE h1(a, b);
@@ -402,31 +402,31 @@ stmt 782 err 1 -1 no such table: c3
   INSERT INTO h3 VALUES(9, '3');
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: h1
-stmt 60 err 1 -1 no such table: h1
-stmt 93 err 1 -1 no such table: h1
-stmt 126 err 1 -1 no such table: h1
-stmt 162 err 1 -1 no such table: h1
-stmt 196 err 1 -1 no such table: h1
+stmt 25 err 1 -1 60 no such table: h1
+stmt 60 err 1 -1 93 no such table: h1
+stmt 93 err 1 -1 126 no such table: h1
+stmt 126 err 1 -1 162 no such table: h1
+stmt 162 err 1 -1 196 no such table: h1
+stmt 196 err 1 -1 230 no such table: h1
 stmt 230 ok
-stmt 268 err 1 -1 no such table: h2
-stmt 300 err 1 -1 no such table: h2
-stmt 332 err 1 -1 no such table: h2
-stmt 366 err 1 -1 no such table: h2
-stmt 399 err 1 -1 no such table: h2
-stmt 431 err 1 -1 no such table: h2
-stmt 463 err 1 -1 no such table: h2
-stmt 497 err 1 -1 no such table: h2
+stmt 268 err 1 -1 300 no such table: h2
+stmt 300 err 1 -1 332 no such table: h2
+stmt 332 err 1 -1 366 no such table: h2
+stmt 366 err 1 -1 399 no such table: h2
+stmt 399 err 1 -1 431 no such table: h2
+stmt 431 err 1 -1 463 no such table: h2
+stmt 463 err 1 -1 497 no such table: h2
+stmt 497 err 1 -1 530 no such table: h2
 stmt 530 ok
-stmt 556 err 1 -1 no such table: h3
-stmt 590 err 1 -1 no such table: h3
-stmt 624 err 1 -1 no such table: h3
-stmt 658 err 1 -1 no such table: h3
-stmt 691 err 1 -1 no such table: h3
-stmt 725 err 1 -1 no such table: h3
-stmt 760 err 1 -1 no such table: h3
-stmt 794 err 1 -1 no such table: h3
-stmt 829 err 1 -1 no such table: h3
+stmt 556 err 1 -1 590 no such table: h3
+stmt 590 err 1 -1 624 no such table: h3
+stmt 624 err 1 -1 658 no such table: h3
+stmt 658 err 1 -1 691 no such table: h3
+stmt 691 err 1 -1 725 no such table: h3
+stmt 725 err 1 -1 760 no such table: h3
+stmt 760 err 1 -1 794 no such table: h3
+stmt 794 err 1 -1 829 no such table: h3
+stmt 829 err 1 -1 862 no such table: h3
 ==== e_select-7.1.0
 
   CREATE TABLE j1(a, b, c);
@@ -457,22 +457,22 @@ stmt 53 ok
 stmt 0 ok
 stmt 41 ok
 stmt 78 ok
-stmt 108 err 1 -1 no such table: q1
-stmt 152 err 1 -1 no such table: q1
-stmt 200 err 1 -1 no such table: q1
-stmt 245 err 1 -1 no such table: q2
-stmt 285 err 1 -1 no such table: q2
-stmt 323 err 1 -1 no such table: q2
-stmt 359 err 1 -1 no such table: q2
-stmt 405 err 1 -1 no such table: q3
-stmt 444 err 1 -1 no such table: q3
+stmt 108 err 1 -1 152 no such table: q1
+stmt 152 err 1 -1 200 no such table: q1
+stmt 200 err 1 -1 245 no such table: q1
+stmt 245 err 1 -1 285 no such table: q2
+stmt 285 err 1 -1 323 no such table: q2
+stmt 323 err 1 -1 359 no such table: q2
+stmt 359 err 1 -1 405 no such table: q2
+stmt 405 err 1 -1 444 no such table: q3
+stmt 444 err 1 -1 482 no such table: q3
 ==== e_select-7.10.0
 
   CREATE TABLE y1(a COLLATE nocase, b COLLATE binary, c);
   INSERT INTO y1 VALUES('Abc', 'abc', 'aBC');
 ----
 stmt 0 ok
-stmt 58 err 1 -1 no such table: y1
+stmt 58 err 1 -1 104 no such table: y1
 ==== e_select-7.10.0.dup1
 
   CREATE TABLE w1(a TEXT, b NUMBER);
@@ -483,8 +483,8 @@ stmt 58 err 1 -1 no such table: y1
 ----
 stmt 0 ok
 stmt 37 ok
-stmt 67 err 1 -1 no such table: w1
-stmt 103 err 1 -1 no such table: w2
+stmt 67 err 1 -1 103 no such table: w1
+stmt 103 err 1 -1 136 no such table: w2
 ==== e_select-7.12.0
 
   CREATE TABLE t1(x);
@@ -493,9 +493,9 @@ stmt 103 err 1 -1 no such table: w2
   INSERT INTO t1 VALUES(3);
 ----
 stmt 0 ok
-stmt 22 err 1 -1 no such table: t1
-stmt 50 err 1 -1 no such table: t1
-stmt 78 err 1 -1 no such table: t1
+stmt 22 err 1 -1 50 no such table: t1
+stmt 50 err 1 -1 78 no such table: t1
+stmt 78 err 1 -1 106 no such table: t1
 ==== e_select-8.1.0
 
   CREATE TABLE d1(x, y, z);
@@ -522,25 +522,25 @@ stmt 78 err 1 -1 no such table: t1
   INSERT INTO d2 VALUES('lad', 'relenting');
 ----
 stmt 0 ok
-stmt 28 err 1 -1 no such table: d1
-stmt 63 err 1 -1 no such table: d1
-stmt 98 err 1 -1 no such table: d1
-stmt 132 err 1 -1 no such table: d1
-stmt 166 err 1 -1 no such table: d1
-stmt 201 err 1 -1 no such table: d1
-stmt 237 err 1 -1 no such table: d1
-stmt 272 err 1 -1 no such table: d1
+stmt 28 err 1 -1 63 no such table: d1
+stmt 63 err 1 -1 98 no such table: d1
+stmt 98 err 1 -1 132 no such table: d1
+stmt 132 err 1 -1 166 no such table: d1
+stmt 166 err 1 -1 201 no such table: d1
+stmt 201 err 1 -1 237 no such table: d1
+stmt 237 err 1 -1 272 no such table: d1
+stmt 272 err 1 -1 307 no such table: d1
 stmt 307 ok
-stmt 333 err 1 -1 no such table: d2
-stmt 380 err 1 -1 no such table: d2
-stmt 432 err 1 -1 no such table: d2
-stmt 478 err 1 -1 no such table: d2
-stmt 531 err 1 -1 no such table: d2
-stmt 581 err 1 -1 no such table: d2
-stmt 634 err 1 -1 no such table: d2
-stmt 684 err 1 -1 no such table: d2
-stmt 734 err 1 -1 no such table: d2
-stmt 784 err 1 -1 no such table: d2
+stmt 333 err 1 -1 380 no such table: d2
+stmt 380 err 1 -1 432 no such table: d2
+stmt 432 err 1 -1 478 no such table: d2
+stmt 478 err 1 -1 531 no such table: d2
+stmt 531 err 1 -1 581 no such table: d2
+stmt 581 err 1 -1 634 no such table: d2
+stmt 634 err 1 -1 684 no such table: d2
+stmt 684 err 1 -1 734 no such table: d2
+stmt 734 err 1 -1 784 no such table: d2
+stmt 784 err 1 -1 829 no such table: d2
 ==== e_select-8.8.0
 
   CREATE TABLE d3(a);
@@ -559,68 +559,68 @@ stmt 784 err 1 -1 no such table: d2
   INSERT INTO d4 VALUES('JKL');
 ----
 stmt 0 ok
-stmt 22 err 1 -1 no such table: d3
-stmt 55 err 1 -1 no such table: d3
-stmt 86 err 1 -1 no such table: d3
-stmt 115 err 1 -1 no such table: d3
-stmt 153 err 1 -1 no such table: d3
-stmt 182 err 1 -1 no such table: d3
-stmt 213 err 1 -1 no such table: d3
+stmt 22 err 1 -1 55 no such table: d3
+stmt 55 err 1 -1 86 no such table: d3
+stmt 86 err 1 -1 115 no such table: d3
+stmt 115 err 1 -1 153 no such table: d3
+stmt 153 err 1 -1 182 no such table: d3
+stmt 182 err 1 -1 213 no such table: d3
+stmt 213 err 1 -1 244 no such table: d3
 stmt 244 ok
-stmt 282 err 1 -1 no such table: d4
-stmt 314 err 1 -1 no such table: d4
-stmt 346 err 1 -1 no such table: d4
-stmt 378 err 1 -1 no such table: d4
+stmt 282 err 1 -1 314 no such table: d4
+stmt 314 err 1 -1 346 no such table: d4
+stmt 346 err 1 -1 378 no such table: d4
+stmt 378 err 1 -1 410 no such table: d4
 ==== e_select-8.8.1
 
   SELECT a FROM d3 ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: d3
+stmt 0 err 1 -1 31 no such table: d3
 ==== e_select-8.8.2
 
   SELECT a FROM d3 ORDER BY a DESC
 ----
-stmt 0 err 1 -1 no such table: d3
+stmt 0 err 1 -1 36 no such table: d3
 ==== e_select-8.9.1
 
   SELECT x FROM d4 ORDER BY 1 COLLATE binary
 ----
-stmt 0 err 1 -1 no such table: d4
+stmt 0 err 1 -1 46 no such table: d4
 ==== e_select-8.9.2
 
   SELECT x COLLATE binary FROM d4 ORDER BY 1 COLLATE nocase
 ----
-stmt 0 err 1 -1 no such table: d4
+stmt 0 err 1 -1 61 no such table: d4
 ==== e_select-8.10.1
 
   SELECT x COLLATE binary FROM d4 ORDER BY 1
 ----
-stmt 0 err 1 -1 no such table: d4
+stmt 0 err 1 -1 46 no such table: d4
 ==== e_select-8.10.2
 
   SELECT x COLLATE binary FROM d4 ORDER BY x
 ----
-stmt 0 err 1 -1 no such table: d4
+stmt 0 err 1 -1 46 no such table: d4
 ==== e_select-8.10.3
 
   SELECT x COLLATE binary AS x FROM d4 ORDER BY x
 ----
-stmt 0 err 1 -1 no such table: d4
+stmt 0 err 1 -1 51 no such table: d4
 ==== e_select-8.11.1
 
   SELECT x AS y FROM d4 ORDER BY y
 ----
-stmt 0 err 1 -1 no such table: d4
+stmt 0 err 1 -1 36 no such table: d4
 ==== e_select-8.11.2
 
   SELECT x||'' FROM d4 ORDER BY x
 ----
-stmt 0 err 1 -1 no such table: d4
+stmt 0 err 1 -1 35 no such table: d4
 ==== e_select-8.12.1
 
   SELECT x FROM d4 ORDER BY x||''
 ----
-stmt 0 err 1 -1 no such table: d4
+stmt 0 err 1 -1 35 no such table: d4
 ==== e_select-8.13.0
 
   CREATE TABLE d5(a, b);
@@ -645,18 +645,18 @@ stmt 0 err 1 -1 no such table: d4
 stmt 0 ok
 stmt 25 ok
 stmt 50 ok
-stmt 75 err 1 -1 no such table: d5
-stmt 110 err 1 -1 no such table: d6
-stmt 143 err 1 -1 no such table: d7
-stmt 176 err 1 -1 no such table: d5
-stmt 209 err 1 -1 no such table: d6
-stmt 242 err 1 -1 no such table: d7
+stmt 75 err 1 -1 110 no such table: d5
+stmt 110 err 1 -1 143 no such table: d6
+stmt 143 err 1 -1 176 no such table: d7
+stmt 176 err 1 -1 209 no such table: d5
+stmt 209 err 1 -1 242 no such table: d6
+stmt 242 err 1 -1 275 no such table: d7
 stmt 275 ok
 stmt 313 ok
-stmt 350 err 1 -1 no such table: d8
-stmt 381 err 1 -1 no such table: d9
-stmt 411 err 1 -1 no such table: d8
-stmt 441 err 1 -1 no such table: d9
+stmt 350 err 1 -1 381 no such table: d8
+stmt 381 err 1 -1 411 no such table: d9
+stmt 411 err 1 -1 441 no such table: d8
+stmt 441 err 1 -1 471 no such table: d9
 ==== e_select-9.0
 
   CREATE TABLE f1(a, b);
@@ -688,29 +688,29 @@ stmt 441 err 1 -1 no such table: d9
   INSERT INTO f1 VALUES(1, 'a');
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: f1
-stmt 59 err 1 -1 no such table: f1
-stmt 93 err 1 -1 no such table: f1
-stmt 127 err 1 -1 no such table: f1
-stmt 161 err 1 -1 no such table: f1
-stmt 195 err 1 -1 no such table: f1
-stmt 229 err 1 -1 no such table: f1
-stmt 263 err 1 -1 no such table: f1
-stmt 297 err 1 -1 no such table: f1
-stmt 331 err 1 -1 no such table: f1
-stmt 365 err 1 -1 no such table: f1
-stmt 399 err 1 -1 no such table: f1
-stmt 433 err 1 -1 no such table: f1
-stmt 467 err 1 -1 no such table: f1
-stmt 501 err 1 -1 no such table: f1
-stmt 535 err 1 -1 no such table: f1
-stmt 569 err 1 -1 no such table: f1
-stmt 603 err 1 -1 no such table: f1
-stmt 636 err 1 -1 no such table: f1
-stmt 669 err 1 -1 no such table: f1
-stmt 702 err 1 -1 no such table: f1
-stmt 735 err 1 -1 no such table: f1
-stmt 768 err 1 -1 no such table: f1
-stmt 801 err 1 -1 no such table: f1
-stmt 834 err 1 -1 no such table: f1
-stmt 867 err 1 -1 no such table: f1
+stmt 25 err 1 -1 59 no such table: f1
+stmt 59 err 1 -1 93 no such table: f1
+stmt 93 err 1 -1 127 no such table: f1
+stmt 127 err 1 -1 161 no such table: f1
+stmt 161 err 1 -1 195 no such table: f1
+stmt 195 err 1 -1 229 no such table: f1
+stmt 229 err 1 -1 263 no such table: f1
+stmt 263 err 1 -1 297 no such table: f1
+stmt 297 err 1 -1 331 no such table: f1
+stmt 331 err 1 -1 365 no such table: f1
+stmt 365 err 1 -1 399 no such table: f1
+stmt 399 err 1 -1 433 no such table: f1
+stmt 433 err 1 -1 467 no such table: f1
+stmt 467 err 1 -1 501 no such table: f1
+stmt 501 err 1 -1 535 no such table: f1
+stmt 535 err 1 -1 569 no such table: f1
+stmt 569 err 1 -1 603 no such table: f1
+stmt 603 err 1 -1 636 no such table: f1
+stmt 636 err 1 -1 669 no such table: f1
+stmt 669 err 1 -1 702 no such table: f1
+stmt 702 err 1 -1 735 no such table: f1
+stmt 735 err 1 -1 768 no such table: f1
+stmt 768 err 1 -1 801 no such table: f1
+stmt 801 err 1 -1 834 no such table: f1
+stmt 834 err 1 -1 867 no such table: f1
+stmt 867 err 1 -1 900 no such table: f1

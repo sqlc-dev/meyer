@@ -1,0 +1,18 @@
+==== ioerr5-generated
+
+        BEGIN EXCLUSIVE;
+        INSERT INTO a VALUES(1, 'ABCDEFGHIJKLMNOP');
+----
+stmt 0 ok
+stmt 25 err 1 -1 78 no such table: a
+==== ioerr5-generated.dup1
+ SELECT count(*) FROM a
+----
+stmt 0 err 1 -1 24 no such table: a
+==== ioerr5-generated.dup2
+
+        BEGIN EXCLUSIVE;
+        INSERT INTO a VALUES(1, 'ABCDEFGHIJKLMNOP');
+----
+stmt 0 ok
+stmt 25 err 1 -1 78 no such table: a

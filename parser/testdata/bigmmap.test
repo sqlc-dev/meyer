@@ -1,0 +1,15 @@
+==== 1.0
+
+  PRAGMA page_size = 4096;
+  CREATE TABLE t0(a INTEGER PRIMARY KEY, b, c, UNIQUE(b, c));
+  WITH  s(i) AS ( SELECT 1 UNION ALL SELECT i+1 FROM s LIMIT 100 )
+  INSERT INTO t0 SELECT i, 't0', randomblob(800) FROM s;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 89 err 1 -1 213 no such table: t0
+==== bigmmap-generated
+
+    PRAGMA main.mmap_size
+----
+stmt 0 ok

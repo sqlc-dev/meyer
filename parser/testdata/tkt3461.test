@@ -1,0 +1,18 @@
+==== tkt3461-1.1
+
+    CREATE TABLE t1(a, b);
+    INSERT INTO t1 VALUES(1, 2);
+----
+stmt 0 ok
+stmt 27 err 1 -1 60 no such table: t1
+==== tkt3461-1.2
+ SELECT a, b+1 AS b_plus_one FROM t1 WHERE a=1
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== tkt3461-2.1
+ 
+    SELECT a, b+1 AS b_plus_one 
+    FROM t1 
+    WHERE CASE WHEN a=1 THEN 1 ELSE b_plus_one END
+----
+stmt 0 err 1 -1 99 no such table: t1

@@ -1,0 +1,115 @@
+==== 100
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA page_size=4096;
+  CREATE TABLE t1(a,b);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<20)
+    INSERT INTO t1(a,b) SELECT x, randomblob(300) FROM c;
+  CREATE INDEX t1a ON t1(a);
+  CREATE INDEX t1b ON t1(b);
+  SELECT sum(a), sum(length(b)) FROM t1;
+  PRAGMA integrity_check;
+  PRAGMA journal_mode;
+  PRAGMA page_count;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 51 ok
+stmt 75 err 1 -1 209 no such table: t1
+stmt 209 err 1 -1 238 no such table: main.t1
+stmt 238 err 1 -1 267 no such table: main.t1
+stmt 267 err 1 -1 308 no such table: t1
+stmt 308 ok
+stmt 334 ok
+stmt 357 ok
+==== 300
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA page_size=8192;
+  PRAGMA journal_mode=WAL;
+  CREATE TABLE t1(a,b);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<20)
+    INSERT INTO t1(a,b) SELECT x, randomblob(1300) FROM c;
+  CREATE INDEX t1a ON t1(a);
+  CREATE INDEX t1b ON t1(b);
+  SELECT sum(a), sum(length(b)) FROM t1;
+  PRAGMA integrity_check;
+  PRAGMA journal_mode;
+  PRAGMA page_size;
+  PRAGMA page_count;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 51 ok
+stmt 78 ok
+stmt 102 err 1 -1 237 no such table: t1
+stmt 237 err 1 -1 266 no such table: main.t1
+stmt 266 err 1 -1 295 no such table: main.t1
+stmt 295 err 1 -1 336 no such table: t1
+stmt 336 ok
+stmt 362 ok
+stmt 385 ok
+stmt 405 ok
+==== 320
+
+  UPDATE sqlite_dbpage SET data=randomblob(8192) WHERE pgno=1;
+  PRAGMA quick_check
+----
+stmt 0 err 1 -1 63 no such table: sqlite_dbpage
+stmt 63 ok
+==== 600
+
+  PRAGMA journal_mode = wal;
+  CREATE TABLE t1(a);
+  INSERT INTO t1 VALUES(1), (2), (3), (4);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 51 err 1 -1 94 no such table: t1
+==== 700
+
+  PRAGMA page_size=512;
+  PRAGMA auto_vacuum = 0;
+  CREATE TABLE t1(a,b,c);
+  CREATE INDEX t1a ON t1(a);
+  CREATE INDEX t1bc ON t1(b,c);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<10)
+    INSERT INTO t1(a,b,c) SELECT x, randomblob(100),randomblob(100) FROM c;
+  PRAGMA page_count;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 24 ok
+stmt 50 ok
+stmt 76 err 1 -1 105 no such table: main.t1
+stmt 105 err 1 -1 137 no such table: main.t1
+stmt 137 err 1 -1 289 no such table: t1
+stmt 289 ok
+stmt 310 ok
+==== 710
+
+  UPDATE sqlite_dbpage SET data=
+    X'53514C69746520666F726D61742033000200030100402020000000000000001300000000000000000000000300000004000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000D00000003017C0001D801AC017C00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002E03061715110145696E6465787431626374310443524541544520494E4445582074316263204F4E20743128622C63292A0206171311013F696E64657874316174310343524541544520494E44455820743161204F4E20743128612926010617111101397461626C657431743102435245415445205441424C4520743128612C622C6329' WHERE pgno=1;
+----
+stmt 0 err 1 -1 1079 no such table: sqlite_dbpage
+==== 720
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== 740
+
+  PRAGMA page_count;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 21 ok
+==== 800
+
+    PRAGMA encoding = 'utf8';
+    CREATE TABLE t1(a, b);
+    PRAGMA encoding;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 57 ok

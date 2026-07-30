@@ -1,0 +1,93 @@
+==== 1.1
+
+  PRAGMA foreign_keys = 1;
+
+  CREATE TABLE s1(a PRIMARY KEY, b);
+  CREATE TABLE par(a, b REFERENCES s1, c UNIQUE, PRIMARY KEY(a));
+
+  CREATE TABLE c1(a, b REFERENCES par);
+  CREATE TABLE c2(a, b REFERENCES par);
+  CREATE TABLE c3(a, b REFERENCES par(c));
+----
+stmt 0 ok
+stmt 27 ok
+stmt 65 ok
+stmt 131 ok
+stmt 172 ok
+stmt 212 ok
+==== 2.0
+
+    CREATE TABLE pX(x PRIMARY KEY);
+    CREATE TABLE cX(a INTEGER PRIMARY KEY, b REFERENCES pX);
+----
+stmt 0 ok
+stmt 36 ok
+==== 2.1
+
+    INSERT INTO cX VALUES(11, zeroblob(40));
+----
+stmt 0 err 1 -1 45 no such table: cX
+==== 3.0
+
+    CREATE TABLE p4 (id INTEGER NOT NULL PRIMARY KEY);
+    INSERT INTO p4 VALUES(1), (2), (3);
+
+    CREATE TABLE c4(x INTEGER REFERENCES p4(id) DEFERRABLE INITIALLY DEFERRED);
+    CREATE INDEX c4_x ON c4(x);
+    INSERT INTO c4 VALUES(1), (2), (3);
+
+    ANALYZE;
+    INSERT INTO p4(id) VALUES(4);
+----
+stmt 0 ok
+stmt 55 err 1 -1 95 no such table: p4
+stmt 95 ok
+stmt 176 err 1 -1 208 no such table: main.c4
+stmt 208 err 1 -1 248 no such table: c4
+stmt 248 ok
+stmt 262 err 1 -1 296 no such table: p4
+==== 4.0
+
+  PRAGMA foreign_keys = true;
+  CREATE TABLE parent(
+    p PRIMARY KEY
+  );
+  CREATE TABLE child(
+    c UNIQUE REFERENCES parent(p)
+  );
+----
+stmt 0 ok
+stmt 30 ok
+stmt 76 ok
+==== 4.1
+
+  INSERT OR FAIL INTO child VALUES(123), (123);
+----
+stmt 0 err 1 -1 48 no such table: child
+==== 4.2
+
+  SELECT * FROM child;
+----
+stmt 0 err 1 -1 23 no such table: child
+==== 4.3
+
+  PRAGMA foreign_key_check;
+----
+stmt 0 ok
+==== 4.4
+
+  INSERT INTO parent VALUES(123);
+  INSERT OR FAIL INTO child VALUES(123), (123);
+----
+stmt 0 err 1 -1 34 no such table: parent
+stmt 34 err 1 -1 82 no such table: child
+==== 4.5
+
+  SELECT * FROM child;
+----
+stmt 0 err 1 -1 23 no such table: child
+==== 4.6
+
+  PRAGMA foreign_key_check;
+----
+stmt 0 ok

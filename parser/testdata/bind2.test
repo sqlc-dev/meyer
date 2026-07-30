@@ -1,0 +1,9 @@
+==== 1.0
+ 
+  CREATE TABLE t1(a REAL);
+  INSERT INTO t1 VALUES(42.0);
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 28 err 1 -1 59 no such table: t1
+stmt 59 err 1 -1 79 no such table: t1

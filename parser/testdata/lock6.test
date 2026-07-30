@@ -1,0 +1,4 @@
+==== lock6-1.2
+pragma lock_status
+----
+stmt 0 ok

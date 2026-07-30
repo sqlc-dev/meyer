@@ -1,0 +1,280 @@
+==== aggnested-4.1
+
+  DROP TABLE IF EXISTS aa;
+  DROP TABLE IF EXISTS bb;
+  CREATE TABLE aa(x INT);  INSERT INTO aa(x) VALUES(123);
+  CREATE TABLE bb(y INT);  INSERT INTO bb(y) VALUES(456);
+  SELECT (SELECT sum(x+(SELECT y)) FROM bb) FROM aa;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 80 err 1 -1 112 no such table: aa
+stmt 112 ok
+stmt 138 err 1 -1 170 no such table: bb
+stmt 170 err 1 -1 223 no such table: aa
+==== aggnested-4.2
+
+  SELECT (SELECT sum(x+y) FROM bb) FROM aa;
+----
+stmt 0 err 1 -1 44 no such table: aa
+==== aggnested-4.3
+
+  DROP TABLE IF EXISTS tx;
+  DROP TABLE IF EXISTS ty;
+  CREATE TABLE tx(x INT);
+  INSERT INTO tx VALUES(1),(2),(3),(4),(5);
+  CREATE TABLE ty(y INT);
+  INSERT INTO ty VALUES(91),(92),(93);
+  SELECT min((SELECT count(y) FROM ty)) FROM tx;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 80 err 1 -1 124 no such table: tx
+stmt 124 ok
+stmt 150 err 1 -1 189 no such table: ty
+stmt 189 err 1 -1 238 no such table: tx
+==== aggnested-4.4
+
+  SELECT max((SELECT a FROM (SELECT count(*) AS a FROM ty) AS s)) FROM tx;
+----
+stmt 0 err 1 -1 75 no such table: tx
+==== 5.0
+
+  CREATE TABLE x1(a, b);
+  INSERT INTO x1 VALUES(1, 2);
+  CREATE TABLE x2(x);
+  INSERT INTO x2 VALUES(NULL), (NULL), (NULL);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: x1
+stmt 56 ok
+stmt 78 err 1 -1 125 no such table: x2
+==== 5.1
+
+  SELECT ( SELECT total( (SELECT b FROM x1) ) ) FROM x2;
+----
+stmt 0 err 1 -1 57 no such table: x2
+==== 5.2
+
+  SELECT ( SELECT total( (SELECT 2 FROM x1) ) ) FROM x2;
+----
+stmt 0 err 1 -1 57 no such table: x2
+==== 5.3
+
+  CREATE TABLE t1(a);
+  CREATE TABLE t2(b);
+----
+stmt 0 ok
+stmt 22 ok
+==== 5.4
+
+  SELECT(
+    SELECT max(b) LIMIT (
+      SELECT total( (SELECT a FROM t1) )
+    )
+  )
+  FROM t2;
+----
+stmt 0 err 1 -1 98 no such table: t2
+==== 5.5
+
+  CREATE TABLE a(b);
+  WITH c AS(SELECT a)
+    SELECT(SELECT(SELECT string_agg(b, b)
+          LIMIT(SELECT 0.100000 *
+            AVG(DISTINCT(SELECT 0 FROM a ORDER BY b, b, b))))
+        FROM a GROUP BY b,
+        b, b) FROM a EXCEPT SELECT b FROM a ORDER BY b,
+    b, b;
+----
+stmt 0 ok
+stmt 21 err 1 -1 274 no such table: a
+==== 6.0
+
+  CREATE TABLE t1(a);
+  CREATE TABLE t2(b);
+
+  INSERT INTO t1 VALUES('x');
+  INSERT INTO t2 VALUES(1);
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 75 no such table: t1
+stmt 75 err 1 -1 103 no such table: t2
+==== 6.1.1
+
+  SELECT ( 
+    SELECT t2.b FROM (SELECT t2.b AS c FROM t1) GROUP BY 1 HAVING t2.b
+  )
+  FROM t2 GROUP BY 'constant_string';
+----
+stmt 0 err 1 -1 125 no such table: t2
+==== 6.1.2
+
+  SELECT ( 
+    SELECT c FROM (SELECT t2.b AS c FROM t1) GROUP BY c HAVING t2.b
+  )
+  FROM t2 GROUP BY 'constant_string';
+----
+stmt 0 err 1 -1 122 no such table: t2
+==== 6.2.0
+
+  UPDATE t2 SET b=0
+----
+stmt 0 err 1 -1 21 no such table: t2
+==== 6.2.1
+
+  SELECT ( 
+    SELECT t2.b FROM (SELECT t2.b AS c FROM t1) GROUP BY 1 HAVING t2.b
+  )
+  FROM t2 GROUP BY 'constant_string';
+----
+stmt 0 err 1 -1 125 no such table: t2
+==== 6.2.2
+
+  SELECT ( 
+    SELECT c FROM (SELECT t2.b AS c FROM t1) GROUP BY c HAVING t2.b
+  )
+  FROM t2 GROUP BY 'constant_string';
+----
+stmt 0 err 1 -1 122 no such table: t2
+==== 7.0
+
+  CREATE TABLE invoice (
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      amount DOUBLE PRECISION DEFAULT NULL,
+      name VARCHAR(100) DEFAULT NULL
+  );
+
+  INSERT INTO invoice (amount, name) VALUES 
+      (4.0, 'Michael'), (15.0, 'Bara'), (4.0, 'Michael'), (6.0, 'John');
+----
+stmt 0 ok
+stmt 164 err 1 -1 283 no such table: invoice
+==== 7.1
+
+  SELECT sum(amount), name
+    from invoice
+  group by name
+  having (select v > 6 from (select sum(amount) v) t)
+----
+stmt 0 err 1 -1 115 no such table: invoice
+==== 7.2
+
+  SELECT (select 1 from (select sum(amount))) FROM invoice
+----
+stmt 0 err 1 -1 60 no such table: invoice
+==== 8.0
+
+  CREATE TABLE t1(x INT);
+  INSERT INTO t1 VALUES(100);
+  INSERT INTO t1 VALUES(20);
+  INSERT INTO t1 VALUES(3);
+  SELECT (SELECT y FROM (SELECT sum(x) AS y) AS t2 ) FROM t1;
+----
+stmt 0 ok
+stmt 26 err 1 -1 56 no such table: t1
+stmt 56 err 1 -1 85 no such table: t1
+stmt 85 err 1 -1 113 no such table: t1
+stmt 113 err 1 -1 175 no such table: t1
+==== 8.1
+
+  SELECT (
+    SELECT y FROM (
+      SELECT z AS y FROM (SELECT sum(x) AS z) AS t2 
+    ) 
+  ) FROM t1;
+----
+stmt 0 err 1 -1 104 no such table: t1
+==== 8.2
+
+  SELECT (
+    SELECT a FROM (
+      SELECT y AS a FROM (
+        SELECT z AS y FROM (SELECT sum(x) AS z) AS t2 
+      ) 
+    )
+  ) FROM t1;
+----
+stmt 0 err 1 -1 141 no such table: t1
+==== 9.1
+
+  WITH out(i, j, k) AS ( 
+      VALUES(1234, 5678, 9012) 
+  )
+  SELECT (
+    SELECT (
+      SELECT min(abc) = ( SELECT ( SELECT 1234 fROM (SELECT abc) ) ) 
+      FROM (
+        SELECT sum( out.i ) + ( SELECT sum( out.i ) ) AS abc FROM (SELECT out.j)
+      )
+    ) 
+  ) FROM out;
+----
+stmt 0 ok
+==== 9.2
+
+  CREATE TABLE t1(a);
+  CREATE TABLE t2(b);
+  INSERT INTO t1 VALUES(1), (2), (3);
+  INSERT INTO t2 VALUES(4), (5), (6);
+
+  SELECT ( 
+    SELECT min(y) + (SELECT x) FROM (
+      SELECT sum(a) AS x, b AS y FROM t2
+    )
+  )
+  FROM t1;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 82 no such table: t1
+stmt 82 err 1 -1 120 no such table: t2
+stmt 120 err 1 -1 233 no such table: t1
+==== 9.3
+
+  SELECT ( 
+    SELECT min(y) + (SELECT (SELECT x)) FROM (
+      SELECT sum(a) AS x, b AS y FROM t2
+    )
+  )
+  FROM t1;
+----
+stmt 0 err 1 -1 121 no such table: t1
+==== 9.4
+
+  SELECT (
+    SELECT (SELECT x) FROM (
+      SELECT sum(a) AS x, b AS y FROM t2
+      ) GROUP BY y
+    )
+  FROM t1;
+----
+stmt 0 err 1 -1 117 no such table: t1
+==== 9.5
+
+  SELECT (
+    SELECT (SELECT (SELECT x)) FROM (
+      SELECT sum(a) AS x, b AS y FROM t2
+      ) GROUP BY y
+    )
+  FROM t1;
+----
+stmt 0 err 1 -1 126 no such table: t1
+==== 10.1
+
+  DROP TABLE IF EXISTS t0;
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t0(c1, c2);  INSERT INTO t0 VALUES(1,2);
+  CREATE TABLE t1(c3, c4);  INSERT INTO t1 VALUES(3,4);
+  SELECT * FROM t0 WHERE EXISTS (SELECT 1 FROM t1 GROUP BY c3 HAVING ( SELECT count(*) FROM (SELECT 1 UNION ALL SELECT sum(DISTINCT c1) ) ) ) BETWEEN 1 AND 1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 81 err 1 -1 110 no such table: t0
+stmt 110 ok
+stmt 137 err 1 -1 166 no such table: t1
+stmt 166 err 1 -1 325 no such table: t0

@@ -1,0 +1,15 @@
+==== 1.1
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA page_size = 1024;
+  PRAGMA cache_size = 100;
+  CREATE TABLE t1(a);
+----
+stmt 0 ok
+stmt 26 ok
+stmt 53 ok
+stmt 80 ok
+==== 1.6
+ ROLLBACK
+----
+stmt 0 ok

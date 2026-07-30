@@ -18,11 +18,11 @@ stmt 28 ok
 stmt 53 ok
 stmt 81 ok
 stmt 113 ok
-stmt 138 err 1 -1 no such table: main.t1
+stmt 138 err 1 -1 166 no such table: main.t1
 stmt 166 ok
 stmt 197 ok
-stmt 227 err 1 244 unknown database aux
-stmt 257 err 1 273 unknown database aux
+stmt 227 err 1 244 251 unknown database aux
+stmt 257 err 1 273 280 unknown database aux
 ==== e_update-1.1.0
 
   INSERT INTO main.t1 VALUES(1, 'i');
@@ -33,12 +33,12 @@ stmt 257 err 1 273 unknown database aux
   INSERT INTO aux.t1 VALUES(2, 'II');
   INSERT INTO aux.t1 VALUES(3, 'III');
 ----
-stmt 0 err 1 -1 no such table: main.t1
-stmt 38 err 1 -1 no such table: main.t1
-stmt 77 err 1 -1 no such table: main.t1
-stmt 117 err 1 -1 no such table: aux.t1
-stmt 155 err 1 -1 no such table: aux.t1
-stmt 193 err 1 -1 no such table: aux.t1
+stmt 0 err 1 -1 38 no such table: main.t1
+stmt 38 err 1 -1 77 no such table: main.t1
+stmt 77 err 1 -1 117 no such table: main.t1
+stmt 117 err 1 -1 155 no such table: aux.t1
+stmt 155 err 1 -1 193 no such table: aux.t1
+stmt 193 err 1 -1 232 no such table: aux.t1
 ==== e_update-1.2.0
 
   DELETE FROM main.t1;
@@ -46,10 +46,10 @@ stmt 193 err 1 -1 no such table: aux.t1
   INSERT INTO main.t1 VALUES(2, 'ii');
   INSERT INTO main.t1 VALUES(3, 'iii');
 ----
-stmt 0 err 1 -1 no such table: main.t1
-stmt 23 err 1 -1 no such table: main.t1
-stmt 61 err 1 -1 no such table: main.t1
-stmt 100 err 1 -1 no such table: main.t1
+stmt 0 err 1 -1 23 no such table: main.t1
+stmt 23 err 1 -1 61 no such table: main.t1
+stmt 61 err 1 -1 100 no such table: main.t1
+stmt 100 err 1 -1 140 no such table: main.t1
 ==== e_update-1.3.0
 
   DELETE FROM main.t1;
@@ -58,11 +58,11 @@ stmt 100 err 1 -1 no such table: main.t1
   INSERT INTO main.t1 VALUES(2, 'ii');
   INSERT INTO main.t1 VALUES(3, 'iii');
 ----
-stmt 0 err 1 -1 no such table: main.t1
-stmt 23 err 1 -1 no such table: main.t1
-stmt 63 err 1 -1 no such table: main.t1
-stmt 101 err 1 -1 no such table: main.t1
-stmt 140 err 1 -1 no such table: main.t1
+stmt 0 err 1 -1 23 no such table: main.t1
+stmt 23 err 1 -1 63 no such table: main.t1
+stmt 63 err 1 -1 101 no such table: main.t1
+stmt 101 err 1 -1 140 no such table: main.t1
+stmt 140 err 1 -1 180 no such table: main.t1
 ==== e_update-1.4.0
 
   DELETE FROM main.t1;
@@ -71,20 +71,20 @@ stmt 140 err 1 -1 no such table: main.t1
   INSERT INTO main.t1 VALUES(2, 'ii');
   INSERT INTO main.t1 VALUES(3, 'iii');
 ----
-stmt 0 err 1 -1 no such table: main.t1
-stmt 23 err 1 -1 no such table: main.t1
-stmt 63 err 1 -1 no such table: main.t1
-stmt 101 err 1 -1 no such table: main.t1
-stmt 140 err 1 -1 no such table: main.t1
+stmt 0 err 1 -1 23 no such table: main.t1
+stmt 23 err 1 -1 63 no such table: main.t1
+stmt 63 err 1 -1 101 no such table: main.t1
+stmt 101 err 1 -1 140 no such table: main.t1
+stmt 140 err 1 -1 180 no such table: main.t1
 ==== e_update-1.5.0
 
   INSERT INTO t2(rowid, a, b, c) VALUES(1,  3, 1, 4);
   INSERT INTO t2(rowid, a, b, c) VALUES(2,  1, 5, 9);
   INSERT INTO t2(rowid, a, b, c) VALUES(3,  2, 6, 5);
 ----
-stmt 0 err 1 -1 no such table: t2
-stmt 54 err 1 -1 no such table: t2
-stmt 108 err 1 -1 no such table: t2
+stmt 0 err 1 -1 54 no such table: t2
+stmt 54 err 1 -1 108 no such table: t2
+stmt 108 err 1 -1 162 no such table: t2
 ==== e_update-1.7.0
 
   DELETE FROM t2;
@@ -92,10 +92,10 @@ stmt 108 err 1 -1 no such table: t2
   INSERT INTO t2(rowid, a, b, c) VALUES(2,  1, 5, 9);
   INSERT INTO t2(rowid, a, b, c) VALUES(3,  2, 6, 5);
 ----
-stmt 0 err 1 -1 no such table: t2
-stmt 18 err 1 -1 no such table: t2
-stmt 72 err 1 -1 no such table: t2
-stmt 126 err 1 -1 no such table: t2
+stmt 0 err 1 -1 18 no such table: t2
+stmt 18 err 1 -1 72 no such table: t2
+stmt 72 err 1 -1 126 no such table: t2
+stmt 126 err 1 -1 180 no such table: t2
 ==== e_update-1.8.0
 
   DELETE FROM t3;
@@ -104,15 +104,15 @@ stmt 126 err 1 -1 no such table: t2
   INSERT INTO t3 VALUES(3, 'three');
   INSERT INTO t3 VALUES(4, 'four');
 ----
-stmt 0 err 1 -1 no such table: t3
-stmt 18 err 1 -1 no such table: t3
-stmt 53 err 1 -1 no such table: t3
-stmt 88 err 1 -1 no such table: t3
-stmt 125 err 1 -1 no such table: t3
+stmt 0 err 1 -1 18 no such table: t3
+stmt 18 err 1 -1 53 no such table: t3
+stmt 53 err 1 -1 88 no such table: t3
+stmt 88 err 1 -1 125 no such table: t3
+stmt 125 err 1 -1 161 no such table: t3
 ==== e_update-generated
 SELECT * FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 17 no such table: t3
 ==== e_update-2.1.3
 
   CREATE TRIGGER tr1 AFTER DELETE ON t4 BEGIN
@@ -120,15 +120,15 @@ stmt 0 err 1 -1 no such table: t3
   END;
   DROP TRIGGER tr1;
 ----
-stmt 0 err 1 -1 no such table: main.t4
-stmt 86 err 1 -1 no such trigger: tr1
+stmt 0 err 1 -1 46 no such table: main.t4
+stmt 86 err 1 -1 106 no such trigger: tr1
 ==== e_update-2.2.X
 
   DROP TRIGGER tr1;
   DROP TRIGGER aux.tr1;
 ----
-stmt 0 err 1 -1 no such trigger: tr1
-stmt 20 err 1 -1 no such trigger: aux.tr1
+stmt 0 err 1 -1 20 no such trigger: tr1
+stmt 20 err 1 -1 44 no such trigger: aux.tr1
 ==== e_update-2.3.0
 
   SELECT 'main', tbl_name FROM main.sqlite_master WHERE type = 'table';
@@ -137,7 +137,7 @@ stmt 20 err 1 -1 no such trigger: aux.tr1
 ----
 stmt 0 ok
 stmt 72 ok
-stmt 144 err 1 -1 no such table: aux.sqlite_master
+stmt 144 err 1 -1 214 no such table: aux.sqlite_master
 ==== e_update-2.3.1
 
   DELETE FROM main.t6;
@@ -153,14 +153,14 @@ stmt 144 err 1 -1 no such table: aux.sqlite_master
   SELECT * FROM main.t6;
   SELECT * FROM temp.t6;
 ----
-stmt 0 err 1 -1 no such table: main.t6
-stmt 23 err 1 -1 no such table: temp.t6
-stmt 46 err 1 -1 no such table: main.t6
-stmt 82 err 1 -1 no such table: temp.t6
-stmt 118 err 1 -1 no such table: t4
-stmt 202 err 1 -1 no such table: t4
-stmt 234 err 1 -1 no such table: main.t6
-stmt 259 err 1 -1 no such table: temp.t6
+stmt 0 err 1 -1 23 no such table: main.t6
+stmt 23 err 1 -1 46 no such table: temp.t6
+stmt 46 err 1 -1 82 no such table: main.t6
+stmt 82 err 1 -1 118 no such table: temp.t6
+stmt 118 err 1 -1 170 no such table: t4
+stmt 202 err 1 -1 234 no such table: t4
+stmt 234 err 1 -1 259 no such table: main.t6
+stmt 259 err 1 -1 284 no such table: temp.t6
 ==== e_update-2.3.2
 
   DELETE FROM main.t1;
@@ -176,14 +176,14 @@ stmt 259 err 1 -1 no such table: temp.t6
   SELECT * FROM main.t1;
   SELECT * FROM aux.t1;
 ----
-stmt 0 err 1 -1 no such table: main.t1
-stmt 23 err 1 -1 no such table: aux.t1
-stmt 45 err 1 -1 no such table: main.t1
-stmt 81 err 1 -1 no such table: aux.t1
-stmt 116 err 1 -1 no such table: t4
-stmt 200 err 1 -1 no such table: t4
-stmt 219 err 1 -1 no such table: main.t1
-stmt 244 err 1 -1 no such table: aux.t1
+stmt 0 err 1 -1 23 no such table: main.t1
+stmt 23 err 1 -1 45 no such table: aux.t1
+stmt 45 err 1 -1 81 no such table: main.t1
+stmt 81 err 1 -1 116 no such table: aux.t1
+stmt 116 err 1 -1 168 no such table: t4
+stmt 200 err 1 -1 219 no such table: t4
+stmt 219 err 1 -1 244 no such table: main.t1
+stmt 244 err 1 -1 268 no such table: aux.t1
 ==== e_update-2.3.3
 
   DELETE FROM aux.t5;
@@ -197,12 +197,12 @@ stmt 244 err 1 -1 no such table: aux.t1
   UPDATE t4 SET x=10;
   SELECT * FROM aux.t5;
 ----
-stmt 0 err 1 -1 no such table: aux.t5
-stmt 22 err 1 -1 no such table: aux.t5
-stmt 57 err 1 -1 no such table: t4
-stmt 93 err 1 -1 no such table: t4
-stmt 176 err 1 -1 no such table: t4
-stmt 199 err 1 -1 no such table: aux.t5
+stmt 0 err 1 -1 22 no such table: aux.t5
+stmt 22 err 1 -1 57 no such table: aux.t5
+stmt 57 err 1 -1 93 no such table: t4
+stmt 93 err 1 -1 144 no such table: t4
+stmt 176 err 1 -1 199 no such table: t4
+stmt 199 err 1 -1 223 no such table: aux.t5
 ==== e_update-3.1.0
 
   CREATE TABLE t7(q, r, s);
@@ -218,16 +218,16 @@ stmt 199 err 1 -1 no such table: aux.t5
   INSERT INTO t7 VALUES(10, 'ten',  'X');
 ----
 stmt 0 ok
-stmt 28 err 1 -1 no such table: t7
-stmt 70 err 1 -1 no such table: t7
-stmt 112 err 1 -1 no such table: t7
-stmt 154 err 1 -1 no such table: t7
-stmt 196 err 1 -1 no such table: t7
-stmt 238 err 1 -1 no such table: t7
-stmt 280 err 1 -1 no such table: t7
-stmt 322 err 1 -1 no such table: t7
-stmt 364 err 1 -1 no such table: t7
-stmt 406 err 1 -1 no such table: t7
+stmt 28 err 1 -1 70 no such table: t7
+stmt 70 err 1 -1 112 no such table: t7
+stmt 112 err 1 -1 154 no such table: t7
+stmt 154 err 1 -1 196 no such table: t7
+stmt 196 err 1 -1 238 no such table: t7
+stmt 238 err 1 -1 280 no such table: t7
+stmt 280 err 1 -1 322 no such table: t7
+stmt 322 err 1 -1 364 no such table: t7
+stmt 364 err 1 -1 406 no such table: t7
+stmt 406 err 1 -1 448 no such table: t7
 ==== e_update-3.5.0
 
   CREATE TABLE t8(x);
@@ -236,4 +236,4 @@ stmt 406 err 1 -1 no such table: t7
   END;
 ----
 stmt 0 ok
-stmt 22 err 1 -1 no such table: main.t7
+stmt 22 err 1 -1 69 no such table: main.t7

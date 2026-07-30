@@ -1,0 +1,360 @@
+==== func7-100
+
+  SELECT ceil(99.9), ceiling(-99.01), floor(17), floor(-17.99);
+----
+stmt 0 err 1 10 64 no such function: ceil
+==== func7-110
+
+  SELECT quote(ceil(NULL)), ceil('-99.99');
+----
+stmt 0 err 1 16 44 no such function: ceil
+==== func7-200
+
+  SELECT round(ln(5),2), log(100.0), log(100), log(2,'256');
+----
+stmt 0 err 1 16 61 no such function: ln
+==== func7-210
+
+  SELECT ln(-5), log(-5,100.0);
+----
+stmt 0 err 1 10 32 no such function: ln
+==== func7-pg-100
+
+  SELECT abs(-17.4)
+----
+stmt 0 ok
+==== func7-pg-110
+
+  SELECT ceil(42.2)
+----
+stmt 0 err 1 10 21 no such function: ceil
+==== func7-pg-120
+
+  SELECT ceil(-42.2)
+----
+stmt 0 err 1 10 22 no such function: ceil
+==== func7-pg-130
+
+  SELECT round(exp(1.0),7)
+----
+stmt 0 err 1 16 28 no such function: exp
+==== func7-pg-140
+
+  SELECT floor(42.8)
+----
+stmt 0 err 1 10 22 no such function: floor
+==== func7-pg-150
+
+  SELECT floor(-42.8)
+----
+stmt 0 err 1 10 23 no such function: floor
+==== func7-pg-160
+
+  SELECT round(ln(2.0),7)
+----
+stmt 0 err 1 16 27 no such function: ln
+==== func7-pg-170
+
+  SELECT log(100.0)
+----
+stmt 0 err 1 10 21 no such function: log
+==== func7-pg-180
+
+  SELECT log10(1000.0)
+----
+stmt 0 err 1 10 24 no such function: log10
+==== func7-pg-181
+
+  SELECT format('%.30f', log10(100.0) );
+----
+stmt 0 err 1 26 41 no such function: log10
+==== func7-pg-182
+
+  SELECT format('%.30f', ln(exp(2.0)) );
+----
+stmt 0 err 1 29 41 no such function: exp
+==== func7-pg-190
+
+  SELECT log(2.0, 64.0)
+----
+stmt 0 err 1 10 25 no such function: log
+==== func7-pg-200
+
+   SELECT mod(9,4);
+----
+stmt 0 err 1 11 20 no such function: mod
+==== func7-pg-210
+
+   SELECT round(pi(),7);
+----
+stmt 0 err 1 17 25 no such function: pi
+==== func7-pg-220
+
+   SELECT power(9,3);
+----
+stmt 0 err 1 11 22 no such function: power
+==== func7-pg-230
+
+   SELECT round(radians(45.0),7);
+----
+stmt 0 err 1 17 34 no such function: radians
+==== func7-pg-240
+
+   SELECT round(42.4);
+----
+stmt 0 ok
+==== func7-pg-250
+
+   SELECT round(42.4382,2);
+----
+stmt 0 ok
+==== func7-pg-260
+
+   SELECT sign(-8.4);
+----
+stmt 0 ok
+==== func7-pg-270
+
+   SELECT round( sqrt(2), 7);
+----
+stmt 0 err 1 18 30 no such function: sqrt
+==== func7-pg-280
+
+   SELECT trunc(42.8), trunc(-42.8);
+----
+stmt 0 err 1 11 37 no such function: trunc
+==== func7-pg-300
+
+   SELECT acos(1);
+----
+stmt 0 err 1 11 19 no such function: acos
+==== func7-pg-301
+
+   SELECT format('%f',degrees(acos(0.5)));
+----
+stmt 0 err 1 31 43 no such function: acos
+==== func7-pg-310
+
+   SELECT round( asin(1), 7);
+----
+stmt 0 err 1 18 30 no such function: asin
+==== func7-pg-311
+
+   SELECT format('%f',degrees( asin(0.5) ));
+----
+stmt 0 err 1 32 45 no such function: asin
+==== func7-pg-320
+
+   SELECT round( atan(1), 7);
+----
+stmt 0 err 1 18 30 no such function: atan
+==== func7-pg-321
+
+   SELECT degrees( atan(1) );
+----
+stmt 0 err 1 20 30 no such function: atan
+==== func7-pg-330
+
+   SELECT round( atan2(1,0), 7);
+----
+stmt 0 err 1 18 33 no such function: atan2
+==== func7-pg-331
+
+   SELECT degrees( atan2(1,0) );
+----
+stmt 0 err 1 20 33 no such function: atan2
+==== func7-pg-400
+
+   SELECT cos(0);
+----
+stmt 0 err 1 11 18 no such function: cos
+==== func7-pg-401
+
+   SELECT cos( radians(60.0) );
+----
+stmt 0 err 1 16 32 no such function: radians
+==== func7-pg-400.dup1
+
+   SELECT cos(0);
+----
+stmt 0 err 1 11 18 no such function: cos
+==== func7-pg-410
+
+   SELECT round( sin(1), 7);
+----
+stmt 0 err 1 18 29 no such function: sin
+==== func7-pg-411
+
+   SELECT sin( radians(30) );
+----
+stmt 0 err 1 16 30 no such function: radians
+==== func7-pg-420
+
+   SELECT round( tan(1), 7);
+----
+stmt 0 err 1 18 29 no such function: tan
+==== func7-pg-421
+
+   SELECT round(tan( radians(45) ),10);
+----
+stmt 0 err 1 22 40 no such function: radians
+==== func7-pg-500
+
+   SELECT round( sinh(1), 7);
+----
+stmt 0 err 1 18 30 no such function: sinh
+==== func7-pg-510
+
+   SELECT round( cosh(0), 7);
+----
+stmt 0 err 1 18 30 no such function: cosh
+==== func7-pg-520
+
+   SELECT round( tanh(1), 7);
+----
+stmt 0 err 1 18 30 no such function: tanh
+==== func7-pg-530
+
+   SELECT round( asinh(1), 7);
+----
+stmt 0 err 1 18 31 no such function: asinh
+==== func7-pg-540
+
+   SELECT round( acosh(1), 7);
+----
+stmt 0 err 1 18 31 no such function: acosh
+==== func7-pg-550
+
+   SELECT round( atanh(0.5), 7);
+----
+stmt 0 err 1 18 33 no such function: atanh
+==== func7-mysql-100
+
+   SELECT acos(1);
+----
+stmt 0 err 1 11 19 no such function: acos
+==== func7-mysql-110
+
+   SELECT acos(1.0001);
+----
+stmt 0 err 1 11 24 no such function: acos
+==== func7-mysql-120
+
+   SELECT round( acos(0.0), 7);
+----
+stmt 0 err 1 18 32 no such function: acos
+==== func7-mysql-130
+
+   SELECT round( asin(0.2), 7);
+----
+stmt 0 err 1 18 32 no such function: asin
+==== func7-mysql-140
+
+   SELECT asin('foo');
+----
+stmt 0 err 1 11 23 no such function: asin
+==== func7-mysql-150
+
+   SELECT round( atan(2), 7), round( atan(-2), 7);
+----
+stmt 0 err 1 18 51 no such function: atan
+==== func7-mysql-160
+
+   SELECT round( atan2(-2,2), 7), round( atan2(pi(),0), 7);
+----
+stmt 0 err 1 18 60 no such function: atan2
+==== func7-mysql-170
+
+   SELECT ceiling(1.23), ceiling(-1.23);
+----
+stmt 0 err 1 11 41 no such function: ceiling
+==== func7-mysql-180
+
+   SELECT cos(pi());
+----
+stmt 0 err 1 15 21 no such function: pi
+==== func7-mysql-190
+
+   SELECT degrees(pi()), degrees(pi()/2);
+----
+stmt 0 err 1 19 42 no such function: pi
+==== func7-mysql-190.dup1
+
+   SELECT round( exp(2), 7), round( exp(-2), 7), exp(0);
+----
+stmt 0 err 1 18 57 no such function: exp
+==== func7-mysql-200
+
+   SELECT floor(1.23), floor(-1.23);
+----
+stmt 0 err 1 11 37 no such function: floor
+==== func7-mysql-210
+
+   SELECT round(ln(2),7), quote(ln(-2));
+----
+stmt 0 err 1 17 41 no such function: ln
+==== func7-mysql-230
+
+   SELECT log(2,65536), log(10,100), quote(log(1,100)), quote(log(0,100));
+----
+stmt 0 err 1 11 75 no such function: log
+==== func7-mysql-240
+
+   SELECT log2(65536), quote(log2(-100)), quote(log2(0));
+----
+stmt 0 err 1 11 58 no such function: log2
+==== func7-mysql-250
+
+   SELECT round(log10(2),7), log10(100), quote(log10(-100));
+----
+stmt 0 err 1 17 61 no such function: log10
+==== func7-mysql-260
+
+   SELECT mod(234,10), 253%7, mod(29,9), 29%9;
+----
+stmt 0 err 1 11 47 no such function: mod
+==== func7-mysql-270
+
+   SELECT mod(34.5,3);
+----
+stmt 0 err 1 11 23 no such function: mod
+==== func7-mysql-280
+
+   SELECT pow(2,2), pow(2,-2);
+----
+stmt 0 err 1 11 31 no such function: pow
+==== func7-mysql-281
+
+   SELECT power(2,2), power(2,-2);
+----
+stmt 0 err 1 11 35 no such function: power
+==== func7-mysql-290
+
+   SELECT round(radians(90),7);
+----
+stmt 0 err 1 17 32 no such function: radians
+==== func7-mysql-300
+
+   SELECT sign(-32), sign(0), sign(234);
+----
+stmt 0 ok
+==== func7-mysql-310
+
+   SELECT sin(pi()) BETWEEN -1.0e-15 AND 1.0e-15;
+----
+stmt 0 err 1 15 50 no such function: pi
+==== func7-mysql-320
+
+   SELECT sqrt(4), round(sqrt(20),7), quote(sqrt(-16));
+----
+stmt 0 err 1 11 56 no such function: sqrt
+==== func7-mysql-330
+
+   SELECT tan(pi()) BETWEEN -1.0e-15 AND 1.0e-15;
+----
+stmt 0 err 1 15 50 no such function: pi
+==== func7-mysql-331
+
+   SELECT round(tan(pi()+1),7);
+----
+stmt 0 err 1 17 32 no such function: tan

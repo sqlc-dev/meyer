@@ -1,0 +1,13 @@
+==== 4.1
+
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES(1, 2);
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.t2(x, y);
+  INSERT INTO t2 VALUES(3, 4);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t1
+stmt 56 ok
+stmt 84 err 1 100 107 unknown database aux
+stmt 113 err 1 -1 144 no such table: t2

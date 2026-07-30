@@ -1,0 +1,4 @@
+==== fts3al-1.4
+SELECT rowid, length(snippet(t4)) FROM t4 WHERE t4 MATCH 'target'
+----
+stmt 0 err 1 -1 66 no such table: t4

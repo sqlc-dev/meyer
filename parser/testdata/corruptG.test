@@ -1,0 +1,31 @@
+==== 1.1
+
+  PRAGMA page_size=512;
+  CREATE TABLE t1(a,b,c);
+  INSERT INTO t1(rowid,a,b,c) VALUES(52,'abc','xyz','123');
+  CREATE INDEX t1abc ON t1(a,b,c);
+----
+stmt 0 ok
+stmt 24 ok
+stmt 50 err 1 -1 110 no such table: t1
+stmt 110 err 1 -1 145 no such table: main.t1
+==== 1.2
+
+    SELECT c FROM t1 WHERE a>'abc';
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== 1.3
+
+     PRAGMA integrity_check
+----
+stmt 0 ok
+==== 1.4
+
+    SELECT c FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 2.1
+
+    SELECT rowid FROM t1 WHERE a='abc' and b='xyz123456789XYZ';
+----
+stmt 0 err 1 -1 64 no such table: t1

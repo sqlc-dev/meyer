@@ -1,0 +1,86 @@
+==== 1.0
+
+  CREATE TABLE t1(a PRIMARY KEY, b);
+----
+stmt 0 ok
+==== 2.0
+
+  CREATE TABLE t2(a, b, c);
+  CREATE INDEX t2a ON t2(a);
+  CREATE INDEX t2b ON t2(b);
+  CREATE INDEX t2c ON t2(c);
+----
+stmt 0 ok
+stmt 28 err 1 -1 57 no such table: main.t2
+stmt 57 err 1 -1 86 no such table: main.t2
+stmt 86 err 1 -1 115 no such table: main.t2
+==== 3.0
+
+  CREATE TABLE x1(a INTEGER PRIMARY KEY, b, c, d);
+  CREATE TABLE x2(a INTEGER PRIMARY KEY, b, c, d);
+----
+stmt 0 ok
+stmt 51 ok
+==== 4.0
+
+  CREATE TABLE log(x);
+  CREATE TABLE p1(one PRIMARY KEY, two);
+
+  CREATE TRIGGER tr_bd BEFORE DELETE ON p1 BEGIN
+    INSERT INTO log VALUES('delete');
+  END;
+  INSERT INTO p1 VALUES('a', 'A'), ('b', 'B'), ('c', 'C');
+  DELETE FROM p1 WHERE one = 'a';
+----
+stmt 0 ok
+stmt 23 ok
+stmt 64 err 1 -1 114 no such table: main.p1
+stmt 159 err 1 -1 218 no such table: p1
+stmt 218 err 1 -1 252 no such table: p1
+==== 4.1
+
+  BEGIN TRANSACTION;
+  CREATE TABLE tbl(a PRIMARY KEY, b, c);
+  CREATE TABLE log(a, b, c);
+  INSERT INTO "tbl" VALUES(1,2,3);
+  CREATE TRIGGER the_trigger BEFORE DELETE ON tbl BEGIN 
+    INSERT INTO log VALUES(1, 2,3);
+  END;
+  COMMIT;
+  DELETE FROM tbl WHERE a=1;
+----
+stmt 0 ok
+stmt 21 ok
+stmt 62 ok
+stmt 91 err 1 -1 126 no such table: tbl
+stmt 126 err 1 -1 182 no such table: main.tbl
+stmt 226 ok
+stmt 236 err 1 -1 265 no such table: tbl
+==== 5.1
+
+  PRAGMA foreign_keys = 1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  CREATE TABLE t2(
+      c INTEGER PRIMARY KEY,
+      d INTEGER DEFAULT 1 REFERENCES t1 ON DELETE SET DEFAULT
+  );
+----
+stmt 0 ok
+stmt 27 ok
+stmt 72 ok
+==== 5.2
+
+  INSERT INTO t1 VALUES(1, 'one');
+  INSERT INTO t1 VALUES(2, 'two');
+  INSERT INTO t2 VALUES(1, 2);
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 35 no such table: t1
+stmt 35 err 1 -1 70 no such table: t1
+stmt 70 err 1 -1 101 no such table: t2
+stmt 101 err 1 -1 121 no such table: t2
+==== 5.3
+
+  DELETE FROM t1 WHERE a = 2;
+----
+stmt 0 err 1 -1 30 no such table: t1

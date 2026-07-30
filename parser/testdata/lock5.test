@@ -1,0 +1,19 @@
+==== lock5-dotfile.7
+ SELECT * FROM t1;
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== lock5-dotfile.9
+ SELECT * FROM t1;
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== lock5-none.2
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== 2.dotfile.2
+
+    BEGIN;
+      UPDATE t1 SET z=z+1, x=hex(randomblob(20));
+----
+stmt 0 ok
+stmt 11 err 1 -1 61 no such table: t1

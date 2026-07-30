@@ -1,0 +1,494 @@
+==== whereG-1.0
+
+  CREATE TABLE composer(
+    cid INTEGER PRIMARY KEY,
+    cname TEXT
+  );
+  CREATE TABLE album(
+    aid INTEGER PRIMARY KEY,
+    aname TEXT
+  );
+  CREATE TABLE track(
+    tid INTEGER PRIMARY KEY,
+    cid INTEGER REFERENCES composer,
+    aid INTEGER REFERENCES album,
+    title TEXT
+  );
+  CREATE INDEX track_i1 ON track(cid);
+  CREATE INDEX track_i2 ON track(aid);
+  INSERT INTO composer VALUES(1, 'W. A. Mozart');
+  INSERT INTO composer VALUES(2, 'Beethoven');
+  INSERT INTO composer VALUES(3, 'Thomas Tallis');
+  INSERT INTO composer VALUES(4, 'Joseph Hayden');
+  INSERT INTO composer VALUES(5, 'Thomas Weelkes');
+  INSERT INTO composer VALUES(6, 'J. S. Bach');
+  INSERT INTO composer VALUES(7, 'Orlando Gibbons');
+  INSERT INTO composer VALUES(8, 'Josquin des Prés');
+  INSERT INTO composer VALUES(9, 'Byrd');
+  INSERT INTO composer VALUES(10, 'Francis Poulenc');
+  INSERT INTO composer VALUES(11, 'Mendelsshon');
+  INSERT INTO composer VALUES(12, 'Zoltán Kodály');
+  INSERT INTO composer VALUES(13, 'Handel');
+  INSERT INTO album VALUES(100, 'Kodály: Missa Brevis');
+  INSERT INTO album VALUES(101, 'Messiah');
+  INSERT INTO album VALUES(102, 'Missa Brevis in D-, K.65');
+  INSERT INTO album VALUES(103, 'The complete English anthems');
+  INSERT INTO album VALUES(104, 'Mass in B Minor, BWV 232');
+  INSERT INTO track VALUES(10005, 12, 100, 'Sanctus');
+  INSERT INTO track VALUES(10007, 12, 100, 'Agnus Dei');
+  INSERT INTO track VALUES(10115, 13, 101, 'Surely He Hath Borne Our Griefs');
+  INSERT INTO track VALUES(10129, 13, 101, 'Since By Man Came Death');
+  INSERT INTO track VALUES(10206, 1, 102, 'Agnus Dei');
+  INSERT INTO track VALUES(10301, 3, 103, 'If Ye Love Me');
+  INSERT INTO track VALUES(10402, 6, 104, 'Domine Deus');
+  INSERT INTO track VALUES(10403, 6, 104, 'Qui tollis');
+----
+stmt 0 ok
+stmt 74 ok
+stmt 145 ok
+stmt 287 err 1 -1 326 no such table: main.track
+stmt 326 err 1 -1 365 no such table: main.track
+stmt 365 err 1 -1 415 no such table: composer
+stmt 415 err 1 -1 462 no such table: composer
+stmt 462 err 1 -1 513 no such table: composer
+stmt 513 err 1 -1 564 no such table: composer
+stmt 564 err 1 -1 616 no such table: composer
+stmt 616 err 1 -1 664 no such table: composer
+stmt 664 err 1 -1 717 no such table: composer
+stmt 717 err 1 -1 772 no such table: composer
+stmt 772 err 1 -1 814 no such table: composer
+stmt 814 err 1 -1 868 no such table: composer
+stmt 868 err 1 -1 918 no such table: composer
+stmt 918 err 1 -1 972 no such table: composer
+stmt 972 err 1 -1 1017 no such table: composer
+stmt 1017 err 1 -1 1075 no such table: album
+stmt 1075 err 1 -1 1119 no such table: album
+stmt 1119 err 1 -1 1180 no such table: album
+stmt 1180 err 1 -1 1245 no such table: album
+stmt 1245 err 1 -1 1306 no such table: album
+stmt 1306 err 1 -1 1361 no such table: track
+stmt 1361 err 1 -1 1418 no such table: track
+stmt 1418 err 1 -1 1497 no such table: track
+stmt 1497 err 1 -1 1568 no such table: track
+stmt 1568 err 1 -1 1624 no such table: track
+stmt 1624 err 1 -1 1684 no such table: track
+stmt 1684 err 1 -1 1742 no such table: track
+stmt 1742 err 1 -1 1799 no such table: track
+==== whereG-1.1
+
+  SELECT DISTINCT aname
+    FROM album, composer, track
+   WHERE unlikely(cname LIKE '%bach%')
+     AND composer.cid=track.cid
+     AND album.aid=track.aid;
+----
+stmt 0 err 1 -1 157 no such table: album
+==== whereG-1.2
+
+  SELECT DISTINCT aname
+    FROM album, composer, track
+   WHERE unlikely(cname LIKE '%bach%')
+     AND composer.cid=track.cid
+     AND album.aid=track.aid;
+----
+stmt 0 err 1 -1 157 no such table: album
+==== whereG-1.3
+
+  SELECT DISTINCT aname
+    FROM album, composer, track
+   WHERE likelihood(cname LIKE '%bach%', 0.5)
+     AND composer.cid=track.cid
+     AND album.aid=track.aid;
+----
+stmt 0 err 1 -1 164 no such table: album
+==== whereG-1.4
+
+  SELECT DISTINCT aname
+    FROM album, composer, track
+   WHERE likelihood(cname LIKE '%bach%', 0.5)
+     AND composer.cid=track.cid
+     AND album.aid=track.aid;
+----
+stmt 0 err 1 -1 164 no such table: album
+==== whereG-1.5
+
+  SELECT DISTINCT aname
+    FROM album, composer, track
+   WHERE cname LIKE '%bach%'
+     AND composer.cid=track.cid
+     AND album.aid=track.aid;
+----
+stmt 0 err 1 -1 147 no such table: album
+==== whereG-1.6
+
+  SELECT DISTINCT aname
+    FROM album, composer, track
+   WHERE cname LIKE '%bach%'
+     AND composer.cid=track.cid
+     AND album.aid=track.aid;
+----
+stmt 0 err 1 -1 147 no such table: album
+==== whereG-1.7
+
+  SELECT DISTINCT aname
+    FROM album, composer, track
+   WHERE cname LIKE '%bach%'
+     AND unlikely(composer.cid=track.cid)
+     AND unlikely(album.aid=track.aid);
+----
+stmt 0 err 1 -1 167 no such table: album
+==== whereG-1.8
+
+  SELECT DISTINCT aname
+    FROM album, composer, track
+   WHERE cname LIKE '%bach%'
+     AND unlikely(composer.cid=track.cid)
+     AND unlikely(album.aid=track.aid);
+----
+stmt 0 err 1 -1 167 no such table: album
+==== whereG-2.1
+
+    SELECT DISTINCT aname
+      FROM album, composer, track
+     WHERE likelihood(cname LIKE '%bach%', -0.01)
+       AND composer.cid=track.cid
+       AND album.aid=track.aid;
+----
+stmt 0 err 1 -1 176 no such table: album
+==== whereG-2.2
+
+    SELECT DISTINCT aname
+      FROM album, composer, track
+     WHERE likelihood(cname LIKE '%bach%', 1.01)
+       AND composer.cid=track.cid
+       AND album.aid=track.aid;
+----
+stmt 0 err 1 -1 175 no such table: album
+==== whereG-2.3
+
+    SELECT DISTINCT aname
+      FROM album, composer, track
+     WHERE likelihood(cname LIKE '%bach%', track.cid)
+       AND composer.cid=track.cid
+       AND album.aid=track.aid;
+----
+stmt 0 err 1 -1 180 no such table: album
+==== whereG-3.0
+
+  CREATE TABLE a(a1 PRIMARY KEY, a2);
+  CREATE TABLE b(b1 PRIMARY KEY, b2);
+----
+stmt 0 ok
+stmt 38 ok
+==== whereG-3.1
+
+  SELECT * FROM a, b WHERE b1=a1 AND a2=5;
+----
+stmt 0 err 1 -1 43 no such table: a
+==== whereG-3.2
+
+  SELECT * FROM a, b WHERE a1=b1 AND a2=5;
+----
+stmt 0 err 1 -1 43 no such table: a
+==== whereG-3.3
+
+  SELECT * FROM a, b WHERE a2=5 AND b1=a1;
+----
+stmt 0 err 1 -1 43 no such table: a
+==== whereG-3.4
+
+  SELECT * FROM a, b WHERE a2=5 AND a1=b1;
+----
+stmt 0 err 1 -1 43 no such table: a
+==== whereG-4.0
+
+  CREATE TABLE t4(x);
+  INSERT INTO t4 VALUES('right'),('wrong');
+  SELECT DISTINCT x
+   FROM (SELECT x FROM t4 GROUP BY x)
+   WHERE x='right'
+   ORDER BY x;
+----
+stmt 0 ok
+stmt 22 err 1 -1 66 no such table: t4
+stmt 66 err 1 -1 158 no such table: t4
+==== 5.1
+
+  CREATE TABLE t1(a, b, c);
+  CREATE INDEX i1 ON t1(a, b);
+----
+stmt 0 ok
+stmt 28 err 1 -1 59 no such table: main.t1
+==== 5.1.2
+
+  SELECT * FROM t1 WHERE a>?
+----
+stmt 0 err 1 -1 30 no such table: t1
+==== 5.1.3
+
+  SELECT * FROM t1 WHERE likelihood(a>?, 0.9)
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 5.1.4
+
+  SELECT * FROM t1 WHERE likely(a>?)
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== 5.2.2
+
+  SELECT * FROM t1 WHERE likelihood(b>?, 0.01)
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== 5.2.3
+
+  SELECT * FROM t1 WHERE likelihood(b>?, 0.9)
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 5.2.4
+
+  SELECT * FROM t1 WHERE likely(b>?)
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== 5.3.1.stat4
+
+    SELECT * FROM t1 WHERE a=?
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== 5.3.1
+
+    SELECT * FROM t1 WHERE a=?
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== 5.3.2
+
+  SELECT * FROM t1 WHERE likelihood(a=?, 0.9)
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 5.3.3
+
+  SELECT * FROM t1 WHERE likely(a=?)
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== 6.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(i int, x, y, z);
+  INSERT INTO t1 VALUES (1,1,1,1), (2,2,2,2), (3,3,3,3), (4,4,4,4);
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t2(i int, bool char);
+  INSERT INTO t2 VALUES(1,'T'), (2,'F');
+  SELECT count(*) FROM t1 LEFT JOIN t2 ON t1.i=t2.i AND bool='T';
+  SELECT count(*) FROM t1 LEFT JOIN t2 ON likely(t1.i=t2.i) AND bool='T';
+----
+stmt 0 ok
+stmt 27 ok
+stmt 62 err 1 -1 130 no such table: t1
+stmt 130 ok
+stmt 157 ok
+stmt 194 err 1 -1 235 no such table: t2
+stmt 235 err 1 -1 301 no such table: t1
+stmt 301 err 1 -1 375 no such table: t1
+==== 7.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a, b, PRIMARY KEY(a,b));
+  INSERT INTO t1 VALUES(9,1),(1,2);
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t2(x, y, PRIMARY KEY(x,y));
+  INSERT INTO t2 VALUES(3,3),(4,4);
+  SELECT likely(a), x FROM t1, t2 ORDER BY 1, 2;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 70 err 1 -1 106 no such table: t1
+stmt 106 ok
+stmt 133 ok
+stmt 176 err 1 -1 212 no such table: t2
+stmt 212 err 1 -1 261 no such table: t1
+==== 7.1
+
+  SELECT unlikely(a), x FROM t1, t2 ORDER BY 1, 2;
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 7.2
+
+  SELECT likelihood(a,0.5), x FROM t1, t2 ORDER BY 1, 2;
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== 7.3
+
+  SELECT coalesce(a,a), x FROM t1, t2 ORDER BY 1, 2;
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== 8.1
+
+  DROP TABLE IF EXISTS t0;
+  CREATE TABLE t0 (c0);
+  INSERT INTO t0(c0) VALUES ('a');
+  SELECT LIKELY(t0.rowid) <= '0' FROM t0;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 51 err 1 -1 86 no such table: t0
+stmt 86 err 1 -1 128 no such table: t0
+==== 8.2
+
+  SELECT * FROM t0 WHERE LIKELY(t0.rowid) <= '0';
+----
+stmt 0 err 1 -1 50 no such table: t0
+==== 8.3
+
+  SELECT (t0.rowid) <= '0' FROM t0;
+----
+stmt 0 err 1 -1 36 no such table: t0
+==== 8.4
+
+  SELECT * FROM t0 WHERE (t0.rowid) <= '0';
+----
+stmt 0 err 1 -1 44 no such table: t0
+==== 8.5
+
+  SELECT unlikely(t0.rowid) <= '0', likelihood(t0.rowid,0.5) <= '0' FROM t0;
+----
+stmt 0 err 1 -1 77 no such table: t0
+==== 8.6
+
+  SELECT * FROM t0 WHERE unlikely(t0.rowid) <= '0';
+----
+stmt 0 err 1 -1 52 no such table: t0
+==== 8.7
+
+  SELECT * FROM t0 WHERE likelihood(t0.rowid, 0.5) <= '0';
+----
+stmt 0 err 1 -1 59 no such table: t0
+==== 8.8
+
+  SELECT unlikely(t0.rowid <= '0'),
+         likely(t0.rowid <= '0'),
+         likelihood(t0.rowid <= '0',0.5)
+    FROM t0;
+----
+stmt 0 err 1 -1 124 no such table: t0
+==== 8.9
+
+  SELECT * FROM t0 WHERE unlikely(t0.rowid <= '0');
+----
+stmt 0 err 1 -1 52 no such table: t0
+==== 8.10
+
+  SELECT * FROM t0 WHERE likelihood(t0.rowid <= '0', 0.5);
+----
+stmt 0 err 1 -1 59 no such table: t0
+==== 8.11
+
+  CREATE TABLE t1(c0 INT);
+  INSERT INTO t1(c0) VALUES (NULL);
+  CREATE INDEX i46 ON t1(CAST( (c0 IS TRUE) AS TEXT));
+  CREATE VIEW v0(c2) AS SELECT CAST( (c0 IS TRUE) AS TEXT ) FROM t1;
+----
+stmt 0 ok
+stmt 27 err 1 -1 63 no such table: t1
+stmt 63 err 1 -1 118 no such table: main.t1
+stmt 118 ok
+==== 8.12
+
+  SELECT quote(c0), quote(c2) FROM t1, v0 WHERE  (0 < LIKELY(v0.c2));
+----
+stmt 0 err 1 -1 70 no such table: t1
+==== 8.13
+
+  SELECT quote(c0), quote(c2) FROM t1, v0 WHERE  (0 < LIKELY(v0.c2)) IS TRUE;
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== 9.10
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a, b FLOAT);
+  INSERT INTO t1(a) VALUES(''),(NULL),('X'),(NULL);
+  SELECT coalesce(max(quote(a)),10) FROM t1 GROUP BY a;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 58 err 1 -1 110 no such table: t1
+stmt 110 err 1 -1 166 no such table: t1
+==== 10.1
+
+  CREATE TABLE a(b TEXT);  INSERT INTO a VALUES(0),(4),(9);
+  CREATE TABLE c(d NUM);
+  CREATE VIEW f(g, h) AS SELECT b, 0 FROM a UNION SELECT d, d FROM c;
+  SELECT g = g FROM f GROUP BY h;
+----
+stmt 0 ok
+stmt 26 err 1 -1 60 no such table: a
+stmt 60 ok
+stmt 85 ok
+stmt 155 err 1 -1 189 no such table: f
+==== 11.0
+
+  CREATE TABLE t1(x PRIMARY KEY, y);
+  INSERT INTO t1 VALUES('AAA', 'BBB');
+
+  CREATE TABLE t2(z);
+  INSERT INTO t2 VALUES('t2');
+
+  CREATE TABLE t3(x PRIMARY KEY, y);
+  INSERT INTO t3 VALUES('AAA', 'AAA');
+----
+stmt 0 ok
+stmt 37 err 1 -1 76 no such table: t1
+stmt 76 ok
+stmt 99 err 1 -1 130 no such table: t2
+stmt 130 ok
+stmt 168 err 1 -1 207 no such table: t3
+==== 11.1.1
+
+  SELECT * FROM t1 JOIN t2 ON unlikely(x=y) AND y='AAA'
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== 11.1.2
+
+  SELECT * FROM t1 JOIN t2 ON likely(x=y) AND y='AAA'
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== 11.1.3
+
+  SELECT * FROM t1 JOIN t2 ON x=y AND y='AAA'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 11.2.1
+
+  SELECT * FROM t3 JOIN t2 ON unlikely(x=y) AND y='AAA'
+----
+stmt 0 err 1 -1 57 no such table: t3
+==== 11.2.2
+
+  SELECT * FROM t3 JOIN t2 ON likely(x=y) AND y='AAA'
+----
+stmt 0 err 1 -1 55 no such table: t3
+==== 11.2.3
+
+  SELECT * FROM t3 JOIN t2 ON x=y AND y='AAA'
+----
+stmt 0 err 1 -1 47 no such table: t3
+==== 12.0
+
+  CREATE TABLE t1(a REAL);
+  INSERT INTO t1(a) VALUES(123);
+  CREATE INDEX t1x1 ON t1(likely(a));
+  SELECT typeof(likely(a)) FROM t1 NOT INDEXED;
+  SELECT typeof(likely(a)) FROM t1 INDEXED BY t1x1;
+----
+stmt 0 ok
+stmt 27 err 1 -1 60 no such table: t1
+stmt 60 err 1 -1 98 no such table: main.t1
+stmt 98 err 1 -1 146 no such table: t1
+stmt 146 err 1 -1 198 no such table: t1
+==== 12.1
+
+  CREATE INDEX t1x2 ON t1(abs(a));
+  SELECT typeof(abs(a)) FROM t1 NOT INDEXED;
+  SELECT typeof(abs(a)) FROM t1 INDEXED BY t1x2;
+----
+stmt 0 err 1 -1 35 no such table: main.t1
+stmt 35 err 1 -1 80 no such table: t1
+stmt 80 err 1 -1 129 no such table: t1

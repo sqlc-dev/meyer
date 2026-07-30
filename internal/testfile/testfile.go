@@ -6,14 +6,16 @@
 //	<SQL, verbatim, one or more lines>
 //	----
 //	stmt <offset> ok
-//	stmt <offset> err <rc> <erroff> <message>
+//	stmt <offset> err <rc> <erroff> <tail> <message>
 //
 // The result lines are the raw per-statement output of the SQLite oracle
 // (see cmd/regenerate-parse): every statement in the case was prepared
 // independently with sqlite3_prepare_v2 against an empty in-memory database.
 // Offsets are byte offsets into the case SQL; erroff is -1 when SQLite did
-// not report an error position. The corpus stores this raw truth; the
-// pass/fail policy for the parser under test is derived from it by
+// not report an error position, and tail is how far sqlite3_prepare_v2
+// reported having got (a successful prepare always reaches the end of its
+// statement, so ok lines carry no tail). The corpus stores this raw truth;
+// the pass/fail policy for the parser under test is derived from it by
 // (*Case).Expected, so the policy can evolve without regenerating.
 //
 // Each corpus file has a sidecar <name>.metadata.json:
@@ -41,6 +43,12 @@ type StmtResult struct {
 	RC        int    // prepare result code when !OK
 	ErrOffset int    // sqlite3_error_offset within the case SQL; -1 if unknown
 	Message   string // sqlite3_errmsg when !OK
+
+	// Tail is pzTail within the case SQL: how far the parser got. On an OK
+	// result 0 is the common case and means "all of it" -- a successful
+	// prepare always consumes at least one statement, so a recorded tail is
+	// never 0.
+	Tail int
 }
 
 // Case is a single corpus entry.
@@ -55,15 +63,54 @@ type Expectation struct {
 	OK      bool
 	Message string // expected parse error message when !OK
 	Offset  int    // expected error offset when !OK; -1 if unknown
+
+	// Unreached lists byte ranges of the case SQL that SQLite's parser
+	// never looked at, because a grammar action failed part-way through a
+	// statement and sqlite3RunParser abandoned the rest of it. The corpus
+	// says nothing about whether that text is valid SQL, so a parser under
+	// test may fail inside one of these ranges without being wrong. A range
+	// that reaches the end of the input includes the offset one past it,
+	// which is where a parser reports running out of input.
+	Unreached []Range
+
+	// Truncated reports that the last statement failed with a non-syntax
+	// message raised while its own last token was the lookahead. SQLite
+	// stopped there, so it never reached the end of the input and could not
+	// notice that the input was cut short: "CREATE TABLE aux1.t1(" is
+	// "unknown database aux1" to SQLite and "incomplete input" to a parser
+	// that reads to the end. pzTail cannot separate the two, because the
+	// statement's last token is also the end of the input, so the case
+	// simply cannot say who is right.
+	Truncated bool
+}
+
+// Range is a half-open byte range of a case's SQL.
+type Range struct{ Start, End int }
+
+// IsUnreached reports whether offset falls in text SQLite's parser never
+// reached. An offset of -1 (unknown) is never unreached.
+func (e Expectation) IsUnreached(offset int) bool {
+	if offset < 0 {
+		return false
+	}
+	for _, r := range e.Unreached {
+		if offset >= r.Start && offset < r.End {
+			return true
+		}
+	}
+	return false
 }
 
 // syntaxFamily matches error messages produced by SQLite's parser/tokenizer
 // proper, as opposed to post-parse semantic analysis. Statements failing with
 // any other message (no such table, ambiguous column, ...) parsed
 // successfully and must be accepted by meyer.
+// The (?s) flag matters: the offending token is interpolated into the
+// message, and a token can contain a newline -- an unterminated string runs
+// to the end of the input, newline and all.
 var syntaxFamily = []*regexp.Regexp{
-	regexp.MustCompile(`^near ".*": syntax error$`),
-	regexp.MustCompile(`^unrecognized token: ".*"$`),
+	regexp.MustCompile(`(?s)^near ".*": syntax error$`),
+	regexp.MustCompile(`(?s)^unrecognized token: ".*"$`),
 	regexp.MustCompile(`^incomplete input$`),
 }
 
@@ -79,14 +126,53 @@ func IsSyntaxError(msg string) bool {
 
 // Expected derives the harness expectation: the first syntax-family error in
 // statement order wins (meyer is fail-fast); if there is none, every
-// statement must parse.
+// statement must parse, except within the ranges SQLite's own parser never
+// reached.
 func (c *Case) Expected() Expectation {
-	for _, r := range c.Results {
+	var unreached []Range
+	for i, r := range c.Results {
 		if !r.OK && IsSyntaxError(r.Message) {
-			return Expectation{OK: false, Message: r.Message, Offset: r.ErrOffset}
+			// Ranges collected from earlier statements still apply: a
+			// parser that trips over unverified text never reaches this.
+			return Expectation{
+				OK: false, Message: r.Message, Offset: r.ErrOffset,
+				Unreached: unreached,
+			}
 		}
+		if r.OK && r.Tail == 0 {
+			continue // prepare consumed everything it was given
+		}
+		// The statement parsed, but only as far as pzTail: a semantic
+		// failure stops where the grammar action raised it, and a
+		// successful prepare stops at the first statement it was handed. A
+		// statement runs to the start of the next one, or to the end of the
+		// case for the last.
+		end := len(c.SQL)
+		if i+1 < len(c.Results) {
+			end = c.Results[i+1].Offset
+		}
+		if r.Tail >= end {
+			continue
+		}
+		if end == len(c.SQL) {
+			// Running out of input is reported at the offset one past the
+			// last byte, so the final range has to include it.
+			end++
+		}
+		unreached = append(unreached, Range{Start: r.Tail, End: end})
 	}
-	return Expectation{OK: true, Offset: -1}
+	return Expectation{
+		OK: true, Offset: -1, Unreached: unreached, Truncated: c.truncated(),
+	}
+}
+
+// truncated implements Expectation.Truncated; see its documentation.
+func (c *Case) truncated() bool {
+	if len(c.Results) == 0 {
+		return false
+	}
+	last := c.Results[len(c.Results)-1]
+	return !last.OK && !IsSyntaxError(last.Message) && last.Tail >= len(c.SQL)
 }
 
 const (
@@ -125,7 +211,7 @@ func Read(path string) ([]Case, error) {
 		c.SQL = sql.String()
 		i++ // skip "----"
 		for i < len(lines) && strings.HasPrefix(lines[i], "stmt ") {
-			r, err := parseResultLine(strings.TrimRight(lines[i], "\n"))
+			r, err := ParseResultLine(strings.TrimRight(lines[i], "\n"))
 			if err != nil {
 				return nil, fmt.Errorf("%s:%d: %w", path, i+1, err)
 			}
@@ -137,7 +223,10 @@ func Read(path string) ([]Case, error) {
 	return cases, nil
 }
 
-func parseResultLine(line string) (StmtResult, error) {
+// ParseResultLine decodes one "stmt ..." line of oracle output. It is
+// exported because the oracle runner in internal/sqlitesrc reads the same
+// lines live, and a wire format with two decoders drifts.
+func ParseResultLine(line string) (StmtResult, error) {
 	rest := strings.TrimPrefix(line, "stmt ")
 	parts := strings.SplitN(rest, " ", 2)
 	if len(parts) != 2 {
@@ -150,22 +239,26 @@ func parseResultLine(line string) (StmtResult, error) {
 	if parts[1] == "ok" {
 		return StmtResult{Offset: off, OK: true}, nil
 	}
-	fields := strings.SplitN(strings.TrimPrefix(parts[1], "err "), " ", 3)
-	if !strings.HasPrefix(parts[1], "err ") || len(fields) != 3 {
+	if tail, found := strings.CutPrefix(parts[1], "ok "); found {
+		n, err := strconv.Atoi(tail)
+		if err != nil {
+			return StmtResult{}, fmt.Errorf("malformed tail in %q", line)
+		}
+		return StmtResult{Offset: off, OK: true, Tail: n}, nil
+	}
+	fields := strings.SplitN(strings.TrimPrefix(parts[1], "err "), " ", 4)
+	if !strings.HasPrefix(parts[1], "err ") || len(fields) != 4 {
 		return StmtResult{}, fmt.Errorf("malformed result line %q", line)
 	}
 	rc, err1 := strconv.Atoi(fields[0])
 	erroff, err2 := strconv.Atoi(fields[1])
-	if err1 != nil || err2 != nil {
+	tail, err3 := strconv.Atoi(fields[2])
+	if err1 != nil || err2 != nil || err3 != nil {
 		return StmtResult{}, fmt.Errorf("malformed result line %q", line)
 	}
-	return StmtResult{Offset: off, RC: rc, ErrOffset: erroff, Message: fields[2]}, nil
-}
-
-// CheckCase reports whether a case can be represented in the file format
-// (SQL must not collide with the markers, messages must be single-line).
-func CheckCase(c Case) error {
-	return checkWritable(c)
+	return StmtResult{
+		Offset: off, RC: rc, ErrOffset: erroff, Tail: tail, Message: fields[3],
+	}, nil
 }
 
 // Write renders cases to path. It refuses SQL that would be ambiguous with
@@ -173,7 +266,7 @@ func CheckCase(c Case) error {
 func Write(path string, cases []Case) error {
 	var b strings.Builder
 	for _, c := range cases {
-		if err := checkWritable(c); err != nil {
+		if err := CheckCase(c); err != nil {
 			return err
 		}
 		b.WriteString(caseMarker)
@@ -183,26 +276,31 @@ func Write(path string, cases []Case) error {
 		b.WriteString(resultMarker)
 		b.WriteString("\n")
 		for _, r := range c.Results {
-			if r.OK {
+			if r.OK && r.Tail == 0 {
 				fmt.Fprintf(&b, "stmt %d ok\n", r.Offset)
+			} else if r.OK {
+				fmt.Fprintf(&b, "stmt %d ok %d\n", r.Offset, r.Tail)
 			} else {
-				fmt.Fprintf(&b, "stmt %d err %d %d %s\n", r.Offset, r.RC, r.ErrOffset, r.Message)
+				fmt.Fprintf(&b, "stmt %d err %d %d %d %s\n",
+					r.Offset, r.RC, r.ErrOffset, r.Tail, r.Message)
 			}
 		}
 	}
 	return os.WriteFile(path, []byte(b.String()), 0o644)
 }
 
-func checkWritable(c Case) error {
-	if c.Name == "" || strings.ContainsAny(c.Name, "\n") {
+// CheckCase reports whether a case can be represented in the file format:
+// its SQL must not collide with the markers, and its messages must be
+// single-line.
+func CheckCase(c Case) error {
+	if c.Name == "" || strings.Contains(c.Name, "\n") {
 		return fmt.Errorf("invalid case name %q", c.Name)
 	}
 	if !strings.HasSuffix(c.SQL, "\n") {
 		return fmt.Errorf("case %q: SQL must end with a newline", c.Name)
 	}
 	for _, line := range strings.Split(c.SQL, "\n") {
-		if strings.HasPrefix(line, caseMarker) || strings.TrimRight(line, " \t") == resultMarker ||
-			strings.HasPrefix(line, "==== ") {
+		if strings.HasPrefix(line, caseMarker) || strings.TrimRight(line, " \t") == resultMarker {
 			return fmt.Errorf("case %q: SQL line collides with file format marker: %q", c.Name, line)
 		}
 	}

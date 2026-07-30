@@ -1,0 +1,147 @@
+==== 110
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 120
+
+  PRAGMA auto_vacuum = off;
+  VACUUM;
+----
+stmt 0 ok
+stmt 28 ok
+==== 130
+
+  CREATE TABLE t2(x, y);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<100)
+   INSERT INTO t2(x, y) SELECT x, randomblob(1000) FROM c;
+  DROP TABLE t2;
+  PRAGMA page_count;
+----
+stmt 0 ok
+stmt 25 err 1 -1 161 no such table: t2
+stmt 161 err 1 -1 178 no such table: t2
+stmt 178 ok
+==== 140
+
+  VACUUM;
+  PRAGMA page_count;
+----
+stmt 0 ok
+stmt 10 ok
+==== 152
+INSERT INTO t1 VALUES(3,4);
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== 162
+INSERT INTO t1 VALUES(5,randomblob(100000))
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== 200
+
+  CREATE TABLE t3(x, y);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<400)
+   INSERT INTO t3(x, y) SELECT x, randomblob(1000) FROM c;
+  PRAGMA quick_check;
+----
+stmt 0 ok
+stmt 25 err 1 -1 161 no such table: t3
+stmt 161 ok
+==== 300
+
+  CREATE TABLE t3(x, y);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<400)
+   INSERT INTO t3(x, y) SELECT x, randomblob(1000) FROM c;
+  PRAGMA quick_check;
+----
+stmt 0 ok
+stmt 25 err 1 -1 161 no such table: t3
+stmt 161 ok
+==== 400
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== 410
+
+  CREATE TABLE t4(a,b);
+  INSERT INTO t4 VALUES('hello','world!');
+  PRAGMA integrity_check;
+  SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 24 err 1 -1 67 no such table: t4
+stmt 67 ok
+stmt 93 err 1 -1 113 no such table: t4
+==== 420
+
+  PRAGMA journal_mode=TRUNCATE;
+  PRAGMA journal_mode=OFF;
+  PRAGMA journal_mode=DELETE;
+  PRAGMA journal_mode=WAL;
+  PRAGMA journal_mode=PERSIST;
+  PRAGMA journal_mode=MEMORY;
+  PRAGMA journal_mode=OFF;
+  PRAGMA journal_mode=DELETE;
+----
+stmt 0 ok
+stmt 32 ok
+stmt 59 ok
+stmt 89 ok
+stmt 116 ok
+stmt 147 ok
+stmt 177 ok
+stmt 204 ok
+==== 510
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== 700
+
+    CREATE TABLE t1(a, b);
+    PRAGMA schema_version = 0;
+----
+stmt 0 ok
+stmt 27 ok
+==== 800
+
+    PRAGMA auto_vacuum = 0;
+    PRAGMA page_size = 8192;
+    PRAGMA journal_mode = wal;
+    CREATE TABLE t1(x, y);
+    INSERT INTO t1 VALUES(1, 2);
+    CREATE TABLE t2(x, y);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 57 ok
+stmt 88 ok
+stmt 115 err 1 -1 148 no such table: t1
+stmt 148 ok
+==== 810
+
+    PRAGMA locking_mode = exclusive;
+    SELECT * FROM t1
+----
+stmt 0 ok
+stmt 37 err 1 -1 59 no such table: t1
+==== 820
+
+    INSERT INTO t1 VALUES(3, 4);
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 33 no such table: t1
+stmt 33 err 1 -1 55 no such table: t1
+==== 830
+
+    PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+==== 1000
+
+  CREATE TABLE t(x); 
+  INSERT INTO t VALUES(1),(2);
+----
+stmt 0 ok
+stmt 21 err 1 -1 53 no such table: t

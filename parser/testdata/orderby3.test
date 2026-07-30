@@ -1,0 +1,134 @@
+==== 1.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY);
+  CREATE TABLE t2(b INTEGER PRIMARY KEY, c INTEGER);
+  CREATE TABLE t3(d INTEGER);
+    
+  INSERT INTO t1 VALUES(1),(2),(3);
+    
+  INSERT INTO t2 VALUES(3, 1);
+  INSERT INTO t2 VALUES(4, 2);
+  INSERT INTO t2 VALUES(5, 3);
+    
+  INSERT INTO t3 VALUES(4),(3),(5);
+----
+stmt 0 ok
+stmt 42 ok
+stmt 95 ok
+stmt 125 err 1 -1 166 no such table: t1
+stmt 166 err 1 -1 202 no such table: t2
+stmt 202 err 1 -1 233 no such table: t2
+stmt 233 err 1 -1 264 no such table: t2
+stmt 264 err 1 -1 305 no such table: t3
+==== 1.1.asc
+
+  SELECT t1.a
+    FROM t1, t2, t3
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a;
+----
+stmt 0 err 1 -1 85 no such table: t1
+==== 1.1.desc
+
+  SELECT t1.a
+    FROM t1, t2, t3
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a DESC;
+----
+stmt 0 err 1 -1 90 no such table: t1
+==== 1.123.asc
+
+  SELECT t1.a
+    FROM t1 CROSS JOIN t2 CROSS JOIN t3
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a;
+----
+stmt 0 err 1 -1 105 no such table: t1
+==== 1.123.desc
+
+  SELECT t1.a
+    FROM t1 CROSS JOIN t2 CROSS JOIN t3
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a DESC;
+----
+stmt 0 err 1 -1 110 no such table: t1
+==== 1.132.asc
+
+  SELECT t1.a
+    FROM t1 CROSS JOIN t3 CROSS JOIN t2
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a;
+----
+stmt 0 err 1 -1 105 no such table: t1
+==== 1.132.desc
+
+  SELECT t1.a
+    FROM t1 CROSS JOIN t3 CROSS JOIN t2
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a DESC;
+----
+stmt 0 err 1 -1 110 no such table: t1
+==== 1.213.asc
+
+  SELECT t1.a
+    FROM t2 CROSS JOIN t1 CROSS JOIN t3
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a;
+----
+stmt 0 err 1 -1 105 no such table: t2
+==== 1.213.desc
+
+  SELECT t1.a
+    FROM t2 CROSS JOIN t1 CROSS JOIN t3
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a DESC;
+----
+stmt 0 err 1 -1 110 no such table: t2
+==== 1.231.asc
+
+  SELECT t1.a
+    FROM t2 CROSS JOIN t3 CROSS JOIN t1
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a;
+----
+stmt 0 err 1 -1 105 no such table: t2
+==== 1.231.desc
+
+  SELECT t1.a
+    FROM t2 CROSS JOIN t3 CROSS JOIN t1
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a DESC;
+----
+stmt 0 err 1 -1 110 no such table: t2
+==== 1.312.asc
+
+  SELECT t1.a
+    FROM t3 CROSS JOIN t1 CROSS JOIN t2
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a;
+----
+stmt 0 err 1 -1 105 no such table: t3
+==== 1.312.desc
+
+  SELECT t1.a
+    FROM t3 CROSS JOIN t1 CROSS JOIN t2
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a DESC;
+----
+stmt 0 err 1 -1 110 no such table: t3
+==== 1.321.asc
+
+  SELECT t1.a
+    FROM t3 CROSS JOIN t2 CROSS JOIN t1
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a;
+----
+stmt 0 err 1 -1 105 no such table: t3
+==== 1.321.desc
+
+  SELECT t1.a
+    FROM t3 CROSS JOIN t2 CROSS JOIN t1
+   WHERE t1.a=t2.c AND t2.b=t3.d
+   ORDER BY t1.a DESC;
+----
+stmt 0 err 1 -1 110 no such table: t3

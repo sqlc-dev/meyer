@@ -1,0 +1,62 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+----
+stmt 0 ok
+==== 1.2
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 1.4
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 1.6
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 2.0
+
+  ATTACH 'test.db2' AS dbfile;
+  ATTACH ''         AS dbtemp;
+  ATTACH ':memory:'  AS dbmem;
+
+  CREATE TABLE t1(x);
+  CREATE TABLE dbfile.t2(x);
+  CREATE TABLE dbtemp.t3(x);
+  CREATE TABLE dbmem.t4(x);
+----
+stmt 0 ok
+stmt 31 ok
+stmt 62 ok
+stmt 93 ok
+stmt 116 err 1 132 142 unknown database dbfile
+stmt 145 err 1 161 171 unknown database dbtemp
+stmt 174 err 1 190 199 unknown database dbmem
+==== 3.0
+
+  PRAGMA synchronous = OFF;
+  CREATE TABLE t1(x, y);
+----
+stmt 0 ok
+stmt 28 ok
+==== 3.1
+
+  BEGIN;
+    INSERT INTO t1 VALUES(100, 200);
+----
+stmt 0 ok
+stmt 9 err 1 -1 46 no such table: t1
+==== 3.3
+
+  SELECT type, name, tbl_name, sql FROM sqlite_schema
+----
+stmt 0 ok
+==== 4.0
+
+  CREATE TABLE t1(x INTEGER PRIMARY KEY);
+----
+stmt 0 ok

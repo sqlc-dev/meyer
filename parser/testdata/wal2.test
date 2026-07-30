@@ -1,0 +1,163 @@
+==== wal2-3.1
+ SELECT count(a), sum(a) FROM t1
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== wal2-3.4
+ SELECT count(a), sum(a) FROM t1
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== wal2-6.1.2
+ PRAGMA lock_status
+----
+stmt 0 ok
+==== wal2-6.1.4
+ 
+    PRAGMA locking_mode = normal; 
+    PRAGMA lock_status;
+----
+stmt 0 ok
+stmt 35 ok
+==== wal2-6.1.5
+ 
+    SELECT * FROM t1;
+    PRAGMA lock_status;
+----
+stmt 0 err 1 -1 23 no such table: t1
+stmt 23 ok
+==== wal2-6.1.6
+
+    INSERT INTO t1 VALUES(3, 4);
+    PRAGMA lock_status;
+----
+stmt 0 err 1 -1 33 no such table: t1
+stmt 33 ok
+==== wal2-6.2.2
+
+    BEGIN;
+      CREATE TABLE t1(a, b);
+      INSERT INTO t1 VALUES(1, 2);
+    COMMIT;
+    Pragma loCK_STATus;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 40 err 1 -1 75 no such table: t1
+stmt 75 ok
+stmt 87 ok
+==== wal2-6.2.4
+
+    SELECT * FROM t1;
+    pragma lock_status;
+----
+stmt 0 err 1 -1 22 no such table: t1
+stmt 22 ok
+==== wal2-6.2.5
+
+    INSERT INTO t1 VALUES(3, 4);
+    pragma lock_status;
+----
+stmt 0 err 1 -1 33 no such table: t1
+stmt 33 ok
+==== wal2-6.2.6
+
+    PRAGMA locking_mode = NORMAL;
+    pragma lock_status;
+----
+stmt 0 ok
+stmt 34 ok
+==== wal2-6.2.7
+
+    BEGIN IMMEDIATE; COMMIT;
+    pragma lock_status;
+----
+stmt 0 ok
+stmt 21 ok
+stmt 29 ok
+==== wal2-6.2.9
+
+    INSERT INTO t1 VALUES(5, 6);
+    SELECT * FROM t1;
+    pragma lock_status;
+----
+stmt 0 err 1 -1 33 no such table: t1
+stmt 33 err 1 -1 55 no such table: t1
+stmt 55 ok
+==== wal2-6.3.3
+ PRAGMA lock_status
+----
+stmt 0 ok
+==== wal2-6.3.4
+ 
+    BEGIN;
+      INSERT INTO t1 VALUES('Groucho');
+----
+stmt 0 ok
+stmt 12 err 1 -1 52 no such table: t1
+==== wal2-6.3.5
+ PRAGMA lock_status
+----
+stmt 0 ok
+==== wal2-6.3.6
+ COMMIT
+----
+stmt 0 ok
+==== wal2-6.3.7
+ PRAGMA lock_status
+----
+stmt 0 ok
+==== wal2-6.5.2
+
+    PRAGMA locking_mode = normal;
+    INSERT INTO t2 VALUES('III', 'IV');
+    PRAGMA locking_mode = exclusive;
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 34 err 1 -1 74 no such table: t2
+stmt 74 ok
+stmt 111 err 1 -1 133 no such table: t2
+==== wal2-6.5.3
+ PRAGMA wal_checkpoint
+----
+stmt 0 ok
+==== wal2-11.2
+ INSERT INTO t1 VALUES(10, 11, 12)
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== wal2-generated
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== wal2-generated.dup1
+ INSERT INTO t1 DEFAULT VALUES
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== wal2-generated.dup2
+ PRAGMA page_size = 4096
+----
+stmt 0 ok
+==== wal2-generated.dup3
+ PRAGMA journal_mode = WAL
+----
+stmt 0 ok
+==== wal2-generated.dup4
+
+    PRAGMA wal_autocheckpoint = 10;
+    CREATE TABLE t1(a, b);                -- 2 wal syncs
+    INSERT INTO t1 VALUES(1, 2);          -- 2 wal sync
+    PRAGMA wal_checkpoint;                -- 1 wal sync, 1 db sync
+    BEGIN;
+      INSERT INTO t1 VALUES(3, 4);
+      INSERT INTO t1 VALUES(5, 6);
+    COMMIT;                               -- 2 wal sync
+    PRAGMA wal_checkpoint;                -- 1 wal sync, 1 db sync
+----
+stmt 0 ok
+stmt 36 ok
+stmt 63 err 1 -1 126 no such table: t1
+stmt 126 ok
+stmt 176 ok
+stmt 227 err 1 -1 262 no such table: t1
+stmt 262 err 1 -1 297 no such table: t1
+stmt 297 ok
+stmt 309 ok

@@ -1,0 +1,29 @@
+==== 3.1.0
+
+  PRAGMA table_info = tcl
+----
+stmt 0 ok
+==== 3.1.1
+
+  SELECT rowid, * FROM tcl
+----
+stmt 0 err 1 -1 28 no such table: tcl
+==== 3.1.2
+
+  INSERT INTO tcl VALUES('i', 'ii') RETURNING *;
+----
+stmt 0 err 1 -1 49 no such table: tcl
+==== 3.1.4
+
+  CREATE TABLE x1(x);
+----
+stmt 0 ok
+==== 3.2.1
+ SELECT * FROM x1
+----
+stmt 0 err 1 -1 18 no such table: x1
+==== 3.2.3
+
+  INSERT INTO tcl VALUES('i', 'ii') RETURNING *;
+----
+stmt 0 err 1 -1 49 no such table: tcl

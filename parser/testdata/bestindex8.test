@@ -1,0 +1,66 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a, b);
+  INSERT INTO t1 VALUES('a', 'b'), ('c', 'd');
+  INSERT INTO t1 VALUES('a', 'b'), ('c', 'd');
+  CREATE VIRTUAL TABLE vt1 USING tcl(vtab_command t1);
+
+  CREATE TABLE t0(c0);
+  INSERT INTO t0(c0) VALUES (1), (0);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: main.t1
+stmt 56 err 1 -1 103 no such table: t1
+stmt 103 err 1 -1 150 no such table: t1
+stmt 150 ok
+stmt 205 ok
+stmt 229 err 1 -1 267 no such table: t0
+==== 2.0
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a, b);
+  CREATE VIRTUAL TABLE vt1 USING tcl(vtab_command t1);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: main.t1
+stmt 56 ok
+==== 3.0
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a, b);
+  CREATE VIRTUAL TABLE vt1 USING tcl(vtab_command t1);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: main.t1
+stmt 56 ok
+==== 4.0
+
+  CREATE TABLE t1(a, b, c);
+  CREATE VIRTUAL TABLE vt1 USING tcl(vtab_command t1);
+----
+stmt 0 ok
+stmt 28 ok
+==== 5.0
+
+  CREATE TABLE t1(a, b, c);
+  CREATE VIRTUAL TABLE vt1 USING tcl(vtab_command t1);
+  INSERT INTO t1 VALUES(1, 2, 3);
+  INSERT INTO t1 VALUES(2, 3, 4);
+  INSERT INTO t1 VALUES(3, 4, 5);
+  INSERT INTO t1 VALUES(1, 5, 6);
+  INSERT INTO t1 VALUES(2, 6, 7);
+  INSERT INTO t1 VALUES(3, 7, 8);
+  INSERT INTO t1 VALUES(1, 8, 9);
+  INSERT INTO t1 VALUES(2, 9, 0);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 83 err 1 -1 117 no such table: t1
+stmt 117 err 1 -1 151 no such table: t1
+stmt 151 err 1 -1 185 no such table: t1
+stmt 185 err 1 -1 219 no such table: t1
+stmt 219 err 1 -1 253 no such table: t1
+stmt 253 err 1 -1 287 no such table: t1
+stmt 287 err 1 -1 321 no such table: t1
+stmt 321 err 1 -1 355 no such table: t1

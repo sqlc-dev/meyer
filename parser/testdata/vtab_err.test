@@ -1,0 +1,7 @@
+==== vtab_err-3.0
+
+  CREATE TABLE r(a PRIMARY KEY, b, c);
+  CREATE VIRTUAL TABLE e USING echo(r);
+----
+stmt 0 ok
+stmt 39 ok

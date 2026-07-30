@@ -1,0 +1,225 @@
+==== 100
+
+  CREATE TABLE link(aa INT, bb INT);
+  CREATE INDEX link_f ON link(aa,bb);
+  CREATE INDEX link_t ON link(bb,aa);
+  INSERT INTO link(aa,bb) VALUES
+    (1,3),
+    (5,3),
+    (7,1),
+    (7,9),
+    (9,9),
+    (5,11),
+    (11,7),
+    (2,4),
+    (4,6),
+    (8,6);
+----
+stmt 0 ok
+stmt 37 err 1 -1 75 no such table: main.link
+stmt 75 err 1 -1 113 no such table: main.link
+stmt 113 err 1 -1 258 no such table: link
+==== 110
+
+  WITH RECURSIVE closure(x) AS (
+     VALUES(1)
+     UNION
+     SELECT aa FROM closure, link WHERE link.bb=closure.x
+     UNION
+     SELECT bb FROM closure, link WHERE link.aa=closure.x
+  )
+  SELECT x FROM closure ORDER BY x;
+----
+stmt 0 err 1 -1 226 no such table: link
+==== 111
+
+  WITH RECURSIVE closure(x) AS (
+     VALUES(1)
+     UNION
+     SELECT aa FROM link, closure WHERE link.bb=closure.x
+     UNION
+     SELECT bb FROM closure, link WHERE link.aa=closure.x
+  )
+  SELECT x FROM closure ORDER BY x;
+----
+stmt 0 err 1 -1 226 no such table: link
+==== 112
+
+  WITH RECURSIVE closure(x) AS (
+     VALUES(1)
+     UNION
+     SELECT bb FROM closure, link WHERE link.aa=closure.x
+     UNION
+     SELECT aa FROM link, closure WHERE link.bb=closure.x
+  )
+  SELECT x FROM closure ORDER BY x;
+----
+stmt 0 err 1 -1 226 no such table: link
+==== 113
+
+  WITH RECURSIVE closure(x) AS (
+     VALUES(1),(200),(300),(400)
+     INTERSECT
+     VALUES(1)
+     UNION
+     SELECT bb FROM closure, link WHERE link.aa=closure.x
+     UNION
+     SELECT aa FROM link, closure WHERE link.bb=closure.x
+  )
+  SELECT x FROM closure ORDER BY x;
+----
+stmt 0 err 1 -1 274 no such table: link
+==== 114
+
+  WITH RECURSIVE closure(x) AS (
+     VALUES(1),(200),(300),(400)
+     UNION ALL
+     VALUES(2)
+     UNION
+     SELECT bb FROM closure, link WHERE link.aa=closure.x
+     UNION
+     SELECT aa FROM link, closure WHERE link.bb=closure.x
+  )
+  SELECT x FROM closure ORDER BY x;
+----
+stmt 0 err 1 -1 274 no such table: link
+==== 120
+
+  WITH RECURSIVE closure(x) AS (
+     VALUES(1),(200),(300),(400)
+     UNION ALL
+     VALUES(2)
+     UNION ALL
+     SELECT bb FROM closure, link WHERE link.aa=closure.x
+     UNION
+     SELECT aa FROM link, closure WHERE link.bb=closure.x
+  )
+  SELECT x FROM closure ORDER BY x;
+----
+stmt 0 err 1 -1 278 circular reference: closure
+==== 121
+
+  WITH RECURSIVE closure(x) AS (
+     VALUES(1),(200),(300),(400)
+     UNION ALL
+     VALUES(2)
+     UNION
+     SELECT bb FROM closure, link WHERE link.aa=closure.x
+     UNION ALL
+     SELECT aa FROM link, closure WHERE link.bb=closure.x
+  )
+  SELECT x FROM closure ORDER BY x;
+----
+stmt 0 err 1 -1 278 circular reference: closure
+==== 130
+
+  WITH RECURSIVE closure(x) AS (
+    SELECT 1 AS x
+    UNION
+    SELECT aa FROM link JOIN closure ON bb=x
+    UNION
+    SELECT bb FROM link JOIN closure on aa=x
+    ORDER BY x LIMIT 4
+  )
+  SELECT * FROM closure;
+----
+stmt 0 err 1 -1 213 no such table: link
+==== 131
+
+  WITH RECURSIVE closure(x) AS (
+    SELECT 1 AS x
+    UNION ALL
+    SELECT 2
+    UNION
+    SELECT aa FROM link JOIN closure ON bb=x
+    UNION
+    SELECT bb FROM link JOIN closure on aa=x
+    ORDER BY x LIMIT 4
+  )
+  SELECT * FROM closure;
+----
+stmt 0 err 1 -1 240 no such table: link
+==== 200
+
+  CREATE TABLE linkA(aa1,aa2);
+  INSERT INTO linkA(aa1,aa2) VALUES(1,3),(5,7),(9,11);
+  CREATE TABLE linkB(bb1,bb2);
+  INSERT INTO linkB(bb1,bb2) VALUES(7,9),(11,13),(3,5);
+  CREATE TABLE linkC(cc1,cc2);
+  INSERT INTO linkC(cc1,cc2) VALUES(1,2),(2,4),(6,8);
+  CREATE TABLE linkD(dd1,dd2);
+  INSERT INTO linkD(dd1,dd2) VALUES(4,6),(100,110);
+----
+stmt 0 ok
+stmt 31 err 1 -1 86 no such table: linkA
+stmt 86 ok
+stmt 117 err 1 -1 173 no such table: linkB
+stmt 173 ok
+stmt 204 err 1 -1 258 no such table: linkC
+stmt 258 ok
+stmt 289 err 1 -1 341 no such table: linkD
+==== 210
+
+  WITH RECURSIVE closure(x) AS (
+    VALUES(1)
+    UNION ALL
+    SELECT aa2 FROM linkA JOIN closure ON x=aa1
+    UNION ALL
+    SELECT bb2 FROM linkB JOIN closure ON x=bb1
+    UNION ALL
+    SELECT cc2 FROM linkC JOIN closure ON x=cc1
+    UNION ALL
+    SELECT dd2 FROM linkD JOIN closure ON x=dd1
+  )
+  SELECT x FROM closure ORDER BY +x;
+----
+stmt 0 err 1 -1 336 no such table: linkD
+==== 220
+
+  CREATE TABLE linkA_ipk(aa1 INTEGER PRIMARY KEY,aa2);
+  INSERT INTO linkA_ipk(aa1,aa2) SELECT aa1, aa2 FROM linkA;
+  CREATE TABLE linkB_ipk(bb1 INTEGER PRIMARY KEY,bb2);
+  INSERT INTO linkB_ipk(bb1,bb2) SELECT bb1, bb2 FROM linkB;
+  CREATE TABLE linkC_ipk(cc1 INTEGER PRIMARY KEY,cc2);
+  INSERT INTO linkC_ipk(cc1,cc2) SELECT cc1, cc2 FROM linkC;
+  CREATE TABLE linkD_ipk(dd1 INTEGER PRIMARY KEY,dd2);
+  INSERT INTO linkD_ipk(dd1,dd2) SELECT dd1, dd2 FROM linkD;
+  WITH RECURSIVE closure(x) AS (
+    VALUES(1)
+    UNION ALL
+    SELECT aa2 FROM linkA_ipk JOIN closure ON x=aa1
+    UNION ALL
+    SELECT bb2 FROM linkB_ipk JOIN closure ON x=bb1
+    UNION ALL
+    SELECT cc2 FROM linkC_ipk JOIN closure ON x=cc1
+    UNION ALL
+    SELECT dd2 FROM linkD_ipk JOIN closure ON x=dd1
+  )
+  SELECT x FROM closure ORDER BY +x;
+----
+stmt 0 ok
+stmt 55 err 1 -1 116 no such table: linkA_ipk
+stmt 116 ok
+stmt 171 err 1 -1 232 no such table: linkB_ipk
+stmt 232 ok
+stmt 287 err 1 -1 348 no such table: linkC_ipk
+stmt 348 ok
+stmt 403 err 1 -1 464 no such table: linkD_ipk
+stmt 464 err 1 -1 816 no such table: linkD_ipk
+==== 300
+
+  CREATE TABLE tree(id INTEGER PRIMARY KEY, parent INTEGER);
+  INSERT INTO tree VALUES(3, 1);
+  INSERT INTO tree VALUES(2, 3);
+----
+stmt 0 ok
+stmt 61 err 1 -1 94 no such table: tree
+stmt 94 err 1 -1 127 no such table: tree
+==== 310
+
+  WITH RECURSIVE tt(ii) AS (
+      VALUES(1) UNION ALL SELECT id FROM tree, tt WHERE parent=ii ORDER BY id
+  )
+  SELECT * FROM tt ORDER BY ii;
+----
+stmt 0 err 1 -1 143 no such table: tree

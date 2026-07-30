@@ -1,0 +1,34 @@
+==== 1.0
+
+  PRAGMA auto_vacuum = 2;
+  CREATE TABLE t1(a PRIMARY KEY, b);
+
+  WITH data(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM data
+  )
+  INSERT INTO t1 SELECT i, randomblob(600) FROM data LIMIT 20;
+  PRAGMA page_count;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 63 err 1 -1 195 no such table: t1
+stmt 195 ok
+==== 1.1
+
+  PRAGMA incremental_vacuum;
+----
+stmt 0 ok
+==== 2.1
+
+  PRAGMA auto_vacuum = 1;
+  CREATE TABLE t1(a PRIMARY KEY, b);
+  WITH data(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM data
+  )
+  INSERT INTO t1 SELECT i, randomblob(600) FROM data LIMIT 20;
+  PRAGMA page_count;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 63 err 1 -1 194 no such table: t1
+stmt 194 ok

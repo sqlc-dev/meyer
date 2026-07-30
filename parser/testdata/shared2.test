@@ -1,0 +1,7 @@
+==== shared2-4.1
+
+    CREATE TABLE t0(a, b);
+    CREATE TABLE t1(a, b DEFAULT 'hello world');
+----
+stmt 0 ok
+stmt 27 ok

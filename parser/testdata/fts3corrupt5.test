@@ -1,0 +1,21 @@
+==== 1.0
+
+  BEGIN;
+    CREATE VIRTUAL TABLE ft USING fts3(a, b, c);
+    INSERT INTO ft VALUES('one', 'one', 'one');
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 58 err 1 -1 106 no such table: ft
+stmt 106 ok
+==== 1.1
+
+  SELECT * FROM ft WHERE ft MATCH 'b:one'
+----
+stmt 0 err 1 -1 43 no such table: ft
+==== 1.2
+
+  SELECT quote(root) FROM ft_segdir;
+----
+stmt 0 err 1 -1 37 no such table: ft_segdir

@@ -1,0 +1,32 @@
+==== incrblob3-1.1
+
+  CREATE TABLE blobs(k INTEGER PRIMARY KEY, v BLOB);
+  INSERT INTO blobs VALUES(1, zeroblob(100));
+  INSERT INTO blobs VALUES(2, zeroblob(100));
+----
+stmt 0 ok
+stmt 53 err 1 -1 99 no such table: blobs
+stmt 99 err 1 -1 145 no such table: blobs
+==== incrblob3-2.2.1
+
+  INSERT INTO blobs VALUES(3, 42);
+  INSERT INTO blobs VALUES(4, 54.4);
+  INSERT INTO blobs VALUES(5, NULL);
+----
+stmt 0 err 1 -1 35 no such table: blobs
+stmt 35 err 1 -1 72 no such table: blobs
+stmt 72 err 1 -1 109 no such table: blobs
+==== 8.1
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.t1(a INTEGER PRIMARY KEY, b);
+
+  INSERT INTO t1 VALUES(4, 'hello');
+  INSERT INTO aux.t1 VALUES(4, 'world');
+----
+stmt 0 ok
+stmt 45 ok
+stmt 73 err 1 89 96 unknown database aux
+stmt 122 err 1 -1 160 no such table: t1
+stmt 160 err 1 -1 201 no such table: aux.t1

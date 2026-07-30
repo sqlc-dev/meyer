@@ -1,0 +1,373 @@
+==== 1.%TN%.0
+
+    CREATE TABLE log(t TEXT);
+    CREATE TABLE t1(x PRIMARY KEY, y, z UNIQUE) %WO%;
+    CREATE INDEX t1y ON t1(y);
+
+    INSERT INTO t1 VALUES(1, 'i',   'one');
+    INSERT INTO t1 VALUES(2, 'ii',  'two');
+    INSERT INTO t1 VALUES(3, 'iii', 'three');
+    INSERT INTO t1 VALUES(4, 'iv',  'four');
+
+    CREATE TRIGGER tr1 BEFORE UPDATE ON t1 BEGIN
+      INSERT INTO log VALUES(old.z || '->' || new.z);
+    END;
+    CREATE TRIGGER tr2 AFTER UPDATE ON t1 BEGIN
+      INSERT INTO log VALUES(old.y || '->' || new.y);
+    END;
+----
+stmt 0 ok
+stmt 30 err 1 79 80 near "%": syntax error
+stmt 84 err 1 -1 115 no such table: main.t1
+stmt 115 err 1 -1 160 no such table: t1
+stmt 160 err 1 -1 204 no such table: t1
+stmt 204 err 1 -1 250 no such table: t1
+stmt 250 err 1 -1 295 no such table: t1
+stmt 295 err 1 -1 345 no such table: main.t1
+stmt 408 err 1 -1 456 no such table: main.t1
+==== 1.%TN%.1
+
+    WITH data(k, v) AS (
+      VALUES(3, 'thirty'), (1, 'ten')
+    )
+    UPDATE t1 SET z=v FROM data WHERE x=k;
+
+    SELECT * FROM t1;
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 112 no such table: t1
+stmt 112 err 1 -1 135 no such table: t1
+stmt 135 err 1 -1 158 no such table: log
+==== 1.%TN%.2
+
+    CREATE TABLE t2(a, b);
+    CREATE TABLE t3(k, v);
+  
+    INSERT INTO t3 VALUES(5,   'v');
+    INSERT INTO t3 VALUES(12, 'xii');
+  
+    INSERT INTO t2 VALUES(2, 12);
+    INSERT INTO t2 VALUES(3, 5);
+  
+    DELETE FROM log;
+    UPDATE t1 SET y=v FROM t2, t3 WHERE t1.x=t2.a AND t3.k=t2.b;
+  
+    SELECT * FROM t1;
+    SELECT * FROM log;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 err 1 -1 94 no such table: t3
+stmt 94 err 1 -1 132 no such table: t3
+stmt 132 err 1 -1 169 no such table: t2
+stmt 169 err 1 -1 202 no such table: t2
+stmt 202 err 1 -1 226 no such table: log
+stmt 226 err 1 -1 291 no such table: t1
+stmt 291 err 1 -1 316 no such table: t1
+stmt 316 err 1 -1 339 no such table: log
+==== 1.%TN%.3
+
+    DELETE FROM log;
+    WITH data(k, v) AS (
+      VALUES(1, 'seven'), (1, 'eight'), (2, 'eleven'), (2, 'twelve')
+    )
+    UPDATE t1 SET z=v FROM data WHERE x=k;
+  
+    SELECT * FROM t1;
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 21 no such table: log
+stmt 21 err 1 -1 164 no such table: t1
+stmt 164 err 1 -1 189 no such table: t1
+stmt 189 err 1 -1 212 no such table: log
+==== 1.%TN%.5
+ 
+    CREATE VIEW v1 AS SELECT * FROM t1;
+    CREATE TRIGGER v1tr INSTEAD OF UPDATE ON v1 BEGIN
+      UPDATE t1 SET y=new.y, z=new.z WHERE x=new.x;
+    END;
+
+    DELETE FROM log;
+    WITH data(k, v) AS (
+      VALUES(3, 'thirteen'), (3, 'fourteen'), (4, 'fifteen'), (4, 'sixteen')
+    )
+    UPDATE v1 SET z=v FROM data WHERE x=k;
+----
+stmt 0 ok
+stmt 41 err 1 -1 95 no such table: main.v1
+stmt 156 err 1 -1 178 no such table: log
+stmt 178 err 1 -1 329 no such table: v1
+==== 1.%TN%.6
+
+    SELECT * FROM v1;
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 22 no such table: v1
+stmt 22 err 1 -1 45 no such table: log
+==== 1.%TN%.7
+
+    CREATE TABLE o1(w, x, y, z UNIQUE, PRIMARY KEY(w, x)) %WO%;
+    CREATE INDEX o1y ON t1(y);
+
+    INSERT INTO o1 VALUES(0, 0, 'i', 'one');
+    INSERT INTO o1 VALUES(0, 1, 'ii', 'two');
+    INSERT INTO o1 VALUES(1, 0, 'iii', 'three');
+    INSERT INTO o1 VALUES(1, 1, 'iv', 'four');
+
+    CREATE TRIGGER tro1 BEFORE UPDATE ON o1 BEGIN
+      INSERT INTO log VALUES(old.z || '->' || new.z);
+    END;
+    CREATE TRIGGER tro2 AFTER UPDATE ON o1 BEGIN
+      INSERT INTO log VALUES(old.y || '->' || new.y);
+    END;
+----
+stmt 0 err 1 59 60 near "%": syntax error
+stmt 64 err 1 -1 95 no such table: main.t1
+stmt 95 err 1 -1 141 no such table: o1
+stmt 141 err 1 -1 187 no such table: o1
+stmt 187 err 1 -1 236 no such table: o1
+stmt 236 err 1 -1 283 no such table: o1
+stmt 283 err 1 -1 334 no such table: main.o1
+stmt 397 err 1 -1 446 no such table: main.o1
+==== 1.%TN%.8
+
+    DELETE FROM log;
+    WITH data(k, v) AS (
+      VALUES(3, 'thirty'), (1, 'ten')
+    )
+    UPDATE o1 SET z=v FROM data WHERE (1+x+w*2)=k;
+
+    SELECT * FROM o1;
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 21 no such table: log
+stmt 21 err 1 -1 141 no such table: o1
+stmt 141 err 1 -1 164 no such table: o1
+stmt 164 err 1 -1 187 no such table: log
+==== 1.%TN%.9
+
+    DELETE FROM log;
+    UPDATE o1 SET y=v FROM t2, t3 WHERE (1+o1.w*2+o1.x)=t2.a AND t3.k=t2.b;
+  
+    SELECT * FROM o1;
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 21 no such table: log
+stmt 21 err 1 -1 97 no such table: o1
+stmt 97 err 1 -1 122 no such table: o1
+stmt 122 err 1 -1 145 no such table: log
+==== 1.%TN%.10
+
+    DELETE FROM log;
+    WITH data(k, v) AS (
+      VALUES(1, 'seven'), (1, 'eight'), (2, 'eleven'), (2, 'twelve')
+    )
+    UPDATE o1 SET z=v FROM data WHERE (1+w*2+x)=k;
+  
+    SELECT * FROM o1;
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 21 no such table: log
+stmt 21 err 1 -1 172 no such table: o1
+stmt 172 err 1 -1 197 no such table: o1
+stmt 197 err 1 -1 220 no such table: log
+==== 1.%TN%.12
+ 
+    CREATE VIEW w1 AS SELECT * FROM o1;
+    CREATE TRIGGER w1tr INSTEAD OF UPDATE ON w1 BEGIN
+      UPDATE o1 SET y=new.y, z=new.z WHERE w=new.w AND x=new.x;
+    END;
+
+    DELETE FROM log;
+    WITH data(k, v) AS (
+      VALUES(3, 'thirteen'), (3, 'fourteen'), (4, 'fifteen'), (4, 'sixteen')
+    )
+    UPDATE w1 SET z=v FROM data WHERE (1+w*2+x)=k;
+----
+stmt 0 ok
+stmt 41 err 1 -1 95 no such table: main.w1
+stmt 168 err 1 -1 190 no such table: log
+stmt 190 err 1 -1 349 no such table: w1
+==== 1.%TN%.13
+
+    SELECT * FROM w1;
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 22 no such table: w1
+stmt 22 err 1 -1 45 no such table: log
+==== 2.%TN%.1
+
+    CREATE TABLE x1(a INTEGER PRIMARY KEY, b) %WO%;
+    INSERT INTO x1 VALUES
+        (1, 'one'), (2, 'two'), (3, 'three'), (4, 'four'),
+        (5, 'five'), (6, 'six'), (7, 'seven'), (8, 'eight');
+----
+stmt 0 err 1 47 48 near "%": syntax error
+stmt 52 err 1 -1 198 no such table: x1
+==== 2.%TN%.2
+
+    CREATE TABLE data1(x, y);
+    INSERT INTO data1 VALUES
+    (1, 'eleven'), (1, 'twenty-one'), (2, 'twelve'), (2, 'twenty-two'),
+    (3, 'thirteen'), (3, 'twenty-three'), (4, 'fourteen'), (4, 'twenty-four');
+----
+stmt 0 ok
+stmt 30 err 1 -1 210 no such table: data1
+==== 2.%TN%.3
+
+    UPDATE x1 SET b=y FROM data1 WHERE a=x ORDER BY a LIMIT 3;
+    SELECT * FROM x1;
+----
+stmt 0 err 1 44 49 near "ORDER": syntax error
+stmt 63 err 1 -1 85 no such table: x1
+==== 2.%TN%.4
+
+    UPDATE x1 SET b=b||y FROM data1 WHERE a=x ORDER BY b LIMIT 3;
+    SELECT * FROM x1;
+----
+stmt 0 err 1 47 52 near "ORDER": syntax error
+stmt 66 err 1 -1 88 no such table: x1
+==== 2.%TN%.5
+
+    UPDATE x1 SET b=b||b ORDER BY b;
+----
+stmt 0 err 1 26 31 near "ORDER": syntax error
+==== 2.%TN%.6
+
+    UPDATE x1 SET b=b||y FROM data1 WHERE a=x ORDER BY b;
+----
+stmt 0 err 1 47 52 near "ORDER": syntax error
+==== 2.%TN%.6.dup1
+
+    DROP TABLE x1;
+    CREATE TABLE x1(u, v, b, PRIMARY KEY(u, v)) %WO%;
+    INSERT INTO x1 VALUES
+        (0, 1, 'one'), (1, 0, 'two'), (1, 1, 'three'), (2, 0, 'four'),
+        (2, 1, 'five'), (3, 0, 'six'), (3, 1, 'seven'), (4, 0, 'eight');
+----
+stmt 0 err 1 -1 19 no such table: x1
+stmt 19 err 1 68 69 near "%": syntax error
+stmt 73 err 1 -1 243 no such table: x1
+==== 2.%TN%.7
+
+    UPDATE x1 SET b=y FROM data1 WHERE (u*2+v)=x ORDER BY u, v LIMIT 3;
+    SELECT * FROM x1;
+----
+stmt 0 err 1 50 55 near "ORDER": syntax error
+stmt 72 err 1 -1 94 no such table: x1
+==== 2.%TN%.8
+
+    UPDATE x1 SET b=b||y FROM data1 WHERE (u*2+v)=x ORDER BY b LIMIT 3;
+    SELECT * FROM x1;
+----
+stmt 0 err 1 53 58 near "ORDER": syntax error
+stmt 72 err 1 -1 94 no such table: x1
+==== 3.0
+
+  CREATE TABLE data(x, y, z);
+  CREATE VIEW t1 AS SELECT * FROM data;
+  CREATE TRIGGER t1_insert INSTEAD OF INSERT ON t1 BEGIN
+    INSERT INTO data VALUES(new.x, new.y, new.z);
+  END;
+  CREATE TRIGGER t1_update INSTEAD OF UPDATE ON t1 BEGIN
+    INSERT INTO log VALUES(old.z || '->' || new.z);
+  END;
+
+  CREATE TABLE log(t TEXT);
+
+  INSERT INTO t1 VALUES(1, 'i',   'one');
+  INSERT INTO t1 VALUES(2, 'ii',  'two');
+  INSERT INTO t1 VALUES(3, 'iii', 'three');
+  INSERT INTO t1 VALUES(4, 'iv',  'four');
+----
+stmt 0 ok
+stmt 30 ok
+stmt 70 err 1 -1 127 no such table: main.t1
+stmt 184 err 1 -1 241 no such table: main.t1
+stmt 300 ok
+stmt 329 err 1 -1 372 no such table: t1
+stmt 372 err 1 -1 414 no such table: t1
+stmt 414 err 1 -1 458 no such table: t1
+stmt 458 err 1 -1 501 no such table: t1
+==== 3.1
+
+  WITH input(k, v) AS (
+      VALUES(3, 'thirty'), (1, 'ten')
+  )
+  UPDATE t1 SET z=v FROM input WHERE x=k;
+----
+stmt 0 err 1 -1 108 no such table: t1
+==== upfrom2-generated
+
+    INSERT INTO x1 VALUES(1, 1, 1);
+    INSERT INTO x1 VALUES(2, 2, 2);
+    INSERT INTO x1 VALUES(3, 3, 3);
+    INSERT INTO x1 VALUES(4, 4, 4);
+    INSERT INTO x1 VALUES(5, 5, 5);
+    CREATE TABLE map(o, t);
+    INSERT INTO map VALUES(3, 30), (4, 40), (1, 10);
+----
+stmt 0 err 1 -1 36 no such table: x1
+stmt 36 err 1 -1 72 no such table: x1
+stmt 72 err 1 -1 108 no such table: x1
+stmt 108 err 1 -1 144 no such table: x1
+stmt 144 err 1 -1 180 no such table: x1
+stmt 180 ok
+stmt 208 err 1 -1 261 no such table: map
+==== upfrom2-generated.dup1
+
+    UPDATE x1 SET a=t FROM map WHERE a=o;
+    SELECT * FROM x1 ORDER BY a;
+----
+stmt 0 err 1 -1 42 no such table: x1
+stmt 42 err 1 -1 75 no such table: x1
+==== 5.0
+
+  CREATE TABLE x1(a, b, c);
+  CREATE TABLE x2(a, b, c);
+----
+stmt 0 ok
+stmt 28 ok
+==== 6.0
+
+  CREATE TABLE t1(a);
+----
+stmt 0 ok
+==== 6.1
+
+  UPDATE t1 SET a = 1 FROM (
+      SELECT * FROM t1
+  )
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== 6.2
+
+  UPDATE t1 SET a = 1 FROM (
+      SELECT * FROM t1 UNION ALL SELECT * FROM t1
+  )
+----
+stmt 0 err 1 -1 84 no such table: t1
+==== 7.0
+
+  CREATE TABLE t1(a);
+  INSERT INTO t1(a) VALUES(11),(22),(33),(44),(55);
+  CREATE VIEW t2(b,c) AS SELECT a, COUNT(*) OVER () FROM t1;
+  CREATE TABLE t3(x,y);
+  CREATE TRIGGER t2r1 INSTEAD OF UPDATE ON t2 BEGIN
+    INSERT INTO t3(x,y) VALUES(new.b,new.c);
+  END;
+  SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 22 err 1 -1 74 no such table: t1
+stmt 74 ok
+stmt 135 ok
+stmt 159 err 1 -1 211 no such table: main.t2
+stmt 263 err 1 -1 283 no such table: t2
+==== 7.1
+
+  UPDATE t2 SET c=t1.a FROM t1 WHERE t2.b=t1.a;
+  SELECT * FROM t3;
+----
+stmt 0 err 1 -1 48 no such table: t2
+stmt 48 err 1 -1 68 no such table: t3

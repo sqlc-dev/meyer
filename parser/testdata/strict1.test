@@ -1,0 +1,351 @@
+==== strict1-1.1
+
+  CREATE TABLE t1(a) STRICT;
+----
+stmt 0 err 1 -1 29 missing datatype for t1.a
+==== strict1-1.2
+
+  CREATE TABLE t1(a PRIMARY KEY) STRICT, WITHOUT ROWID;
+----
+stmt 0 err 1 -1 56 missing datatype for t1.a
+==== strict1-1.3
+
+  CREATE TABLE t1(a PRIMARY KEY) WITHOUT ROWID, STRICT;
+----
+stmt 0 err 1 -1 56 missing datatype for t1.a
+==== strict1-1.4
+
+  CREATE TABLE t1(a BANJO PRIMARY KEY) WITHOUT ROWID, STRICT;
+----
+stmt 0 err 1 -1 62 unknown datatype for t1.a: "BANJO"
+==== strict1-1.5
+
+  CREATE TABLE t1(a TEXT PRIMARY KEY, b INT, c INTEGER, d REAL, e BLOB, f DATE) strict;
+----
+stmt 0 err 1 -1 88 unknown datatype for t1.f: "DATE"
+==== strict1-1.6
+
+  CREATE TABLE t1(a TEXT PRIMARY KEY, b INT, c INTEGER, d REAL, e BLOB, f TEXT(50)) WITHOUT ROWID, STRICT;
+----
+stmt 0 err 1 -1 107 unknown datatype for t1.f: "TEXT(50)"
+==== strict1-2.0
+
+  CREATE TABLE t1(
+    a INT,
+    b INTEGER,
+    c BLOB,
+    d TEXT,
+    e REAL
+  ) STRICT;
+----
+stmt 0 ok
+==== strict1-2.0a
+
+    SELECT strict FROM pragma_table_list('t1');
+----
+stmt 0 ok
+==== strict1-2.1
+
+  INSERT INTO t1(a) VALUES('xyz');
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== strict1-2.2
+
+  INSERT INTO t1(b) VALUES('xyz');
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== strict1-2.3
+
+  INSERT INTO t1(c) VALUES('xyz');
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== strict1-2.4
+
+  INSERT INTO t1(d) VALUES(x'3142536475');
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== strict1-2.5
+
+  INSERT INTO t1(e) VALUES('xyz');
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== strict1-3.1
+
+  INSERT INTO t1(a, b) VALUES(1,2),('3','4'),(5.0, 6.0),(null,null);
+  SELECT a, b, '|' FROM t1;
+----
+stmt 0 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 97 no such table: t1
+==== strict1-3.2
+
+  INSERT INTO t1(a) VALUES(1.2);
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== strict1-3.3
+
+  INSERT INTO t1(a) VALUES(x'313233');
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== strict1-3.4
+
+  INSERT INTO t1(b) VALUES(1.2);
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== strict1-3.5
+
+  INSERT INTO t1(b) VALUES(x'313233');
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== strict1-4.1
+
+  DELETE FROM t1;
+  INSERT INTO t1(c) VALUES(x'313233'), (NULL);
+  SELECT typeof(c), c FROM t1;
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 96 no such table: t1
+==== strict1-4.2
+
+  INSERT INTO t1(c) VALUES('456');
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== strict1-5.1
+
+  DELETE FROM t1;
+  INSERT INTO t1(d) VALUES('xyz'),(4),(5.5),(NULL);
+  SELECT typeof(d), d FROM t1;
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 70 no such table: t1
+stmt 70 err 1 -1 101 no such table: t1
+==== strict1-5.2
+
+  INSERT INTO t1(d) VALUES(x'4567');
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== strict1-6.1
+
+  DELETE FROM t1;
+  INSERT INTO t1(e) VALUES(1),(2.5),('3'),('4.5'),(6.0),(NULL);
+  SELECT typeof(e), e FROM t1;
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 82 no such table: t1
+stmt 82 err 1 -1 113 no such table: t1
+==== strict1-6.2
+
+  INSERT INTO t1(e) VALUES('xyz');
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== strict1-6.3
+
+  INSERT INTO t1(e) VALUES(x'3456');
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== strict1-7.1
+
+    DROP TABLE IF EXISTS t4;
+    CREATE TABLE t4(
+      a INT AS (b*2) VIRTUAL,
+      b INT AS (c*2) STORED,
+      c INT PRIMARY KEY
+    ) STRICT;
+    INSERT INTO t4(c) VALUES(1);
+    SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 147 err 1 -1 180 no such table: t4
+stmt 180 err 1 -1 202 no such table: t4
+==== strict1-7.2
+
+    ALTER TABLE t4 ADD COLUMN d VARCHAR;
+----
+stmt 0 err 1 -1 41 no such table: t4
+==== strict1-7.3
+
+    ALTER TABLE t4 ADD COLUMN d;
+----
+stmt 0 err 1 -1 33 no such table: t4
+==== strict1-8.1
+
+  CREATE TABLE csv_import_table (
+    "debit" TEXT,
+    "credit" TEXT
+  );
+  INSERT INTO csv_import_table VALUES ('', '250.00');
+  CREATE TABLE IF NOT EXISTS transactions (
+      debit REAL,
+      credit REAL,
+      amount REAL GENERATED ALWAYS AS (ifnull(credit, 0.0) - ifnull(debit, 0.0))
+  ) STRICT;
+  INSERT INTO transactions
+  SELECT
+      nullif(debit, '') AS debit,
+      nullif(credit, '') AS credit
+  FROM csv_import_table;
+  SELECT * FROM transactions;
+----
+stmt 0 ok
+stmt 75 err 1 -1 129 no such table: csv_import_table
+stmt 129 ok
+stmt 303 err 1 -1 433 no such table: transactions
+stmt 433 err 1 -1 463 no such table: transactions
+==== strict1-8.2
+
+  CREATE TABLE t1(x REAL, y REAL AS (x)) STRICT;
+  INSERT INTO t1 VALUES(5),(4611686018427387904);
+  SELECT *, '|' FROM t1;
+----
+stmt 0 ok
+stmt 49 err 1 -1 99 no such table: t1
+stmt 99 err 1 -1 124 no such table: t1
+==== strict1-9.1
+
+  CREATE TABLE strict (
+    k INTEGER PRIMARY KEY,
+    c1 REAL AS(if(k=11,1.5, k=12,2, k=13,'x', k=14,x'34', 0.0))   STORED,
+    c2 INT  AS(if(k=21,1.5, k=22,2, k=23,'x', k=24,x'34', 0))     STORED,
+    c3 TEXT AS(if(k=31,1.5, k=32,2, k=33,'x', k=34,x'34', 'x'))   STORED,
+    c4 BLOB AS(if(k=41,1.5, k=42,2, k=43,'x', k=44,x'34', x'00')) STORED,
+    c5 ANY  AS(if(k=51,1.5, k=52,2, k=53,'x', k=54,x'34', 0))     STORED
+  ) STRICT;
+  INSERT INTO strict(k) VALUES(11);
+  INSERT INTO strict(k) VALUES(12);
+  INSERT INTO strict(k) VALUES(22);
+  INSERT INTO strict(k) VALUES(31);
+  INSERT INTO strict(k) VALUES(32);
+  INSERT INTO strict(k) VALUES(33);
+  INSERT INTO strict(k) VALUES(44);
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 432 err 1 -1 468 no such table: strict
+stmt 468 err 1 -1 504 no such table: strict
+stmt 504 err 1 -1 540 no such table: strict
+stmt 540 err 1 -1 576 no such table: strict
+stmt 576 err 1 -1 612 no such table: strict
+stmt 612 err 1 -1 648 no such table: strict
+stmt 648 err 1 -1 684 no such table: strict
+stmt 684 ok
+==== strict1-9.2.13
+
+  INSERT INTO strict(k) VALUES(13);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.2.14
+
+  INSERT INTO strict(k) VALUES(14);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.2.21
+
+  INSERT INTO strict(k) VALUES(21);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.2.23
+
+  INSERT INTO strict(k) VALUES(23);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.2.24
+
+  INSERT INTO strict(k) VALUES(24);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.2.34
+
+  INSERT INTO strict(k) VALUES(34);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.2.41
+
+  INSERT INTO strict(k) VALUES(41);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.2.42
+
+  INSERT INTO strict(k) VALUES(42);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.2.43
+
+  INSERT INTO strict(k) VALUES(43);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.3
+
+  DROP TABLE strict;
+  CREATE TABLE strict (
+    k INTEGER PRIMARY KEY,
+    c1 REAL AS(if(k=11,1.5, k=12,2, k=13,'x', k=14,x'34', 0.0))   VIRTUAL,
+    c2 INT  AS(if(k=21,1.5, k=22,2, k=23,'x', k=24,x'34', 0))     VIRTUAL,
+    c3 TEXT AS(if(k=31,1.5, k=32,2, k=33,'x', k=34,x'34', 'x'))   VIRTUAL,
+    c4 BLOB AS(if(k=41,1.5, k=42,2, k=43,'x', k=44,x'34', x'00')) VIRTUAL,
+    c5 ANY  AS(if(k=51,1.5, k=52,2, k=53,'x', k=54,x'34', 0))     VIRTUAL
+  ) STRICT;
+  INSERT INTO strict(k) VALUES(11);
+  INSERT INTO strict(k) VALUES(12);
+  INSERT INTO strict(k) VALUES(22);
+  INSERT INTO strict(k) VALUES(31);
+  INSERT INTO strict(k) VALUES(32);
+  INSERT INTO strict(k) VALUES(33);
+  INSERT INTO strict(k) VALUES(44);
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 21 no such table: strict
+stmt 21 ok
+stmt 458 err 1 -1 494 no such table: strict
+stmt 494 err 1 -1 530 no such table: strict
+stmt 530 err 1 -1 566 no such table: strict
+stmt 566 err 1 -1 602 no such table: strict
+stmt 602 err 1 -1 638 no such table: strict
+stmt 638 err 1 -1 674 no such table: strict
+stmt 674 err 1 -1 710 no such table: strict
+stmt 710 ok
+==== strict1-9.4.13
+
+  INSERT INTO strict(k) VALUES(13);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.4.14
+
+  INSERT INTO strict(k) VALUES(14);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.4.21
+
+  INSERT INTO strict(k) VALUES(21);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.4.23
+
+  INSERT INTO strict(k) VALUES(23);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.4.24
+
+  INSERT INTO strict(k) VALUES(24);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.4.34
+
+  INSERT INTO strict(k) VALUES(34);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.4.41
+
+  INSERT INTO strict(k) VALUES(41);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.4.42
+
+  INSERT INTO strict(k) VALUES(42);
+----
+stmt 0 err 1 -1 36 no such table: strict
+==== strict1-9.4.43
+
+  INSERT INTO strict(k) VALUES(43);
+----
+stmt 0 err 1 -1 36 no such table: strict

@@ -1,0 +1,14 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(c, d NOT NULL);
+----
+stmt 0 ok
+stmt 25 ok
+==== 2.0
+
+  CREATE TABLE t1(a, b, c); 
+  CREATE TABLE t2(a, b, c, PRIMARY KEY(a, b, c)) WITHOUT ROWID;
+----
+stmt 0 ok
+stmt 28 ok

@@ -1,0 +1,709 @@
+==== vtab1-1.1.1
+
+    CREATE VIRTUAL TABLE t1 USING echo;
+----
+stmt 0 ok
+==== vtab1-1.1.2
+
+    CREATE VIRTUAL TABLE IF NOT EXISTS t1 USING echo;
+----
+stmt 0 ok
+==== vtab1-1.2
+
+    SELECT name FROM sqlite_master ORDER BY 1
+----
+stmt 0 ok
+==== vtab1-1.3.1
+
+    CREATE VIRTUAL TABLE t1 USING echo;
+----
+stmt 0 ok
+==== vtab1-1.3.2
+
+    CREATE VIRTUAL TABLE IF NOT EXISTS t1 USING echo;
+----
+stmt 0 ok
+==== vtab1-1.4
+
+    SELECT name FROM sqlite_master ORDER BY 1
+----
+stmt 0 ok
+==== vtab1-1.5.1
+
+    CREATE VIRTUAL TABLE t1 USING echo(no_such_table);
+----
+stmt 0 ok
+==== vtab1-1.5.2
+
+    CREATE VIRTUAL TABLE IF NOT EXISTS t1 USING echo(no_such_table);
+----
+stmt 0 ok
+==== vtab1-1.6
+
+    SELECT name FROM sqlite_master ORDER BY 1
+----
+stmt 0 ok
+==== vtab1-1.7.1
+
+    CREATE VIRTUAL TABLE sqlite_master USING echo;
+----
+stmt 0 err 1 -1 51 object name reserved for internal use: sqlite_master
+==== vtab1-1.7.2
+
+    CREATE VIRTUAL TABLE IF NOT EXISTS sqlite_master USING echo;
+----
+stmt 0 err 1 -1 65 object name reserved for internal use: sqlite_master
+==== vtab1-1.8.1
+
+    CREATE TABLE treal(a, b, c);
+    CREATE VIRTUAL TABLE treal USING echo(treal);
+----
+stmt 0 ok
+stmt 33 ok
+==== vtab1-1.8.2
+
+    CREATE VIRTUAL TABLE IF NOT EXISTS treal USING echo(treal);
+----
+stmt 0 ok
+==== vtab1-1.9
+
+    DROP TABLE treal;
+    SELECT name FROM sqlite_master ORDER BY 1
+----
+stmt 0 err 1 -1 22 no such table: treal
+stmt 22 ok
+==== vtab1-1.11
+
+    INSERT INTO techo VALUES(1, 2, 3);
+----
+stmt 0 err 1 -1 39 no such table: techo
+==== vtab1-1.12
+
+    UPDATE techo SET a = 10;
+----
+stmt 0 err 1 -1 29 no such table: techo
+==== vtab1-1.13
+
+    DELETE FROM techo;
+----
+stmt 0 err 1 -1 23 no such table: techo
+==== vtab1-1.14
+
+    PRAGMA table_info(techo)
+----
+stmt 0 ok
+==== vtab1-1.15
+
+    DROP TABLE techo;
+----
+stmt 0 err 1 -1 22 no such table: techo
+==== vtab1-1.17
+
+    DROP TABLE treal;
+    DROP TABLE logmsg;
+    SELECT sql FROM sqlite_master;
+----
+stmt 0 err 1 -1 22 no such table: treal
+stmt 22 err 1 -1 45 no such table: logmsg
+stmt 45 ok
+==== vtab1.2.6
+ PRAGMA table_info(t1);
+----
+stmt 0 ok
+==== vtab1.2.7
+ PRAGMA table_info(t1);
+----
+stmt 0 ok
+==== vtab1-2.6
+ 
+    PRAGMA table_info(t1);
+----
+stmt 0 ok
+==== vtab1-2.7
+
+    SELECT sql FROM sqlite_master;
+----
+stmt 0 ok
+==== vtab1-2.8
+ 
+    DROP TABLE template;
+    SELECT sql FROM sqlite_master;
+----
+stmt 0 err 1 -1 26 no such table: template
+stmt 26 ok
+==== vtab1-3.2
+
+    SELECT a, b, c FROM t1;
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== vtab1-3.3
+
+    INSERT INTO treal VALUES(1, 2, 3);
+    INSERT INTO treal VALUES(4, 5, 6);
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 39 no such table: treal
+stmt 39 err 1 -1 78 no such table: treal
+stmt 78 err 1 -1 100 no such table: t1
+==== vtab1-3.4
+
+    SELECT a FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== vtab1-3.5
+
+    SELECT rowid FROM t1;
+----
+stmt 0 err 1 -1 26 no such table: t1
+==== vtab1-3.7
+
+    SELECT rowid, * FROM t1;
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== vtab1-3.8.1
+
+    SELECT a AS d, b AS e, c AS f FROM t1;
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== vtab1-5-1
+ 
+    CREATE TABLE t1(a, b, c);
+    CREATE TABLE t2(d, e, f);
+    INSERT INTO t1 VALUES(1, 'red', 'green');
+    INSERT INTO t1 VALUES(2, 'blue', 'black');
+    INSERT INTO t2 VALUES(1, 'spades', 'clubs');
+    INSERT INTO t2 VALUES(2, 'hearts', 'diamonds');
+    CREATE VIRTUAL TABLE et1 USING echo(t1);
+    CREATE VIRTUAL TABLE et2 USING echo(t2);
+----
+stmt 0 ok
+stmt 31 ok
+stmt 61 err 1 -1 107 no such table: t1
+stmt 107 err 1 -1 154 no such table: t1
+stmt 154 err 1 -1 203 no such table: t2
+stmt 203 err 1 -1 255 no such table: t2
+stmt 255 ok
+stmt 300 ok
+==== vtab1-6-1
+ SELECT sql FROM sqlite_master
+----
+stmt 0 ok
+==== vtab1-6-2
+
+    CREATE TABLE treal(a PRIMARY KEY, b, c);
+    CREATE VIRTUAL TABLE techo USING echo(treal);
+    SELECT name FROM sqlite_master WHERE type = 'table';
+----
+stmt 0 ok
+stmt 45 ok
+stmt 95 ok
+==== vtab1-6-3.1.1
+
+    PRAGMA count_changes=ON;
+    INSERT INTO techo VALUES(1, 2, 3);
+----
+stmt 0 ok
+stmt 29 err 1 -1 68 no such table: techo
+==== vtab1-6-3.2
+
+    SELECT * FROM techo;
+----
+stmt 0 err 1 -1 25 no such table: techo
+==== vtab1-6-4.2
+
+    SELECT * FROM techo;
+----
+stmt 0 err 1 -1 25 no such table: techo
+==== vtab1-6-4.4
+
+    SELECT * FROM techo;
+----
+stmt 0 err 1 -1 25 no such table: techo
+==== vtab1-6-5.2
+
+   SELECT * FROM techo;
+----
+stmt 0 err 1 -1 24 no such table: techo
+==== vtab1-6-6.2
+
+    SELECT rowid FROM techo;
+----
+stmt 0 err 1 -1 29 no such table: techo
+==== vtab1-6-7.1.1
+
+    INSERT INTO techo VALUES(11,12,13);
+----
+stmt 0 err 1 -1 40 no such table: techo
+==== vtab1-6-7.2
+
+    SELECT * FROM techo ORDER BY a;
+----
+stmt 0 err 1 -1 36 no such table: techo
+==== vtab1-6-7.4
+
+    SELECT * FROM techo ORDER BY a;
+----
+stmt 0 err 1 -1 36 no such table: techo
+==== vtab1-6-8.2
+
+    SELECT * FROM techo ORDER BY a;
+----
+stmt 0 err 1 -1 36 no such table: techo
+==== vtab1-6-8.4
+
+    SELECT * FROM techo ORDER BY a;
+----
+stmt 0 err 1 -1 36 no such table: techo
+==== vtab1.7-1
+
+    CREATE TABLE real_abc(a PRIMARY KEY, b, c);
+    CREATE VIRTUAL TABLE echo_abc USING echo(real_abc);
+----
+stmt 0 ok
+stmt 48 ok
+==== vtab1.7-2
+
+    INSERT INTO echo_abc VALUES(1, 2, 3);
+    SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 42 no such table: echo_abc
+stmt 42 ok
+==== vtab1.7-3
+
+    INSERT INTO echo_abc(rowid) VALUES(31427);
+    SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 47 no such table: echo_abc
+stmt 47 ok
+==== vtab1.7-4
+
+    INSERT INTO echo_abc SELECT a||'.v2', b, c FROM echo_abc;
+    SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 62 no such table: echo_abc
+stmt 62 ok
+==== vtab1.7-5
+
+    SELECT rowid, a, b, c FROM echo_abc
+----
+stmt 0 err 1 -1 41 no such table: echo_abc
+==== vtab1.7-6
+
+    UPDATE echo_abc SET c = 5 WHERE b = 2;
+    SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 43 no such table: echo_abc
+stmt 43 ok
+==== vtab1.7-7
+
+    UPDATE echo_abc SET rowid = 5 WHERE rowid = 1;
+    SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 51 no such table: echo_abc
+stmt 51 ok
+==== vtab1.7-8
+
+    DELETE FROM echo_abc WHERE b = 2;
+    SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 38 no such table: echo_abc
+stmt 38 ok
+==== vtab1.7-9
+
+    SELECT rowid, a, b, c FROM echo_abc
+----
+stmt 0 err 1 -1 41 no such table: echo_abc
+==== vtab1.7-10
+
+    DELETE FROM echo_abc WHERE b = 2;
+    SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 38 no such table: echo_abc
+stmt 38 ok
+==== vtab1.7-11
+
+    SELECT rowid, a, b, c FROM real_abc
+----
+stmt 0 err 1 -1 41 no such table: real_abc
+==== vtab1.7-12
+
+    DELETE FROM echo_abc;
+    SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 26 no such table: echo_abc
+stmt 26 ok
+==== vtab1.7-13
+
+    SELECT rowid, a, b, c FROM real_abc
+----
+stmt 0 err 1 -1 41 no such table: real_abc
+==== vtab1.7-14
+
+    PRAGMA index_info('echo_abc');
+    PRAGMA index_xinfo('echo_abc');
+----
+stmt 0 ok
+stmt 35 ok
+==== vtab1.9-2
+
+    DROP TABLE e;
+    SELECT name FROM sqlite_master;
+----
+stmt 0 err 1 -1 18 no such table: e
+stmt 18 ok
+==== vtab1.11-1
+
+    INSERT INTO r(a,b,c) VALUES(1,'?',99);
+    INSERT INTO r(a,b,c) VALUES(2,3,99);
+    SELECT a GLOB b FROM e
+----
+stmt 0 err 1 -1 43 no such table: r
+stmt 43 err 1 -1 84 no such table: r
+stmt 84 err 1 -1 112 no such table: e
+==== vtab1.11-2
+
+    SELECT a like 'b' FROM e
+----
+stmt 0 err 1 -1 30 no such table: e
+==== vtab1.11-3
+
+    SELECT a glob '2' FROM e
+----
+stmt 0 err 1 -1 30 no such table: e
+==== vtab1.11-4
+
+    SELECT  glob('2',a) FROM e
+----
+stmt 0 err 1 -1 32 no such table: e
+==== vtab1.11-5
+
+    SELECT  glob(a,'2') FROM e
+----
+stmt 0 err 1 -1 32 no such table: e
+==== vtab1.12-1
+
+    CREATE TABLE b(a, b, c);
+    CREATE TABLE c(a UNIQUE, b, c);
+    INSERT INTO b VALUES(1, 'A', 'B');
+    INSERT INTO b VALUES(2, 'C', 'D');
+    INSERT INTO b VALUES(3, 'E', 'F');
+    INSERT INTO c VALUES(3, 'G', 'H');
+    CREATE VIRTUAL TABLE echo_c USING echo(c);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 65 err 1 -1 104 no such table: b
+stmt 104 err 1 -1 143 no such table: b
+stmt 143 err 1 -1 182 no such table: b
+stmt 182 err 1 -1 221 no such table: c
+stmt 221 ok
+==== vtab1.12-2
+ INSERT INTO echo_c SELECT * FROM b;
+----
+stmt 0 err 1 -1 36 no such table: echo_c
+==== vtab1.12-3
+ SELECT * FROM c
+----
+stmt 0 err 1 -1 17 no such table: c
+==== vtab1.12-5
+ SELECT * FROM c
+----
+stmt 0 err 1 -1 17 no such table: c
+==== vtab1.13-1
+ 
+    SELECT * FROM echo_c WHERE a IS NULL
+----
+stmt 0 err 1 -1 43 no such table: echo_c
+==== vtab1.13-2
+ 
+    INSERT INTO c VALUES(NULL, 15, 16);
+    SELECT * FROM echo_c WHERE a IS NULL
+----
+stmt 0 err 1 -1 41 no such table: c
+stmt 41 err 1 -1 83 no such table: echo_c
+==== vtab1.13-3
+ 
+    INSERT INTO c VALUES(15, NULL, 16);
+    SELECT * FROM echo_c WHERE b IS NULL
+----
+stmt 0 err 1 -1 41 no such table: c
+stmt 41 err 1 -1 83 no such table: echo_c
+==== vtab1.13-5
+ 
+    SELECT * FROM echo_c WHERE b IS NULL AND a = 15;
+----
+stmt 0 err 1 -1 54 no such table: echo_c
+==== vtab1.13-6
+ 
+    SELECT * FROM echo_c WHERE NULL IS b AND a IS 15;
+----
+stmt 0 err 1 -1 55 no such table: echo_c
+==== vtab1-14.001
+SELECT rowid, * FROM echo_c WHERE +rowid IN (1,2,3)
+----
+stmt 0 err 1 -1 52 no such table: echo_c
+==== vtab1-14.002
+SELECT rowid, * FROM echo_c WHERE rowid IN (1,2,3)
+----
+stmt 0 err 1 -1 51 no such table: echo_c
+==== vtab1-14.003
+SELECT rowid, * FROM echo_c WHERE +rowid IN (0,1,5,2,'a',3,NULL)
+----
+stmt 0 err 1 -1 65 no such table: echo_c
+==== vtab1-14.004
+SELECT rowid, * FROM echo_c WHERE rowid IN (0,1,5,'a',2,3,NULL)
+----
+stmt 0 err 1 -1 64 no such table: echo_c
+==== vtab1-14.005
+SELECT rowid, * FROM echo_c WHERE rowid NOT IN (0,1,5,'a',2,3)
+----
+stmt 0 err 1 -1 63 no such table: echo_c
+==== vtab1-14.006
+SELECT rowid, * FROM echo_c WHERE rowid NOT IN (0,5,'a',2,3)
+----
+stmt 0 err 1 -1 61 no such table: echo_c
+==== vtab1-14.007
+SELECT rowid, * FROM echo_c WHERE +rowid NOT IN (0,5,'a',2,3,NULL)
+----
+stmt 0 err 1 -1 67 no such table: echo_c
+==== vtab1-14.008
+SELECT rowid, * FROM echo_c WHERE rowid NOT IN (0,5,'a',2,3,NULL)
+----
+stmt 0 err 1 -1 66 no such table: echo_c
+==== vtab1-14.011
+SELECT * FROM echo_c WHERE +a IN (1,3,8,'x',NULL,15,24)
+----
+stmt 0 err 1 -1 56 no such table: echo_c
+==== vtab1-14.012
+SELECT * FROM echo_c WHERE a IN (1,3,8,'x',NULL,15,24)
+----
+stmt 0 err 1 -1 55 no such table: echo_c
+==== vtab1-14.013
+SELECT * FROM echo_c WHERE a NOT IN (1,8,'x',15,24)
+----
+stmt 0 err 1 -1 52 no such table: echo_c
+==== vtab1-14.014
+SELECT * FROM echo_c WHERE a NOT IN (1,8,'x',NULL,15,24)
+----
+stmt 0 err 1 -1 57 no such table: echo_c
+==== vtab1-14.015
+SELECT * FROM echo_c WHERE +a NOT IN (1,8,'x',NULL,15,24)
+----
+stmt 0 err 1 -1 58 no such table: echo_c
+==== vtab1-15.1
+
+    CREATE TABLE t1(a, b, c);
+    CREATE VIRTUAL TABLE echo_t1 USING echo(t1);
+----
+stmt 0 ok
+stmt 30 ok
+==== vtab1-15.2
+
+    INSERT INTO echo_t1(rowid) VALUES(45);
+    SELECT rowid, * FROM echo_t1;
+----
+stmt 0 err 1 -1 43 no such table: echo_t1
+stmt 43 err 1 -1 77 no such table: echo_t1
+==== vtab1-15.3
+
+    INSERT INTO echo_t1(rowid) VALUES(NULL);
+    SELECT rowid, * FROM echo_t1;
+----
+stmt 0 err 1 -1 45 no such table: echo_t1
+stmt 45 err 1 -1 79 no such table: echo_t1
+==== vtab1-15.4
+
+    INSERT INTO echo_t1(rowid) VALUES('new rowid');
+----
+stmt 0 err 1 -1 52 no such table: echo_t1
+==== vtab1-16.1
+
+    CREATE TABLE t2(a PRIMARY KEY, b, c);
+    INSERT INTO t2 VALUES(1, 2, 3);
+    INSERT INTO t2 VALUES(4, 5, 6);
+    CREATE VIRTUAL TABLE echo_t2 USING echo(t2);
+----
+stmt 0 ok
+stmt 42 err 1 -1 78 no such table: t2
+stmt 78 err 1 -1 114 no such table: t2
+stmt 114 ok
+==== vtab1-17.1
+ 
+    CREATE TABLE t5(a, b);
+    CREATE VIRTUAL TABLE e5 USING echo_v2(t5);
+    BEGIN;
+      INSERT INTO e5 VALUES(1, 2);
+      DROP TABLE e5;
+      SAVEPOINT one;
+      ROLLBACK TO one;
+    COMMIT;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 75 ok
+stmt 86 err 1 -1 121 no such table: e5
+stmt 121 err 1 -1 142 no such table: e5
+stmt 142 ok
+stmt 163 ok
+stmt 186 ok
+==== vtab1-17.2
+ DELETE FROM sqlite_master WHERE sql LIKE 'insert%'
+----
+stmt 0 err 1 -1 52 table sqlite_master may not be modified
+==== 18.1.0
+
+  CREATE TABLE t6(a, b TEXT);
+  CREATE INDEX i6 ON t6(b, a);
+  INSERT INTO t6 VALUES(1, 'Peter');
+  INSERT INTO t6 VALUES(2, 'Andrew');
+  INSERT INTO t6 VALUES(3, '8James');
+  INSERT INTO t6 VALUES(4, '8John');
+  INSERT INTO t6 VALUES(5, 'Phillip');
+  INSERT INTO t6 VALUES(6, 'Bartholomew');
+  CREATE VIRTUAL TABLE e6 USING echo(t6);
+----
+stmt 0 ok
+stmt 30 err 1 -1 61 no such table: main.t6
+stmt 61 err 1 -1 98 no such table: t6
+stmt 98 err 1 -1 136 no such table: t6
+stmt 136 err 1 -1 174 no such table: t6
+stmt 174 err 1 -1 211 no such table: t6
+stmt 211 err 1 -1 250 no such table: t6
+stmt 250 err 1 -1 293 no such table: t6
+stmt 293 ok
+==== 18.2.0
+  PRAGMA case_sensitive_like = ON
+----
+stmt 0 ok
+==== 18.2.x
+  PRAGMA case_sensitive_like = OFF
+----
+stmt 0 ok
+==== 20.1
+
+  CREATE TABLE t7 (a, b);
+  CREATE TABLE t8 (c, d);
+  CREATE INDEX i2 ON t7(a);
+  CREATE INDEX i3 ON t7(b);
+  CREATE INDEX i4 ON t8(c);
+  CREATE INDEX i5 ON t8(d);
+
+  CREATE VIRTUAL TABLE t7v USING echo(t7);
+  CREATE VIRTUAL TABLE t8v USING echo(t8);
+----
+stmt 0 ok
+stmt 26 ok
+stmt 52 err 1 -1 80 no such table: main.t7
+stmt 80 err 1 -1 108 no such table: main.t7
+stmt 108 err 1 -1 136 no such table: main.t8
+stmt 136 err 1 -1 164 no such table: main.t8
+stmt 164 ok
+stmt 208 ok
+==== 20.3
+
+  SELECT a, b FROM (
+      SELECT a, b FROM t7 WHERE a=11 OR b=12
+      UNION ALL
+      SELECT c, d FROM t8 WHERE c=5 OR d=6
+  )
+  ORDER BY 1, 2;
+----
+stmt 0 err 1 -1 146 no such table: t8
+==== 20.4
+
+  SELECT a, b FROM (
+      SELECT a, b FROM t7v WHERE a=11 OR b=12
+      UNION ALL
+      SELECT c, d FROM t8v WHERE c=5 OR d=6
+  )
+  ORDER BY 1, 2;
+----
+stmt 0 err 1 -1 148 no such table: t8v
+==== 21.1
+
+  CREATE TABLE t9(a,b,c);
+  CREATE VIRTUAL TABLE t9v USING echo(t9);
+
+  INSERT INTO t9 VALUES(1,2,3);
+  INSERT INTO t9 VALUES(3,2,1);
+  INSERT INTO t9 VALUES(2,2,2);
+----
+stmt 0 ok
+stmt 26 ok
+stmt 69 err 1 -1 102 no such table: t9
+stmt 102 err 1 -1 134 no such table: t9
+stmt 134 err 1 -1 166 no such table: t9
+==== 21.2
+
+  SELECT * FROM t9v WHERE a<b;
+----
+stmt 0 err 1 -1 31 no such table: t9v
+==== 21.3
+
+  SELECT * FROM t9v WHERE a=b;
+----
+stmt 0 err 1 -1 31 no such table: t9v
+==== 23.3.2
+ SELECT * FROM t1e
+----
+stmt 0 err 1 -1 19 no such table: t1e
+==== 24.0
+
+    CREATE VIRTUAL TABLE t4 USING fts3();
+    SAVEPOINT a;
+    INSERT INTO t4 VALUES('a b c');
+    ROLLBACK TO a;
+    RELEASE a;
+    SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 42 ok
+stmt 59 err 1 -1 95 no such table: t4
+stmt 95 ok
+stmt 114 ok
+stmt 129 err 1 -1 151 no such table: t4
+==== 24.1
+ SELECT * FROM t4 WHERE t4 MATCH 'b'
+----
+stmt 0 err 1 -1 37 no such table: t4
+==== 24.2
+ INSERT INTO t4(t4) VALUES('integrity-check')
+----
+stmt 0 err 1 -1 46 no such table: t4
+==== 24.3
+
+    SAVEPOINT a;
+    CREATE VIRTUAL TABLE t5 USING fts3();
+    SAVEPOINT b;
+    ROLLBACK TO a;
+    SAVEPOINT c;
+    RELEASE a;
+----
+stmt 0 ok
+stmt 17 ok
+stmt 59 ok
+stmt 76 ok
+stmt 95 ok
+stmt 112 ok
+==== 25.0
+
+  CREATE TABLE t0(a);
+  CREATE VIRTUAL TABLE t1 USING echo(t0);
+  WITH t3(a) AS (SELECT * FROM t1 UNION ALL SELECT * FROM t1)
+  UPDATE t1 SET (a,a) = (SELECT 1, 0) FROM t3;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 64 err 1 -1 173 no such table: t1
+==== 26.1
+
+  CREATE VIRTUAL TABLE t1 USING wholenumber;
+  CREATE TABLE tx(a, b, c);
+----
+stmt 0 ok
+stmt 45 ok
+==== 26.3
+
+  SELECT value FROM t1 WHERE value<5
+----
+stmt 0 err 1 -1 38 no such table: t1

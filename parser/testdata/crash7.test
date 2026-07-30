@@ -1,0 +1,37 @@
+==== 2.0
+
+  CREATE TABLE t1(a, b, UNIQUE(a, b));
+  INSERT INTO t1 VALUES(randomblob(100), randomblob(100));
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  INSERT INTO t1 SELECT randomblob(100), randomblob(100) FROM t1;
+  DELETE FROM t1 WHERE rowid%2;
+----
+stmt 0 ok
+stmt 39 err 1 -1 98 no such table: t1
+stmt 98 err 1 -1 164 no such table: t1
+stmt 164 err 1 -1 230 no such table: t1
+stmt 230 err 1 -1 296 no such table: t1
+stmt 296 err 1 -1 362 no such table: t1
+stmt 362 err 1 -1 428 no such table: t1
+stmt 428 err 1 -1 494 no such table: t1
+stmt 494 err 1 -1 560 no such table: t1
+stmt 560 err 1 -1 626 no such table: t1
+stmt 626 err 1 -1 692 no such table: t1
+stmt 692 err 1 -1 758 no such table: t1
+stmt 758 err 1 -1 824 no such table: t1
+stmt 824 err 1 -1 890 no such table: t1
+stmt 890 err 1 -1 956 no such table: t1
+stmt 956 err 1 -1 1022 no such table: t1
+stmt 1022 err 1 -1 1054 no such table: t1

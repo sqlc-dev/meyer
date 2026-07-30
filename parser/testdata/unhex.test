@@ -1,0 +1,32 @@
+==== 2.0
+
+  SELECT typeof( unhex('') ), length( unhex('') );
+----
+stmt 0 ok
+==== 3.0
+
+  SELECT unhex();
+----
+stmt 0 err 1 10 18 wrong number of arguments to function unhex()
+==== 3.1
+
+  SELECT unhex('ABCD', '1234', '');
+----
+stmt 0 err 1 10 36 wrong number of arguments to function unhex()
+==== 6.0
+
+  SELECT typeof( unhex(' ', ' -') ), length( unhex('-', ' -') );
+----
+stmt 0 ok
+==== 6.4.1
+ SELECT typeof(unhex(NULL))
+----
+stmt 0 ok
+==== 6.4.2
+ SELECT typeof(unhex(NULL, ' '))
+----
+stmt 0 ok
+==== 6.4.3
+ SELECT typeof(unhex('1234', NULL))
+----
+stmt 0 ok

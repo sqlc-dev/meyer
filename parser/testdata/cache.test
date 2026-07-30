@@ -1,0 +1,61 @@
+==== cache-2.0
+
+  PRAGMA auto_vacuum=OFF;
+  PRAGMA journal_mode=DELETE;
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(c, d);
+  INSERT INTO t1 VALUES('x', 'y');
+  INSERT INTO t2 VALUES('i', 'j');
+----
+stmt 0 ok
+stmt 26 ok
+stmt 56 ok
+stmt 81 ok
+stmt 106 err 1 -1 141 no such table: t1
+stmt 141 err 1 -1 176 no such table: t2
+==== cache-2.3.1
+
+  PRAGMA cache_size = 1;
+  BEGIN;
+    INSERT INTO t1 VALUES(1, 2);
+    PRAGMA lock_status;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 34 err 1 -1 67 no such table: t1
+stmt 67 ok
+==== cache-2.3.3
+
+    INSERT INTO t2 VALUES(1, 2);
+    PRAGMA lock_status;
+----
+stmt 0 err 1 -1 33 no such table: t2
+stmt 33 ok
+==== cache-2.3.7
+
+  SELECT * FROM t1 UNION SELECT * FROM t2;
+----
+stmt 0 err 1 -1 43 no such table: t2
+==== cache-2.4.1
+
+  PRAGMA cache_size = 0;
+  BEGIN;
+    INSERT INTO t1 VALUES(1, 2);
+    PRAGMA lock_status;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 34 err 1 -1 67 no such table: t1
+stmt 67 ok
+==== cache-2.4.3
+
+    INSERT INTO t2 VALUES(1, 2);
+    PRAGMA lock_status;
+----
+stmt 0 err 1 -1 33 no such table: t2
+stmt 33 ok
+==== cache-2.4.7
+
+  SELECT * FROM t1 UNION SELECT * FROM t2;
+----
+stmt 0 err 1 -1 43 no such table: t2

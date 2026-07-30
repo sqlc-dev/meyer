@@ -1,0 +1,127 @@
+==== 1.0
+
+  BEGIN;
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(randomblob(202));
+    INSERT INTO t1 SELECT randomblob(202) FROM t1;     --     2
+    INSERT INTO t1 SELECT randomblob(202) FROM t1;     --     4
+    INSERT INTO t1 SELECT randomblob(202) FROM t1;     --     8
+    INSERT INTO t1 SELECT randomblob(202) FROM t1;     --    16
+    INSERT INTO t1 SELECT randomblob(202) FROM t1;     --    32
+    INSERT INTO t1 SELECT randomblob(202) FROM t1;     --    64
+    INSERT INTO t1 SELECT randomblob(202) FROM t1;     --   128
+    INSERT INTO t1 SELECT randomblob(202) FROM t1;     --   256
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 33 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 128 no such table: t1
+stmt 128 err 1 -1 192 no such table: t1
+stmt 192 err 1 -1 256 no such table: t1
+stmt 256 err 1 -1 320 no such table: t1
+stmt 320 err 1 -1 384 no such table: t1
+stmt 384 err 1 -1 448 no such table: t1
+stmt 448 err 1 -1 512 no such table: t1
+stmt 512 err 1 -1 576 no such table: t1
+stmt 576 ok
+==== 2.0
+
+  BEGIN;
+    DROP TABLE IF EXISTS t1;
+    CREATE TABLE t1(t,u,v,w,x,y,z);
+    INSERT INTO t1 VALUES(
+      randomblob(30), randomblob(30), randomblob(30), randomblob(30),
+      randomblob(30), randomblob(30), randomblob(30)
+    );
+    INSERT INTO t1 SELECT 
+      randomblob(30), randomblob(30), randomblob(30), randomblob(30),
+      randomblob(30), randomblob(30), randomblob(30) FROM t1;         -- 2
+    INSERT INTO t1 SELECT 
+      randomblob(30), randomblob(30), randomblob(30), randomblob(30),
+      randomblob(30), randomblob(30), randomblob(30) FROM t1;         -- 4
+    INSERT INTO t1 SELECT 
+      randomblob(30), randomblob(30), randomblob(30), randomblob(30),
+      randomblob(30), randomblob(30), randomblob(30) FROM t1;         -- 8
+    INSERT INTO t1 SELECT 
+      randomblob(30), randomblob(30), randomblob(30), randomblob(30),
+      randomblob(30), randomblob(30), randomblob(30) FROM t1;         -- 16
+    INSERT INTO t1 SELECT 
+      randomblob(30), randomblob(30), randomblob(30), randomblob(30),
+      randomblob(30), randomblob(30), randomblob(30) FROM t1;         -- 32
+    INSERT INTO t1 SELECT 
+      randomblob(30), randomblob(30), randomblob(30), randomblob(30),
+      randomblob(30), randomblob(30), randomblob(30) FROM t1;         -- 64
+    INSERT INTO t1 SELECT 
+      randomblob(30), randomblob(30), randomblob(30), randomblob(30),
+      randomblob(30), randomblob(30), randomblob(30) FROM t1;         -- 128
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 38 ok
+stmt 74 err 1 -1 231 no such table: t1
+stmt 231 err 1 -1 390 no such table: t1
+stmt 390 err 1 -1 562 no such table: t1
+stmt 562 err 1 -1 734 no such table: t1
+stmt 734 err 1 -1 906 no such table: t1
+stmt 906 err 1 -1 1079 no such table: t1
+stmt 1079 err 1 -1 1252 no such table: t1
+stmt 1252 err 1 -1 1425 no such table: t1
+stmt 1425 ok
+==== 3.0
+
+  BEGIN;
+    DROP TABLE IF EXISTS t1;
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(randomblob(11000));
+    INSERT INTO t1 SELECT randomblob(11001) FROM t1;     --     2
+    INSERT INTO t1 SELECT randomblob(11002) FROM t1;     --     4
+    INSERT INTO t1 SELECT randomblob(11003) FROM t1;     --     8
+    INSERT INTO t1 SELECT randomblob(11004) FROM t1;     --    16
+    INSERT INTO t1 SELECT randomblob(11005) FROM t1;     --    32
+    INSERT INTO t1 SELECT randomblob(11006) FROM t1;     --    64
+    INSERT INTO t1 SELECT randomblob(11007) FROM t1;     --   128
+    INSERT INTO t1 SELECT randomblob(11008) FROM t1;     --   256
+    INSERT INTO t1 SELECT randomblob(11009) FROM t1;     --   512
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 38 ok
+stmt 62 err 1 -1 108 no such table: t1
+stmt 108 err 1 -1 161 no such table: t1
+stmt 161 err 1 -1 227 no such table: t1
+stmt 227 err 1 -1 293 no such table: t1
+stmt 293 err 1 -1 359 no such table: t1
+stmt 359 err 1 -1 425 no such table: t1
+stmt 425 err 1 -1 491 no such table: t1
+stmt 491 err 1 -1 557 no such table: t1
+stmt 557 err 1 -1 623 no such table: t1
+stmt 623 err 1 -1 689 no such table: t1
+stmt 689 ok
+==== 4.0
+
+  BEGIN;
+    DROP TABLE IF EXISTS t1;
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(randomblob(11000));
+    INSERT INTO t1 SELECT randomblob(11001) FROM t1;     --     2
+    INSERT INTO t1 SELECT randomblob(11002) FROM t1;     --     4
+    INSERT INTO t1 SELECT randomblob(11003) FROM t1;     --     8
+    INSERT INTO t1 SELECT randomblob(11004) FROM t1;     --    16
+    INSERT INTO t1 SELECT randomblob(11005) FROM t1;     --    32
+    INSERT INTO t1 SELECT randomblob(11005) FROM t1;     --    64
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 38 ok
+stmt 62 err 1 -1 108 no such table: t1
+stmt 108 err 1 -1 161 no such table: t1
+stmt 161 err 1 -1 227 no such table: t1
+stmt 227 err 1 -1 293 no such table: t1
+stmt 293 err 1 -1 359 no such table: t1
+stmt 359 err 1 -1 425 no such table: t1
+stmt 425 err 1 -1 491 no such table: t1
+stmt 491 ok

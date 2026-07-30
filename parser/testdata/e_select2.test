@@ -1,0 +1,52 @@
+==== e_select-2.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(a, b);
+  CREATE TABLE t3(b COLLATE nocase);
+
+  INSERT INTO t1 VALUES(2, 'B');
+  INSERT INTO t1 VALUES(1, 'A');
+  INSERT INTO t1 VALUES(4, 'D');
+  INSERT INTO t1 VALUES(NULL, NULL);
+  INSERT INTO t1 VALUES(3, NULL);
+
+  INSERT INTO t2 VALUES(1, 'A');
+  INSERT INTO t2 VALUES(2, NULL);
+  INSERT INTO t2 VALUES(5, 'E');
+  INSERT INTO t2 VALUES(NULL, NULL);
+  INSERT INTO t2 VALUES(3, 'C');
+
+  INSERT INTO t3 VALUES('a');
+  INSERT INTO t3 VALUES('c');
+  INSERT INTO t3 VALUES('b');
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 ok
+stmt 87 err 1 -1 121 no such table: t1
+stmt 121 err 1 -1 154 no such table: t1
+stmt 154 err 1 -1 187 no such table: t1
+stmt 187 err 1 -1 224 no such table: t1
+stmt 224 err 1 -1 258 no such table: t1
+stmt 258 err 1 -1 292 no such table: t2
+stmt 292 err 1 -1 326 no such table: t2
+stmt 326 err 1 -1 359 no such table: t2
+stmt 359 err 1 -1 396 no such table: t2
+stmt 396 err 1 -1 429 no such table: t2
+stmt 429 err 1 -1 460 no such table: t3
+stmt 460 err 1 -1 490 no such table: t3
+stmt 490 err 1 -1 520 no such table: t3
+==== e_select-2.2.0
+
+  CREATE TABLE t4(x TEXT COLLATE nocase);
+  CREATE TABLE t5(y INTEGER, z TEXT COLLATE binary);
+
+  INSERT INTO t4 VALUES('2.0');
+  INSERT INTO t4 VALUES('TWO');
+  INSERT INTO t5 VALUES(2, 'two');
+----
+stmt 0 ok
+stmt 42 ok
+stmt 95 err 1 -1 128 no such table: t4
+stmt 128 err 1 -1 160 no such table: t4
+stmt 160 err 1 -1 195 no such table: t5

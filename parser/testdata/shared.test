@@ -1,0 +1,85 @@
+==== shared-generated
+
+    SELECT * FROM seq;
+----
+stmt 0 err 1 -1 23 no such table: seq
+==== shared-generated.dup1
+
+    CREATE TABLE abc(a, b, c);
+    CREATE TABLE def(d, e, f);
+    INSERT INTO abc VALUES('i', 'ii', 'iii');
+    INSERT INTO def VALUES('I', 'II', 'III');
+----
+stmt 0 ok
+stmt 31 ok
+stmt 62 err 1 -1 108 no such table: abc
+stmt 108 err 1 -1 154 no such table: def
+==== shared-generated.dup2
+
+    INSERT INTO abc VALUES('iv', 'v', 'vi');
+----
+stmt 0 err 1 -1 45 no such table: abc
+==== shared-generated.dup3
+
+    CREATE TABLE ghi(g, h, i);
+----
+stmt 0 ok
+==== shared-generated.dup4
+
+    INSERT INTO def VALUES('IV', 'V', 'VI');
+----
+stmt 0 err 1 -1 45 no such table: def
+==== shared-generated.dup5
+
+      SELECT * FROM sqlite_master;
+----
+stmt 0 ok
+==== shared-generated.dup6
+
+      ATTACH 'test2.db' AS aux;
+      SELECT * FROM aux.sqlite_master;
+----
+stmt 0 ok
+stmt 32 err 1 -1 71 no such table: aux.sqlite_master
+==== shared-generated.dup7
+
+      SELECT * FROM aux.sqlite_master;
+----
+stmt 0 err 1 -1 39 no such table: aux.sqlite_master
+==== shared-generated.dup8
+SELECT * FROM abc2
+----
+stmt 0 err 1 -1 19 no such table: abc2
+==== shared-generated.dup9
+
+    INSERT INTO abc2 VALUES(4, 5, 6);
+    INSERT INTO abc2 VALUES(7, 8, 9);
+----
+stmt 0 err 1 -1 38 no such table: abc2
+stmt 38 err 1 -1 76 no such table: abc2
+==== shared-generated.dup10
+
+      PRAGMA cache_size = 10;
+      PRAGMA cache_size;
+----
+stmt 0 ok
+stmt 30 ok
+==== shared-generated.dup11
+
+    CREATE TABLE t1(a, b, c);
+    CREATE TABLE aux2.t2(a, b, c);
+    CREATE TABLE aux3.t3(a, b, c);
+    CREATE TABLE aux4.t4(a, b, c);
+    CREATE TABLE aux5.t5(a, b, c);
+    SELECT count(*) FROM 
+      aux2.sqlite_master, 
+      aux3.sqlite_master, 
+      aux4.sqlite_master, 
+      aux5.sqlite_master
+----
+stmt 0 ok
+stmt 30 err 1 48 56 unknown database aux2
+stmt 65 err 1 83 91 unknown database aux3
+stmt 100 err 1 118 126 unknown database aux4
+stmt 135 err 1 153 161 unknown database aux5
+stmt 170 err 1 -1 303 no such table: aux2.sqlite_master

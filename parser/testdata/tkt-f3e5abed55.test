@@ -1,0 +1,20 @@
+==== tkt-f3e5abed55-1.1
+
+    ATTACH 'test.db2' AS aux;
+    CREATE TABLE main.t1(a, b);
+    CREATE TABLE aux.t2(c, d);
+----
+stmt 0 ok
+stmt 30 ok
+stmt 62 err 1 80 87 unknown database aux
+==== tkt-f3e5abed55-2.1
+
+      ATTACH 'test.db2' AS aux;
+      BEGIN;
+        INSERT INTO t1 VALUES(3, 4);
+        INSERT INTO t2 VALUES(3, 4);
+----
+stmt 0 ok
+stmt 32 ok
+stmt 45 err 1 -1 82 no such table: t1
+stmt 82 err 1 -1 119 no such table: t2

@@ -1,0 +1,315 @@
+==== hook-3.8
+SELECT * FROM t2
+----
+stmt 0 err 1 -1 17 no such table: t2
+==== hook-4.1.1b
+
+    INSERT INTO t1 VALUES(1, 'one');
+    INSERT INTO t1 VALUES(2, 'two');
+    INSERT INTO t1 VALUES(3, 'three');
+    INSERT INTO t1w SELECT * FROM t1;
+----
+stmt 0 err 1 -1 37 no such table: t1
+stmt 37 err 1 -1 74 no such table: t1
+stmt 74 err 1 -1 113 no such table: t1
+stmt 113 err 1 -1 151 no such table: t1w
+==== hook-4.4.1
+
+  SELECT * FROM t4 ORDER BY a;
+----
+stmt 0 err 1 -1 31 no such table: t4
+==== hook-4.4.3
+
+  SELECT * FROM t4 ORDER BY a;
+----
+stmt 0 err 1 -1 31 no such table: t4
+==== 7.0
+ 
+  CREATE TABLE t1(a, b); 
+  CREATE TABLE t2(x, y); 
+  CREATE TABLE t3(i, j, UNIQUE(i));
+
+  INSERT INTO t2 VALUES('a', 'b');
+  INSERT INTO t2 VALUES('c', 'd');
+
+  INSERT INTO t3 VALUES(4, 16);
+  INSERT INTO t3 VALUES(5, 25);
+  INSERT INTO t3 VALUES(6, 36);
+----
+stmt 0 ok
+stmt 26 ok
+stmt 52 ok
+stmt 89 err 1 -1 125 no such table: t2
+stmt 125 err 1 -1 160 no such table: t2
+stmt 160 err 1 -1 193 no such table: t3
+stmt 193 err 1 -1 225 no such table: t3
+stmt 225 err 1 -1 257 no such table: t3
+==== 7.2.0
+ SELECT rowid FROM t1
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== 7.3.0
+ 
+  DELETE FROM t1;
+  DELETE FROM t2;
+  DELETE FROM t3;
+
+  INSERT INTO t2 VALUES('a', 'b');
+  INSERT INTO t2 VALUES('c', 'd');
+
+  INSERT INTO t3 VALUES(4, 16);
+  INSERT INTO t3 VALUES(5, 25);
+  INSERT INTO t3 VALUES(6, 36);
+----
+stmt 0 err 1 -1 19 no such table: t1
+stmt 19 err 1 -1 37 no such table: t2
+stmt 37 err 1 -1 55 no such table: t3
+stmt 55 err 1 -1 91 no such table: t2
+stmt 91 err 1 -1 126 no such table: t2
+stmt 126 err 1 -1 159 no such table: t3
+stmt 159 err 1 -1 191 no such table: t3
+stmt 191 err 1 -1 223 no such table: t3
+==== 7.3.4.2
+
+  INSERT INTO t3 VALUES(10, 100);
+  SELECT rowid, * FROM t3;
+----
+stmt 0 err 1 -1 34 no such table: t3
+stmt 34 err 1 -1 61 no such table: t3
+==== 7.4.1.0
+
+  CREATE TABLE t4(a, b);
+  INSERT INTO t4 VALUES('a', 1);
+  INSERT INTO t4 VALUES('b', 2);
+  INSERT INTO t4 VALUES('c', 3);
+
+  CREATE TRIGGER t4t BEFORE DELETE ON t4 BEGIN
+    DELETE FROM t4 WHERE b = 1;
+  END;
+----
+stmt 0 ok
+stmt 25 err 1 -1 58 no such table: t4
+stmt 58 err 1 -1 91 no such table: t4
+stmt 91 err 1 -1 124 no such table: t4
+stmt 124 err 1 -1 172 no such table: main.t4
+==== 7.4.1.2
+
+  INSERT INTO t4(rowid, a, b) VALUES(1, 'a', 1);
+  INSERT INTO t4(rowid, a, b) VALUES(3, 'c', 3);
+----
+stmt 0 err 1 -1 49 no such table: t4
+stmt 49 err 1 -1 98 no such table: t4
+==== 7.4.2.0
+
+  CREATE TABLE t5(a, b);
+  INSERT INTO t5 VALUES('a', 1);
+  INSERT INTO t5 VALUES('b', 2);
+  INSERT INTO t5 VALUES('c', 3);
+
+  CREATE TRIGGER t5t BEFORE UPDATE ON t5 BEGIN
+    DELETE FROM t5 WHERE b = 1;
+  END;
+----
+stmt 0 ok
+stmt 25 err 1 -1 58 no such table: t5
+stmt 58 err 1 -1 91 no such table: t5
+stmt 91 err 1 -1 124 no such table: t5
+stmt 124 err 1 -1 172 no such table: main.t5
+==== 7.4.2.2
+
+  INSERT INTO t5(rowid, a, b) VALUES(1, 'a', 1);
+----
+stmt 0 err 1 -1 49 no such table: t5
+==== 7.5.1.0
+
+    CREATE TABLE t7(a, b);
+    INSERT INTO t7 VALUES('one', 'two');
+    INSERT INTO t7 VALUES('three', 'four');
+    ALTER TABLE t7 ADD COLUMN c DEFAULT NULL;
+----
+stmt 0 ok
+stmt 27 err 1 -1 68 no such table: t7
+stmt 68 err 1 -1 112 no such table: t7
+stmt 112 err 1 -1 152 no such table: t7
+==== 7.5.2.0
+
+    CREATE TABLE t8(a, b);
+    INSERT INTO t8 VALUES('one', 'two');
+    INSERT INTO t8 VALUES('three', 'four');
+    ALTER TABLE t8 ADD COLUMN c DEFAULT 'xxx';
+----
+stmt 0 ok
+stmt 27 err 1 -1 68 no such table: t8
+stmt 68 err 1 -1 112 no such table: t8
+stmt 112 err 1 -1 152 no such table: t8
+==== 7.6.1
+ CREATE TABLE t9(a, b INTEGER PRIMARY KEY, c)
+----
+stmt 0 ok
+==== 7.6.1.dup1
+ 
+  CREATE TABLE t1(x PRIMARY KEY);
+  CREATE TABLE t2(x PRIMARY KEY);
+  CREATE TABLE t3(x PRIMARY KEY);
+  CREATE TABLE t4(x PRIMARY KEY);
+
+  CREATE TRIGGER a AFTER INSERT ON t1 BEGIN INSERT INTO t2 VALUES(new.x); END;
+  CREATE TRIGGER b AFTER INSERT ON t2 BEGIN INSERT INTO t3 VALUES(new.x); END;
+  CREATE TRIGGER c AFTER INSERT ON t3 BEGIN INSERT INTO t4 VALUES(new.x); END;
+
+  CREATE TRIGGER d AFTER UPDATE ON t1 BEGIN UPDATE t2 SET x = new.x; END;
+  CREATE TRIGGER e AFTER UPDATE ON t2 BEGIN UPDATE t3 SET x = new.x; END;
+  CREATE TRIGGER f AFTER UPDATE ON t3 BEGIN UPDATE t4 SET x = new.x; END;
+
+  CREATE TRIGGER g AFTER DELETE ON t1 BEGIN DELETE FROM t2 WHERE 1; END;
+  CREATE TRIGGER h AFTER DELETE ON t2 BEGIN DELETE FROM t3 WHERE 1; END;
+  CREATE TRIGGER i AFTER DELETE ON t3 BEGIN DELETE FROM t4 WHERE 1; END;
+----
+stmt 0 ok
+stmt 35 ok
+stmt 69 ok
+stmt 103 ok
+stmt 137 err 1 -1 182 no such table: main.t1
+stmt 217 err 1 -1 261 no such table: main.t2
+stmt 296 err 1 -1 340 no such table: main.t3
+stmt 375 err 1 -1 420 no such table: main.t1
+stmt 450 err 1 -1 494 no such table: main.t2
+stmt 524 err 1 -1 568 no such table: main.t3
+stmt 598 err 1 -1 643 no such table: main.t1
+stmt 672 err 1 -1 716 no such table: main.t2
+stmt 745 err 1 -1 789 no such table: main.t3
+==== 7.6.5
+ 
+  DROP TRIGGER a; DROP TRIGGER b; DROP TRIGGER c;
+  DROP TRIGGER d; DROP TRIGGER e; DROP TRIGGER f;
+  DROP TRIGGER g; DROP TRIGGER h; DROP TRIGGER i;
+
+  CREATE TRIGGER a BEFORE INSERT ON t1 BEGIN INSERT INTO t2 VALUES(new.x); END;
+  CREATE TRIGGER b BEFORE INSERT ON t2 BEGIN INSERT INTO t3 VALUES(new.x); END;
+  CREATE TRIGGER c BEFORE INSERT ON t3 BEGIN INSERT INTO t4 VALUES(new.x); END;
+
+  CREATE TRIGGER d BEFORE UPDATE ON t1 BEGIN UPDATE t2 SET x = new.x; END;
+  CREATE TRIGGER e BEFORE UPDATE ON t2 BEGIN UPDATE t3 SET x = new.x; END;
+  CREATE TRIGGER f BEFORE UPDATE ON t3 BEGIN UPDATE t4 SET x = new.x; END;
+
+  CREATE TRIGGER g BEFORE DELETE ON t1 BEGIN DELETE FROM t2 WHERE 1; END;
+  CREATE TRIGGER h BEFORE DELETE ON t2 BEGIN DELETE FROM t3 WHERE 1; END;
+  CREATE TRIGGER i BEFORE DELETE ON t3 BEGIN DELETE FROM t4 WHERE 1; END;
+----
+stmt 0 err 1 -1 19 no such trigger: a
+stmt 19 err 1 -1 35 no such trigger: b
+stmt 35 err 1 -1 51 no such trigger: c
+stmt 51 err 1 -1 69 no such trigger: d
+stmt 69 err 1 -1 85 no such trigger: e
+stmt 85 err 1 -1 101 no such trigger: f
+stmt 101 err 1 -1 119 no such trigger: g
+stmt 119 err 1 -1 135 no such trigger: h
+stmt 135 err 1 -1 151 no such trigger: i
+stmt 151 err 1 -1 197 no such table: main.t1
+stmt 232 err 1 -1 277 no such table: main.t2
+stmt 312 err 1 -1 357 no such table: main.t3
+stmt 392 err 1 -1 438 no such table: main.t1
+stmt 468 err 1 -1 513 no such table: main.t2
+stmt 543 err 1 -1 588 no such table: main.t3
+stmt 618 err 1 -1 664 no such table: main.t1
+stmt 693 err 1 -1 738 no such table: main.t2
+stmt 767 err 1 -1 812 no such table: main.t3
+==== 9.0
+
+    CREATE TABLE t1(a INTEGER PRIMARY KEY, b, c);
+    CREATE TABLE t2(a, b INTEGER PRIMARY KEY);
+----
+stmt 0 ok
+stmt 50 ok
+==== 9.2
+
+    ALTER TABLE t1 ADD COLUMN d;
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 10.0
+
+  CREATE TABLE t3(a, b INTEGER PRIMARY KEY);
+----
+stmt 0 ok
+==== 10.2
+ SELECT * FROM t3
+----
+stmt 0 err 1 -1 18 no such table: t3
+==== 11.1
+
+    CREATE TABLE t1(a, b);
+    CREATE INDEX idx1 ON t1(a);
+    CREATE INDEX idx2 ON t1(b);
+
+    INSERT INTO t1 VALUES(1, 2);
+    INSERT INTO t1 VALUES(3, 4);
+    INSERT INTO t1 VALUES(5, 6);
+    INSERT INTO t1 VALUES(7, 8);
+----
+stmt 0 ok
+stmt 27 err 1 -1 59 no such table: main.t1
+stmt 59 err 1 -1 91 no such table: main.t1
+stmt 91 err 1 -1 125 no such table: t1
+stmt 125 err 1 -1 158 no such table: t1
+stmt 158 err 1 -1 191 no such table: t1
+stmt 191 err 1 -1 224 no such table: t1
+==== 11.3
+
+    INSERT INTO t1 VALUES(9, 10);
+    INSERT INTO t1 VALUES(11, 12);
+    INSERT INTO t1 VALUES(13, 14);
+    INSERT INTO t1 VALUES(15, 16);
+----
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 104 no such table: t1
+stmt 104 err 1 -1 139 no such table: t1
+==== 12.1
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  CREATE TABLE t2(a INTEGER PRIMARY KEY, b) WITHOUT ROWID;
+
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(3, 4);
+  INSERT INTO t2 VALUES(5, 6);
+  INSERT INTO t2 VALUES(7, 8);
+
+  CREATE TABLE t3 (a INTEGER PRIMARY KEY, b) WITHOUT ROWID;
+----
+stmt 0 ok
+stmt 45 ok
+stmt 104 err 1 -1 136 no such table: t1
+stmt 136 err 1 -1 167 no such table: t1
+stmt 167 err 1 -1 198 no such table: t2
+stmt 198 err 1 -1 229 no such table: t2
+stmt 229 ok
+==== 12.5
+
+  CREATE TABLE t4(a COLLATE nocase PRIMARY KEY, b) WITHOUT ROWID;
+  INSERT INTO t4 VALUES('abc', 1);
+  INSERT INTO t4 VALUES('DEF', 2);
+----
+stmt 0 ok
+stmt 66 err 1 -1 101 no such table: t4
+stmt 101 err 1 -1 136 no such table: t4
+==== 12.6
+
+  INSERT INTO t4 VALUES('def', 3);
+----
+stmt 0 err 1 -1 35 no such table: t4
+==== 13.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY);
+  INSERT INTO t1 VALUES(100), (200), (300), (400);
+----
+stmt 0 ok
+stmt 42 err 1 -1 93 no such table: t1
+==== 13.1
+
+  ALTER TABLE t1 ADD COLUMN b DEFAULT 1234;
+  ALTER TABLE t1 ADD COLUMN c DEFAULT 'abcdef';
+  ALTER TABLE t1 ADD COLUMN d DEFAULT NULL;
+----
+stmt 0 err 1 -1 38 no such table: t1
+stmt 44 err 1 -1 82 no such table: t1
+stmt 92 err 1 -1 130 no such table: t1

@@ -6,51 +6,51 @@
     INSERT INTO abc VALUES(5, 6);
 ----
 stmt 0 ok
-stmt 28 err 1 -1 no such table: abc
-stmt 62 err 1 -1 no such table: abc
-stmt 96 err 1 -1 no such table: abc
+stmt 28 err 1 -1 62 no such table: abc
+stmt 62 err 1 -1 96 no such table: abc
+stmt 96 err 1 -1 130 no such table: abc
 ==== alter2-1.3
 
     SELECT * FROM abc;
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 23 no such table: abc
 ==== alter2-1.4
 
     UPDATE abc SET c = 10 WHERE a = 1;
     SELECT * FROM abc;
 ----
-stmt 0 err 1 -1 no such table: abc
-stmt 39 err 1 -1 no such table: abc
+stmt 0 err 1 -1 39 no such table: abc
+stmt 39 err 1 -1 62 no such table: abc
 ==== alter2-1.5
 
     CREATE INDEX abc_i ON abc(c);
 ----
-stmt 0 err 1 -1 no such table: main.abc
+stmt 0 err 1 -1 34 no such table: main.abc
 ==== alter2-1.6
 
     SELECT c FROM abc ORDER BY c;
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 34 no such table: abc
 ==== alter2-1.7
 
     SELECT * FROM abc WHERE c = 10;
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 36 no such table: abc
 ==== alter2-1.8
 
     SELECT sum(a), c FROM abc GROUP BY c;
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 42 no such table: abc
 ==== alter2-1.10
 
     SELECT typeof(d) FROM abc;
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 31 no such table: abc
 ==== alter2-1.99
 
     DROP TABLE abc;
 ----
-stmt 0 err 1 -1 no such table: abc
+stmt 0 err 1 -1 20 no such table: abc
 ==== alter2-2.1
 
       CREATE TABLE abc2(a, b, c);
@@ -61,18 +61,18 @@ stmt 0 err 1 -1 no such table: abc
       SELECT * FROM abc2_v;
 ----
 stmt 0 ok
-stmt 34 err 1 -1 no such table: abc2
-stmt 75 err 1 -1 no such table: abc2
-stmt 118 err 1 -1 no such table: abc2
+stmt 34 err 1 -1 75 no such table: abc2
+stmt 75 err 1 -1 118 no such table: abc2
+stmt 118 err 1 -1 161 no such table: abc2
 stmt 161 ok
-stmt 209 err 1 -1 no such table: abc2_v
+stmt 209 err 1 -1 237 no such table: abc2_v
 ==== alter2-2.3
 
       DROP TABLE abc2;
       DROP VIEW abc2_v;
 ----
-stmt 0 err 1 -1 no such table: abc2
-stmt 23 err 1 -1 no such view: abc2_v
+stmt 0 err 1 -1 23 no such table: abc2
+stmt 23 err 1 -1 47 no such view: abc2_v
 ==== alter2-3.1
 
       CREATE TABLE abc3(a, b);
@@ -83,28 +83,28 @@ stmt 23 err 1 -1 no such view: abc2_v
 ----
 stmt 0 ok
 stmt 31 ok
-stmt 62 err 1 -1 no such table: main.abc3
+stmt 62 err 1 -1 122 no such table: main.abc3
 ==== alter2-3.2
 
       INSERT INTO abc3 VALUES(1, 4);
       UPDATE abc3 SET b = 2 WHERE b = 4;
       SELECT * FROM blog;
 ----
-stmt 0 err 1 -1 no such table: abc3
-stmt 37 err 1 -1 no such table: abc3
-stmt 78 err 1 -1 no such table: blog
+stmt 0 err 1 -1 37 no such table: abc3
+stmt 37 err 1 -1 78 no such table: abc3
+stmt 78 err 1 -1 104 no such table: blog
 ==== alter2-3.4
 
       UPDATE abc3 SET b = b*2 WHERE a<4;
       SELECT * FROM abc3;
 ----
-stmt 0 err 1 -1 no such table: abc3
-stmt 41 err 1 -1 no such table: abc3
+stmt 0 err 1 -1 41 no such table: abc3
+stmt 41 err 1 -1 67 no such table: abc3
 ==== alter2-3.5
 
       SELECT * FROM blog;
 ----
-stmt 0 err 1 -1 no such table: blog
+stmt 0 err 1 -1 26 no such table: blog
 ==== alter2-3.6
 
       CREATE TABLE clog(o, n);
@@ -115,9 +115,9 @@ stmt 0 err 1 -1 no such table: blog
       SELECT * FROM clog;
 ----
 stmt 0 ok
-stmt 31 err 1 -1 no such table: main.abc3
-stmt 150 err 1 -1 no such table: abc3
-stmt 181 err 1 -1 no such table: clog
+stmt 31 err 1 -1 92 no such table: main.abc3
+stmt 150 err 1 -1 181 no such table: abc3
+stmt 181 err 1 -1 207 no such table: clog
 ==== alter2-5.2
  VACUUM
 ----
@@ -132,46 +132,46 @@ stmt 0 ok
     INSERT INTO t1 VALUES(4);
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 19 no such table: t1
 stmt 19 ok
-stmt 43 err 1 -1 no such table: t1
-stmt 73 err 1 -1 no such table: t1
-stmt 103 err 1 -1 no such table: t1
-stmt 133 err 1 -1 no such table: t1
-stmt 163 err 1 -1 no such table: t1
+stmt 43 err 1 -1 73 no such table: t1
+stmt 73 err 1 -1 103 no such table: t1
+stmt 103 err 1 -1 133 no such table: t1
+stmt 133 err 1 -1 163 no such table: t1
+stmt 163 err 1 -1 185 no such table: t1
 ==== alter2-7.3
 
     SELECT a, typeof(a), b, typeof(b), c, typeof(c) FROM t1 LIMIT 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 69 no such table: t1
 ==== alter2-7.4
 
     SELECT a, typeof(a), b, typeof(b), c, typeof(c) FROM t1 LIMIT 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 69 no such table: t1
 ==== alter2-8.2
 
     UPDATE t1 SET c = 10 WHERE a = 1;
     SELECT a, typeof(a), b, typeof(b), c, typeof(c) FROM t1 LIMIT 1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 38 err 1 -1 no such table: t1
+stmt 0 err 1 -1 38 no such table: t1
+stmt 38 err 1 -1 107 no such table: t1
 ==== alter2-10.2
 
       CREATE INDEX i1 ON t2(b);
       SELECT a FROM t2 WHERE b = X'ABCD';
 ----
-stmt 0 err 1 -1 no such table: main.t2
-stmt 32 err 1 -1 no such table: t2
+stmt 0 err 1 -1 32 no such table: main.t2
+stmt 32 err 1 -1 74 no such table: t2
 ==== alter2-10.3
 
       DELETE FROM t2 WHERE a = 'c';
       SELECT a FROM t2 WHERE b = X'ABCD';
 ----
-stmt 0 err 1 -1 no such table: t2
-stmt 36 err 1 -1 no such table: t2
+stmt 0 err 1 -1 36 no such table: t2
+stmt 36 err 1 -1 78 no such table: t2
 ==== alter2-10.4
 
       SELECT count(b) FROM t2 WHERE b = X'ABCD';
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 49 no such table: t2

@@ -7,10 +7,10 @@
   SELECT * FROM t1;
 ----
 stmt 0 ok
-stmt 63 err 1 -1 no such table: main.t1
-stmt 100 err 1 -1 no such table: t1
-stmt 158 err 1 -1 no such table: t1
-stmt 224 err 1 -1 no such table: t1
+stmt 63 err 1 -1 100 no such table: main.t1
+stmt 100 err 1 -1 158 no such table: t1
+stmt 158 err 1 -1 224 no such table: t1
+stmt 224 err 1 -1 244 no such table: t1
 ==== upsert1-101
 
   DELETE FROM t1;
@@ -18,10 +18,10 @@ stmt 224 err 1 -1 no such table: t1
   INSERT INTO t1(a,b) VALUES(2,99) ON CONFLICT(a) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 79 err 1 -1 no such table: t1
-stmt 141 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 141 no such table: t1
+stmt 141 err 1 -1 161 no such table: t1
 ==== upsert1-102
 
   DELETE FROM t1;
@@ -29,40 +29,40 @@ stmt 141 err 1 -1 no such table: t1
   INSERT INTO t1(a,b) VALUES(99,4) ON CONFLICT(b) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 79 err 1 -1 no such table: t1
-stmt 141 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 79 no such table: t1
+stmt 79 err 1 -1 141 no such table: t1
+stmt 141 err 1 -1 161 no such table: t1
 ==== upsert1-110
 
   INSERT INTO t1(a,b) VALUES(5,6) ON CONFLICT(x) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 61 err 1 -1 no such table: t1
+stmt 0 err 1 -1 61 no such table: t1
+stmt 61 err 1 -1 81 no such table: t1
 ==== upsert1-120
 
   INSERT INTO t1(a,b) VALUES(5,6) ON CONFLICT(c) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 61 err 1 -1 no such table: t1
+stmt 0 err 1 -1 61 no such table: t1
+stmt 61 err 1 -1 81 no such table: t1
 ==== upsert1-130
 
   INSERT INTO t1(a,b) VALUES(5,6) ON CONFLICT(b COLLATE nocase) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 76 err 1 -1 no such table: t1
+stmt 0 err 1 -1 76 no such table: t1
+stmt 76 err 1 -1 96 no such table: t1
 ==== upsert1-140
 
   DELETE FROM t1;
   INSERT INTO t1(a,b) VALUES(5,6) ON CONFLICT(b COLLATE binary) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 94 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 114 no such table: t1
 ==== upsert1-200
 
   DROP TABLE t1;
@@ -72,26 +72,26 @@ stmt 94 err 1 -1 no such table: t1
   INSERT INTO t1(a,b) VALUES(8,7),(9,6) ON CONFLICT(a+b) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 17 no such table: t1
 stmt 17 ok
-stmt 79 err 1 -1 no such table: main.t1
-stmt 118 err 1 -1 no such table: t1
-stmt 181 err 1 -1 no such table: t1
-stmt 250 err 1 -1 no such table: t1
+stmt 79 err 1 -1 118 no such table: main.t1
+stmt 118 err 1 -1 181 no such table: t1
+stmt 181 err 1 -1 250 no such table: t1
+stmt 250 err 1 -1 270 no such table: t1
 ==== upsert1-201
 
   INSERT INTO t1(a,b) VALUES(8,7),(9,6) ON CONFLICT(a) DO NOTHING;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 67 no such table: t1
 ==== upsert1-210
 
   DELETE FROM t1;
   INSERT INTO t1(a,b) VALUES(9,10) ON CONFLICT(a+(+b)) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 85 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 85 no such table: t1
+stmt 85 err 1 -1 105 no such table: t1
 ==== upsert1-300
 
   DROP INDEX t1x1;
@@ -100,20 +100,20 @@ stmt 85 err 1 -1 no such table: t1
   INSERT INTO t1(a,b) VALUES(1,2),(3,2) ON CONFLICT(b) DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such index: t1x1
-stmt 19 err 1 -1 no such table: t1
-stmt 37 err 1 -1 no such table: main.t1
-stmt 85 err 1 -1 no such table: t1
-stmt 152 err 1 -1 no such table: t1
+stmt 0 err 1 -1 19 no such index: t1x1
+stmt 19 err 1 -1 37 no such table: t1
+stmt 37 err 1 -1 85 no such table: main.t1
+stmt 85 err 1 -1 152 no such table: t1
+stmt 152 err 1 -1 172 no such table: t1
 ==== upsert1-310
 
   DELETE FROM t1;
   INSERT INTO t1(a,b) VALUES(1,2),(3,2) ON CONFLICT(b) WHERE b!=10 DO NOTHING;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 97 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 97 no such table: t1
+stmt 97 err 1 -1 117 no such table: t1
 ==== upsert1-320
 
   DELETE FROM t1;
@@ -121,9 +121,9 @@ stmt 97 err 1 -1 no such table: t1
          ON CONFLICT(b) WHERE b>10 DO NOTHING;
   SELECT *, 'x' FROM t1 ORDER BY b, a;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 119 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 119 no such table: t1
+stmt 119 err 1 -1 158 no such table: t1
 ==== upsert1-400
 
   DROP TABLE IF EXISTS t2;
@@ -135,16 +135,16 @@ stmt 119 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 78 err 1 -1 no such table: t2
+stmt 78 err 1 -1 131 no such table: t2
 stmt 131 ok
-stmt 158 err 1 -1 no such table: t2
+stmt 158 err 1 -1 261 no such table: t2
 ==== upsert1-410
 
   PRAGMA count_changes=OFF;
   SELECT a, b FROM t2 ORDER BY a;
 ----
 stmt 0 ok
-stmt 28 err 1 -1 no such table: t2
+stmt 28 err 1 -1 62 no such table: t2
 ==== upsert1-500
 
   DROP TABLE t1;
@@ -153,10 +153,10 @@ stmt 28 err 1 -1 no such table: t2
     ON CONFLICT(x) DO UPDATE SET y=max(t1.y,excluded.y) AND true;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 17 no such table: t1
 stmt 17 ok
-stmt 73 err 1 -1 no such table: t1
-stmt 183 err 1 -1 no such table: t1
+stmt 73 err 1 -1 183 no such table: t1
+stmt 183 err 1 -1 203 no such table: t1
 ==== upsert1-600
 
   DROP TABLE t1;
@@ -164,9 +164,9 @@ stmt 183 err 1 -1 no such table: t1
   INSERT OR IGNORE INTO t1(a) VALUES('1') ON CONFLICT(a) DO NOTHING;
   PRAGMA integrity_check;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 17 no such table: t1
 stmt 17 ok
-stmt 79 err 1 -1 no such table: t1
+stmt 79 err 1 -1 148 no such table: t1
 stmt 148 ok
 ==== upsert1-610
 
@@ -174,8 +174,8 @@ stmt 148 ok
   INSERT OR IGNORE INTO t1(a) VALUES('1'),(1) ON CONFLICT(a) DO NOTHING;
   PRAGMA integrity_check;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 91 no such table: t1
 stmt 91 ok
 ==== upsert1-700
 
@@ -188,13 +188,13 @@ stmt 91 ok
     ON CONFLICT(e) DO UPDATE SET c=excluded.c;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 17 no such table: t1
 stmt 17 ok
-stmt 87 err 1 -1 no such table: main.t1
-stmt 123 err 1 -1 no such table: main.t1
-stmt 159 err 1 -1 no such table: t1
-stmt 206 err 1 -1 no such table: t1
-stmt 301 err 1 -1 no such table: t1
+stmt 87 err 1 -1 123 no such table: main.t1
+stmt 123 err 1 -1 159 no such table: main.t1
+stmt 159 err 1 -1 206 no such table: t1
+stmt 206 err 1 -1 301 no such table: t1
+stmt 301 err 1 -1 321 no such table: t1
 ==== upsert1-710
 
   DELETE FROM t1;
@@ -203,10 +203,10 @@ stmt 301 err 1 -1 no such table: t1
     ON CONFLICT(a) DO UPDATE SET c=excluded.c;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 65 err 1 -1 no such table: t1
-stmt 160 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 160 no such table: t1
+stmt 160 err 1 -1 180 no such table: t1
 ==== upsert1-720
 
   DELETE FROM t1;
@@ -215,10 +215,10 @@ stmt 160 err 1 -1 no such table: t1
     ON CONFLICT(b) DO UPDATE SET c=excluded.c;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 65 err 1 -1 no such table: t1
-stmt 160 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 160 no such table: t1
+stmt 160 err 1 -1 180 no such table: t1
 ==== upsert1-730
 
   DROP TABLE t1;
@@ -231,14 +231,14 @@ stmt 160 err 1 -1 no such table: t1
     ON CONFLICT(e) DO UPDATE SET c=excluded.c;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 17 no such table: t1
 stmt 17 ok
-stmt 71 err 1 -1 no such table: main.t1
-stmt 107 err 1 -1 no such table: main.t1
-stmt 143 err 1 -1 no such table: main.t1
-stmt 179 err 1 -1 no such table: t1
-stmt 226 err 1 -1 no such table: t1
-stmt 321 err 1 -1 no such table: t1
+stmt 71 err 1 -1 107 no such table: main.t1
+stmt 107 err 1 -1 143 no such table: main.t1
+stmt 143 err 1 -1 179 no such table: main.t1
+stmt 179 err 1 -1 226 no such table: t1
+stmt 226 err 1 -1 321 no such table: t1
+stmt 321 err 1 -1 341 no such table: t1
 ==== upsert1-740
 
   DELETE FROM t1;
@@ -247,10 +247,10 @@ stmt 321 err 1 -1 no such table: t1
     ON CONFLICT(a) DO UPDATE SET c=excluded.c;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 65 err 1 -1 no such table: t1
-stmt 160 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 160 no such table: t1
+stmt 160 err 1 -1 180 no such table: t1
 ==== upsert1-750
 
   DELETE FROM t1;
@@ -259,10 +259,10 @@ stmt 160 err 1 -1 no such table: t1
     ON CONFLICT(b) DO UPDATE SET c=excluded.c;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 65 err 1 -1 no such table: t1
-stmt 160 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 160 no such table: t1
+stmt 160 err 1 -1 180 no such table: t1
 ==== upsert1-760
 
   DROP TABLE t1;
@@ -275,14 +275,14 @@ stmt 160 err 1 -1 no such table: t1
     ON CONFLICT(e) DO UPDATE SET c=excluded.c;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 17 no such table: t1
 stmt 17 ok
-stmt 97 err 1 -1 no such table: main.t1
-stmt 133 err 1 -1 no such table: main.t1
-stmt 169 err 1 -1 no such table: main.t1
-stmt 205 err 1 -1 no such table: t1
-stmt 252 err 1 -1 no such table: t1
-stmt 347 err 1 -1 no such table: t1
+stmt 97 err 1 -1 133 no such table: main.t1
+stmt 133 err 1 -1 169 no such table: main.t1
+stmt 169 err 1 -1 205 no such table: main.t1
+stmt 205 err 1 -1 252 no such table: t1
+stmt 252 err 1 -1 347 no such table: t1
+stmt 347 err 1 -1 367 no such table: t1
 ==== upsert1-770
 
   DELETE FROM t1;
@@ -291,10 +291,10 @@ stmt 347 err 1 -1 no such table: t1
     ON CONFLICT(a) DO UPDATE SET c=excluded.c;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 65 err 1 -1 no such table: t1
-stmt 160 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 160 no such table: t1
+stmt 160 err 1 -1 180 no such table: t1
 ==== upsert1-780
 
   DELETE FROM t1;
@@ -303,10 +303,10 @@ stmt 160 err 1 -1 no such table: t1
     ON CONFLICT(b) DO UPDATE SET c=excluded.c;
   SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 18 err 1 -1 no such table: t1
-stmt 65 err 1 -1 no such table: t1
-stmt 160 err 1 -1 no such table: t1
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 160 no such table: t1
+stmt 160 err 1 -1 180 no such table: t1
 ==== upsert1-800
 
   DROP TABLE IF EXISTS t0;
@@ -319,9 +319,9 @@ stmt 160 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 66 err 1 -1 no such table: main.t0
-stmt 114 err 1 -1 no such table: t0
-stmt 163 err 1 -1 no such table: t0
+stmt 66 err 1 -1 114 no such table: main.t0
+stmt 114 err 1 -1 163 no such table: t0
+stmt 163 err 1 -1 241 no such table: t0
 stmt 241 ok
 stmt 267 ok
 ==== upsert1-900
@@ -332,12 +332,12 @@ stmt 267 ok
   END;
 ----
 stmt 0 ok
-stmt 33 err 1 -1 no such table: main.t1
+stmt 33 err 1 -1 85 no such table: main.t1
 ==== upsert1-910
 
   INSERT INTO t1 VALUES(3) ON CONFLICT(x) DO NOTHING;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 54 no such table: t1
 ==== upsert1-1000
 
   CREATE TABLE t0(c0 PRIMARY KEY, c1, c2 UNIQUE) WITHOUT ROWID;
@@ -345,7 +345,7 @@ stmt 0 err 1 -1 no such table: t1
     ON CONFLICT(c2) DO UPDATE SET c1 = c0;
 ----
 stmt 0 ok
-stmt 64 err 1 -1 no such table: t0
+stmt 64 err 1 -1 155 no such table: t0
 ==== upsert1-1100
 
   CREATE TABLE t1(a INTEGER PRIMARY KEY ON CONFLICT REPLACE, b UNIQUE);
@@ -354,21 +354,21 @@ stmt 64 err 1 -1 no such table: t0
   SELECT * FROM t1;
 ----
 stmt 0 ok
-stmt 72 err 1 -1 no such table: t1
-stmt 104 err 1 -1 no such table: t1
-stmt 162 err 1 -1 no such table: t1
+stmt 72 err 1 -1 104 no such table: t1
+stmt 104 err 1 -1 162 no such table: t1
+stmt 162 err 1 -1 182 no such table: t1
 ==== upsert1-1200
 
   CREATE TABLE t1(a INT, b INT);
   CREATE UNIQUE INDEX t1x ON t1(b+3);
 ----
 stmt 0 ok
-stmt 33 err 1 -1 no such table: main.t1
+stmt 33 err 1 -1 71 no such table: main.t1
 ==== upsert1-1210
 
   INSERT INTO t1(a,b) VALUES(1,2) ON CONFLICT(b+?1) DO NOTHING;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 64 no such table: t1
 ==== upsert1-1300
 
   CREATE TABLE t1(x INT, y TEXT);
@@ -389,7 +389,7 @@ stmt 0 err 1 -1 no such table: t1
    ON CONFLICT (x) DO UPDATE SET y = excluded.y;
 ----
 stmt 0 ok
-stmt 34 err 1 -1 no such table: t1
+stmt 34 err 1 -1 190 no such table: t1
 stmt 190 ok
-stmt 231 err 1 -1 no such table: main.t2
-stmt 506 err 1 -1 no such table: t2
+stmt 231 err 1 -1 277 no such table: main.t2
+stmt 506 err 1 -1 612 no such table: t2

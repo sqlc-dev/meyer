@@ -1,0 +1,44 @@
+# Differential testing against a real SQLite build.
+#
+# This is separate from CI because it downloads the pinned SQLite release
+# and compiles it, which the ordinary test run must not depend on. It is the
+# only thing that exercises error fidelity at scale: the vendored corpus is
+# almost all valid SQL, so mutating it -- and mutating the ~36k inputs of
+# SQLite's own fuzzdata databases, which are the opposite -- is how
+# divergent messages and offsets get found.
+name: difftest
+
+on:
+  schedule:
+    - cron: "17 4 * * 1" # Mondays, early
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: "PRNG seed (default: the run id, so each run is new ground)"
+        default: ""
+      per:
+        description: "mutations per input"
+        default: "60"
+
+jobs:
+  difftest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Cache the pinned SQLite artifacts
+        uses: actions/cache@v4
+        with:
+          path: .sqlite
+          key: sqlite-${{ hashFiles('internal/sqlitesrc/sqlitesrc.go', 'internal/sqlitesrc/oracle/oracle.c') }}
+      # The seed defaults to the run id rather than to a constant: a weekly
+      # job with a fixed seed re-checks the same mutations forever. Roughly
+      # 17M checks, a few minutes on a four-core runner -- the oracle runs
+      # as a pool of batch-mode processes, so the cost is nearly all meyer.
+      - run: >
+          go run ./cmd/difftest
+          -per ${{ github.event.inputs.per || '60' }}
+          -depth 3
+          -seed ${{ github.event.inputs.seed || github.run_id }}

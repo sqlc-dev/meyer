@@ -1,0 +1,84 @@
+==== descidx3-2.1
+
+    INSERT INTO t1 VALUES(1, NULL, NULL, NULL, NULL);
+    INSERT INTO t1 VALUES(2, 2, 2, 2, 2);
+    INSERT INTO t1 VALUES(3, 3, 3, 3, 3);
+    INSERT INTO t1 VALUES(4, 2.5, 2.5, 2.5, 2.5);
+    INSERT INTO t1 VALUES(5, -5, -5, -5, -5);
+    INSERT INTO t1 VALUES(6, 'six', 'six', 'six', 'six');
+    INSERT INTO t1 VALUES(7, x'77', x'77', x'77', x'77');
+    INSERT INTO t1 VALUES(8, 'eight', 'eight', 'eight', 'eight');
+    INSERT INTO t1 VALUES(9, x'7979', x'7979', x'7979', x'7979');
+    SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 54 no such table: t1
+stmt 54 err 1 -1 96 no such table: t1
+stmt 96 err 1 -1 138 no such table: t1
+stmt 138 err 1 -1 188 no such table: t1
+stmt 188 err 1 -1 234 no such table: t1
+stmt 234 err 1 -1 292 no such table: t1
+stmt 292 err 1 -1 350 no such table: t1
+stmt 350 err 1 -1 416 no such table: t1
+stmt 416 err 1 -1 482 no such table: t1
+stmt 482 err 1 -1 511 no such table: t1
+==== descidx3-2.2
+
+    SELECT i FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== descidx3-2.3
+
+    SELECT i FROM t1 ORDER BY a DESC;
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== descidx3-2.4
+
+    SELECT i FROM t1 WHERE a<=x'7979';
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== descidx3-2.5
+
+    SELECT i FROM t1 WHERE a>-99;
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== descidx3-3.1
+
+    UPDATE t1 SET a=1;
+    SELECT i FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 23 no such table: t1
+stmt 23 err 1 -1 56 no such table: t1
+==== descidx3-3.2
+
+    SELECT i FROM t1 WHERE a=1 AND b>0 AND b<'zzz'
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== descidx3-3.3
+
+    SELECT i FROM t1 WHERE b>0 AND b<'zzz'
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== descidx3-3.4
+
+    SELECT i FROM t1 WHERE a=1 AND b>-9999 AND b<x'ffffffff'
+----
+stmt 0 err 1 -1 62 no such table: t1
+==== descidx3-3.5
+
+    SELECT i FROM t1 WHERE b>-9999 AND b<x'ffffffff'
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== descidx3-4.2
+
+      UPDATE t1 SET a=1;
+      SELECT i FROM t1 WHERE a IN (1,2) AND b>0 AND b<'zzz';
+----
+stmt 0 err 1 -1 25 no such table: t1
+stmt 25 err 1 -1 86 no such table: t1
+==== descidx3-4.3
+
+      UPDATE t1 SET b=2;
+      SELECT i FROM t1 WHERE a IN (1,2) AND b>0 AND b<'zzz';
+----
+stmt 0 err 1 -1 25 no such table: t1
+stmt 25 err 1 -1 86 no such table: t1

@@ -1,0 +1,37 @@
+==== 1.0
+
+  PRAGMA table_info(pragma_function_list)
+----
+stmt 0 ok
+==== 1.1
+
+  SELECT DISTINCT name, builtin
+    FROM pragma_function_list WHERE name='upper' AND builtin
+----
+stmt 0 ok
+==== 1.2
+
+  SELECT DISTINCT name, builtin
+    FROM pragma_function_list WHERE name LIKE 'exter%';
+----
+stmt 0 ok
+==== 2.0
+
+    PRAGMA table_info(pragma_module_list)
+----
+stmt 0 ok
+==== 2.1
+
+    SELECT * FROM pragma_module_list WHERE name='fts5'
+----
+stmt 0 ok
+==== 3.0
+
+  PRAGMA table_info(pragma_pragma_list)
+----
+stmt 0 ok
+==== 3.1
+
+  SELECT * FROM pragma_pragma_list WHERE name='pragma_list'
+----
+stmt 0 ok

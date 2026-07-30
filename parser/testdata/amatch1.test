@@ -1,0 +1,82 @@
+==== amatch1-2.0
+
+    CREATE TABLE costs(iLang, cFrom, cTo, Cost);
+    INSERT INTO costs VALUES(0, '', '?', 100);
+    INSERT INTO costs VALUES(0, '?', '', 100);
+    INSERT INTO costs VALUES(0, '?', '?', 150);
+    CREATE TABLE vocab(w TEXT UNIQUE);
+    INSERT OR IGNORE INTO vocab SELECT term FROM t1aux;
+    CREATE VIRTUAL TABLE t2 USING approximate_match(
+      vocabulary_table=t1aux,
+      vocabulary_word=term,
+      edit_distances=costs
+    );
+    CREATE VIRTUAL TABLE t3 USING approximate_match(
+      vocabulary_table=vocab,
+      vocabulary_word=w,
+      edit_distances=costs
+    );
+    CREATE VIRTUAL TABLE t4 USING approximate_match(
+        vocabulary_table=vtemp,
+        vocabulary_word=w,
+        edit_distances=costs
+      );
+----
+stmt 0 ok
+stmt 49 err 1 -1 96 no such table: costs
+stmt 96 err 1 -1 143 no such table: costs
+stmt 143 err 1 -1 191 no such table: costs
+stmt 191 ok
+stmt 230 err 1 -1 286 no such table: vocab
+stmt 286 ok
+stmt 431 ok
+stmt 573 ok
+==== amatch1-2.1
+
+      SELECT word, distance FROM t2
+       WHERE word MATCH 'josxph' AND distance<300;
+----
+stmt 0 err 1 -1 87 no such table: t2
+==== amatch1-2.2
+
+      SELECT word, distance FROM t3
+       WHERE word MATCH 'josxph' AND distance<300;
+----
+stmt 0 err 1 -1 87 no such table: t3
+==== amatch1-2.3a
+
+      CREATE TEMP TABLE vtemp(w TEXT UNIQUE);
+      INSERT OR IGNORE INTO vtemp SELECT term FROM t1aux;
+----
+stmt 0 ok
+stmt 46 err 1 -1 104 no such table: vtemp
+==== amatch1-2.3b
+
+      SELECT word, distance FROM t4
+       WHERE word MATCH 'josxph' AND distance<300;
+----
+stmt 0 err 1 -1 87 no such table: t4
+==== amatch1-2.11
+
+    SELECT word, distance FROM t2
+     WHERE word MATCH 'joxxph' AND distance<=300;
+----
+stmt 0 err 1 -1 84 no such table: t2
+==== amatch1-2.12
+
+    SELECT word, distance FROM t3
+     WHERE word MATCH 'joxxph' AND distance<=300;
+----
+stmt 0 err 1 -1 84 no such table: t3
+==== amatch1-2.21
+
+    SELECT word, distance FROM t2
+     WHERE word MATCH 'joxxph' AND distance<300;
+----
+stmt 0 err 1 -1 83 no such table: t2
+==== amatch1-2.22
+
+    SELECT word, distance FROM t3
+     WHERE word MATCH 'joxxph' AND distance<300;
+----
+stmt 0 err 1 -1 83 no such table: t3

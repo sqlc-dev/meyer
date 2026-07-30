@@ -1,0 +1,143 @@
+==== descidx1-2.1
+
+    INSERT INTO t1 VALUES(1,1);
+    INSERT INTO t1 VALUES(2,2);
+    INSERT INTO t1 SELECT a+2, a+2 FROM t1;
+    INSERT INTO t1 SELECT a+4, a+4 FROM t1;
+    SELECT b FROM t1 WHERE a>3 AND a<7;
+----
+stmt 0 err 1 -1 32 no such table: t1
+stmt 32 err 1 -1 64 no such table: t1
+stmt 64 err 1 -1 108 no such table: t1
+stmt 108 err 1 -1 152 no such table: t1
+stmt 152 err 1 -1 192 no such table: t1
+==== descidx1-2.2
+
+    SELECT a FROM t1 WHERE b>3 AND b<7;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== descidx1-2.3
+
+    SELECT b FROM t1 WHERE a>=3 AND a<7;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== descidx1-2.4
+
+    SELECT b FROM t1 WHERE a>3 AND a<=7;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== descidx1-2.5
+
+    SELECT b FROM t1 WHERE a>=3 AND a<=7;
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== descidx1-2.6
+
+    SELECT a FROM t1 WHERE b>=3 AND b<=7;
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== descidx1-4.1
+
+      CREATE TABLE t2(a INT, b TEXT, c BLOB, d REAL);
+      CREATE INDEX i3 ON t2(a ASC, b DESC, c ASC);
+      CREATE INDEX i4 ON t2(b DESC, a ASC, d DESC);
+      INSERT INTO t2 VALUES(1,'one',x'31',1.0);
+      INSERT INTO t2 VALUES(2,'two',x'3232',2.0);
+      INSERT INTO t2 VALUES(3,'three',x'333333',3.0);
+      INSERT INTO t2 VALUES(4,'four',x'34343434',4.0);
+      INSERT INTO t2 VALUES(5,'five',x'3535353535',5.0);
+      INSERT INTO t2 VALUES(6,'six',x'363636363636',6.0);
+      INSERT INTO t2 VALUES(2,'two',x'323232',2.1);
+      INSERT INTO t2 VALUES(2,'zwei',x'3232',2.2);
+      INSERT INTO t2 VALUES(2,NULL,NULL,2.3);
+      SELECT count(*) FROM t2;
+----
+stmt 0 ok
+stmt 54 err 1 -1 105 no such table: main.t2
+stmt 105 err 1 -1 157 no such table: main.t2
+stmt 157 err 1 -1 205 no such table: t2
+stmt 205 err 1 -1 255 no such table: t2
+stmt 255 err 1 -1 309 no such table: t2
+stmt 309 err 1 -1 364 no such table: t2
+stmt 364 err 1 -1 421 no such table: t2
+stmt 421 err 1 -1 479 no such table: t2
+stmt 479 err 1 -1 531 no such table: t2
+stmt 531 err 1 -1 582 no such table: t2
+stmt 582 err 1 -1 628 no such table: t2
+stmt 628 err 1 -1 659 no such table: t2
+==== descidx1-4.2
+
+      SELECT d FROM t2 ORDER BY a;
+----
+stmt 0 err 1 -1 35 no such table: t2
+==== descidx1-4.3
+
+      SELECT d FROM t2 WHERE a>=2 ORDER BY a;
+----
+stmt 0 err 1 -1 46 no such table: t2
+==== descidx1-4.4
+
+      SELECT d FROM t2 WHERE a>2 ORDER BY a;
+----
+stmt 0 err 1 -1 45 no such table: t2
+==== descidx1-4.5
+
+      SELECT d FROM t2 WHERE a=2 AND b>'two';
+----
+stmt 0 err 1 -1 46 no such table: t2
+==== descidx1-4.6
+
+      SELECT d FROM t2 WHERE a=2 AND b>='two';
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== descidx1-4.7
+
+      SELECT d FROM t2 WHERE a=2 AND b<'two';
+----
+stmt 0 err 1 -1 46 no such table: t2
+==== descidx1-4.8
+
+      SELECT d FROM t2 WHERE a=2 AND b<='two';
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== descidx1-5.1
+
+    CREATE TABLE t3(a,b,c,d);
+    CREATE INDEX t3i1 ON t3(a DESC, b ASC, c DESC, d ASC);
+    INSERT INTO t3 VALUES(0,0,0,0);
+    INSERT INTO t3 VALUES(0,0,0,1);
+    INSERT INTO t3 VALUES(0,0,1,0);
+    INSERT INTO t3 VALUES(0,0,1,1);
+    INSERT INTO t3 VALUES(0,1,0,0);
+    INSERT INTO t3 VALUES(0,1,0,1);
+    INSERT INTO t3 VALUES(0,1,1,0);
+    INSERT INTO t3 VALUES(0,1,1,1);
+    INSERT INTO t3 VALUES(1,0,0,0);
+    INSERT INTO t3 VALUES(1,0,0,1);
+    INSERT INTO t3 VALUES(1,0,1,0);
+    INSERT INTO t3 VALUES(1,0,1,1);
+    INSERT INTO t3 VALUES(1,1,0,0);
+    INSERT INTO t3 VALUES(1,1,0,1);
+    INSERT INTO t3 VALUES(1,1,1,0);
+    INSERT INTO t3 VALUES(1,1,1,1);
+    SELECT count(*) FROM t3;
+----
+stmt 0 ok
+stmt 30 err 1 -1 89 no such table: main.t3
+stmt 89 err 1 -1 125 no such table: t3
+stmt 125 err 1 -1 161 no such table: t3
+stmt 161 err 1 -1 197 no such table: t3
+stmt 197 err 1 -1 233 no such table: t3
+stmt 233 err 1 -1 269 no such table: t3
+stmt 269 err 1 -1 305 no such table: t3
+stmt 305 err 1 -1 341 no such table: t3
+stmt 341 err 1 -1 377 no such table: t3
+stmt 377 err 1 -1 413 no such table: t3
+stmt 413 err 1 -1 449 no such table: t3
+stmt 449 err 1 -1 485 no such table: t3
+stmt 485 err 1 -1 521 no such table: t3
+stmt 521 err 1 -1 557 no such table: t3
+stmt 557 err 1 -1 593 no such table: t3
+stmt 593 err 1 -1 629 no such table: t3
+stmt 629 err 1 -1 665 no such table: t3
+stmt 665 err 1 -1 694 no such table: t3

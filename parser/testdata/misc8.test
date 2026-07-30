@@ -1,0 +1,145 @@
+==== misc8-1.0
+
+  CREATE TABLE t1(a,b,c);
+  INSERT INTO t1 VALUES(1,2,3),(4,5,6);
+  SELECT quote(eval('SELECT * FROM t1 ORDER BY a','-abc-'));
+----
+stmt 0 ok
+stmt 26 err 1 -1 66 no such table: t1
+stmt 66 err 1 82 127 no such function: eval
+==== misc8-1.1
+
+  SELECT quote(eval('SELECT * FROM t1 ORDER BY a'));
+----
+stmt 0 err 1 16 53 no such function: eval
+==== misc8-1.2
+
+  SELECT quote(eval('SELECT d FROM t1 ORDER BY a'));
+----
+stmt 0 err 1 16 53 no such function: eval
+==== misc8-1.3
+
+  INSERT INTO t1 VALUES(7,null,9);
+  SELECT eval('SELECT * FROM t1 ORDER BY a',',');
+----
+stmt 0 err 1 -1 35 no such table: t1
+stmt 35 err 1 45 85 no such function: eval
+==== misc8-1.4
+
+  BEGIN;
+  INSERT INTO t1 VALUES(10,11,12);
+  SELECT a, coalesce(b, eval('ROLLBACK; SELECT ''bam'';')), c
+   FROM t1 ORDER BY a;
+----
+stmt 0 ok
+stmt 9 err 1 -1 44 no such table: t1
+stmt 44 err 1 -1 129 no such table: t1
+==== misc8-1.5
+
+  INSERT INTO t1 VALUES(10,11,12);
+  SELECT a, coalesce(b, eval('SELECT ''bam''')), c
+    FROM t1
+   ORDER BY rowid;
+----
+stmt 0 err 1 -1 35 no such table: t1
+stmt 35 err 1 -1 117 no such table: t1
+==== misc8-1.6
+
+  SELECT a, coalesce(b, eval('DELETE FROM t1; SELECT ''bam''')), c
+    FROM t1
+   ORDER BY rowid;
+----
+stmt 0 err 1 -1 98 no such table: t1
+==== misc8-1.7
+
+  INSERT INTO t1 VALUES(1,2,3),(4,5,6),(7,null,9);
+  BEGIN;
+  CREATE TABLE t2(x);
+  SELECT a, coalesce(b, eval('ROLLBACK; SELECT ''bam''')), c
+    FROM t1
+   ORDER BY rowid;
+----
+stmt 0 err 1 -1 51 no such table: t1
+stmt 51 ok
+stmt 60 ok
+stmt 82 err 1 -1 174 no such table: t1
+==== misc8-1.8
+
+  PRAGMA empty_result_callbacks = 1;
+  SELECT eval('SELECT * FROM t1 WHERE 1 = 0;');
+----
+stmt 0 ok
+stmt 37 err 1 47 85 no such function: eval
+==== misc8-2.1
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b INTEGER) WITHOUT ROWID;
+  CREATE TABLE t2(c INTEGER PRIMARY KEY, d INTEGER, x BLOB);
+  INSERT INTO t1 VALUES(0,0);
+  INSERT INTO t1 VALUES(10,10);
+  INSERT INTO t2 VALUES(1,1,zeroblob(200));
+  INSERT INTO t2 VALUES(2,2,zeroblob(200));
+  INSERT INTO t2 VALUES(3,3,zeroblob(200));
+  INSERT INTO t2 VALUES(4,4,zeroblob(200));
+  INSERT INTO t2 VALUES(5,5,zeroblob(200));
+  INSERT INTO t2 VALUES(6,6,zeroblob(200));
+  INSERT INTO t2 VALUES(7,7,zeroblob(200));
+  INSERT INTO t2 VALUES(8,8,zeroblob(200));
+  INSERT INTO t2 VALUES(9,9,zeroblob(200));
+  INSERT INTO t2 VALUES(10,10,zeroblob(200));
+  SELECT a, c, eval(
+      printf('DELETE FROM t2 WHERE c=%d AND %d>5', a+c, a+c)
+  ) FROM t1, t2;
+----
+stmt 0 ok
+stmt 67 ok
+stmt 128 err 1 -1 158 no such table: t1
+stmt 158 err 1 -1 190 no such table: t1
+stmt 190 err 1 -1 234 no such table: t2
+stmt 234 err 1 -1 278 no such table: t2
+stmt 278 err 1 -1 322 no such table: t2
+stmt 322 err 1 -1 366 no such table: t2
+stmt 366 err 1 -1 410 no such table: t2
+stmt 410 err 1 -1 454 no such table: t2
+stmt 454 err 1 -1 498 no such table: t2
+stmt 498 err 1 -1 542 no such table: t2
+stmt 542 err 1 -1 586 no such table: t2
+stmt 586 err 1 -1 632 no such table: t2
+stmt 632 err 1 -1 731 no such table: t1
+==== misc8-3.0
+
+  SELECT *
+    FROM
+         (
+           (SELECT 0 AS i) AS x1,
+           (SELECT 1) AS x2
+         ) AS x3,
+         (SELECT 6 AS j UNION ALL SELECT 7) AS x4
+   WHERE i<rowid
+   ORDER BY 1;
+----
+stmt 0 err 1 173 193 no such column: rowid
+==== misc8-4.0
+
+  CREATE TABLE t1(a,b,c);
+  INSERT INTO t1 VALUES(1,2,3);
+  ATTACH 'test2.db' AS aux2;
+  CREATE TABLE aux2.t2(c,d,e);
+  INSERT INTO t2 VALUES(4,5,6);
+  SELECT * FROM t1, t2;
+----
+stmt 0 ok
+stmt 26 err 1 -1 58 no such table: t1
+stmt 58 ok
+stmt 87 err 1 103 111 unknown database aux2
+stmt 118 err 1 -1 150 no such table: t2
+stmt 150 err 1 -1 174 no such table: t1
+==== misc8-4.1
+
+  PRAGMA database_list;
+----
+stmt 0 ok
+==== misc8-4.2
+
+  SELECT name FROM icecube.sqlite_master;
+----
+stmt 0 err 1 -1 42 no such table: icecube.sqlite_master

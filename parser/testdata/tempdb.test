@@ -1,0 +1,5 @@
+==== tempdb-1.2
+
+    SELECT * FROM t1
+----
+stmt 0 err 1 -1 22 no such table: t1

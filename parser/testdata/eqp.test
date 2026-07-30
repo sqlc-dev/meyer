@@ -1,0 +1,325 @@
+==== 1.1
+
+  CREATE TABLE t1(a INT, b INT, ex TEXT);
+  CREATE INDEX i1 ON t1(a);
+  CREATE INDEX i2 ON t1(b);
+  CREATE TABLE t2(a INT, b INT, ex TEXT);
+  CREATE TABLE t3(a INT, b INT, ex TEXT);
+----
+stmt 0 ok
+stmt 42 err 1 -1 70 no such table: main.t1
+stmt 70 err 1 -1 98 no such table: main.t1
+stmt 98 ok
+stmt 140 ok
+==== 1.2
+
+  SELECT * FROM t2, t1 WHERE t1.a=1 OR t1.b=2;
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 1.3
+
+  SELECT * FROM t2 CROSS JOIN t1 WHERE t1.a=1 OR t1.b=2;
+----
+stmt 0 err 1 -1 57 no such table: t2
+==== 1.3.dup1
+
+  SELECT a FROM t1 ORDER BY a
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== 1.4
+
+  SELECT a FROM t1 ORDER BY +a
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== 1.5
+
+  SELECT a FROM t1 WHERE a=4
+----
+stmt 0 err 1 -1 30 no such table: t1
+==== 1.6
+
+  SELECT DISTINCT count(*) FROM t3 GROUP BY a;
+----
+stmt 0 err 1 -1 47 no such table: t3
+==== 1.7.1
+
+  SELECT * FROM t3 JOIN (SELECT 1)
+----
+stmt 0 err 1 -1 36 no such table: t3
+==== 1.7.2
+
+  SELECT * FROM t3 JOIN (SELECT 1) AS v1
+----
+stmt 0 err 1 -1 42 no such table: t3
+==== 1.7.3
+
+  SELECT * FROM t3 AS xx JOIN (SELECT 1) AS yy
+----
+stmt 0 err 1 -1 48 no such table: t3
+==== 1.8
+
+  SELECT * FROM t3 JOIN (SELECT 1 UNION SELECT 2)
+----
+stmt 0 err 1 -1 51 no such table: t3
+==== 1.9
+
+  SELECT * FROM t3 JOIN (SELECT 1 EXCEPT SELECT a FROM t3 LIMIT 17) AS abc
+----
+stmt 0 err 1 -1 76 no such table: t3
+==== 1.10
+
+  SELECT * FROM t3 JOIN (SELECT 1 INTERSECT SELECT a FROM t3 LIMIT 17) AS abc
+----
+stmt 0 err 1 -1 79 no such table: t3
+==== 1.11
+
+  SELECT * FROM t3 JOIN (SELECT 1 UNION ALL SELECT a FROM t3 LIMIT 17) abc
+----
+stmt 0 err 1 -1 76 no such table: t3
+==== 2.1
+
+  CREATE TABLE t1(x INT, y INT, ex TEXT);
+
+  CREATE TABLE t2(x INT, y INT, ex TEXT);
+  CREATE INDEX t2i1 ON t2(x);
+----
+stmt 0 ok
+stmt 42 ok
+stmt 85 err 1 -1 115 no such table: main.t2
+==== 3.1.1
+
+  SELECT (SELECT x FROM t1 AS sub) FROM t1;
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== 3.1.2
+
+  SELECT * FROM t1 WHERE (SELECT x FROM t1 AS sub);
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== 3.1.3
+
+  SELECT * FROM t1 WHERE (SELECT x FROM t1 AS sub ORDER BY y);
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== 3.1.4
+
+  SELECT * FROM t1 WHERE (SELECT x FROM t2 ORDER BY x);
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== 4.1.1
+
+  SELECT * FROM t1 UNION ALL SELECT * FROM t2
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 4.1.2
+
+  SELECT * FROM t1 UNION ALL SELECT * FROM t2 ORDER BY 2
+----
+stmt 0 err 1 -1 58 no such table: t2
+==== 4.1.3
+
+  SELECT * FROM t1 UNION SELECT * FROM t2 ORDER BY 2
+----
+stmt 0 err 1 -1 54 no such table: t2
+==== 4.1.4
+
+  SELECT * FROM t1 INTERSECT SELECT * FROM t2 ORDER BY 2
+----
+stmt 0 err 1 -1 58 no such table: t2
+==== 4.1.5
+
+  SELECT * FROM t1 EXCEPT SELECT * FROM t2 ORDER BY 2
+----
+stmt 0 err 1 -1 55 no such table: t2
+==== 4.2.2
+
+  SELECT * FROM t1 UNION ALL SELECT * FROM t2 ORDER BY 1
+----
+stmt 0 err 1 -1 58 no such table: t2
+==== 4.2.3
+
+  SELECT * FROM t1 UNION SELECT * FROM t2 ORDER BY 1
+----
+stmt 0 err 1 -1 54 no such table: t2
+==== 4.2.4
+
+  SELECT * FROM t1 INTERSECT SELECT * FROM t2 ORDER BY 1
+----
+stmt 0 err 1 -1 58 no such table: t2
+==== 4.2.5
+
+  SELECT * FROM t1 EXCEPT SELECT * FROM t2 ORDER BY 1
+----
+stmt 0 err 1 -1 55 no such table: t2
+==== 4.3.1
+
+  SELECT x FROM t1 UNION SELECT x FROM t2
+----
+stmt 0 err 1 -1 43 no such table: t2
+==== 4.3.2
+
+  SELECT x FROM t1 UNION SELECT x FROM t2 UNION SELECT x FROM t1
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== 4.3.3
+
+  SELECT x FROM t1 UNION SELECT x FROM t2 UNION SELECT x FROM t1 ORDER BY 1
+----
+stmt 0 err 1 -1 77 no such table: t1
+==== 5.1.0
+ CREATE TABLE t1(a INT, b INT, ex TEXT)
+----
+stmt 0 ok
+==== 5.2.0
+ CREATE INDEX i1 ON t1(a)
+----
+stmt 0 err 1 -1 26 no such table: main.t1
+==== 5.3.0
+ CREATE INDEX i2 ON t1(a, b)
+----
+stmt 0 err 1 -1 29 no such table: main.t1
+==== 5.4.0
+CREATE TABLE t2(c INT, d INT, ex TEXT)
+----
+stmt 0 ok
+==== 5.5.0
+CREATE INDEX i3 ON t1(b)
+----
+stmt 0 err 1 -1 25 no such table: main.t1
+==== 5.8.0
+CREATE INDEX i4 ON t2(c)
+----
+stmt 0 err 1 -1 25 no such table: main.t2
+==== 7.0
+
+  CREATE TABLE t1(a INT, b INT, ex CHAR(100));
+  CREATE TABLE t2(a INT, b INT, ex CHAR(100));
+  CREATE INDEX i1 ON t2(a);
+----
+stmt 0 ok
+stmt 47 ok
+stmt 94 err 1 -1 122 no such table: main.t2
+==== 7.3
+
+  INSERT INTO t1(a,b) VALUES(1, 2);
+  INSERT INTO t1(a,b) VALUES(3, 4);
+
+  INSERT INTO t2(a,b) VALUES(1, 2);
+  INSERT INTO t2(a,b) VALUES(3, 4);
+  INSERT INTO t2(a,b) VALUES(5, 6);
+ 
+  ANALYZE;
+----
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 72 no such table: t1
+stmt 72 err 1 -1 109 no such table: t2
+stmt 109 err 1 -1 145 no such table: t2
+stmt 145 err 1 -1 181 no such table: t2
+stmt 181 ok
+==== 8.0
+
+  CREATE TABLE t1(a, b, c, PRIMARY KEY(b, c)) WITHOUT ROWID;
+  CREATE TABLE t2(a, b, c);
+----
+stmt 0 ok
+stmt 61 ok
+==== 9.0
+
+  -- Schema from Fossil 2018-08-16
+  CREATE TABLE forumpost(
+    fpid INTEGER PRIMARY KEY,
+    froot INT,
+    fprev INT,
+    firt INT,
+    fmtime REAL
+  );
+  CREATE INDEX forumthread ON forumpost(froot,fmtime);
+  CREATE TABLE blob(
+    rid INTEGER PRIMARY KEY,
+    rcvid INTEGER,
+    size INTEGER,
+    uuid TEXT UNIQUE NOT NULL,
+    content BLOB,
+    CHECK( length(uuid)>=40 AND rid>0 )
+  );
+  CREATE TABLE event(
+    type TEXT,
+    mtime DATETIME,
+    objid INTEGER PRIMARY KEY,
+    tagid INTEGER,
+    uid INTEGER REFERENCES user,
+    bgcolor TEXT,
+    euser TEXT,
+    user TEXT,
+    ecomment TEXT,
+    comment TEXT,
+    brief TEXT,
+    omtime DATETIME
+  );
+  CREATE INDEX event_i1 ON event(mtime);
+  CREATE TABLE private(rid INTEGER PRIMARY KEY);
+----
+stmt 0 ok
+stmt 156 err 1 -1 211 no such table: main.forumpost
+stmt 211 ok
+stmt 392 ok
+stmt 659 err 1 -1 700 no such table: main.event
+stmt 700 ok
+==== 9.1
+
+  WITH thread(age,duration,cnt,root,last) AS (
+    SELECT
+      julianday('now') - max(fmtime) AS age,
+      max(fmtime) - min(fmtime) AS duration,
+      sum(fprev IS NULL) AS msg_count,
+      froot,
+      (SELECT fpid FROM forumpost
+        WHERE froot=x.froot
+          AND fpid NOT IN private
+        ORDER BY fmtime DESC LIMIT 1)
+    FROM forumpost AS x
+    WHERE fpid NOT IN private  --- Ensure this table mentioned in EQP output!
+    GROUP BY froot
+    ORDER BY 1 LIMIT 26 OFFSET 5
+  )
+  SELECT
+    thread.age,
+    thread.duration,
+    thread.cnt,
+    blob.uuid,
+    substr(event.comment,instr(event.comment,':')+1)
+  FROM thread, blob, event
+  WHERE blob.rid=thread.last
+    AND event.objid=thread.last
+  ORDER BY 1;
+----
+stmt 0 err 1 -1 724 no such table: forumpost
+==== 9.2
+
+  WITH thread(age,duration,cnt,root,last) AS (
+    SELECT
+      julianday('now') - max(fmtime) AS age,
+      max(fmtime) - min(fmtime) AS duration,
+      sum(fprev IS NULL) AS msg_count,
+      froot,
+      (SELECT fpid FROM forumpost
+        WHERE froot=x.froot
+          AND fpid NOT IN private
+        ORDER BY fmtime DESC LIMIT 1)
+    FROM forumpost AS x
+    WHERE fpid NOT IN private  --- Ensure this table mentioned in EQP output!
+    GROUP BY froot
+    ORDER BY 1 LIMIT 26 OFFSET 5
+  )
+  SELECT
+    thread.age,
+    thread.duration,
+    thread.cnt,
+    blob.uuid,
+    substr(event.comment,instr(event.comment,':')+1)
+  FROM thread, blob, event
+  WHERE blob.rid=thread.last
+    AND event.objid=thread.last
+  ORDER BY 1;
+----
+stmt 0 err 1 -1 724 no such table: forumpost

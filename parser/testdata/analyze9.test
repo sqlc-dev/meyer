@@ -1,0 +1,715 @@
+==== 1.0
+
+  CREATE TABLE t1(a TEXT, b TEXT); 
+  INSERT INTO t1 VALUES('(0)', '(0)');
+  INSERT INTO t1 VALUES('(1)', '(1)');
+  INSERT INTO t1 VALUES('(2)', '(2)');
+  INSERT INTO t1 VALUES('(3)', '(3)');
+  INSERT INTO t1 VALUES('(4)', '(4)');
+  CREATE INDEX i1 ON t1(a, b);
+----
+stmt 0 ok
+stmt 35 err 1 -1 75 no such table: t1
+stmt 75 err 1 -1 114 no such table: t1
+stmt 114 err 1 -1 153 no such table: t1
+stmt 153 err 1 -1 192 no such table: t1
+stmt 192 err 1 -1 231 no such table: t1
+stmt 231 err 1 -1 262 no such table: main.t1
+==== 1.1
+
+  ANALYZE;
+----
+stmt 0 ok
+==== 1.2
+
+  SELECT tbl,idx,nEq,nLt,nDLt,test_decode(sample) FROM sqlite_stat4;
+----
+stmt 0 err 1 -1 69 no such table: sqlite_stat4
+==== 1.3
+
+    SELECT tbl,idx,nEq,nLt,nDLt,s(sample) FROM sqlite_stat4;
+----
+stmt 0 err 1 -1 61 no such table: sqlite_stat4
+==== 2.1
+
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES('some text', 14, NULL);
+  INSERT INTO t1 VALUES(22.0, NULL, x'656667');
+  CREATE INDEX i1 ON t1(a, b, c);
+  ANALYZE;
+  SELECT test_decode(sample) FROM sqlite_stat4;
+----
+stmt 0 ok
+stmt 28 err 1 -1 76 no such table: t1
+stmt 76 err 1 -1 124 no such table: t1
+stmt 124 err 1 -1 158 no such table: main.t1
+stmt 158 ok
+stmt 169 err 1 -1 217 no such table: sqlite_stat4
+==== 3.1
+
+  CREATE TABLE t2(a, b);
+  CREATE INDEX i2 ON t2(a, b);
+  BEGIN;
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: main.t2
+stmt 56 ok
+==== 3.3.1
+
+  SELECT count(*) FROM t2 GROUP BY a;
+----
+stmt 0 err 1 -1 38 no such table: t2
+==== 3.3.2
+
+  ANALYZE;
+  SELECT lindex(nEq, 0) FROM sqlite_stat4;
+----
+stmt 0 ok
+stmt 11 err 1 -1 54 no such table: sqlite_stat4
+==== 3.4
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b, c);
+  INSERT INTO t1 VALUES(1, 1, 'one-a');
+  INSERT INTO t1 VALUES(11, 1, 'one-b');
+  INSERT INTO t1 VALUES(21, 1, 'one-c');
+  INSERT INTO t1 VALUES(31, 1, 'one-d');
+  INSERT INTO t1 VALUES(41, 1, 'one-e');
+  INSERT INTO t1 VALUES(51, 1, 'one-f');
+  INSERT INTO t1 VALUES(61, 1, 'one-g');
+  INSERT INTO t1 VALUES(71, 1, 'one-h');
+  INSERT INTO t1 VALUES(81, 1, 'one-i');
+  INSERT INTO t1 VALUES(91, 1, 'one-j');
+  INSERT INTO t1 SELECT a+1,2,'two' || substr(c,4) FROM t1;
+  INSERT INTO t1 SELECT a+2,3,'three'||substr(c,4) FROM t1 WHERE c GLOB 'one-*';
+  INSERT INTO t1 SELECT a+3,4,'four'||substr(c,4) FROM t1 WHERE c GLOB 'one-*';
+  INSERT INTO t1 SELECT a+4,5,'five'||substr(c,4) FROM t1 WHERE c GLOB 'one-*';
+  INSERT INTO t1 SELECT a+5,6,'six'||substr(c,4) FROM t1 WHERE c GLOB 'one-*';	
+  CREATE INDEX t1b ON t1(b);
+  ANALYZE;
+  SELECT c FROM t1 WHERE b=3 AND a BETWEEN 30 AND 60;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 75 err 1 -1 115 no such table: t1
+stmt 115 err 1 -1 156 no such table: t1
+stmt 156 err 1 -1 197 no such table: t1
+stmt 197 err 1 -1 238 no such table: t1
+stmt 238 err 1 -1 279 no such table: t1
+stmt 279 err 1 -1 320 no such table: t1
+stmt 320 err 1 -1 361 no such table: t1
+stmt 361 err 1 -1 402 no such table: t1
+stmt 402 err 1 -1 443 no such table: t1
+stmt 443 err 1 -1 484 no such table: t1
+stmt 484 err 1 -1 544 no such table: t1
+stmt 544 err 1 -1 625 no such table: t1
+stmt 625 err 1 -1 705 no such table: t1
+stmt 705 err 1 -1 785 no such table: t1
+stmt 785 err 1 -1 864 no such table: t1
+stmt 864 err 1 -1 894 no such table: main.t1
+stmt 894 ok
+stmt 905 err 1 -1 959 no such table: t1
+==== 4.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a, b, c);
+  CREATE INDEX i1 ON t1(c, b, a);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 55 err 1 -1 89 no such table: main.t1
+==== 4.2
+
+  SELECT 
+    neq,
+    lrange(nlt, 0, 2),
+    lrange(ndlt, 0, 2),
+    lrange(test_decode(sample), 0, 2)
+    FROM sqlite_stat4
+  ORDER BY rowid LIMIT 16;
+----
+stmt 0 err 1 -1 153 no such table: sqlite_stat4
+==== 4.3
+
+  SELECT 
+    neq,
+    lrange(nlt, 0, 2),
+    lrange(ndlt, 0, 2),
+    lrange(test_decode(sample), 0, 1)
+    FROM sqlite_stat4
+  ORDER BY rowid DESC LIMIT 2;
+----
+stmt 0 err 1 -1 157 no such table: sqlite_stat4
+==== 4.4
+ SELECT count(DISTINCT c) FROM t1 WHERE c<201
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== 4.5
+ SELECT count(DISTINCT c) FROM t1 WHERE c<200
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== 4.6
+
+  SELECT count(*) FROM sqlite_stat4
+  WHERE lindex(test_decode(sample), 3) IN 
+    ('34', '68', '102', '136', '170', '204', '238', '272')
+----
+stmt 0 err 1 -1 139 no such table: sqlite_stat4
+==== 4.8
+
+  SELECT test_decode(sample) FROM sqlite_stat4;
+----
+stmt 0 err 1 -1 48 no such table: sqlite_stat4
+==== 5.1
+
+  PRAGMA encoding = 'utf-16';
+  CREATE TABLE t0(v);
+  ANALYZE;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 52 ok
+==== 6.1
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a);
+  CREATE INDEX i2 ON t1(b);
+  INSERT INTO t1 VALUES(1, 1);
+  INSERT INTO t1 VALUES(2, 2);
+  INSERT INTO t1 VALUES(3, 3);
+  INSERT INTO t1 VALUES(4, 4);
+  INSERT INTO t1 VALUES(5, 5);
+  ANALYZE;
+  PRAGMA writable_schema = 1;
+  CREATE TEMP TABLE x1 AS
+    SELECT tbl,idx,neq,nlt,ndlt,sample FROM sqlite_stat4
+    ORDER BY (rowid%5), rowid;
+  DELETE FROM sqlite_stat4;
+  INSERT INTO sqlite_stat4 SELECT * FROM x1;
+  PRAGMA writable_schema = 0;
+  ANALYZE sqlite_master;
+----
+stmt 0 ok
+stmt 25 err 1 -1 53 no such table: main.t1
+stmt 53 err 1 -1 81 no such table: main.t1
+stmt 81 err 1 -1 112 no such table: t1
+stmt 112 err 1 -1 143 no such table: t1
+stmt 143 err 1 -1 174 no such table: t1
+stmt 174 err 1 -1 205 no such table: t1
+stmt 205 err 1 -1 236 no such table: t1
+stmt 236 ok
+stmt 247 ok
+stmt 277 err 1 -1 391 no such table: sqlite_stat4
+stmt 391 err 1 -1 419 no such table: sqlite_stat4
+stmt 419 err 1 -1 464 no such table: sqlite_stat4
+stmt 464 ok
+stmt 494 ok
+==== 6.2
+
+  SELECT * FROM t1 WHERE a = 'abc';
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== 7.1
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a, b);
+  INSERT INTO t1 VALUES(1, 1);
+  INSERT INTO t1 VALUES(2, 2);
+  INSERT INTO t1 VALUES(3, 3);
+  INSERT INTO t1 VALUES(4, 4);
+  INSERT INTO t1 VALUES(5, 5);
+  ANALYZE;
+  UPDATE sqlite_stat4 SET sample = X'' WHERE rowid = 1;
+  ANALYZE sqlite_master;
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: main.t1
+stmt 56 err 1 -1 87 no such table: t1
+stmt 87 err 1 -1 118 no such table: t1
+stmt 118 err 1 -1 149 no such table: t1
+stmt 149 err 1 -1 180 no such table: t1
+stmt 180 err 1 -1 211 no such table: t1
+stmt 211 ok
+stmt 222 err 1 -1 278 no such table: sqlite_stat4
+stmt 278 ok
+==== 7.2
+
+  UPDATE sqlite_stat4 SET sample = X'FFFF';
+  ANALYZE sqlite_master;
+  SELECT * FROM t1 WHERE a = 1;
+----
+stmt 0 err 1 -1 44 no such table: sqlite_stat4
+stmt 44 ok
+stmt 69 err 1 -1 101 no such table: t1
+==== 7.3
+
+  ANALYZE;
+  UPDATE sqlite_stat4 SET neq = '0 0 0';
+  ANALYZE sqlite_master;
+  SELECT * FROM t1 WHERE a = 1;
+----
+stmt 0 ok
+stmt 11 err 1 -1 52 no such table: sqlite_stat4
+stmt 52 ok
+stmt 77 err 1 -1 109 no such table: t1
+==== 7.4
+
+  ANALYZE;
+  UPDATE sqlite_stat4 SET ndlt = '0 0 0';
+  ANALYZE sqlite_master;
+  SELECT * FROM t1 WHERE a = 3;
+----
+stmt 0 ok
+stmt 11 err 1 -1 53 no such table: sqlite_stat4
+stmt 53 ok
+stmt 78 err 1 -1 110 no such table: t1
+==== 7.5
+
+  ANALYZE;
+  UPDATE sqlite_stat4 SET nlt = '0 0 0';
+  ANALYZE sqlite_master;
+  SELECT * FROM t1 WHERE a = 5;
+----
+stmt 0 ok
+stmt 11 err 1 -1 52 no such table: sqlite_stat4
+stmt 52 ok
+stmt 77 err 1 -1 109 no such table: t1
+==== 8.1
+
+  CREATE TABLE t1(x TEXT);
+  CREATE INDEX i1 ON t1(x);
+  INSERT INTO t1 VALUES('1');
+  INSERT INTO t1 VALUES('2');
+  INSERT INTO t1 VALUES('3');
+  INSERT INTO t1 VALUES('4');
+  ANALYZE;
+----
+stmt 0 ok
+stmt 27 err 1 -1 55 no such table: main.t1
+stmt 55 err 1 -1 85 no such table: t1
+stmt 85 err 1 -1 115 no such table: t1
+stmt 115 err 1 -1 145 no such table: t1
+stmt 145 err 1 -1 175 no such table: t1
+stmt 175 ok
+==== 8.2
+
+  SELECT * FROM t1 WHERE x = 3;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== 9.1
+
+  CREATE TABLE t1(a, b, c, d, e);
+  CREATE INDEX i1 ON t1(a, b, c, d);
+  CREATE INDEX i2 ON t1(e);
+----
+stmt 0 ok
+stmt 34 err 1 -1 71 no such table: main.t1
+stmt 71 err 1 -1 99 no such table: main.t1
+==== 9.3.1
+
+  SELECT * FROM t1 WHERE a='x' AND b='y' AND c='z' AND d=101 AND e=5;
+----
+stmt 0 err 1 -1 70 no such table: t1
+==== 9.3.2
+
+  SELECT * FROM t1 WHERE a='x' AND b='y' AND c='z' AND d=99 AND e=5;
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== 10.1.1
+
+  DROP TABLE IF EXISTS t3;
+  CREATE TABLE t3(a, b);
+  CREATE INDEX t3a ON t3(a);
+  CREATE INDEX t3b ON t3(b);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 52 err 1 -1 81 no such table: main.t3
+stmt 81 err 1 -1 110 no such table: main.t3
+==== 10.1.3
+
+  SELECT * FROM t3 WHERE a IS NULL AND b = 2
+----
+stmt 0 err 1 -1 46 no such table: t3
+==== 10.1.4
+
+  SELECT * FROM t3 WHERE a IS NOT NULL AND b = 2
+----
+stmt 0 err 1 -1 50 no such table: t3
+==== 10.2.1
+
+  DROP TABLE IF EXISTS t3;
+  CREATE TABLE t3(x, a, b);
+  CREATE INDEX t3a ON t3(x, a);
+  CREATE INDEX t3b ON t3(x, b);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 55 err 1 -1 87 no such table: main.t3
+stmt 87 err 1 -1 119 no such table: main.t3
+==== 10.2.3
+
+  SELECT * FROM t3 WHERE x = 'xyz' AND a IS NULL AND b = 2
+----
+stmt 0 err 1 -1 60 no such table: t3
+==== 10.2.4
+
+  SELECT * FROM t3 WHERE x = 'xyz' AND a IS NOT NULL AND b = 2
+----
+stmt 0 err 1 -1 64 no such table: t3
+==== analyze9-generated
+
+    SELECT * FROM t4 WHERE a = 'def' AND b = 3;
+----
+stmt 0 err 1 -1 48 no such table: t4
+==== analyze9-generated.dup1
+
+    SELECT * FROM t4 WHERE x=X'abcdef' AND a = 'def' AND b = 3;
+----
+stmt 0 err 1 -1 64 no such table: t4
+==== 13.2.1
+
+  SELECT * FROM t1 WHERE a='abc' AND rowid<15 AND b<12
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== 13.2.2
+
+  SELECT * FROM t1 WHERE a='abc' AND rowid<'15' AND b<12
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 13.3.1
+
+  SELECT * FROM t1 WHERE a='abc' AND rowid<100 AND b<12
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== 13.3.2
+
+  SELECT * FROM t1 WHERE a='abc' AND rowid<'100' AND b<12
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== 13.2.1.dup1
+
+  SELECT * FROM t1 WHERE a='ott' AND b<10 AND c=1
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 13.2.2.dup1
+
+  SELECT * FROM t1 WHERE a='ott' AND b<'10' AND c=1
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== 14.4.3
+
+  SELECT lrange(test_decode(sample), 0, 1) AS s FROM sqlite_stat4
+  WHERE lindex(s, 1)=='1' ORDER BY rowid
+----
+stmt 0 err 1 -1 108 no such table: sqlite_stat4
+==== 15.1
+
+  CREATE TABLE x1(a, b, UNIQUE(a, b));
+  INSERT INTO x1 VALUES(1, 2);
+  INSERT INTO x1 VALUES(3, 4);
+  INSERT INTO x1 VALUES(5, 6);
+  ANALYZE;
+  INSERT INTO sqlite_stat4 VALUES(NULL, NULL, NULL, NULL, NULL, NULL);
+----
+stmt 0 ok
+stmt 39 err 1 -1 70 no such table: x1
+stmt 70 err 1 -1 101 no such table: x1
+stmt 101 err 1 -1 132 no such table: x1
+stmt 132 ok
+stmt 143 err 1 -1 214 no such table: sqlite_stat4
+==== 15.2
+ SELECT * FROM x1
+----
+stmt 0 err 1 -1 18 no such table: x1
+==== 15.3
+
+  INSERT INTO sqlite_stat4 VALUES(42, 42, 42, 42, 42, 42);
+----
+stmt 0 err 1 -1 59 no such table: sqlite_stat4
+==== 15.4
+ SELECT * FROM x1
+----
+stmt 0 err 1 -1 18 no such table: x1
+==== 15.5
+
+  UPDATE sqlite_stat1 SET stat = NULL;
+----
+stmt 0 err 1 -1 39 no such table: sqlite_stat1
+==== 15.6
+ SELECT * FROM x1
+----
+stmt 0 err 1 -1 18 no such table: x1
+==== 15.7
+
+  ANALYZE;
+  UPDATE sqlite_stat1 SET tbl = 'no such tbl';
+----
+stmt 0 ok
+stmt 11 err 1 -1 58 no such table: sqlite_stat1
+==== 15.8
+ SELECT * FROM x1
+----
+stmt 0 err 1 -1 18 no such table: x1
+==== 15.9
+
+  ANALYZE;
+  UPDATE sqlite_stat4 SET neq = NULL, nlt=NULL, ndlt=NULL;
+----
+stmt 0 ok
+stmt 11 err 1 -1 70 no such table: sqlite_stat4
+==== 15.10
+ SELECT * FROM x1
+----
+stmt 0 err 1 -1 18 no such table: x1
+==== 15.11
+
+  ANALYZE;
+  UPDATE sqlite_stat1 SET stat = stat || ' unordered';
+----
+stmt 0 ok
+stmt 11 err 1 -1 66 no such table: sqlite_stat1
+==== 15.12
+ SELECT * FROM x1
+----
+stmt 0 err 1 -1 18 no such table: x1
+==== 17.1.2
+
+  ANALYZE temp.t1;
+----
+stmt 0 err 1 -1 19 no such table: temp.t1
+==== 17.2
+
+  SELECT * FROM t1 WHERE d IS NOT NULL AND a=0 AND b=10 AND c=10;
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== 17.3
+
+  SELECT * FROM t1 WHERE d IS NOT NULL AND a=0 AND b=0 AND c=10;
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== 17.4
+
+  CREATE INDEX i2 ON t1(c, d);
+  ANALYZE main.i2;
+----
+stmt 0 err 1 -1 31 no such table: main.t1
+stmt 31 err 1 -1 50 no such table: main.i2
+==== 17.5
+
+  SELECT * FROM t1 WHERE d IS NOT NULL AND a=0 AND b=10 AND c=10;
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== 17.6
+
+  SELECT * FROM t1 WHERE d IS NOT NULL AND a=0 AND b=0 AND c=10;
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== 20.2
+ ANALYZE
+----
+stmt 0 ok
+==== 21.0
+
+  CREATE TABLE t2(a, b);
+  CREATE INDEX i2 ON t2(a);
+----
+stmt 0 ok
+stmt 25 err 1 -1 53 no such table: main.t2
+==== 21.2
+
+  SELECT * FROM t2 WHERE a='one' AND rowid < 10
+----
+stmt 0 err 1 -1 49 no such table: t2
+==== 21.3
+
+  SELECT * FROM t2 WHERE a='one' AND rowid < 50
+----
+stmt 0 err 1 -1 49 no such table: t2
+==== 22.0
+
+  CREATE TABLE t3(a, b, c, d, PRIMARY KEY(a, b)) WITHOUT ROWID;
+  SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 64 err 1 -1 84 no such table: t3
+==== 22.1
+
+  WITH r(x) AS (
+    SELECT 1
+    UNION ALL
+    SELECT x+1 FROM r WHERE x<=100
+  )
+
+  INSERT INTO t3 SELECT
+    CASE WHEN (x>45 AND x<96) THEN 'B' ELSE 'A' END,  /* Column "a" */
+    x,                                                /* Column "b" */
+    CASE WHEN (x<51) THEN 'one' ELSE 'two' END,       /* Column "c" */
+    x                                                 /* Column "d" */
+  FROM r;
+
+  CREATE INDEX i3 ON t3(c);
+  CREATE INDEX i4 ON t3(d);
+  ANALYZE;
+----
+stmt 0 err 1 -1 402 no such table: t3
+stmt 402 err 1 -1 431 no such table: main.t3
+stmt 431 err 1 -1 459 no such table: main.t3
+stmt 459 ok
+==== 23.0
+
+  CREATE TABLE t4(
+    a COLLATE nocase, b, c, 
+    d, e, f, 
+    PRIMARY KEY(c, b, a)
+  ) WITHOUT ROWID;
+  CREATE INDEX i41 ON t4(e);
+  CREATE INDEX i42 ON t4(f);
+
+  WITH data(a, b, c, d, e, f) AS (
+    SELECT int_to_char(0), 'xyz', 'zyx', '*', 0, 0
+    UNION ALL
+    SELECT 
+      int_to_char(f+1), b, c, d, (e+1) % 2, f+1
+    FROM data WHERE f<1024
+  )
+  INSERT INTO t4 SELECT a, b, c, d, e, f FROM data;
+  ANALYZE;
+----
+stmt 0 ok
+stmt 106 err 1 -1 135 no such table: main.t4
+stmt 135 err 1 -1 164 no such table: main.t4
+stmt 164 err 1 -1 408 no such table: t4
+stmt 408 ok
+==== 23.1
+
+  SELECT * FROM t4 WHERE 
+    (e=1 AND b='xyz' AND c='zyx' AND a<'AEA') AND f<300
+  -- Formerly used index i41.  But i41 is not a covering index whereas
+  -- the PRIMARY KEY is a covering index, and so as of 2017-10-15, the
+  -- PRIMARY KEY is preferred.
+----
+stmt 0 err 1 -1 256 no such table: t4
+==== 23.2
+
+  SELECT * FROM t4 WHERE 
+    (e=1 AND b='xyz' AND c='zyx' AND a<'JJJ') AND f<300
+----
+stmt 0 err 1 -1 83 no such table: t4
+==== 24.0
+
+  CREATE TABLE t5(c, d, b, e, a, PRIMARY KEY(a, b, c)) WITHOUT ROWID;
+  WITH data(a, b, c, d, e) AS (
+    SELECT 'z', 'y', 0, 0, 0
+    UNION ALL
+    SELECT 
+      a, CASE WHEN b='y' THEN 'n' ELSE 'y' END, c+1, e/250, e+1 
+    FROM data
+    WHERE e<1000
+  )
+  INSERT INTO t5(a, b, c, d, e) SELECT * FROM data;
+  CREATE INDEX t5d ON t5(d);
+  CREATE INDEX t5e ON t5(e);
+  ANALYZE;
+----
+stmt 0 ok
+stmt 70 err 1 -1 309 no such table: t5
+stmt 309 err 1 -1 338 no such table: main.t5
+stmt 338 err 1 -1 367 no such table: main.t5
+stmt 367 ok
+==== 25.1
+
+    CREATE TABLE t6(a, b);
+    WITH ints(i,j) AS (
+      SELECT 1,1 UNION ALL SELECT i+1,j+1 FROM ints WHERE i<100
+    ) INSERT INTO t6 SELECT * FROM ints;
+    CREATE INDEX aa ON t6(a);
+    CREATE INDEX bb ON t6(b);
+    ANALYZE;
+----
+stmt 0 ok
+stmt 27 err 1 -1 156 no such table: t6
+stmt 156 err 1 -1 186 no such table: main.t6
+stmt 186 err 1 -1 216 no such table: main.t6
+stmt 216 ok
+==== 25.2.1
+ SELECT * FROM t6 WHERE a<30 AND b<?
+----
+stmt 0 err 1 -1 37 no such table: t6
+==== 25.2.2
+ SELECT * FROM t6 WHERE a<20 AND b<?
+----
+stmt 0 err 1 -1 37 no such table: t6
+==== 25.3.1
+ 
+    SELECT * FROM t6 WHERE a BETWEEN 5 AND 10 AND b BETWEEN ? AND ?
+----
+stmt 0 err 1 -1 70 no such table: t6
+==== 25.4.1
+ 
+    SELECT * FROM t6 WHERE a < 10 AND (b BETWEEN ? AND 60)
+----
+stmt 0 err 1 -1 61 no such table: t6
+==== 25.4.2
+ 
+    SELECT * FROM t6 WHERE a < 20 AND (b BETWEEN ? AND 60)
+----
+stmt 0 err 1 -1 61 no such table: t6
+==== 26.1.2
+
+  SELECT count(*) FROM t1 WHERE x = 10000 AND y < 50;
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== 26.1.3
+
+  SELECT count(*) FROM t1 WHERE z = 444;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== 26.1.4
+
+  SELECT * FROM t1 WHERE x = 10000 AND y < 50 AND z = 444;
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== 26.2.1
+
+  BEGIN;
+    CREATE TABLE t1(x, y, z);
+    CREATE INDEX i1 ON t1(x, y);
+    CREATE INDEX i2 ON t1(z);
+  
+    WITH 
+    cnt(y) AS (SELECT 0 UNION ALL SELECT y+1 FROM cnt WHERE y<99),
+    letters(x) AS (
+      SELECT 'A' UNION SELECT 'B' UNION SELECT 'C' UNION SELECT 'D'
+    )
+    INSERT INTO t1(x, y) SELECT x, y FROM letters, cnt;
+  
+    WITH
+    letters(x) AS (
+      SELECT 'A' UNION SELECT 'B' UNION SELECT 'C' UNION SELECT 'D'
+    )
+    INSERT INTO t1(x, y) SELECT x, 70 FROM letters;
+  
+    WITH
+    cnt(i) AS (SELECT 0 UNION ALL SELECT i+1 FROM cnt WHERE i<9999)
+    INSERT INTO t1(x, y) SELECT i, i FROM cnt;
+  
+    UPDATE t1 SET z = (rowid / 95);
+    ANALYZE;
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 39 err 1 -1 72 no such table: main.t1
+stmt 72 err 1 -1 102 no such table: main.t1
+stmt 102 err 1 -1 332 no such table: t1
+stmt 332 err 1 -1 490 no such table: t1
+stmt 490 err 1 -1 617 no such table: t1
+stmt 617 err 1 -1 656 no such table: t1
+stmt 656 ok
+stmt 669 ok
+==== 26.2.2
+
+  SELECT * FROM t1 WHERE x='B' AND y>25 AND z=?;
+----
+stmt 0 err 1 -1 49 no such table: t1

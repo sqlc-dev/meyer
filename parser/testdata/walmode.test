@@ -1,0 +1,222 @@
+==== walmode-0.1
+ PRAGMA journal_mode = wal
+----
+stmt 0 ok
+==== walmode-0.2
+ PRAGMA main.journal_mode = wal
+----
+stmt 0 ok
+==== walmode-0.3
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walmode-4.3
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== walmode-5.1.2
+ PRAGMA main.journal_mode = wal
+----
+stmt 0 ok
+==== walmode-5.1.3
+
+    BEGIN;
+      CREATE TABLE t1(a, b);
+      INSERT INTO t1 VALUES(1, 2);
+    COMMIT;
+    SELECT * FROM t1;
+    PRAGMA main.journal_mode;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 40 err 1 -1 75 no such table: t1
+stmt 75 ok
+stmt 87 err 1 -1 109 no such table: t1
+stmt 109 ok
+==== walmode-5.1.4
+ PRAGMA main.journal_mode = wal
+----
+stmt 0 ok
+==== walmode-5.1.5
+ 
+    INSERT INTO t1 VALUES(3, 4);
+    SELECT * FROM t1;
+    PRAGMA main.journal_mode;
+----
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 err 1 -1 56 no such table: t1
+stmt 56 ok
+==== walmode-5.2.2
+ PRAGMA main.journal_mode = wal
+----
+stmt 0 ok
+==== walmode-5.2.3
+
+    BEGIN;
+      CREATE TABLE t1(a, b);
+      INSERT INTO t1 VALUES(1, 2);
+    COMMIT;
+    SELECT * FROM t1;
+    PRAGMA main.journal_mode;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 40 err 1 -1 75 no such table: t1
+stmt 75 ok
+stmt 87 err 1 -1 109 no such table: t1
+stmt 109 ok
+==== walmode-5.2.4
+ PRAGMA main.journal_mode = wal
+----
+stmt 0 ok
+==== walmode-5.2.5
+ 
+    INSERT INTO t1 VALUES(3, 4);
+    SELECT * FROM t1;
+    PRAGMA main.journal_mode;
+----
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 err 1 -1 56 no such table: t1
+stmt 56 ok
+==== walmode-5.3.2
+ PRAGMA temp.journal_mode = wal
+----
+stmt 0 ok
+==== walmode-5.3.3
+
+    BEGIN;
+      CREATE TEMP TABLE t1(a, b);
+      INSERT INTO t1 VALUES(1, 2);
+    COMMIT;
+    SELECT * FROM t1;
+    PRAGMA temp.journal_mode;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 45 err 1 -1 80 no such table: t1
+stmt 80 ok
+stmt 92 err 1 -1 114 no such table: t1
+stmt 114 ok
+==== walmode-5.3.4
+ PRAGMA temp.journal_mode = wal
+----
+stmt 0 ok
+==== walmode-5.3.5
+ 
+    INSERT INTO t1 VALUES(3, 4);
+    SELECT * FROM t1;
+    PRAGMA temp.journal_mode;
+----
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 err 1 -1 56 no such table: t1
+stmt 56 ok
+==== walmode-8.1
+
+  CREATE TABLE t1(a, b);
+  PRAGMA journal_mode = WAL;
+  ATTACH 'test.db2' AS two;
+  CREATE TABLE two.t2(a, b);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 54 ok
+stmt 82 err 1 98 105 unknown database two
+==== walmode-8.2
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walmode-8.3
+ PRAGMA two.journal_mode
+----
+stmt 0 err 1 8 25 unknown database two
+==== walmode-8.4
+ PRAGMA two.journal_mode = DELETE
+----
+stmt 0 err 1 8 34 unknown database two
+==== walmode-8.5
+ ATTACH 'test.db2' AS two
+----
+stmt 0 ok
+==== walmode-8.6
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walmode-8.7
+ PRAGMA two.journal_mode
+----
+stmt 0 err 1 8 25 unknown database two
+==== walmode-8.8
+ INSERT INTO two.t2 DEFAULT VALUES
+----
+stmt 0 err 1 -1 35 no such table: two.t2
+==== walmode-8.9
+ PRAGMA two.journal_mode
+----
+stmt 0 err 1 8 25 unknown database two
+==== walmode-8.10
+ INSERT INTO t1 DEFAULT VALUES
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== walmode-8.11
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walmode-8.12
+ PRAGMA journal_mode
+----
+stmt 0 ok
+==== walmode-8.x1
+
+     PRAGMA two.journal_mode=WAL;
+     PRAGMA two.journal_mode;
+----
+stmt 0 err 1 13 34 unknown database two
+stmt 34 err 1 47 64 unknown database two
+==== walmode-8.13
+ PRAGMA journal_mode = WAL
+----
+stmt 0 ok
+==== walmode-8.14
+ ATTACH 'test.db2' AS two
+----
+stmt 0 ok
+==== walmode-8.15
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walmode-8.16
+ PRAGMA two.journal_mode
+----
+stmt 0 err 1 8 25 unknown database two
+==== walmode-8.17
+ INSERT INTO two.t2 DEFAULT VALUES
+----
+stmt 0 err 1 -1 35 no such table: two.t2
+==== walmode-8.18
+ PRAGMA two.journal_mode
+----
+stmt 0 err 1 8 25 unknown database two
+==== walmode-8.20
+ PRAGMA journal_mode = DELETE
+----
+stmt 0 ok
+==== walmode-8.21
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walmode-8.22
+ PRAGMA two.journal_mode
+----
+stmt 0 err 1 8 25 unknown database two
+==== walmode-8.21.dup1
+ PRAGMA journal_mode = WAL
+----
+stmt 0 ok
+==== walmode-8.21.dup2
+ PRAGMA main.journal_mode
+----
+stmt 0 ok
+==== walmode-8.22.dup1
+ PRAGMA two.journal_mode
+----
+stmt 0 err 1 8 25 unknown database two

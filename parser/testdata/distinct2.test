@@ -1,0 +1,465 @@
+==== 100
+
+  CREATE TABLE t1(x INTEGER PRIMARY KEY);
+  INSERT INTO t1 VALUES(0),(1),(2);
+  CREATE TABLE t2 AS
+     SELECT DISTINCT a.x AS aa, b.x AS bb
+      FROM t1 a, t1 b;
+  SELECT *, '|' FROM t2 ORDER BY aa, bb;
+----
+stmt 0 ok
+stmt 42 err 1 -1 78 no such table: t1
+stmt 78 err 1 -1 164 no such table: t1
+stmt 164 err 1 -1 205 no such table: t2
+==== 110
+
+  DROP TABLE t2;
+  CREATE TABLE t2 AS
+     SELECT DISTINCT a.x AS aa, b.x AS bb
+       FROM t1 a, t1 b
+      WHERE a.x IN t1 AND b.x IN t1;
+  SELECT *, '|' FROM t2 ORDER BY aa, bb;
+----
+stmt 0 err 1 -1 17 no such table: t2
+stmt 17 err 1 -1 140 no such table: t1
+stmt 140 err 1 -1 181 no such table: t2
+==== 120
+
+  CREATE TABLE t102 (i0 TEXT UNIQUE NOT NULL);
+  INSERT INTO t102 VALUES ('0'),('1'),('2');
+  DROP TABLE t2;
+  CREATE TABLE t2 AS
+    SELECT DISTINCT * 
+    FROM t102 AS t0 
+    JOIN t102 AS t4 ON (t2.i0 IN t102)
+    NATURAL JOIN t102 AS t3
+    JOIN t102 AS t1 ON (t0.i0 IN t102)
+    JOIN t102 AS t2 ON (t2.i0=+t0.i0 OR (t0.i0<>500 AND t2.i0=t1.i0));
+  SELECT *, '|' FROM t2 ORDER BY 1, 2, 3, 4, 5;
+----
+stmt 0 ok
+stmt 47 err 1 -1 92 no such table: t102
+stmt 92 err 1 -1 109 no such table: t2
+stmt 109 err 1 -1 351 no such table: t102
+stmt 351 err 1 -1 399 no such table: t2
+==== 400
+
+  CREATE TABLE t4(a,b,c,d,e,f,g,h,i,j);
+  INSERT INTO t4 VALUES(0,1,2,3,4,5,6,7,8,9);
+  INSERT INTO t4 SELECT * FROM t4;
+  INSERT INTO t4 SELECT * FROM t4;
+  CREATE INDEX t4x ON t4(c,d,e);
+  SELECT DISTINCT a,b,c FROM t4 WHERE a=0 AND b=1;
+----
+stmt 0 ok
+stmt 40 err 1 -1 86 no such table: t4
+stmt 86 err 1 -1 121 no such table: t4
+stmt 121 err 1 -1 156 no such table: t4
+stmt 156 err 1 -1 189 no such table: main.t4
+stmt 189 err 1 -1 240 no such table: t4
+==== 410
+
+  SELECT DISTINCT a,b,c,d FROM t4 WHERE a=0 AND b=1;
+----
+stmt 0 err 1 -1 53 no such table: t4
+==== 411
+
+  SELECT DISTINCT d,a,b,c FROM t4 WHERE a=0 AND b=1;
+----
+stmt 0 err 1 -1 53 no such table: t4
+==== 420
+
+  SELECT DISTINCT a,b,c,d,e FROM t4 WHERE a=0 AND b=1;
+----
+stmt 0 err 1 -1 55 no such table: t4
+==== 430
+
+  SELECT DISTINCT a,b,c,d,e,f FROM t4 WHERE a=0 AND b=1;
+----
+stmt 0 err 1 -1 57 no such table: t4
+==== 500
+
+  CREATE TABLE t5(a INT, b INT);
+  CREATE UNIQUE INDEX t5x ON t5(a+b);
+  INSERT INTO t5(a,b) VALUES(0,0),(1,0),(1,1),(0,3);
+  CREATE TEMP TABLE out AS SELECT DISTINCT a+b FROM t5;
+  SELECT * FROM out ORDER BY 1;
+----
+stmt 0 ok
+stmt 33 err 1 -1 71 no such table: main.t5
+stmt 71 err 1 -1 124 no such table: t5
+stmt 124 err 1 -1 180 no such table: t5
+stmt 180 err 1 -1 212 no such table: out
+==== 600
+
+  CREATE TABLE t6a(x INTEGER PRIMARY KEY);
+  INSERT INTO t6a VALUES(1);
+  CREATE TABLE t6b(y INTEGER PRIMARY KEY);
+  INSERT INTO t6b VALUES(2),(3);
+  SELECT DISTINCT x, x FROM t6a, t6b;
+----
+stmt 0 ok
+stmt 43 err 1 -1 72 no such table: t6a
+stmt 72 ok
+stmt 115 err 1 -1 148 no such table: t6b
+stmt 148 err 1 -1 186 no such table: t6a
+==== 700
+
+  CREATE TABLE t7(a, b, c);
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE (i+1)<200
+  )
+  INSERT INTO t7 SELECT i/100, i/50, i FROM s;
+----
+stmt 0 ok
+stmt 28 err 1 -1 153 no such table: t7
+==== 710
+
+  SELECT DISTINCT a, b FROM t7;
+----
+stmt 0 err 1 -1 32 no such table: t7
+==== 720
+
+  SELECT DISTINCT a, b+1 FROM t7;
+----
+stmt 0 err 1 -1 34 no such table: t7
+==== 730
+
+  CREATE INDEX i7 ON t7(a, b+1);
+  ANALYZE;
+  SELECT DISTINCT a, b+1 FROM t7;
+----
+stmt 0 err 1 -1 33 no such table: main.t7
+stmt 33 ok
+stmt 44 err 1 -1 78 no such table: t7
+==== 800
+
+  CREATE TABLE t8(a, b, c);
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE (i+1)<100
+  )
+  INSERT INTO t8 SELECT i/40, i/20, i/40 FROM s;
+----
+stmt 0 ok
+stmt 28 err 1 -1 155 no such table: t8
+==== 820
+
+  SELECT DISTINCT a, b, c FROM t8;
+----
+stmt 0 err 1 -1 35 no such table: t8
+==== 820.dup1
+
+  SELECT DISTINCT a, b, c FROM t8 WHERE b=3;
+----
+stmt 0 err 1 -1 45 no such table: t8
+==== 830
+
+  CREATE INDEX i8 ON t8(a, c);
+  ANALYZE;
+  SELECT DISTINCT a, b, c FROM t8 WHERE b=3;
+----
+stmt 0 err 1 -1 31 no such table: main.t8
+stmt 31 ok
+stmt 42 err 1 -1 87 no such table: t8
+==== 900
+
+  CREATE TABLE t9(v);
+  INSERT INTO t9 VALUES 
+    ('abcd'), ('Abcd'), ('aBcd'), ('ABcd'), ('abCd'), ('AbCd'), ('aBCd'), 
+    ('ABCd'), ('abcD'), ('AbcD'), ('aBcD'), ('ABcD'), ('abCD'), ('AbCD'), 
+    ('aBCD'), ('ABCD'),
+    ('wxyz'), ('Wxyz'), ('wXyz'), ('WXyz'), ('wxYz'), ('WxYz'), ('wXYz'), 
+    ('WXYz'), ('wxyZ'), ('WxyZ'), ('wXyZ'), ('WXyZ'), ('wxYZ'), ('WxYZ'), 
+    ('wXYZ'), ('WXYZ');
+----
+stmt 0 ok
+stmt 22 err 1 -1 395 no such table: t9
+==== 910
+
+  SELECT DISTINCT v COLLATE NOCASE, v FROM t9 ORDER BY +v;
+----
+stmt 0 err 1 -1 59 no such table: t9
+==== 920
+
+  CREATE INDEX i9 ON t9(v COLLATE NOCASE, v);
+  ANALYZE;
+
+  SELECT DISTINCT v COLLATE NOCASE, v FROM t9 ORDER BY +v;
+----
+stmt 0 err 1 -1 46 no such table: main.t9
+stmt 46 ok
+stmt 57 err 1 -1 117 no such table: t9
+==== 1000
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b INTEGER);
+  CREATE INDEX t1b ON t1(b);
+  CREATE TABLE t2(x INTEGER PRIMARY KEY, y INTEGER);
+  CREATE INDEX t2y ON t2(y);
+  WITH RECURSIVE c(x) AS (VALUES(0) UNION ALL SELECT x+1 FROM c WHERE x<49)
+    INSERT INTO t1(b) SELECT x/10 - 1 FROM c;
+  WITH RECURSIVE c(x) AS (VALUES(-1) UNION ALL SELECT x+1 FROM c WHERE x<19)
+    INSERT INTO t2(x,y) SELECT x, 1 FROM c;
+  SELECT DISTINCT y FROM t1, t2 WHERE b=x AND b<>-1;
+  ANALYZE;
+  SELECT DISTINCT y FROM t1, t2 WHERE b=x AND b<>-1;
+----
+stmt 0 ok
+stmt 53 err 1 -1 82 no such table: main.t1
+stmt 82 ok
+stmt 135 err 1 -1 164 no such table: main.t2
+stmt 164 err 1 -1 286 no such table: t1
+stmt 286 err 1 -1 407 no such table: t2
+stmt 407 err 1 -1 460 no such table: t1
+stmt 460 ok
+stmt 471 err 1 -1 524 no such table: t1
+==== 1010
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b INTEGER);
+  CREATE INDEX t1b ON t1(b);
+  CREATE TABLE t2(x INTEGER PRIMARY KEY, y INTEGER);
+  CREATE INDEX t2y ON t2(y);
+  WITH RECURSIVE c(x) AS (VALUES(0) UNION ALL SELECT x+1 FROM c WHERE x<49)
+    INSERT INTO t1(b) SELECT -(x/10 - 1) FROM c;
+  WITH RECURSIVE c(x) AS (VALUES(-1) UNION ALL SELECT x+1 FROM c WHERE x<19)
+    INSERT INTO t2(x,y) SELECT -x, 1 FROM c;
+  SELECT DISTINCT y FROM t1, t2 WHERE b=x AND b<>1 ORDER BY y DESC;
+  ANALYZE;
+  SELECT DISTINCT y FROM t1, t2 WHERE b=x AND b<>1 ORDER BY y DESC;
+----
+stmt 0 ok
+stmt 53 err 1 -1 82 no such table: main.t1
+stmt 82 ok
+stmt 135 err 1 -1 164 no such table: main.t2
+stmt 164 err 1 -1 289 no such table: t1
+stmt 289 err 1 -1 411 no such table: t2
+stmt 411 err 1 -1 479 no such table: t1
+stmt 479 ok
+stmt 490 err 1 -1 558 no such table: t1
+==== 1020
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX t1a ON t1(a, b);
+  -- Lots of rows of (1, 'no'), followed by a single (1, 'yes').
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<100)
+    INSERT INTO t1(a, b) SELECT 1, 'no' FROM c;
+  INSERT INTO t1(a, b) VALUES(1, 'yes');
+  CREATE TABLE t2(x PRIMARY KEY);
+  INSERT INTO t2 VALUES('yes');
+  SELECT DISTINCT a FROM t1, t2 WHERE x=b;
+  ANALYZE;
+  SELECT DISTINCT a FROM t1, t2 WHERE x=b;
+----
+stmt 0 ok
+stmt 25 err 1 -1 57 no such table: main.t1
+stmt 57 err 1 -1 247 no such table: t1
+stmt 247 err 1 -1 288 no such table: t1
+stmt 288 ok
+stmt 322 err 1 -1 354 no such table: t2
+stmt 354 err 1 -1 397 no such table: t1
+stmt 397 ok
+stmt 408 err 1 -1 451 no such table: t1
+==== 2000
+
+  CREATE TABLE t0 (c0, c1, c2, PRIMARY KEY (c0, c1));
+  CREATE TABLE t1 (c2);
+  INSERT INTO t0(c2) VALUES (0),(1),(3),(4),(5),(6),(7),(8),(9),(10),(11);
+  INSERT INTO t0(c1) VALUES ('a');
+  INSERT INTO t1(c2) VALUES (0);
+----
+stmt 0 ok
+stmt 54 ok
+stmt 78 err 1 -1 153 no such table: t0
+stmt 153 err 1 -1 188 no such table: t0
+stmt 188 err 1 -1 221 no such table: t1
+==== 2010
+
+  SELECT DISTINCT t0.c0, t1._rowid_, t0.c1 FROM t1 CROSS JOIN t0 ORDER BY t0.c0;
+----
+stmt 0 err 1 -1 81 no such table: t1
+==== 1.2
+
+  ANALYZE;
+----
+stmt 0 ok
+==== 2020
+
+  SELECT DISTINCT t0.c0, t1._rowid_, t0.c1 FROM t1 CROSS JOIN t0 ORDER BY t0.c0;
+----
+stmt 0 err 1 -1 81 no such table: t1
+==== 2030
+
+  CREATE TABLE t2(a, b, c);
+  CREATE INDEX t2ab ON t2(a, b);
+  
+  WITH c(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM c WHERE i<64)
+    INSERT INTO t2 SELECT 'one', i%2, 'one' FROM c;
+
+  WITH c(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM c WHERE i<64)
+    INSERT INTO t2 SELECT 'two', i%2, 'two' FROM c;
+
+  CREATE TABLE t3(x INTEGER PRIMARY KEY);
+  INSERT INTO t3 VALUES(1);
+
+  ANALYZE;
+----
+stmt 0 ok
+stmt 28 err 1 -1 61 no such table: main.t2
+stmt 61 err 1 -1 181 no such table: t2
+stmt 181 err 1 -1 299 no such table: t2
+stmt 299 ok
+stmt 342 err 1 -1 370 no such table: t3
+stmt 370 ok
+==== 2040
+
+  SELECT DISTINCT a, b, x FROM t3 CROSS JOIN t2 ORDER BY a, +b;
+----
+stmt 0 err 1 -1 64 no such table: t3
+==== 3000
+
+  CREATE TABLE t0 (c0, c1 NOT NULL DEFAULT 1, c2, PRIMARY KEY (c0, c1));
+  INSERT INTO t0(c2) VALUES (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL), (NULL);
+  INSERT INTO t0(c2) VALUES('a');
+----
+stmt 0 ok
+stmt 73 err 1 -1 189 no such table: t0
+stmt 189 err 1 -1 223 no such table: t0
+==== 3010
+
+  SELECT DISTINCT * FROM t0 WHERE NULL IS t0.c0;
+----
+stmt 0 err 1 -1 49 no such table: t0
+==== 3020
+
+  ANALYZE;
+----
+stmt 0 ok
+==== 3030
+
+  SELECT DISTINCT * FROM t0 WHERE NULL IS c0;
+----
+stmt 0 err 1 -1 46 no such table: t0
+==== 4010
+
+  CREATE TABLE t1(a, b COLLATE RTRIM);
+  INSERT INTO t1 VALUES(1, ''), (2, ' '), (3, '  ');
+----
+stmt 0 ok
+stmt 39 err 1 -1 92 no such table: t1
+==== 4020
+
+  SELECT b FROM t1 UNION SELECT 1;
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== 5010
+
+  CREATE TABLE cnt(a);
+  WITH RECURSIVE cnt2(x) AS (
+    VALUES(1) UNION ALL SELECT x+1 FROM cnt2 WHERE x<50
+  )
+  INSERT INTO cnt SELECT x FROM cnt2;
+----
+stmt 0 ok
+stmt 23 err 1 -1 151 no such table: cnt
+==== 5020
+
+  SELECT DISTINCT abs(random())%5 AS r FROM cnt ORDER BY r;
+----
+stmt 0 err 1 -1 60 no such table: cnt
+==== 5030
+
+  SELECT abs(random())%5 AS r FROM cnt GROUP BY 1 ORDER BY 1;
+----
+stmt 0 err 1 -1 62 no such table: cnt
+==== 5040
+
+  SELECT a FROM cnt WHERE a>45 GROUP BY 1;
+----
+stmt 0 err 1 -1 43 no such table: cnt
+==== 5050
+
+  CREATE TABLE t0(a TEXT); INSERT INTO t0 VALUES('abcd');
+  CREATE TABLE t1(b TEXT);
+  CREATE TABLE t2(c TEXT);
+  CREATE TABLE t3(d TEXT); INSERT INTO t3 VALUES('wxyz');
+  CREATE VIEW  v4(e) AS SELECT (SELECT t2.c FROM t0, t1 GROUP BY 1) FROM t2;
+  SELECT v4.e FROM t3 LEFT JOIN v4 ON true GROUP BY 1;
+----
+stmt 0 ok
+stmt 27 err 1 -1 58 no such table: t0
+stmt 58 ok
+stmt 85 ok
+stmt 112 ok
+stmt 139 err 1 -1 170 no such table: t3
+stmt 170 ok
+stmt 247 err 1 -1 302 no such table: t3
+==== 5060
+
+  DROP VIEW v4;
+  CREATE VIEW  v4(e) AS SELECT (SELECT t2.c COLLATE nocase FROM t0, t1 GROUP BY 1) FROM t2;
+  SELECT v4.e FROM t3 LEFT JOIN v4 ON true GROUP BY 1;
+----
+stmt 0 err 1 -1 16 no such view: v4
+stmt 16 ok
+stmt 108 err 1 -1 163 no such table: t3
+==== 5070
+
+  DROP VIEW v4;
+  CREATE VIEW  v4(e) AS SELECT (SELECT unlikely(t2.c COLLATE nocase) FROM t0, t1 GROUP BY 1) FROM t2;
+  SELECT v4.e FROM t3 LEFT JOIN v4 ON true GROUP BY 1;
+----
+stmt 0 err 1 -1 16 no such view: v4
+stmt 16 ok
+stmt 118 err 1 -1 173 no such table: t3
+==== 5080
+
+  CREATE TABLE dual(dummy TEXT);
+  INSERT INTO dual VALUES('X');
+  SELECT 11 = (
+                SELECT b
+                  FROM (
+                         SELECT a AS b
+                           FROM dual
+                           LEFT JOIN (SELECT 22 AS a FROM dual)
+                       )
+                 GROUP BY b, b
+              );
+----
+stmt 0 ok
+stmt 33 err 1 -1 65 no such table: dual
+stmt 65 err 1 -1 344 no such table: dual
+==== 6000
+
+  CREATE TABLE t1(c1 UNIQUE NOT NULL);
+  INSERT INTO t1 VALUES(1);
+  CREATE TABLE t0(c0 UNIQUE);
+  INSERT INTO t0 VALUES(0);
+  WITH RECURSIVE c(n) AS (VALUES(1) UNION ALL SELECT n+1 FROM c WHERE n<1000)
+    INSERT INTO t0(c0) SELECT NULL FROM c;
+----
+stmt 0 ok
+stmt 39 err 1 -1 67 no such table: t1
+stmt 67 ok
+stmt 97 err 1 -1 125 no such table: t0
+stmt 125 err 1 -1 246 no such table: t0
+==== 6010
+
+  SELECT DISTINCT * FROM t1 LEFT OUTER JOIN t0 ON c0>c1;
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== 6020
+
+  SELECT DISTINCT * FROM t1 FULL OUTER JOIN t0 ON c0>c1;
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== 6040
+
+  ANALYZE;
+  SELECT DISTINCT * FROM t1 LEFT OUTER JOIN t0 ON c0>c1;
+----
+stmt 0 ok
+stmt 11 err 1 -1 68 no such table: t1
+==== 6050
+
+  SELECT DISTINCT * FROM t1 FULL OUTER JOIN t0 ON c0>c1;
+----
+stmt 0 err 1 -1 57 no such table: t1

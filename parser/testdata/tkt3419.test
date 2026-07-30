@@ -1,0 +1,64 @@
+==== tkt3419-1.1
+
+    create table a(id integer primary key);
+    create table b(id integer primary key, a_id integer);
+    create table c(id integer primary key, b_id integer);
+  
+    insert into a values (1);
+    insert into a values (2);
+  
+    insert into b values (3, 1);
+    insert into b values (4, 1);
+    insert into b values (5, 1);
+    insert into b values (6, 1);
+    insert into b values (9, 2);
+  
+    insert into c values (4, 3);
+    insert into c values (5, 5);
+    insert into c values (6, 4);
+    insert into c values (7, 6);
+    insert into c values (8, 9);
+  
+    select * FROM a, b, c WHERE a.id=2 AND b.a_id = a.id AND b.id=c.b_id;
+----
+stmt 0 ok
+stmt 44 ok
+stmt 102 ok
+stmt 160 err 1 -1 193 no such table: a
+stmt 193 err 1 -1 223 no such table: a
+stmt 223 err 1 -1 259 no such table: b
+stmt 259 err 1 -1 292 no such table: b
+stmt 292 err 1 -1 325 no such table: b
+stmt 325 err 1 -1 358 no such table: b
+stmt 358 err 1 -1 391 no such table: b
+stmt 391 err 1 -1 427 no such table: c
+stmt 427 err 1 -1 460 no such table: c
+stmt 460 err 1 -1 493 no such table: c
+stmt 493 err 1 -1 526 no such table: c
+stmt 526 err 1 -1 559 no such table: c
+stmt 559 err 1 -1 636 no such table: a
+==== tkt3419-1.2
+
+    select * FROM a, c, b WHERE a.id=2 AND b.a_id = a.id AND b.id=c.b_id;
+----
+stmt 0 err 1 -1 74 no such table: a
+==== tkt3419-1.3
+
+    select * FROM b, a, c WHERE a.id=2 AND b.a_id = a.id AND b.id=c.b_id;
+----
+stmt 0 err 1 -1 74 no such table: b
+==== tkt3419-1.4
+
+    select * FROM b, c, a WHERE a.id=2 AND b.a_id = a.id AND b.id=c.b_id;
+----
+stmt 0 err 1 -1 74 no such table: b
+==== tkt3419-1.5
+
+    select * FROM c, a, b WHERE a.id=2 AND b.a_id = a.id AND b.id=c.b_id;
+----
+stmt 0 err 1 -1 74 no such table: c
+==== tkt3419-1.6
+
+    select * FROM c, b, a WHERE a.id=2 AND b.a_id = a.id AND b.id=c.b_id;
+----
+stmt 0 err 1 -1 74 no such table: c

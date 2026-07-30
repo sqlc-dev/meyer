@@ -1,0 +1,19 @@
+==== journal2-1.4
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== journal2-1.7
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== journal2-1.9
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== journal2-1.15
+
+    SELECT count(*) FROM t2;
+    PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 29 no such table: t2
+stmt 29 ok

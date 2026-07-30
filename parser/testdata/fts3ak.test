@@ -1,0 +1,81 @@
+==== fts3ak-1.1
+
+    BEGIN TRANSACTION;
+    INSERT INTO t1 (rowid, content) VALUES(4, 'false world');
+    INSERT INTO t1 (rowid, content) VALUES(5, 'false door');
+    COMMIT TRANSACTION;
+    SELECT rowid FROM t1 WHERE t1 MATCH 'world';
+----
+stmt 0 ok
+stmt 23 err 1 -1 85 no such table: t1
+stmt 85 err 1 -1 146 no such table: t1
+stmt 146 ok
+stmt 170 err 1 -1 219 no such table: t1
+==== fts3ak-1.2
+
+    BEGIN TRANSACTION;
+    INSERT INTO t1 (rowid, content) VALUES(6, 'another world');
+    INSERT INTO t1 (rowid, content) VALUES(7, 'another test');
+    SELECT rowid FROM t1 WHERE t1 MATCH 'world';
+    COMMIT TRANSACTION;
+----
+stmt 0 ok
+stmt 23 err 1 -1 87 no such table: t1
+stmt 87 err 1 -1 150 no such table: t1
+stmt 150 err 1 -1 199 no such table: t1
+stmt 199 ok
+==== fts3ak-1.3
+
+    BEGIN TRANSACTION;
+    INSERT INTO t1 (rowid, content) VALUES(8, 'second world');
+    INSERT INTO t1 (rowid, content) VALUES(9, 'second sight');
+    SELECT rowid FROM t1 WHERE t1 MATCH 'world';
+    ROLLBACK TRANSACTION;
+----
+stmt 0 ok
+stmt 23 err 1 -1 86 no such table: t1
+stmt 86 err 1 -1 149 no such table: t1
+stmt 149 err 1 -1 198 no such table: t1
+stmt 198 ok
+==== fts3ak-1.4
+
+    SELECT rowid FROM t1 WHERE t1 MATCH 'world';
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== fts3ak-1.5
+
+    BEGIN TRANSACTION;
+    INSERT INTO t1 (rowid, content) VALUES(10, 'second world');
+    INSERT INTO t1 (rowid, content) VALUES(11, 'second sight');
+    ROLLBACK TRANSACTION;
+    SELECT rowid FROM t1 WHERE t1 MATCH 'world';
+----
+stmt 0 ok
+stmt 23 err 1 -1 87 no such table: t1
+stmt 87 err 1 -1 151 no such table: t1
+stmt 151 ok
+stmt 177 err 1 -1 226 no such table: t1
+==== fts3ak-1.6
+
+    BEGIN;
+    INSERT INTO t1 (rowid, content) VALUES(12, 'third world');
+    COMMIT;
+    SELECT rowid FROM t1 WHERE t1 MATCH 'third';
+----
+stmt 0 ok
+stmt 11 err 1 -1 74 no such table: t1
+stmt 74 ok
+stmt 86 err 1 -1 135 no such table: t1
+==== fts3ak-1.7
+
+    BEGIN;
+    INSERT INTO t1 (rowid, content) VALUES(13, 'third dimension');
+    CREATE TABLE x (c);
+    COMMIT;
+    SELECT rowid FROM t1 WHERE t1 MATCH 'dimension';
+----
+stmt 0 ok
+stmt 11 err 1 -1 78 no such table: t1
+stmt 78 ok
+stmt 102 ok
+stmt 114 err 1 -1 167 no such table: t1

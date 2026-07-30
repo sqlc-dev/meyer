@@ -1,0 +1,47 @@
+==== 1.1
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 1.2
+
+  DELETE FROM t1;
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== 1.4
+
+  SELECT count(b) FROM t1
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== 1.5
+
+  PRAGMA journal_mode = wal;
+  DELETE FROM t1;
+----
+stmt 0 ok
+stmt 29 err 1 -1 47 no such table: t1
+==== 1.6
+
+  PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+==== 1.7
+
+  WITH s(i) AS (
+    VALUES(1) UNION ALL SELECT i+1 FROM s WHERE i<100
+  )
+  INSERT INTO t1 SELECT NULL, randomblob(5000), randomblob(i) FROM s;
+  SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 145 no such table: t1
+stmt 145 err 1 -1 172 no such table: t1
+==== 1.8
+
+  SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== 1.9
+
+  SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 27 no such table: t1

@@ -1,0 +1,38 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING fts5(a, b, c);
+  INSERT INTO t1 VALUES('one', 'two', 'three');
+----
+stmt 0 ok
+stmt 47 err 1 -1 95 no such table: t1
+==== 1.1.2
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 1.2.1
+
+  CREATE TABLE t4(hello);
+----
+stmt 0 ok
+==== 2.0.1
+
+  CREATE TABLE t1(x);
+  CREATE TABLE t2(y);
+  INSERT INTO t1 VALUES('one');
+  INSERT INTO t2 VALUES('two');
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 76 no such table: t1
+stmt 76 err 1 -1 108 no such table: t2
+==== 2.1.1
+
+  CREATE virtual TABLE r1 USING fts5(x);
+----
+stmt 0 ok
+==== 3.1.0
+
+  CREATE TABLE t4(hello, check( hello IS NOT "xyz") );
+----
+stmt 0 ok

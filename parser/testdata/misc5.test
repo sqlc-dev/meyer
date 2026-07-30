@@ -1,0 +1,168 @@
+==== misc5-2.1
+
+      create table t2(x unique);
+      insert into t2 values(1);
+      insert or ignore into t2 select x*2 from t2;
+      insert or ignore into t2 select x*4 from t2;
+      insert or ignore into t2 select x*16 from t2;
+      insert or ignore into t2 select x*256 from t2;
+      insert or ignore into t2 select x*65536 from t2;
+      insert or ignore into t2 select x*2147483648 from t2;
+      insert or ignore into t2 select x-1 from t2;
+      insert or ignore into t2 select x+1 from t2;
+      insert or ignore into t2 select -x from t2;
+      select count(*) from t2;
+----
+stmt 0 ok
+stmt 33 err 1 -1 65 no such table: t2
+stmt 65 err 1 -1 116 no such table: t2
+stmt 116 err 1 -1 167 no such table: t2
+stmt 167 err 1 -1 219 no such table: t2
+stmt 219 err 1 -1 272 no such table: t2
+stmt 272 err 1 -1 327 no such table: t2
+stmt 327 err 1 -1 387 no such table: t2
+stmt 387 err 1 -1 438 no such table: t2
+stmt 438 err 1 -1 489 no such table: t2
+stmt 489 err 1 -1 539 no such table: t2
+stmt 539 err 1 -1 570 no such table: t2
+==== misc5-2.1.dup1
+
+      BEGIN;
+      create table t2(x unique);
+      create table t2_temp(x);
+      insert into t2_temp values(1);
+      insert into t2_temp select x*2 from t2_temp;
+      insert into t2_temp select x*4 from t2_temp;
+      insert into t2_temp select x*16 from t2_temp;
+      insert into t2_temp select x*256 from t2_temp;
+      insert into t2_temp select x*65536 from t2_temp;
+      insert into t2_temp select x*2147483648 from t2_temp;
+      insert into t2_temp select x-1 from t2_temp;
+      insert into t2_temp select x+1 from t2_temp;
+      insert into t2_temp select -x from t2_temp;
+      INSERT INTO t2 SELECT DISTINCT(x) FROM t2_temp;
+      DROP TABLE t2_temp;
+      COMMIT;
+      select count(*) from t2;
+----
+stmt 0 ok
+stmt 13 ok
+stmt 46 ok
+stmt 77 err 1 -1 114 no such table: t2_temp
+stmt 114 err 1 -1 165 no such table: t2_temp
+stmt 165 err 1 -1 216 no such table: t2_temp
+stmt 216 err 1 -1 268 no such table: t2_temp
+stmt 268 err 1 -1 321 no such table: t2_temp
+stmt 321 err 1 -1 376 no such table: t2_temp
+stmt 376 err 1 -1 436 no such table: t2_temp
+stmt 436 err 1 -1 487 no such table: t2_temp
+stmt 487 err 1 -1 538 no such table: t2_temp
+stmt 538 err 1 -1 588 no such table: t2_temp
+stmt 588 err 1 -1 642 no such table: t2
+stmt 642 err 1 -1 668 no such table: t2_temp
+stmt 668 ok
+stmt 682 err 1 -1 713 no such table: t2
+==== misc5-2.2
+
+    select x from t2 order by x;
+----
+stmt 0 err 1 -1 33 no such table: t2
+==== misc5-3.1
+
+      CREATE TABLE songs(songid, artist, timesplayed);
+      INSERT INTO songs VALUES(1,'one',1);
+      INSERT INTO songs VALUES(2,'one',2);
+      INSERT INTO songs VALUES(3,'two',3);
+      INSERT INTO songs VALUES(4,'three',5);
+      INSERT INTO songs VALUES(5,'one',7);
+      INSERT INTO songs VALUES(6,'two',11);
+      SELECT DISTINCT artist 
+      FROM (    
+       SELECT DISTINCT artist    
+       FROM songs      
+       WHERE songid IN (    
+        SELECT songid    
+        FROM songs    
+        WHERE LOWER(artist) = (    
+          -- This sub-query is indeterminate. Because there is no ORDER BY,
+          -- it may return 'one', 'two' or 'three'. Because of this, the
+	  -- outermost parent query may correctly return any of 'one', 'two' 
+          -- or 'three' as well.
+          SELECT DISTINCT LOWER(artist)    
+          FROM (      
+            -- This sub-query returns the table:
+            --
+            --     two      14
+            --     one      10
+            --     three    5
+            --
+            SELECT DISTINCT artist,sum(timesplayed) AS total      
+            FROM songs      
+            GROUP BY LOWER(artist)      
+            ORDER BY total DESC      
+            LIMIT 10    
+          )    
+          WHERE artist <> '' 
+        )  
+       )       
+      )  
+      ORDER BY LOWER(artist) ASC;
+----
+stmt 0 ok
+stmt 55 err 1 -1 98 no such table: songs
+stmt 98 err 1 -1 141 no such table: songs
+stmt 141 err 1 -1 184 no such table: songs
+stmt 184 err 1 -1 229 no such table: songs
+stmt 229 err 1 -1 272 no such table: songs
+stmt 272 err 1 -1 316 no such table: songs
+stmt 316 err 1 -1 1344 no such table: songs
+==== misc5-5.1
+SELECT .1
+----
+stmt 0 ok
+==== misc5-5.2
+SELECT 2.
+----
+stmt 0 ok
+==== misc5-5.3
+SELECT 3.e0
+----
+stmt 0 ok
+==== misc5-5.4
+SELECT .4e+1
+----
+stmt 0 ok
+==== misc5-6.1
+
+      SELECT * FROM sqlite_master 
+      UNION ALL 
+      SELECT * FROM sqlite_master
+      LIMIT (SELECT count(*) FROM blah);
+----
+stmt 0 err 1 -1 127 no such table: blah
+==== misc5-9.1
+
+      SELECT name, type FROM sqlite_master WHERE name IS NULL
+      UNION
+      SELECT type, name FROM sqlite_master WHERE type IS NULL
+      ORDER BY 1, 2, 1, 2, 1, 2
+----
+stmt 0 ok
+==== misc5-9.2
+
+      SELECT name, type FROM sqlite_master WHERE name IS NULL
+      UNION
+      SELECT type, name FROM sqlite_master WHERE type IS NULL
+      ORDER BY 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2
+----
+stmt 0 ok
+==== misc5-10.1
+
+    SELECT 123abc
+----
+stmt 0 err 1 12 12 unrecognized token: "123abc"
+==== misc5-10.2
+
+    SELECT 1*123.4e5ghi;
+----
+stmt 0 err 1 14 14 unrecognized token: "123.4e5ghi"

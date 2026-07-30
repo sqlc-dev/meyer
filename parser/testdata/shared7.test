@@ -1,0 +1,5 @@
+==== shared7-1.4
+
+    ATTACH 'test.db' AS err1;
+----
+stmt 0 ok

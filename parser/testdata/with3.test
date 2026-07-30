@@ -6,7 +6,7 @@
   )
   SELECT * FROM i;
 ----
-stmt 0 err 1 -1 no such table: m
+stmt 0 err 1 -1 109 no such table: m
 ==== 1.1
 
   CREATE VIEW v1(x,y) AS
@@ -15,7 +15,7 @@ stmt 0 err 1 -1 no such table: m
   SELECT * FROM v1;
 ----
 stmt 0 ok
-stmt 98 err 1 -1 no such table: v1
+stmt 98 err 1 -1 118 no such table: v1
 ==== 2.0
 
  WITH
@@ -43,8 +43,8 @@ stmt 0 ok
   SELECT * FROM t1;
 ----
 stmt 0 ok
-stmt 22 err 1 -1 no such table: t1
-stmt 153 err 1 -1 no such table: t1
+stmt 22 err 1 -1 153 no such table: t1
+stmt 153 err 1 -1 173 no such table: t1
 ==== 3.1.1
 
     CREATE TABLE y1(a, b);
@@ -55,9 +55,21 @@ stmt 153 err 1 -1 no such table: t1
     ANALYZE;
 ----
 stmt 0 ok
-stmt 27 err 1 -1 no such table: main.y1
-stmt 58 err 1 -1 no such table: y1
+stmt 27 err 1 -1 58 no such table: main.y1
+stmt 58 err 1 -1 177 no such table: y1
 stmt 177 ok
+==== 3.1.2
+
+    WITH cnt(i) AS ( SELECT 1 UNION ALL SELECT i+1 FROM cnt LIMIT 1)
+    SELECT * FROM cnt, y1 WHERE i=a
+----
+stmt 0 err 1 -1 106 no such table: y1
+==== 3.1.3
+
+    WITH cnt(i) AS ( SELECT 1 UNION ALL SELECT i+1 FROM cnt LIMIT 1000000)
+    SELECT * FROM cnt, y1 WHERE i=a
+----
+stmt 0 err 1 -1 112 no such table: y1
 ==== 3.2.1
 
   CREATE TABLE w1(pk INTEGER PRIMARY KEY, x INTEGER);
@@ -65,6 +77,14 @@ stmt 177 ok
 ----
 stmt 0 ok
 stmt 54 ok
+==== 3.2.2
+
+  WITH RECURSIVE c(w,id) AS (SELECT 0, (SELECT pk FROM w2 LIMIT 1)
+     UNION ALL SELECT c.w + 1, x FROM w1, c LIMIT 1)
+     SELECT * FROM c, w2, w1
+     WHERE c.id=w2.pk AND c.id=w1.pk;
+----
+stmt 0 err 1 -1 187 no such table: w2
 ==== 4.0
 
   WITH t5(t5col1) AS (
@@ -122,6 +142,13 @@ stmt 0 ok
   GROUP BY 1;
 ----
 stmt 0 ok
+==== 5.1
+
+  WITH RECURSIVE c(x) AS (VALUES(0) UNION ALL SELECT x+1 FROM c WHERE x<1)
+  SELECT x1.x||x2.x||x3.x||x4.x FROM c AS x1, c AS x2, c AS x3, c AS x4
+  ORDER BY 1;
+----
+stmt 0 ok
 ==== 5.2
 
   WITH RECURSIVE c(x) AS (VALUES(0) UNION ALL SELECT x+1 FROM c WHERE x<1)
@@ -136,7 +163,7 @@ stmt 0 ok
     cte2(z) as ( select 1 from cte1 )
   select * from cte2, cte1;
 ----
-stmt 0 err 1 -1 table cte1 has 3 values for 2 columns
+stmt 0 err 1 -1 111 table cte1 has 3 values for 2 columns
 ==== 6.1
 
   with
@@ -144,4 +171,4 @@ stmt 0 err 1 -1 table cte1 has 3 values for 2 columns
     cte2(z) as ( select 1 from cte1 UNION ALL SELECT z+1 FROM cte2 WHERE z<5)
   select * from cte2, cte1;
 ----
-stmt 0 err 1 -1 table cte1 has 3 values for 2 columns
+stmt 0 err 1 -1 151 table cte1 has 3 values for 2 columns

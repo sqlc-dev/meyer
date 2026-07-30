@@ -1,0 +1,184 @@
+==== memdb-generated
+
+         INSERT INTO t3 SELECT randstr(10,400) FROM t3 WHERE random()%10==0;
+----
+stmt 0 err 1 -1 77 no such table: t3
+==== memdb-3.1
+
+    CREATE TABLE t4(a,b,c,d);
+    BEGIN;
+    INSERT INTO t4 VALUES(1,2,3,4);
+    SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 41 err 1 -1 77 no such table: t4
+stmt 77 err 1 -1 99 no such table: t4
+==== memdb-3.2
+
+    SELECT name FROM sqlite_master WHERE type='table';
+----
+stmt 0 ok
+==== memdb-3.3
+
+    DROP TABLE t4;
+    SELECT name FROM sqlite_master WHERE type='table';
+----
+stmt 0 err 1 -1 19 no such table: t4
+stmt 19 ok
+==== memdb-3.4
+
+    ROLLBACK;
+    SELECT name FROM sqlite_master WHERE type='table';
+----
+stmt 0 ok
+stmt 14 ok
+==== memdb-4.0
+
+    CREATE TABLE t1(a, b, c, UNIQUE(a,b));
+    CREATE TABLE t2(x);
+    SELECT c FROM t1 ORDER BY c;
+----
+stmt 0 ok
+stmt 43 ok
+stmt 67 err 1 -1 100 no such table: t1
+==== memdb-5.0
+
+    DROP TABLE t2;
+    DROP TABLE t3;
+    CREATE TABLE t2(a,b,c);
+    INSERT INTO t2 VALUES(1,2,1);
+    INSERT INTO t2 VALUES(2,3,2);
+    INSERT INTO t2 VALUES(3,4,1);
+    INSERT INTO t2 VALUES(4,5,4);
+    SELECT c FROM t2 ORDER BY b;
+    CREATE TABLE t3(x);
+    INSERT INTO t3 VALUES(1);
+----
+stmt 0 err 1 -1 19 no such table: t2
+stmt 19 err 1 -1 38 no such table: t3
+stmt 38 ok
+stmt 66 err 1 -1 100 no such table: t2
+stmt 100 err 1 -1 134 no such table: t2
+stmt 134 err 1 -1 168 no such table: t2
+stmt 168 err 1 -1 202 no such table: t2
+stmt 202 err 1 -1 235 no such table: t2
+stmt 235 ok
+stmt 259 err 1 -1 289 no such table: t3
+==== memdb-6.1
+
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== memdb-6.2
+
+    BEGIN;
+    DROP TABLE t2;
+    SELECT name FROM sqlite_master WHERE type='table' ORDER BY 1;
+----
+stmt 0 ok
+stmt 11 err 1 -1 30 no such table: t2
+stmt 30 ok
+==== memdb-6.3
+
+    ROLLBACK;
+    SELECT name FROM sqlite_master WHERE type='table' ORDER BY 1;
+----
+stmt 0 ok
+stmt 14 ok
+==== memdb-6.4
+
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== memdb-6.5
+
+    SELECT a FROM t2 UNION SELECT b FROM t2 ORDER BY 1;
+----
+stmt 0 err 1 -1 56 no such table: t2
+==== memdb-6.6
+
+    CREATE INDEX i2 ON t2(c);
+    SELECT a FROM t2 ORDER BY c;
+----
+stmt 0 err 1 -1 30 no such table: main.t2
+stmt 30 err 1 -1 63 no such table: t2
+==== memdb-6.6.dup1
+
+    SELECT a FROM t2 ORDER BY c DESC;
+----
+stmt 0 err 1 -1 38 no such table: t2
+==== memdb-6.7
+
+    BEGIN;
+    CREATE TABLE t5(x,y);
+    INSERT INTO t5 VALUES(1,2);
+    SELECT * FROM t5;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 37 err 1 -1 69 no such table: t5
+stmt 69 err 1 -1 91 no such table: t5
+==== memdb-6.8
+
+    SELECT name FROM sqlite_master WHERE type='table' ORDER BY 1;
+----
+stmt 0 ok
+==== memdb-6.9
+
+    ROLLBACK;
+    SELECT name FROM sqlite_master WHERE type='table' ORDER BY 1;
+----
+stmt 0 ok
+stmt 14 ok
+==== memdb-6.10
+
+    CREATE TABLE t5(x PRIMARY KEY, y UNIQUE);
+    SELECT * FROM t5;
+----
+stmt 0 ok
+stmt 46 err 1 -1 68 no such table: t5
+==== memdb-6.11
+
+    SELECT * FROM t5 ORDER BY y DESC;
+----
+stmt 0 err 1 -1 38 no such table: t5
+==== memdb-6.12
+
+      INSERT INTO t5 VALUES(1,2);
+      INSERT INTO t5 VALUES(3,4);
+      REPLACE INTO t5 VALUES(1,4);
+      SELECT rowid,* FROM t5;
+----
+stmt 0 err 1 -1 34 no such table: t5
+stmt 34 err 1 -1 68 no such table: t5
+stmt 68 err 1 -1 103 no such table: t5
+stmt 103 err 1 -1 133 no such table: t5
+==== memdb-6.13
+
+      DELETE FROM t5 WHERE x>5;
+      SELECT * FROM t5;
+----
+stmt 0 err 1 -1 32 no such table: t5
+stmt 32 err 1 -1 56 no such table: t5
+==== memdb-6.14
+
+      DELETE FROM t5 WHERE y<3;
+      SELECT * FROM t5;
+----
+stmt 0 err 1 -1 32 no such table: t5
+stmt 32 err 1 -1 56 no such table: t5
+==== memdb-6.15
+
+    DELETE FROM t5 WHERE x>0;
+    SELECT * FROM t5;
+----
+stmt 0 err 1 -1 30 no such table: t5
+stmt 30 err 1 -1 52 no such table: t5
+==== memdb-8.2
+
+    DELETE FROM t1;
+    SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 49 no such table: t1

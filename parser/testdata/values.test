@@ -1,0 +1,629 @@
+==== 1.0
+
+  CREATE TABLE x1(a, b, c);
+----
+stmt 0 ok
+==== 1.1.1
+
+  INSERT INTO x1 VALUES(1, 1, 1), (2, 2, 2), (3, 3, 3), (4, 4, 4);
+----
+stmt 0 err 1 -1 67 no such table: x1
+==== 1.1.2
+
+  SELECT * FROM x1;
+----
+stmt 0 err 1 -1 20 no such table: x1
+==== 1.2.0
+
+  DELETE FROM x1
+----
+stmt 0 err 1 -1 18 no such table: x1
+==== 1.2.1
+
+  INSERT INTO x1 VALUES(1, 1, 1), (2, 2, 2), (3, 3, 3) UNION ALL SELECT 4, 4, 4;
+  SELECT * FROM x1;
+----
+stmt 0 err 1 -1 81 no such table: x1
+stmt 81 err 1 -1 101 no such table: x1
+==== 1.2.2
+
+  DELETE FROM x1;
+  INSERT INTO x1 
+  VALUES(1, 1, 1), (2, 2, 2), (3, 3, 3), (4, 4, 4), (5, 5, 5) 
+  UNION ALL SELECT 6, 6, 6;
+  SELECT * FROM x1;
+----
+stmt 0 err 1 -1 18 no such table: x1
+stmt 18 err 1 -1 127 no such table: x1
+stmt 127 err 1 -1 147 no such table: x1
+==== 1.2.3
+
+  DELETE FROM x1;
+  INSERT INTO x1 
+  VALUES(1, 1, 1), (2, 2, 2), (3, 3, 3), (4, 4, 4)
+  UNION ALL SELECT 6, 6, 6;
+  SELECT * FROM x1;
+----
+stmt 0 err 1 -1 18 no such table: x1
+stmt 18 err 1 -1 115 no such table: x1
+stmt 115 err 1 -1 135 no such table: x1
+==== 1.2.4
+
+  DELETE FROM x1;
+  INSERT INTO x1 VALUES(1, 1, 1), (2, 2, 2), (3, 3, 3) UNION ALL SELECT 6, 6, 6;
+  SELECT * FROM x1;
+----
+stmt 0 err 1 -1 18 no such table: x1
+stmt 18 err 1 -1 99 no such table: x1
+stmt 99 err 1 -1 119 no such table: x1
+==== 1.2.6
+
+  SELECT * FROM x1;
+----
+stmt 0 err 1 -1 20 no such table: x1
+==== 2.0
+
+  CREATE TABLE x1(a, b, c);
+----
+stmt 0 ok
+==== 2.1.1
+
+  INSERT INTO x1 VALUES
+      (1, 1, 1), 
+      (2, 2, 2), 
+      (3, 3, 3), 
+      (4, 4, 4), 
+      (5, 5, 5), 
+      (6, 6, 6), 
+      (7, 7, 7), 
+      (8, 8, 8), 
+      (9, 9, 9), 
+      (10, 10, 10, 10)
+----
+stmt 0 err 1 -1 210 all VALUES must have the same number of terms
+==== 2.1.2
+
+  INSERT INTO x1 VALUES
+      (1, 1, 1), 
+      (2, 2, 2, 2), 
+      (3, 3, 3), 
+      (4, 4, 4), 
+      (5, 5, 5), 
+      (6, 6, 6), 
+      (7, 7, 7), 
+      (8, 8, 8), 
+      (9, 9, 9), 
+      (10, 10, 10)
+----
+stmt 0 err 1 -1 62 all VALUES must have the same number of terms
+==== 2.2
+
+  INSERT INTO x1 VALUES
+      (1, 1, 1), 
+      (2, 2, 2), 
+      (3, 3, 3), 
+      (4, 4, 4), 
+      (5, 5, 5), 
+      (6, 6, 6), 
+      (7, 7, 7), 
+      (8, 8, 8), 
+      (9, 9, 9), 
+      (10, 10, 10)
+----
+stmt 0 err 1 -1 206 no such table: x1
+==== 2.3
+
+  INSERT INTO x1 VALUES
+      (1, 1, 1), 
+      (2, 2, 2), 
+      (3, 3, 3), 
+      (4, 4, 4), 
+      (5, 5, 5), 
+      (6, 6, 6), 
+      (7, 7, 7), 
+      (8, 8, 8), 
+      (9, 9, 9), 
+      (10, 10, 10)
+      UNION ALL 
+      SELECT 5, 12, 12
+      ORDER BY 1
+----
+stmt 0 err 1 -1 263 no such table: x1
+==== 3.0
+
+  CREATE TABLE y1(x, y);
+----
+stmt 0 ok
+==== 3.1.1
+
+  DELETE FROM y1;
+  INSERT INTO y1 VALUES(1, 2), (3, 4), (row_number() OVER (), 5);
+----
+stmt 0 err 1 -1 18 no such table: y1
+stmt 18 err 1 -1 84 no such table: y1
+==== 3.1.2
+
+  SELECT * FROM y1;
+----
+stmt 0 err 1 -1 20 no such table: y1
+==== 3.2.1
+
+  DELETE FROM y1;
+  INSERT INTO y1 VALUES(1, 2), (3, 4), (row_number() OVER (), 6)
+    , (row_number() OVER (), 7)
+----
+stmt 0 err 1 -1 18 no such table: y1
+stmt 18 err 1 -1 116 no such table: y1
+==== 3.1.2.dup1
+
+  SELECT * FROM y1;
+----
+stmt 0 err 1 -1 20 no such table: y1
+==== 4.0
+
+  CREATE TABLE x1(a PRIMARY KEY, b) WITHOUT ROWID;
+----
+stmt 0 ok
+==== 4.1.1
+
+    DELETE FROM x1;
+    INSERT INTO x1 VALUES
+        (1, 1),
+        (2, (SELECT * FROM  (VALUES('a'), ('b'), ('c'), ('d')) ))
+----
+stmt 0 err 1 -1 20 no such table: x1
+stmt 20 err 1 -1 129 no such table: x1
+==== 4.1.2
+
+    SELECT * FROM x1
+----
+stmt 0 err 1 -1 22 no such table: x1
+==== 4.2.1
+
+    DELETE FROM x1;
+    INSERT INTO x1 VALUES
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, (SELECT * FROM  (VALUES('a'), ('b'), ('c'), ('d')) ))
+----
+stmt 0 err 1 -1 20 no such table: x1
+stmt 20 err 1 -1 177 no such table: x1
+==== 4.2.2
+
+    SELECT * FROM x1
+----
+stmt 0 err 1 -1 22 no such table: x1
+==== 4.3.1
+
+    DELETE FROM x1;
+    INSERT INTO x1 VALUES
+        (1, (SELECT * FROM  (VALUES('a'), ('b'), ('c'), ('d'), ('e')) ))
+----
+stmt 0 err 1 -1 20 no such table: x1
+stmt 20 err 1 -1 120 no such table: x1
+==== 4.3.2
+
+    SELECT * FROM x1
+----
+stmt 0 err 1 -1 22 no such table: x1
+==== 5.0
+
+  CREATE VIEW v1 AS VALUES(1, 2, 3), (4, 5, 6), (7, 8, 9);
+----
+stmt 0 ok
+==== 5.1
+
+  SELECT * FROM v1
+----
+stmt 0 err 1 -1 20 no such table: v1
+==== 6.0
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(1), (2);
+----
+stmt 0 ok
+stmt 22 err 1 -1 55 no such table: t1
+==== 6.1
+
+  SELECT ( VALUES( x ), ( x ) ) FROM t1;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== 6.0.dup1
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES('x'), ('y');
+----
+stmt 0 ok
+stmt 22 err 1 -1 59 no such table: t1
+==== 6.1.dup1
+
+  SELECT * FROM t1, (VALUES(1), (2))
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== 6.2
+
+  VALUES(CAST(44 AS REAL)),(55);
+----
+stmt 0 ok
+==== 7.1
+
+  WITH x1(a, b) AS (
+    VALUES(1, 2), ('a', 'b')
+  )
+  SELECT * FROM x1 one, x1 two
+----
+stmt 0 ok
+==== 8.0
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES('d'), (NULL), (123)
+----
+stmt 0 ok
+stmt 22 err 1 -1 67 no such table: t1
+==== 9.1
+
+  VALUES(456), (123), (NULL) UNION ALL SELECT 122 ORDER BY 1
+----
+stmt 0 ok
+==== 9.2
+
+  VALUES (1, 2), (3, 4), (
+    ( SELECT column1 FROM ( VALUES (5, 6), (7, 8) ) ),
+    ( SELECT max(column2) FROM ( VALUES (5, 1), (7, 6) ) )
+  )
+----
+stmt 0 ok
+==== 10.1
+
+  CREATE TABLE a2(a, b, c DEFAULT 'xyz');
+----
+stmt 0 ok
+==== 10.2
+
+  INSERT INTO a2(a) VALUES(3),(4);
+----
+stmt 0 err 1 -1 35 no such table: a2
+==== 11.0
+
+    CREATE VIRTUAL TABLE ft USING fts3(x);
+----
+stmt 0 ok
+==== 11.1
+
+    INSERT INTO ft VALUES('one'), ('two');
+----
+stmt 0 err 1 -1 43 no such table: ft
+==== 12.0
+
+  CREATE TABLE t1(a, b);
+----
+stmt 0 ok
+==== 12.1
+
+  INSERT INTO t1 SELECT 1, 2 UNION ALL VALUES(3, 4), (5, 6);
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== 12.2
+
+  SELECT * FROM t1
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 13.0
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES('xyz');
+
+  SELECT (
+      VALUES( (max(substr('abc', 1, 1), x)) ),
+      (123),
+      (456)
+      )
+  FROM t1;
+----
+stmt 0 ok
+stmt 22 err 1 -1 54 no such table: t1
+stmt 54 err 1 -1 157 no such table: t1
+==== 13.1
+
+  VALUES(300), (zeroblob(300) OVER win);
+----
+stmt 0 err 1 17 41 zeroblob() may not be used as a window function
+==== 14.1
+
+  PRAGMA encoding = utf16;
+  CREATE TABLE t1(a, b);
+----
+stmt 0 ok
+stmt 27 ok
+==== 14.2
+
+  INSERT INTO t1 VALUES
+    (17, 'craft'),
+    (16, 'urtlek' IN(1,2,3));
+----
+stmt 0 err 1 -1 73 no such table: t1
+==== 15.1
+
+  VALUES(1),(2),(3),(4),(5);
+----
+stmt 0 ok
+==== 15.2
+
+  CREATE TABLE t1(a,b);
+----
+stmt 0 ok
+==== 15.3
+
+  INSERT INTO t1 VALUES
+    (1,2),(3,4),(7,8);
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 15.4
+
+  INSERT INTO t1 VALUES
+    (1,2),(3,4),(7,8),
+    (5,row_number()OVER());
+----
+stmt 0 err 1 -1 75 no such table: t1
+==== 15.5
+
+  SELECT * FROM (VALUES(1),(2),(3),(4),(5),(6)), (VALUES('a'),('b'),('c'));
+----
+stmt 0 ok
+==== 15.6
+
+  CREATE TABLE t2(x,y);
+----
+stmt 0 ok
+==== 15.7
+
+  SELECT * FROM t2 UNION ALL VALUES(1,2),(3,4),(5,6),(7,8);
+----
+stmt 0 err 1 -1 60 no such table: t2
+==== 16.1
+
+  CREATE TABLE t1(a,b);
+----
+stmt 0 ok
+==== 16.2
+
+  BEGIN;
+  INSERT INTO t1 VALUES(1,2),(3,4),(5,6),
+     (7,row_number()OVER()),
+     (9,10), (11,12), (13,14), (15,16);
+  SELECT * FROM t1 ORDER BY a, b;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 -1 120 no such table: t1
+stmt 120 err 1 -1 154 no such table: t1
+stmt 154 ok
+==== 16.3
+
+  INSERT INTO t1 VALUES(1,2),(3,4),(5,6),
+     (7,row_number()OVER()),
+     (9,10), (11,12), (13,14), (15,16);
+----
+stmt 0 err 1 -1 111 no such table: t1
+==== 16.4
+
+  BEGIN;
+  INSERT INTO t1 VALUES
+     (1,row_number()OVER()),
+     (2,3), (4,5), (6,7);
+  SELECT * FROM t1 ORDER BY a, b;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 -1 88 no such table: t1
+stmt 88 err 1 -1 122 no such table: t1
+stmt 122 ok
+==== 16.5
+
+  INSERT INTO t1 VALUES
+     (1,row_number()OVER()),
+     (2,3), (4,5), (6,7);
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== 16.6
+
+  BEGIN;
+  INSERT INTO t1 VALUES
+     (1,2),(3,4),
+     (5,row_number()OVER()),
+     (7,8),(9,10),(11,12),
+     (13,row_number()OVER()),
+     (15,16),(17,18),(19,20),(21,22);
+  SELECT * FROM t1 ORDER BY a, b;
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 err 1 -1 175 no such table: t1
+stmt 175 err 1 -1 209 no such table: t1
+stmt 209 ok
+==== 16.7
+
+  INSERT INTO t1 VALUES
+     (1,2),(3,4),
+     (5,row_number()OVER()),
+     (7,8),(9,10),(11,12),
+     (13,row_number()OVER()),
+     (15,16),(17,18),(19,20),(21,22);
+----
+stmt 0 err 1 -1 166 no such table: t1
+==== 17.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1 AS SELECT * FROM (VALUES(1,2), (3,4 IN (1,2,3)));
+----
+stmt 0 ok
+stmt 27 ok
+==== 17.2
+
+  SELECT * FROM t1
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 18.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(x INTEGER PRIMARY KEY);
+  INSERT INTO t1 VALUES(RAISE(IGNORE)),(0);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 59 err 1 -1 103 no such table: t1
+==== 18.2
+
+  DROP TABLE t1;
+  CREATE TABLE t1(x INTEGER PRIMARY KEY, y, z);
+  CREATE TRIGGER r2 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t1(y) VALUES(RAISE(IGNORE)),(0);
+  END;
+  INSERT INTO t1 VALUES(1,2,3);
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 65 err 1 -1 110 no such table: main.t1
+stmt 166 err 1 -1 198 no such table: t1
+stmt 198 err 1 -1 218 no such table: t1
+==== 18.3.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(x INTEGER PRIMARY KEY, y, z);
+  CREATE TRIGGER r2 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t1(y) VALUES(RAISE(ABORT,'error 18.3')),(0);
+  END;
+  INSERT INTO t1 VALUES(1,2,3);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 65 err 1 -1 110 no such table: main.t1
+stmt 178 err 1 -1 210 no such table: t1
+==== 18.3.2
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 18.4.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(x INTEGER PRIMARY KEY, y, z);
+  CREATE TRIGGER r2 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t1(y) VALUES(1),(RAISE(ABORT,'error 18.4')),(0);
+  END;
+  INSERT INTO t1 VALUES(1,2,3);
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 65 err 1 -1 110 no such table: main.t1
+stmt 182 err 1 -1 214 no such table: t1
+==== 18.4.2
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 18.5.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(x INTEGER PRIMARY KEY, y, z);
+  CREATE TRIGGER r2 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t1(y) VALUES(1),
+       (CASE WHEN new.z>7 THEN RAISE(ABORT,'error 18.5') ELSE 2 END);
+  END;
+  INSERT INTO t1 VALUES(1,2,3);
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 65 err 1 -1 110 no such table: main.t1
+stmt 220 err 1 -1 252 no such table: t1
+stmt 252 err 1 -1 272 no such table: t1
+==== 18.5.2
+
+  DELETE FROM t1;
+  INSERT INTO t1 VALUES(1,2,13);
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 51 no such table: t1
+==== 18.5.3
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 19.1
+
+  CREATE TABLE t1(a INT, b INT);
+  INSERT INTO t1 VALUES(11,22);
+  SELECT * FROM t1 LEFT JOIN (VALUES(33,44),(55,66)) AS t2 ON a=b;
+----
+stmt 0 ok
+stmt 33 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 132 no such table: t1
+==== 19.2
+
+  SELECT * FROM (VALUES(33,44),(55,66)) AS t2 RIGHT JOIN t1 ON a=b;
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== 19.3
+
+  SELECT *, '|' FROM t1 FULL JOIN (VALUES(33,44),(55,66)) AS t2 ON a=b
+  ORDER BY +column1
+----
+stmt 0 err 1 -1 92 no such table: t1
+==== 19.4
+
+  SELECT *, '|' FROM (VALUES(33,44),(55,66)) AS t2 FULL JOIN t1 ON a=b
+  ORDER BY +column1
+----
+stmt 0 err 1 -1 92 no such table: t1
+==== 19.5
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  DROP TABLE IF EXISTS t3;
+  CREATE TABLE t1(a,b);              INSERT INTO t1 VALUES(1,2);
+  CREATE TABLE t2(column1,column2);  INSERT INTO t2 VALUES(11,22),(33,44);
+  CREATE TABLE t3(d,e);              INSERT INTO t3 VALUES(3,4);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 81 ok
+stmt 105 err 1 -1 146 no such table: t1
+stmt 146 ok
+stmt 182 err 1 -1 221 no such table: t2
+stmt 221 ok
+stmt 245 err 1 -1 286 no such table: t3
+==== 19.6
+
+  -- output verify using PG 14.2
+  SELECT *
+    FROM t1 CROSS JOIN t2 FULL JOIN t3 ON a=d
+   ORDER BY +d, +column1;
+----
+stmt 0 err 1 -1 116 no such table: t1
+==== 19.7
+
+  SELECT *
+    FROM t1 CROSS JOIN (VALUES(11,22),(33,44)) FULL JOIN t3 ON a=d
+   ORDER BY +d, +column1;
+----
+stmt 0 err 1 -1 104 no such table: t1
+==== 19.8
+
+  -- output verified using PG 14.2
+  SELECT *
+    FROM t1 CROSS JOIN t2 FULL JOIN t3 ON a=d
+   WHERE column1 IS NULL;
+----
+stmt 0 err 1 -1 118 no such table: t1
+==== 19.9
+
+  SELECT *
+    FROM t1 CROSS JOIN (VALUES(11,22),(33,44)) FULL JOIN t3 ON a=d
+   WHERE column1 IS NULL;
+----
+stmt 0 err 1 -1 104 no such table: t1

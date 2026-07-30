@@ -1,7 +1,7 @@
 ==== select4-1.0
 SELECT DISTINCT log FROM t1 ORDER BY log
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 41 no such table: t1
 ==== select4-1.1c
 
     SELECT DISTINCT log FROM t1
@@ -9,7 +9,7 @@ stmt 0 err 1 -1 no such table: t1
     SELECT n FROM t1 WHERE log=3
     ORDER BY log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 97 no such table: t1
 ==== select4-1.1d
 
     CREATE TABLE t2 AS
@@ -19,8 +19,8 @@ stmt 0 err 1 -1 no such table: t1
       ORDER BY log;
     SELECT * FROM t2;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 128 err 1 -1 no such table: t2
+stmt 0 err 1 -1 128 no such table: t1
+stmt 128 err 1 -1 150 no such table: t2
 ==== select4-1.1e
 
     CREATE TABLE t2 AS
@@ -30,15 +30,15 @@ stmt 128 err 1 -1 no such table: t2
       ORDER BY log DESC;
     SELECT * FROM t2;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 133 err 1 -1 no such table: t2
+stmt 0 err 1 -1 133 no such table: t1
+stmt 133 err 1 -1 155 no such table: t2
 ==== select4-1.1f
 
     SELECT DISTINCT log FROM t1
     UNION ALL
     SELECT n FROM t1 WHERE log=2
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 80 no such table: t1
 ==== select4-1.1g
 
     CREATE TABLE t2 AS 
@@ -47,8 +47,8 @@ stmt 0 err 1 -1 no such table: t1
       SELECT n FROM t1 WHERE log=2;
     SELECT * FROM t2;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 110 err 1 -1 no such table: t2
+stmt 0 err 1 -1 110 no such table: t1
+stmt 110 err 1 -1 132 no such table: t2
 ==== select4-1.2
 
       SELECT log FROM t1 WHERE n IN 
@@ -56,13 +56,13 @@ stmt 110 err 1 -1 no such table: t2
          SELECT n FROM t1 WHERE log=3)
       ORDER BY log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 143 no such table: t1
 ==== select4-1.4
 
   SELECT (VALUES(0) INTERSECT SELECT(0) UNION SELECT(0) ORDER BY 1 UNION
           SELECT 0 UNION SELECT 0 ORDER BY 1);
 ----
-stmt 0 err 1 -1 ORDER BY clause should come after UNION not before
+stmt 0 err 1 -1 119 ORDER BY clause should come after UNION not before
 ==== select4-2.1
 
     SELECT DISTINCT log FROM t1
@@ -70,7 +70,7 @@ stmt 0 err 1 -1 ORDER BY clause should come after UNION not before
     SELECT n FROM t1 WHERE log=3
     ORDER BY log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 93 no such table: t1
 ==== select4-2.2
 
       SELECT log FROM t1 WHERE n IN 
@@ -78,7 +78,7 @@ stmt 0 err 1 -1 no such table: t1
          SELECT n FROM t1 WHERE log=3)
       ORDER BY log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 139 no such table: t1
 ==== select4-2.5
 
   SELECT 123 AS x ORDER BY (SELECT x ORDER BY 1);
@@ -91,7 +91,7 @@ stmt 0 ok
     SELECT n FROM t1 WHERE log=3
     ORDER BY log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 94 no such table: t1
 ==== select4-3.1.2
 
     CREATE TABLE t2 AS 
@@ -101,8 +101,8 @@ stmt 0 err 1 -1 no such table: t1
       ORDER BY log;
     SELECT * FROM t2;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 126 err 1 -1 no such table: t2
+stmt 0 err 1 -1 126 no such table: t1
+stmt 126 err 1 -1 148 no such table: t2
 ==== select4-3.1.3
 
     CREATE TABLE t2 AS 
@@ -112,8 +112,8 @@ stmt 126 err 1 -1 no such table: t2
       ORDER BY log DESC;
     SELECT * FROM t2;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 131 err 1 -1 no such table: t2
+stmt 0 err 1 -1 131 no such table: t1
+stmt 131 err 1 -1 153 no such table: t2
 ==== select4-3.2
 
       SELECT log FROM t1 WHERE n IN 
@@ -121,7 +121,7 @@ stmt 131 err 1 -1 no such table: t2
          SELECT n FROM t1 WHERE log=3)
       ORDER BY log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 140 no such table: t1
 ==== select4-4.1.1
 
     SELECT DISTINCT log FROM t1
@@ -129,7 +129,7 @@ stmt 0 err 1 -1 no such table: t1
     SELECT n FROM t1 WHERE log=3
     ORDER BY log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 97 no such table: t1
 ==== select4-4.1.2
 
     SELECT DISTINCT log FROM t1
@@ -139,7 +139,7 @@ stmt 0 err 1 -1 no such table: t1
     SELECT n FROM t1 WHERE log=3
     ORDER BY t1.log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 127 no such table: t1
 ==== select4-4.1.3
 
     CREATE TABLE t2 AS
@@ -149,8 +149,8 @@ stmt 0 err 1 -1 no such table: t1
       ORDER BY log;
     SELECT * FROM t2;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 147 err 1 -1 no such table: t2
+stmt 0 err 1 -1 147 no such table: t1
+stmt 147 err 1 -1 169 no such table: t2
 ==== select4-4.1.4
 
     CREATE TABLE t2 AS
@@ -160,8 +160,8 @@ stmt 147 err 1 -1 no such table: t2
       ORDER BY log DESC;
     SELECT * FROM t2;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 152 err 1 -1 no such table: t2
+stmt 0 err 1 -1 152 no such table: t1
+stmt 152 err 1 -1 174 no such table: t2
 ==== select4-4.2
 
       SELECT log FROM t1 WHERE n IN 
@@ -169,7 +169,7 @@ stmt 152 err 1 -1 no such table: t2
          SELECT n FROM t1 WHERE log=3)
       ORDER BY log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 143 no such table: t1
 ==== select4-4.4
 
   SELECT 3 IN (
@@ -181,7 +181,7 @@ stmt 0 err 1 -1 no such table: t1
     ORDER BY 1
   );
 ----
-stmt 0 err 1 -1 ORDER BY clause should come after INTERSECT not before
+stmt 0 err 1 -1 114 ORDER BY clause should come after INTERSECT not before
 ==== select4-5.2f
 
     SELECT DISTINCT log FROM t1
@@ -189,7 +189,7 @@ stmt 0 err 1 -1 ORDER BY clause should come after INTERSECT not before
     SELECT n FROM t1 WHERE log=3
     ORDER BY log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 97 no such table: t1
 ==== select4-5.2g
 
     SELECT DISTINCT log FROM t1
@@ -197,7 +197,7 @@ stmt 0 err 1 -1 no such table: t1
     SELECT n FROM t1 WHERE log=3
     ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 95 no such table: t1
 ==== select4-5.2h
 
     SELECT DISTINCT log FROM t1
@@ -205,7 +205,7 @@ stmt 0 err 1 -1 no such table: t1
     SELECT n FROM t1 WHERE log=3
     ORDER BY 2;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 95 no such table: t1
 ==== select4-5.2i
 
     SELECT DISTINCT 1, log FROM t1
@@ -213,7 +213,7 @@ stmt 0 err 1 -1 no such table: t1
     SELECT 2, n FROM t1 WHERE log=3
     ORDER BY 2, 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 104 no such table: t1
 ==== select4-5.2j
 
     SELECT DISTINCT 1, log FROM t1
@@ -221,7 +221,7 @@ stmt 0 err 1 -1 no such table: t1
     SELECT 2, n FROM t1 WHERE log=3
     ORDER BY 1, 2 DESC;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 109 no such table: t1
 ==== select4-5.2k
 
     SELECT DISTINCT 1, log FROM t1
@@ -229,12 +229,12 @@ stmt 0 err 1 -1 no such table: t1
     SELECT 2, n FROM t1 WHERE log=3
     ORDER BY n, 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 104 no such table: t1
 ==== select4-5.3-3807-1
 
     SELECT 1 UNION SELECT 2, 3 UNION SELECT 4, 5 ORDER BY 1;
 ----
-stmt 0 err 1 -1 SELECTs to the left and right of UNION do not have the same number of result columns
+stmt 0 err 1 -1 61 SELECTs to the left and right of UNION do not have the same number of result columns
 ==== select4-6.1
 
     SELECT log, count(*) as cnt FROM t1 GROUP BY log
@@ -242,7 +242,7 @@ stmt 0 err 1 -1 SELECTs to the left and right of UNION do not have the same numb
     SELECT log, n FROM t1 WHERE n=7
     ORDER BY cnt, log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 122 no such table: t1
 ==== select4-6.2
 
     SELECT log, count(*) FROM t1 GROUP BY log
@@ -250,7 +250,7 @@ stmt 0 err 1 -1 no such table: t1
     SELECT log, n FROM t1 WHERE n=7
     ORDER BY count(*), log;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 120 no such table: t1
 ==== select4-6.3
 
     SELECT NULL UNION SELECT NULL UNION
@@ -296,13 +296,13 @@ stmt 0 ok
     CREATE TABLE t2 AS SELECT log AS 'x', count(*) AS 'y' FROM t1 GROUP BY log;
     SELECT * FROM t2 ORDER BY x;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 80 err 1 -1 no such table: t2
+stmt 0 err 1 -1 80 no such table: t1
+stmt 80 err 1 -1 113 no such table: t2
 ==== select4-8.2
 
     SELECT DISTINCT c FROM t3 ORDER BY c;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 42 no such table: t3
 ==== select4-9.8
 
     SELECT 0 AS x, 1 AS y
@@ -315,103 +315,103 @@ stmt 0 ok
 
     SELECT DISTINCT log FROM t1 ORDER BY log
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 46 no such table: t1
 ==== select4-10.2
 
     SELECT DISTINCT log FROM t1 ORDER BY log LIMIT 4
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 54 no such table: t1
 ==== select4-10.3
 
     SELECT DISTINCT log FROM t1 ORDER BY log LIMIT 0
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 54 no such table: t1
 ==== select4-10.4
 
     SELECT DISTINCT log FROM t1 ORDER BY log LIMIT -1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 55 no such table: t1
 ==== select4-10.5
 
     SELECT DISTINCT log FROM t1 ORDER BY log LIMIT -1 OFFSET 2
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 64 no such table: t1
 ==== select4-10.6
 
     SELECT DISTINCT log FROM t1 ORDER BY log LIMIT 3 OFFSET 2
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 63 no such table: t1
 ==== select4-10.7
 
     SELECT DISTINCT log FROM t1 ORDER BY +log LIMIT 3 OFFSET 20
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 65 no such table: t1
 ==== select4-10.8
 
     SELECT DISTINCT log FROM t1 ORDER BY log LIMIT 0 OFFSET 3
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 63 no such table: t1
 ==== select4-10.9
 
     SELECT DISTINCT max(n), log FROM t1 ORDER BY +log; -- LIMIT 2 OFFSET 1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 55 no such table: t1
 ==== select4-11.1
 
     SELECT x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x FROM t2
     UNION
     SELECT x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 111 no such table: t2
 ==== select4-11.2
 
     SELECT x FROM t2
     UNION
     SELECT x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 111 no such table: t2
 ==== select4-11.3
 
     SELECT x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x FROM t2
     UNION ALL
     SELECT x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 115 no such table: t2
 ==== select4-11.4
 
     SELECT x FROM t2
     UNION ALL
     SELECT x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 115 no such table: t2
 ==== select4-11.5
 
     SELECT x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x FROM t2
     EXCEPT
     SELECT x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 112 no such table: t2
 ==== select4-11.6
 
     SELECT x FROM t2
     EXCEPT
     SELECT x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 112 no such table: t2
 ==== select4-11.7
 
     SELECT x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x FROM t2
     INTERSECT
     SELECT x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 115 no such table: t2
 ==== select4-11.8
 
     SELECT x FROM t2
     INTERSECT
     SELECT x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 115 no such table: t2
 ==== select4-11.11
 
     SELECT x FROM t2
@@ -424,7 +424,7 @@ stmt 0 err 1 -1 no such table: t2
     INTERSECT
     SELECT x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 215 no such table: t2
 ==== select4-11.12
 
     SELECT x FROM t2
@@ -437,7 +437,7 @@ stmt 0 err 1 -1 no such table: t2
     EXCEPT
     SELECT x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 212 no such table: t2
 ==== select4-11.13
 
     SELECT x FROM t2
@@ -450,7 +450,7 @@ stmt 0 err 1 -1 no such table: t2
     EXCEPT
     SELECT x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 215 no such table: t2
 ==== select4-11.14
 
     SELECT x FROM t2
@@ -463,7 +463,7 @@ stmt 0 err 1 -1 no such table: t2
     EXCEPT
     SELECT x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 211 no such table: t2
 ==== select4-11.15
 
     SELECT x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x,x FROM t2
@@ -476,12 +476,12 @@ stmt 0 err 1 -1 no such table: t2
     EXCEPT
     SELECT x FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 215 no such table: t2
 ==== select4-11.16
 
     INSERT INTO t2(rowid) VALUES(2) UNION SELECT 3,4 UNION SELECT 5,6 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 82 no such table: t2
 ==== select4-14.1
 
   CREATE TABLE t14(a,b,c);
@@ -489,52 +489,52 @@ stmt 0 err 1 -1 no such table: t2
   SELECT * FROM t14 INTERSECT VALUES(3,2,1),(2,3,1),(1,2,3),(2,1,3);
 ----
 stmt 0 ok
-stmt 27 err 1 -1 no such table: t14
-stmt 68 err 1 -1 no such table: t14
+stmt 27 err 1 -1 68 no such table: t14
+stmt 68 err 1 -1 137 no such table: t14
 ==== select4-14.2
 
   SELECT * FROM t14 INTERSECT VALUES(1,2,3);
 ----
-stmt 0 err 1 -1 no such table: t14
+stmt 0 err 1 -1 45 no such table: t14
 ==== select4-14.3
 
   SELECT * FROM t14
    UNION VALUES(3,2,1),(2,3,1),(1,2,3),(7,8,9),(4,5,6)
    UNION SELECT * FROM t14 ORDER BY 1, 2, 3
 ----
-stmt 0 err 1 -1 no such table: t14
+stmt 0 err 1 -1 120 no such table: t14
 ==== select4-14.4
 
   SELECT * FROM t14
    UNION VALUES(3,2,1)
    UNION SELECT * FROM t14 ORDER BY 1, 2, 3
 ----
-stmt 0 err 1 -1 no such table: t14
+stmt 0 err 1 -1 88 no such table: t14
 ==== select4-14.5
 
   SELECT * FROM t14 EXCEPT VALUES(3,2,1),(2,3,1),(1,2,3),(2,1,3);
 ----
-stmt 0 err 1 -1 no such table: t14
+stmt 0 err 1 -1 66 no such table: t14
 ==== select4-14.6
 
   SELECT * FROM t14 EXCEPT VALUES(1,2,3)
 ----
-stmt 0 err 1 -1 no such table: t14
+stmt 0 err 1 -1 42 no such table: t14
 ==== select4-14.7
 
   SELECT * FROM t14 EXCEPT VALUES(1,2,3) EXCEPT VALUES(4,5,6)
 ----
-stmt 0 err 1 -1 no such table: t14
+stmt 0 err 1 -1 63 no such table: t14
 ==== select4-14.8
 
   SELECT * FROM t14 EXCEPT VALUES('a','b','c') EXCEPT VALUES(4,5,6)
 ----
-stmt 0 err 1 -1 no such table: t14
+stmt 0 err 1 -1 69 no such table: t14
 ==== select4-14.9
 
   SELECT * FROM t14 UNION ALL VALUES(3,2,1),(2,3,1),(1,2,3),(2,1,3);
 ----
-stmt 0 err 1 -1 no such table: t14
+stmt 0 err 1 -1 69 no such table: t14
 ==== select4-14.10
 
   SELECT (VALUES(1),(2),(3),(4))
@@ -593,9 +593,9 @@ stmt 0 ok
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 76 err 1 -1 no such table: tx
-stmt 114 err 1 -1 no such table: tx
-stmt 152 err 1 -1 no such table: tx
+stmt 76 err 1 -1 114 no such table: tx
+stmt 114 err 1 -1 152 no such table: tx
+stmt 152 err 1 -1 392 no such table: tx
 ==== select4-16.1
 
   DROP TABLE IF EXISTS t1;
@@ -614,8 +614,8 @@ stmt 152 err 1 -1 no such table: tx
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 138 err 1 -1 no such table: t1
-stmt 297 err 1 -1 no such table: t1
+stmt 138 err 1 -1 297 no such table: t1
+stmt 297 err 1 -1 448 no such table: t1
 ==== select4-16.2
 
   SELECT t3.c FROM 
@@ -624,7 +624,7 @@ stmt 297 err 1 -1 no such table: t1
   WHERE t2.a=t3.a AND t2.m=t3.b
   ORDER BY t3.a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 156 no such table: t1
 ==== select4-16.3
 
   SELECT t3.c FROM 
@@ -633,7 +633,7 @@ stmt 0 err 1 -1 no such table: t1
   WHERE t2.a=t3.a AND t2.m=t3.b
   ORDER BY t3.a;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 155 no such table: t1
 ==== select4-17.1
 
   DROP TABLE IF EXISTS t1;
@@ -648,8 +648,8 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 60 err 1 -1 no such table: t1
-stmt 104 err 1 -1 no such table: t1
+stmt 60 err 1 -1 104 no such table: t1
+stmt 104 err 1 -1 249 no such table: t1
 ==== select4-17.2
 
   SELECT x, y FROM (
@@ -659,7 +659,7 @@ stmt 104 err 1 -1 no such table: t1
   ) AS w WHERE y>=20
   ORDER BY +x;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 145 no such table: t1
 ==== select4-17.3
 
   SELECT x, y FROM (
@@ -669,14 +669,14 @@ stmt 0 err 1 -1 no such table: t1
   ) AS w WHERE y>=20
   ORDER BY +x;
 ----
-stmt 0 err 1 -1 LIMIT clause should come after UNION not before
+stmt 0 err 1 -1 121 LIMIT clause should come after UNION not before
 ==== select4-18.1
 
   CREATE VIEW v0(v0) AS WITH v0 AS(SELECT 0 v0) SELECT(SELECT min(v0) OVER()) FROM v0 GROUP BY v0;
   SELECT *FROM v0 v1 JOIN v0 USING(v0) WHERE datetime(v0) = (v0.v0)AND v0 = 10;
 ----
 stmt 0 ok
-stmt 99 err 1 -1 no such table: v0
+stmt 99 err 1 -1 179 no such table: v0
 ==== select4-18.2
 
   CREATE VIEW t1(aa) AS
@@ -685,13 +685,13 @@ stmt 99 err 1 -1 no such table: v0
   SELECT * FROM t1;
 ----
 stmt 0 ok
-stmt 114 err 1 -1 no such table: t1
+stmt 114 err 1 -1 134 no such table: t1
 ==== select4-18.3
 
   SELECT * FROM t1 AS z1 JOIN t1 AS z2 USING(aa)
    WHERE abs(z1.aa)=z2.aa AND z1.aa=123;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 90 no such table: t1
 ==== select4-19.1
 
   CREATE TABLE t1(x);
@@ -699,5 +699,5 @@ stmt 0 err 1 -1 no such table: t1
   SELECT sum((SELECT 1 FROM (SELECT 2 WHERE x IS NULL) WHERE 0)) FROM t1;
 ----
 stmt 0 ok
-stmt 22 err 1 -1 no such table: t1
-stmt 51 err 1 -1 no such table: t1
+stmt 22 err 1 -1 51 no such table: t1
+stmt 51 err 1 -1 125 no such table: t1

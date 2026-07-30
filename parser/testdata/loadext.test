@@ -1,0 +1,30 @@
+==== loadext-1.1
+
+    SELECT half(1.0);
+----
+stmt 0 err 1 12 22 no such function: half
+==== loadext-3.1
+
+    SELECT half(5);
+----
+stmt 0 err 1 12 20 no such function: half
+==== loadext-3.4
+
+    SELECT half(5);
+----
+stmt 0 err 1 12 20 no such function: half
+==== loadext-3.6
+
+    SELECT sqlite3_status('MEMORY_USED_X') AS mused
+----
+stmt 0 err 1 12 53 no such function: sqlite3_status
+==== loadext-3.7
+
+    SELECT sqlite3_status(4.53) AS mused
+----
+stmt 0 err 1 12 42 no such function: sqlite3_status
+==== loadext-3.8
+
+    SELECT sqlite3_status(23) AS mused
+----
+stmt 0 err 1 12 40 no such function: sqlite3_status

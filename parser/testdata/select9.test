@@ -30,26 +30,26 @@
 stmt 0 ok
 stmt 30 ok
 stmt 60 ok
-stmt 71 err 1 -1 no such table: t1
-stmt 118 err 1 -1 no such table: t1
-stmt 166 err 1 -1 no such table: t1
-stmt 213 err 1 -1 no such table: t1
-stmt 262 err 1 -1 no such table: t1
-stmt 310 err 1 -1 no such table: t1
-stmt 358 err 1 -1 no such table: t1
-stmt 406 err 1 -1 no such table: t1
-stmt 454 err 1 -1 no such table: t1
-stmt 504 err 1 -1 no such table: t1
-stmt 551 err 1 -1 no such table: t2
-stmt 603 err 1 -1 no such table: t2
-stmt 656 err 1 -1 no such table: t2
-stmt 707 err 1 -1 no such table: t2
-stmt 759 err 1 -1 no such table: t2
-stmt 810 err 1 -1 no such table: t2
-stmt 861 err 1 -1 no such table: t2
-stmt 916 err 1 -1 no such table: t2
-stmt 970 err 1 -1 no such table: t2
-stmt 1021 err 1 -1 no such table: t2
+stmt 71 err 1 -1 118 no such table: t1
+stmt 118 err 1 -1 166 no such table: t1
+stmt 166 err 1 -1 213 no such table: t1
+stmt 213 err 1 -1 262 no such table: t1
+stmt 262 err 1 -1 310 no such table: t1
+stmt 310 err 1 -1 358 no such table: t1
+stmt 358 err 1 -1 406 no such table: t1
+stmt 406 err 1 -1 454 no such table: t1
+stmt 454 err 1 -1 504 no such table: t1
+stmt 504 err 1 -1 551 no such table: t1
+stmt 551 err 1 -1 603 no such table: t2
+stmt 603 err 1 -1 656 no such table: t2
+stmt 656 err 1 -1 707 no such table: t2
+stmt 707 err 1 -1 759 no such table: t2
+stmt 759 err 1 -1 810 no such table: t2
+stmt 810 err 1 -1 861 no such table: t2
+stmt 861 err 1 -1 916 no such table: t2
+stmt 916 err 1 -1 970 no such table: t2
+stmt 970 err 1 -1 1021 no such table: t2
+stmt 1021 err 1 -1 1072 no such table: t2
 stmt 1072 ok
 ==== select9-2.0
 
@@ -58,37 +58,37 @@ stmt 1072 ok
     DROP INDEX i3;
     DROP INDEX i4;
 ----
-stmt 0 err 1 -1 no such index: i1
-stmt 19 err 1 -1 no such index: i2
-stmt 38 err 1 -1 no such index: i3
-stmt 57 err 1 -1 no such index: i4
+stmt 0 err 1 -1 19 no such index: i1
+stmt 19 err 1 -1 38 no such index: i2
+stmt 38 err 1 -1 57 no such index: i3
+stmt 57 err 1 -1 76 no such index: i4
 ==== select9-2.X
 
     DROP INDEX i1;
     DROP INDEX i2;
     DROP INDEX i3;
 ----
-stmt 0 err 1 -1 no such index: i1
-stmt 19 err 1 -1 no such index: i2
-stmt 38 err 1 -1 no such index: i3
+stmt 0 err 1 -1 19 no such index: i1
+stmt 19 err 1 -1 38 no such index: i2
+stmt 38 err 1 -1 57 no such index: i3
 ==== select9-3.X
 
     DROP INDEX i1;
     DROP INDEX i2;
     DROP VIEW v1;
 ----
-stmt 0 err 1 -1 no such index: i1
-stmt 19 err 1 -1 no such index: i2
-stmt 38 err 1 -1 no such view: v1
+stmt 0 err 1 -1 19 no such index: i1
+stmt 19 err 1 -1 38 no such index: i2
+stmt 38 err 1 -1 56 no such view: v1
 ==== select9-4.X
 
     DROP INDEX i1;
     DROP INDEX i2;
     DROP VIEW v1;
 ----
-stmt 0 err 1 -1 no such index: i1
-stmt 19 err 1 -1 no such index: i2
-stmt 38 err 1 -1 no such view: v1
+stmt 0 err 1 -1 19 no such index: i1
+stmt 19 err 1 -1 38 no such index: i2
+stmt 38 err 1 -1 56 no such view: v1
 ==== select9-6.1
 
   CREATE TABLE t61(a);
@@ -99,16 +99,16 @@ stmt 38 err 1 -1 no such view: v1
 ----
 stmt 0 ok
 stmt 23 ok
-stmt 46 err 1 -1 no such table: t61
-stmt 77 err 1 -1 no such table: t62
-stmt 108 err 1 -1 no such table: t62
+stmt 46 err 1 -1 77 no such table: t61
+stmt 77 err 1 -1 108 no such table: t62
+stmt 108 err 1 -1 161 no such table: t62
 ==== select9-6.2
 
   SELECT a FROM t61 WHERE 0 UNION ALL SELECT b FROM t62;
 ----
-stmt 0 err 1 -1 no such table: t62
+stmt 0 err 1 -1 57 no such table: t62
 ==== select9-6.3
 
   SELECT a FROM t61 UNION SELECT b FROM t62 WHERE 0;
 ----
-stmt 0 err 1 -1 no such table: t62
+stmt 0 err 1 -1 53 no such table: t62

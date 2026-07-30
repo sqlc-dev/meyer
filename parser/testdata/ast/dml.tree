@@ -1,0 +1,385 @@
+InsertStmt{
+  Span: 50:75
+  Table: QualifiedName{
+    Span: 62:63
+    Name: Ident{
+      Span: 62:63
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Select: SelectStmt{
+    Span: 64:74
+    Cores: [
+      ValuesClause{
+        Span: 64:74
+        Rows: [
+          [
+            Literal{
+              Span: 72:73
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+          ]
+        ]
+      }
+    ]
+  }
+}
+InsertStmt{
+  Span: 76:145
+  OrConflict: ConflictAction(REPLACE)
+  Table: QualifiedName{
+    Span: 99:104
+    Schema: Ident{
+      Span: 99:102
+      Name: "sch"
+      Raw: "sch"
+    }
+    Name: Ident{
+      Span: 103:104
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Alias: Ident{
+    Span: 108:113
+    Name: "alias"
+    Raw: "alias"
+  }
+  Columns: [
+    Ident{
+      Span: 115:116
+      Name: "a"
+      Raw: "a"
+    }
+    Ident{
+      Span: 118:119
+      Name: "b"
+      Raw: "b"
+    }
+  ]
+  Select: SelectStmt{
+    Span: 121:132
+    Cores: [
+      SelectQuery{
+        Span: 121:132
+        Columns: [
+          ResultColumn{
+            Span: 128:129
+            Expr: Literal{
+              Span: 128:129
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+          }
+          ResultColumn{
+            Span: 131:132
+            Expr: Literal{
+              Span: 131:132
+              Kind: LiteralKind(INTEGER)
+              Value: "2"
+              Raw: "2"
+            }
+          }
+        ]
+      }
+    ]
+  }
+  Returning: [
+    ResultColumn{
+      Span: 143:144
+      Expr: Star{
+        Span: 143:144
+      }
+    }
+  ]
+}
+InsertStmt{
+  Span: 146:176
+  Replace: true
+  Table: QualifiedName{
+    Span: 159:160
+    Name: Ident{
+      Span: 159:160
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  DefaultValues: true
+}
+InsertStmt{
+  Span: 177:299
+  Table: QualifiedName{
+    Span: 189:190
+    Name: Ident{
+      Span: 189:190
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Select: SelectStmt{
+    Span: 191:201
+    Cores: [
+      ValuesClause{
+        Span: 191:201
+        Rows: [
+          [
+            Literal{
+              Span: 199:200
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+          ]
+        ]
+      }
+    ]
+  }
+  Upserts: [
+    Upsert{
+      Span: 202:273
+      Target: [
+        OrderingTerm{
+          Span: 215:216
+          Expr: Ident{
+            Span: 215:216
+            Name: "a"
+            Raw: "a"
+          }
+        }
+        OrderingTerm{
+          Span: 218:224
+          Expr: Ident{
+            Span: 218:219
+            Name: "b"
+            Raw: "b"
+          }
+          Order: SortOrder(DESC)
+        }
+      ]
+      TargetWhere: Ident{
+        Span: 232:233
+        Name: "a"
+        Raw: "a"
+      }
+      Set: [
+        SetPair{
+          Span: 248:253
+          Columns: [
+            Ident{
+              Span: 248:249
+              Name: "x"
+              Raw: "x"
+            }
+          ]
+          Value: Literal{
+            Span: 252:253
+            Kind: LiteralKind(INTEGER)
+            Value: "1"
+            Raw: "1"
+          }
+        }
+        SetPair{
+          Span: 255:265
+          Columns: [
+            Ident{
+              Span: 256:257
+              Name: "y"
+              Raw: "y"
+            }
+            Ident{
+              Span: 259:260
+              Name: "z"
+              Raw: "z"
+            }
+          ]
+          Paren: true
+          Value: Literal{
+            Span: 264:265
+            Kind: LiteralKind(INTEGER)
+            Value: "2"
+            Raw: "2"
+          }
+        }
+      ]
+      Where: Ident{
+        Span: 272:273
+        Name: "b"
+        Raw: "b"
+      }
+    }
+    Upsert{
+      Span: 276:298
+      DoNothing: true
+    }
+  ]
+}
+InsertStmt{
+  Span: 300:351
+  With: With{
+    Span: 300:320
+    CTEs: [
+      CTE{
+        Span: 305:320
+        Name: Ident{
+          Span: 305:306
+          Name: "c"
+          Raw: "c"
+        }
+        Select: SelectStmt{
+          Span: 311:319
+          Cores: [
+            SelectQuery{
+              Span: 311:319
+              Columns: [
+                ResultColumn{
+                  Span: 318:319
+                  Expr: Literal{
+                    Span: 318:319
+                    Kind: LiteralKind(INTEGER)
+                    Value: "1"
+                    Raw: "1"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  }
+  Table: QualifiedName{
+    Span: 333:334
+    Name: Ident{
+      Span: 333:334
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  Select: SelectStmt{
+    Span: 335:350
+    Cores: [
+      SelectQuery{
+        Span: 335:350
+        Columns: [
+          ResultColumn{
+            Span: 342:343
+            Expr: Star{
+              Span: 342:343
+            }
+          }
+        ]
+        From: [
+          TableRef{
+            Span: 349:350
+            Name: QualifiedName{
+              Span: 349:350
+              Name: Ident{
+                Span: 349:350
+                Name: "c"
+                Raw: "c"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+UpdateStmt{
+  Span: 352:428
+  OrConflict: ConflictAction(ROLLBACK)
+  Table: QualifiedName{
+    Span: 371:372
+    Name: Ident{
+      Span: 371:372
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  IndexedBy: Ident{
+    Span: 384:385
+    Name: "i"
+    Raw: "i"
+  }
+  Set: [
+    SetPair{
+      Span: 390:395
+      Columns: [
+        Ident{
+          Span: 390:391
+          Name: "a"
+          Raw: "a"
+        }
+      ]
+      Value: Literal{
+        Span: 394:395
+        Kind: LiteralKind(INTEGER)
+        Value: "1"
+        Raw: "1"
+      }
+    }
+  ]
+  From: [
+    TableRef{
+      Span: 401:402
+      Name: QualifiedName{
+        Span: 401:402
+        Name: Ident{
+          Span: 401:402
+          Name: "u"
+          Raw: "u"
+        }
+      }
+    }
+  ]
+  Where: Ident{
+    Span: 409:410
+    Name: "b"
+    Raw: "b"
+  }
+  Returning: [
+    ResultColumn{
+      Span: 421:427
+      Expr: Ident{
+        Span: 421:422
+        Name: "a"
+        Raw: "a"
+      }
+      Alias: Ident{
+        Span: 426:427
+        Name: "x"
+        Raw: "x"
+      }
+      HasAs: true
+    }
+  ]
+}
+DeleteStmt{
+  Span: 429:475
+  Table: QualifiedName{
+    Span: 441:442
+    Name: Ident{
+      Span: 441:442
+      Name: "t"
+      Raw: "t"
+    }
+  }
+  NotIndexed: true
+  Where: Ident{
+    Span: 461:462
+    Name: "a"
+    Raw: "a"
+  }
+  Returning: [
+    ResultColumn{
+      Span: 473:474
+      Expr: Star{
+        Span: 473:474
+      }
+    }
+  ]
+}

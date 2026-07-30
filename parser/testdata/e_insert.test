@@ -13,27 +13,27 @@ stmt 124 ok
 
   INSERT INTO a1 VALUES('x', 'y');
 ----
-stmt 0 err 1 -1 no such table: a1
+stmt 0 err 1 -1 35 no such table: a1
 ==== e_insert-4.1.0
 
   INSERT INTO a4 VALUES(1, 'a');
   INSERT INTO a4 VALUES(2, 'a');
   INSERT INTO a4 VALUES(3, 'a');
 ----
-stmt 0 err 1 -1 no such table: a4
-stmt 33 err 1 -1 no such table: a4
-stmt 66 err 1 -1 no such table: a4
+stmt 0 err 1 -1 33 no such table: a4
+stmt 33 err 1 -1 66 no such table: a4
+stmt 66 err 1 -1 99 no such table: a4
 ==== e_insert-generated
 SELECT * FROM a4
 ----
-stmt 0 err 1 -1 no such table: a4
+stmt 0 err 1 -1 17 no such table: a4
 ==== e_insert-5.1.1
 
   CREATE TRIGGER AFTER UPDATE ON a1 BEGIN
     INSERT INTO main.a4 VALUES(new.a, new.b);
   END;
 ----
-stmt 0 err 1 -1 no such table: main.a1
+stmt 0 err 1 -1 42 no such table: main.a1
 ==== e_insert-5.1.2
 
   CREATE TEMP TABLE IF NOT EXISTS tmptable(a, b);
@@ -42,11 +42,11 @@ stmt 0 err 1 -1 no such table: main.a1
   END;
 ----
 stmt 0 ok
-stmt 50 err 1 -1 no such table: main.a3
+stmt 50 err 1 -1 92 no such table: main.a3
 ==== e_insert-5.2.1
 
   CREATE TRIGGER AFTER UPDATE ON a1 BEGIN
     INSERT INTO a4 DEFAULT VALUES;
   END;
 ----
-stmt 0 err 1 -1 no such table: main.a1
+stmt 0 err 1 -1 42 no such table: main.a1

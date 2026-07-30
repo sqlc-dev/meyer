@@ -1,0 +1,38 @@
+==== hexlit-300
+
+  CREATE TABLE t1(x INT, y REAL);
+  INSERT INTO t1 VALUES('1234','4567'),('0x1234','0x4567');
+  SELECT typeof(x), x, typeof(y), y, '#' FROM t1 ORDER BY rowid;
+----
+stmt 0 ok
+stmt 34 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 159 no such table: t1
+==== hexlit-301
+
+  SELECT CAST('0x1234' AS INTEGER);
+----
+stmt 0 ok
+==== hexlist-400
+
+  SELECT 0x10000000000000000;
+----
+stmt 0 err 1 10 30 hex literal too big: 0x10000000000000000
+==== hexlist-401
+
+  SELECT DISTINCT 0x10000000000000000;
+----
+stmt 0 err 1 19 39 hex literal too big: 0x10000000000000000
+==== hexlist-402
+
+  SELECT DISTINCT -0x08000000000000000;
+----
+stmt 0 err 1 20 40 hex literal too big: -0x08000000000000000
+==== hexlist-410
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(1+0x10000000000000000);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 49 err 1 -1 97 no such table: t1

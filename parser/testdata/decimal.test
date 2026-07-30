@@ -1,0 +1,318 @@
+==== 1000
+
+  SELECT decimal(1);
+----
+stmt 0 err 1 10 21 no such function: decimal
+==== 1001
+
+  SELECT decimal('+0'), decimal('-0');
+----
+stmt 0 err 1 10 39 no such function: decimal
+==== 1010
+
+  SELECT decimal('1.0');
+----
+stmt 0 err 1 10 25 no such function: decimal
+==== 1020
+
+  SELECT decimal('0001.0');
+----
+stmt 0 err 1 10 28 no such function: decimal
+==== 1030
+
+  SELECT decimal('+0001.0');
+----
+stmt 0 err 1 10 29 no such function: decimal
+==== 1040
+
+  SELECT decimal('-0001.0');
+----
+stmt 0 err 1 10 29 no such function: decimal
+==== 1041
+
+  SELECT decimal('-0000.0');
+----
+stmt 0 err 1 10 29 no such function: decimal
+==== 1042
+
+  SELECT decimal(0.0)==decimal(-0.0);
+----
+stmt 0 err 1 24 38 no such function: decimal
+==== 1050
+
+  SELECT decimal('1.0e72');
+----
+stmt 0 err 1 10 28 no such function: decimal
+==== 1060
+
+  SELECT decimal('1.0e-72');
+----
+stmt 0 err 1 10 29 no such function: decimal
+==== 1070
+
+  SELECT decimal('-123e-4');
+----
+stmt 0 err 1 10 29 no such function: decimal
+==== 1080
+
+  SELECT decimal('+123e+4');
+----
+stmt 0 err 1 10 29 no such function: decimal
+==== 1081
+
+  SELECT decimal_exp('+123e+4');
+----
+stmt 0 err 1 10 33 no such function: decimal_exp
+==== 2000
+
+  CREATE TABLE t1(seq INTEGER PRIMARY KEY, val TEXT);
+  INSERT INTO t1 VALUES
+    (1, '-9999e99'),
+    (2, '-9998.000e+99'),
+    (3, '-9999.0'),
+    (4, '-1'),
+    (5, '-9999e-20'),
+    (6, '0'),
+    (7, '1e-30'),
+    (8, '1e-29'),
+    (9, '1'),
+    (10,'1.00000000000000001'),
+    (11,'+1.00001'),
+    (12,'99e+99');
+  SELECT *, '|'
+    FROM t1 AS a, t1 AS b
+   WHERE a.seq<b.seq
+     AND decimal_cmp(a.val,b.val)>=0;
+----
+stmt 0 ok
+stmt 54 err 1 -1 318 no such table: t1
+stmt 318 err 1 -1 419 no such table: t1
+==== 2001
+
+  WITH vx(a,b) AS (VALUES
+    ('-0','+0'),
+    ('-000.000','0'),
+    ('1.2','1.2000')
+  )
+  SELECT *, '|' FROM vx 
+   WHERE decimal_cmp(a,b)!=0
+      OR decimal_cmp(b,a)!=0;
+----
+stmt 0 err 1 125 174 no such function: decimal_cmp
+==== 2010
+
+  SELECT *, '|'
+    FROM t1 AS a, t1 AS b
+   WHERE a.seq<>b.seq
+     AND decimal_cmp(a.val,b.val)==0;
+----
+stmt 0 err 1 -1 102 no such table: t1
+==== 2020
+
+  SELECT *, '|'
+    FROM t1 AS a, t1 AS b
+   WHERE a.seq>b.seq
+     AND decimal_cmp(a.val,b.val)<=0;
+----
+stmt 0 err 1 -1 101 no such table: t1
+==== 2030
+
+  SELECT seq FROM t1 ORDER BY val COLLATE decimal;
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 2040
+
+  SELECT seq FROM t1 ORDER BY val COLLATE decimal DESC;
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== 3000
+
+  CREATE TABLE t3(seq INTEGER PRIMARY KEY, val TEXT);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION SELECT x+1 FROM c WHERE x<10)
+    INSERT INTO t3(seq, val) SELECT x, x FROM c;
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION SELECT x+1 FROM c WHERE x<5)
+    INSERT INTO t3(seq, val) SELECT x+10, x*1000 FROM c;
+  SELECT decimal(val) FROM t3 ORDER BY seq;
+----
+stmt 0 ok
+stmt 54 err 1 -1 175 no such table: t3
+stmt 175 err 1 -1 303 no such table: t3
+stmt 303 err 1 -1 347 no such table: t3
+==== 3020
+
+  SELECT decimal_add(val,'0.5') FROM t3 WHERE seq>5 ORDER BY seq
+----
+stmt 0 err 1 -1 66 no such table: t3
+==== 3030
+
+  SELECT decimal_add(val,'-10') FROM t3 ORDER BY seq;
+----
+stmt 0 err 1 -1 54 no such table: t3
+==== 4000
+
+  SELECT decimal_sum(val) FROM t3;
+----
+stmt 0 err 1 -1 35 no such table: t3
+==== 4010
+
+  SELECT decimal_sum(decimal_add(val,val||'e+10')) FROM t3;
+----
+stmt 0 err 1 -1 60 no such table: t3
+==== 4010.dup1
+
+  SELECT decimal_sum(decimal_add(val||'e+20',decimal_add(val,val||'e-20')))
+    FROM t3;
+----
+stmt 0 err 1 -1 89 no such table: t3
+==== 5000
+
+  WITH RECURSIVE c(x,y,z) AS (
+    VALUES(0,'1','1')
+    UNION ALL
+    SELECT x+1, decimal_mul(y,'2'), decimal_mul(z,'0.5')
+      FROM c WHERE x<32
+  )
+  SELECT count(*) FROM c WHERE decimal_mul(y,z)='1';
+----
+stmt 0 err 1 84 205 no such function: decimal_mul
+==== 5100
+
+  SELECT decimal_mul('1234.00','2.00');
+----
+stmt 0 err 1 10 40 no such function: decimal_mul
+==== 5101
+
+  SELECT decimal_mul('1234.00','2.0000');
+----
+stmt 0 err 1 10 42 no such function: decimal_mul
+==== 5102
+
+  SELECT decimal_mul('1234.0000','2.000');
+----
+stmt 0 err 1 10 43 no such function: decimal_mul
+==== 5103
+
+  SELECT decimal_mul('1234.0000','2');
+----
+stmt 0 err 1 10 39 no such function: decimal_mul
+==== 6000
+
+  CREATE TABLE pow2(x INTEGER PRIMARY KEY, v TEXT);
+  WITH RECURSIVE c(x,v) AS (
+    VALUES(0,'1')
+    UNION ALL
+    SELECT x+1, decimal_mul(v,'2') FROM c WHERE x+1<=971
+  ) INSERT INTO pow2(x,v) SELECT x, v FROM c;
+  WITH RECURSIVE c(x,v) AS (
+    VALUES(-1,'0.5')
+    UNION ALL
+    SELECT x-1, decimal_mul(v,'0.5') FROM c WHERE x-1>=-1075
+  ) INSERT INTO pow2(x,v) SELECT x, v FROM c;
+----
+stmt 0 ok
+stmt 52 err 1 -1 216 no such table: pow2
+stmt 216 err 1 -1 387 no such table: pow2
+==== 6010
+
+  WITH c(n) AS (SELECT ieee754_from_blob(x'0000000000000001'))
+SELECT decimal_mul(ieee754_mantissa(c.n),pow2.v)
+  FROM pow2, c WHERE pow2.x=ieee754_exponent(c.n);
+----
+stmt 0 err 1 -1 163 no such table: pow2
+==== 6011
+
+  WITH c(n) AS (SELECT ieee754_from_blob(x'0000000000000001'))
+SELECT decimal(c.n) FROM c;
+----
+stmt 0 err 1 24 91 no such function: ieee754_from_blob
+==== 6020
+
+  WITH c(n) AS (SELECT ieee754_from_blob(x'7fefffffffffffff'))
+SELECT decimal_mul(ieee754_mantissa(c.n),pow2.v)
+  FROM pow2, c WHERE pow2.x=ieee754_exponent(c.n);
+----
+stmt 0 err 1 -1 163 no such table: pow2
+==== 6100
+
+  SELECT ieee754(ieee754_from_blob(x'0000000000000001'));
+----
+stmt 0 err 1 18 58 no such function: ieee754_from_blob
+==== 6110
+
+  SELECT ieee754(ieee754_from_blob(x'7fefffffffffffff'));
+----
+stmt 0 err 1 18 58 no such function: ieee754_from_blob
+==== 6120
+
+  SELECT printf('%.8e',ieee754_from_blob(x'0000000000000001'));
+----
+stmt 0 err 1 24 64 no such function: ieee754_from_blob
+==== 6130
+
+  SELECT printf('%.8e',ieee754_from_blob(x'ffefffffffffffff'));
+----
+stmt 0 err 1 24 64 no such function: ieee754_from_blob
+==== 7000
+
+  SELECT decimal('999999999999999', 1);
+----
+stmt 0 err 1 10 40 no such function: decimal
+==== 7010
+
+  SELECT decimal('999999999999999', 2);
+----
+stmt 0 err 1 10 40 no such function: decimal
+==== 7020
+
+  SELECT decimal('999999999999999', 14);
+----
+stmt 0 err 1 10 41 no such function: decimal
+==== 7030
+
+  SELECT decimal('999999999999999', 15);
+----
+stmt 0 err 1 10 41 no such function: decimal
+==== 7040
+
+  SELECT decimal('899999999999999', 1);
+----
+stmt 0 err 1 10 40 no such function: decimal
+==== 7050
+
+  SELECT decimal('899999999999999', 14);
+----
+stmt 0 err 1 10 41 no such function: decimal
+==== 7060
+
+  SELECT decimal('899999999999999', 15);
+----
+stmt 0 err 1 10 41 no such function: decimal
+==== 7070
+
+  SELECT decimal('989999999999999', 14);
+----
+stmt 0 err 1 10 41 no such function: decimal
+==== 7080
+
+  SELECT decimal('998999999999999', 14);
+----
+stmt 0 err 1 10 41 no such function: decimal
+==== 8000
+
+  SELECT decimal('999.999',3);
+----
+stmt 0 err 1 10 31 no such function: decimal
+==== 8100
+
+  PRAGMA cache_size=10;
+  PRAGMA page_size=512;
+  CREATE TABLE t(x TEXT, pad TEXT);
+  WITH RECURSIVE c(n) AS (VALUES(1) UNION ALL SELECT n+1 FROM c WHERE n<5000)
+    INSERT INTO t SELECT printf('%*s', 8, ''), randomblob(2000) FROM c;
+  SELECT count(*) FROM (SELECT x FROM t ORDER BY x COLLATE decimal);
+----
+stmt 0 ok
+stmt 24 ok
+stmt 48 ok
+stmt 84 err 1 -1 234 no such table: t
+stmt 234 err 1 -1 303 no such table: t

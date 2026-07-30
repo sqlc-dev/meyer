@@ -1,0 +1,18 @@
+==== tkt3201-1
+
+    CREATE TABLE t1(a INTEGER PRIMARY KEY, b TEXT);
+    INSERT INTO t1 VALUES(1, 'one');
+    INSERT INTO t1 VALUES(2, 'two');
+----
+stmt 0 ok
+stmt 52 err 1 -1 89 no such table: t1
+stmt 89 err 1 -1 126 no such table: t1
+==== tkt3201-2
+
+    SELECT l.a, r.a FROM t1 AS l, t1 AS r WHERE l.a < r.a;
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== tkt3201-7
+ SELECT a, b, c, d FROM t1, t3 WHERE a < c
+----
+stmt 0 err 1 -1 43 no such table: t1

@@ -1,0 +1,132 @@
+==== temptable-1.3
+SELECT name FROM sqlite_master
+----
+stmt 0 ok
+==== temptable-1.7
+INSERT INTO t2 VALUES(8,9,0);
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== temptable-2.1
+
+    BEGIN TRANSACTION;
+    CREATE TEMPORARY TABLE t2(x,y);
+    INSERT INTO t2 VALUES(1,2);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 59 err 1 -1 91 no such table: t2
+stmt 91 err 1 -1 113 no such table: t2
+==== temptable-2.3
+
+    BEGIN TRANSACTION;
+    CREATE TEMPORARY TABLE t2(x,y);
+    INSERT INTO t2 VALUES(1,2);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 59 err 1 -1 91 no such table: t2
+stmt 91 err 1 -1 113 no such table: t2
+==== temptable-3.1
+
+    CREATE INDEX i2 ON t2(x);
+    SELECT name FROM sqlite_master WHERE type='index';
+----
+stmt 0 err 1 -1 30 no such table: main.t2
+stmt 30 ok
+==== temptable-3.2
+
+    SELECT y FROM t2 WHERE x=1;
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== temptable-3.3
+
+    DROP INDEX i2;
+    SELECT y FROM t2 WHERE x=1;
+----
+stmt 0 err 1 -1 19 no such index: i2
+stmt 19 err 1 -1 51 no such table: t2
+==== temptable-4.2
+
+    CREATE TABLE t2(x,y,z);
+    INSERT INTO t2 VALUES(9,8,7);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 28 err 1 -1 62 no such table: t2
+stmt 62 err 1 -1 84 no such table: t2
+==== temptable-4.7
+
+    DROP TABLE t2;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 19 no such table: t2
+stmt 19 err 1 -1 41 no such table: t2
+==== temptable-4.9
+
+    CREATE TABLE t2(x unique, y);
+    INSERT INTO t2 VALUES(3,4);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 34 err 1 -1 66 no such table: t2
+stmt 66 err 1 -1 88 no such table: t2
+==== temptable-4.12
+
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== temptable-4.14
+
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t2
+==== temptable-5.4
+
+    SELECT y FROM t2 WHERE x=3
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== temptable-5.8
+
+    SELECT y FROM t2 WHERE x=1;
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== temptable-5.9
+
+    SELECT y FROM t2 WHERE x=3
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== temptable-6.1
+
+    CREATE TABLE t8(x);
+    INSERT INTO t8 VALUES('xyzzy');
+    SELECT * FROM t8;
+----
+stmt 0 ok
+stmt 24 err 1 -1 60 no such table: t8
+stmt 60 err 1 -1 82 no such table: t8
+==== temptable-6.4
+
+    CREATE TEMP TABLE t9(x,y);
+----
+stmt 0 ok
+==== temptable-6.5
+
+    INSERT INTO t9 VALUES(1,2);
+    SELECT * FROM t9;
+----
+stmt 0 err 1 -1 32 no such table: t9
+stmt 32 err 1 -1 54 no such table: t9
+==== temptable-6.7
+
+    SELECT * FROM t8,t9;
+----
+stmt 0 err 1 -1 25 no such table: t8
+==== temptable-7.1
+
+      ATTACH 'test2.db' AS two;
+      CREATE TEMP TABLE two.abc(x,y);
+----
+stmt 0 ok
+stmt 32 err 1 57 65 unknown database two

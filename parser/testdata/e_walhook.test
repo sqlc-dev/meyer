@@ -1,0 +1,29 @@
+==== 3.0
+
+    ATTACH 'test.db2' AS aux;
+    CREATE TABLE aux.t2(x);
+    PRAGMA aux.journal_mode = wal;
+----
+stmt 0 ok
+stmt 30 err 1 48 55 unknown database aux
+stmt 58 err 1 70 93 unknown database aux
+==== 4.1
+
+  INSERT INTO t1 VALUES(7)
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== 4.2
+
+  INSERT INTO t1 VALUES(8)
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== 4.3
+
+  INSERT INTO t1 VALUES(9)
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== 4.4
+
+  SELECT * FROM t1
+----
+stmt 0 err 1 -1 20 no such table: t1

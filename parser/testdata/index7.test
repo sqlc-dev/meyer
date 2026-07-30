@@ -1,0 +1,318 @@
+==== index7-1.1.1
+
+  SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== index7-1.2
+
+    CREATE INDEX bad1 ON t1(a,b) WHERE x IS NOT NULL;
+----
+stmt 0 err 1 -1 54 no such table: main.t1
+==== index7-1.3
+
+    CREATE INDEX bad1 ON t1(a,b) WHERE EXISTS(SELECT * FROM t1);
+----
+stmt 0 err 1 -1 65 no such table: main.t1
+==== index7-1.4
+
+    CREATE INDEX bad1 ON t1(a,b) WHERE a!=?1;
+----
+stmt 0 err 1 -1 46 no such table: main.t1
+==== index7-1.5
+
+    CREATE INDEX bad1 ON t1(a,b) WHERE a!=random();
+----
+stmt 0 err 1 -1 52 no such table: main.t1
+==== index7-1.6
+
+    CREATE INDEX bad1 ON t1(a,b) WHERE a NOT LIKE 'abc%';
+----
+stmt 0 err 1 -1 58 no such table: main.t1
+==== index7-1.7
+
+  INSERT INTO t1(a,b,c)
+     VALUES('abcde',1,101),('abdef',2,102),('xyz',3,103),('abcz',4,104);
+  SELECT c FROM t1 WHERE a NOT LIKE 'abc%' AND a=7 ORDER BY +b;
+----
+stmt 0 err 1 -1 97 no such table: t1
+stmt 97 err 1 -1 161 no such table: t1
+==== index7-1.7eqp
+
+  EXPLAIN QUERY PLAN
+  SELECT b FROM t1 WHERE a NOT LIKE 'abc%' AND a=7 ORDER BY +b;
+----
+stmt 0 err 1 -1 85 no such table: t1
+==== index7-1.8
+
+  DELETE FROM t1 WHERE c>=101;
+  DROP INDEX IF EXISTS bad1;
+----
+stmt 0 err 1 -1 31 no such table: t1
+stmt 31 ok
+==== index7-1.10
+
+    ANALYZE;
+    SELECT idx, stat FROM sqlite_stat1 ORDER BY idx;
+    PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 13 err 1 -1 66 no such table: sqlite_stat1
+stmt 66 ok
+==== index7-1.11
+
+    UPDATE t1 SET a=b;
+    ANALYZE;
+    SELECT idx, stat FROM sqlite_stat1 ORDER BY idx;
+    PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 23 no such table: t1
+stmt 23 ok
+stmt 36 err 1 -1 89 no such table: sqlite_stat1
+stmt 89 ok
+==== index7-1.11b
+
+    UPDATE t1 SET a=NULL WHERE b%3!=0;
+    UPDATE t1 SET b=b+100;
+    ANALYZE;
+    SELECT idx, stat FROM sqlite_stat1 ORDER BY idx;
+    PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 39 no such table: t1
+stmt 39 err 1 -1 66 no such table: t1
+stmt 66 ok
+stmt 79 err 1 -1 132 no such table: sqlite_stat1
+stmt 132 ok
+==== index7-1.12
+
+    UPDATE t1 SET a=CASE WHEN b%3!=0 THEN b END;
+    UPDATE t1 SET b=b-100;
+    ANALYZE;
+    SELECT idx, stat FROM sqlite_stat1 ORDER BY idx;
+    PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 49 no such table: t1
+stmt 49 err 1 -1 76 no such table: t1
+stmt 76 ok
+stmt 89 err 1 -1 142 no such table: sqlite_stat1
+stmt 142 ok
+==== index7-1.13
+
+    DELETE FROM t1 WHERE b BETWEEN 8 AND 12;
+    ANALYZE;
+    SELECT idx, stat FROM sqlite_stat1 ORDER BY idx;
+    PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 45 no such table: t1
+stmt 45 ok
+stmt 58 err 1 -1 111 no such table: sqlite_stat1
+stmt 111 ok
+==== index7-1.14
+
+    REINDEX;
+    ANALYZE;
+    SELECT idx, stat FROM sqlite_stat1 ORDER BY idx;
+    PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 13 ok
+stmt 26 err 1 -1 79 no such table: sqlite_stat1
+stmt 79 ok
+==== index7-1.15
+
+    CREATE INDEX t1c ON t1(c);
+    ANALYZE;
+    SELECT idx, stat FROM sqlite_stat1 ORDER BY idx;
+    PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 31 no such table: main.t1
+stmt 31 ok
+stmt 44 err 1 -1 97 no such table: sqlite_stat1
+stmt 97 ok
+==== index7-2.1
+
+    CREATE TABLE t2(a,b PRIMARY KEY) without rowid;
+    INSERT INTO t2(a,b) SELECT value, value FROM nums WHERE value<1000;
+    UPDATE t2 SET a=NULL WHERE b%5==0;
+    CREATE INDEX t2a1 ON t2(a) WHERE a IS NOT NULL;
+    SELECT count(*) FROM t2 WHERE a IS NOT NULL;
+----
+stmt 0 ok
+stmt 52 err 1 -1 124 no such table: t2
+stmt 124 err 1 -1 163 no such table: t2
+stmt 163 err 1 -1 215 no such table: main.t2
+stmt 215 err 1 -1 264 no such table: t2
+==== index7-2.2
+
+    EXPLAIN QUERY PLAN
+    SELECT * FROM t2 WHERE a=5;
+----
+stmt 0 err 1 -1 55 no such table: t2
+==== index7-2.3stat4
+
+      EXPLAIN QUERY PLAN
+      SELECT * FROM t2 WHERE a IS NOT NULL;
+----
+stmt 0 err 1 -1 69 no such table: t2
+==== index7-2.3stat4.dup1
+
+      EXPLAIN QUERY PLAN
+      SELECT * FROM t2 WHERE a IS NOT NULL AND a>0;
+----
+stmt 0 err 1 -1 77 no such table: t2
+==== index7-2.4
+
+    EXPLAIN QUERY PLAN
+    SELECT * FROM t2 WHERE a IS NULL;
+----
+stmt 0 err 1 -1 61 no such table: t2
+==== index7-2.101
+
+  DROP INDEX t2a1;
+  UPDATE t2 SET a=b, b=b+10000;
+  SELECT b FROM t2 WHERE a=15;
+----
+stmt 0 err 1 -1 19 no such index: t2a1
+stmt 19 err 1 -1 51 no such table: t2
+stmt 51 err 1 -1 82 no such table: t2
+==== index7-2.102
+
+  CREATE INDEX t2a2 ON t2(a) WHERE a<100 OR a>200;
+  SELECT b FROM t2 WHERE a=15;
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 51 no such table: main.t2
+stmt 51 err 1 -1 82 no such table: t2
+stmt 82 ok
+==== index7-2.102eqp
+
+  EXPLAIN QUERY PLAN
+  SELECT b FROM t2 WHERE a=15;
+----
+stmt 0 err 1 -1 52 no such table: t2
+==== index7-2.103
+
+  SELECT b FROM t2 WHERE a=15 AND a<100;
+----
+stmt 0 err 1 -1 41 no such table: t2
+==== index7-2.103eqp
+
+  EXPLAIN QUERY PLAN
+  SELECT b FROM t2 WHERE a=15 AND a<100;
+----
+stmt 0 err 1 -1 62 no such table: t2
+==== index7-2.104
+
+  SELECT b FROM t2 WHERE a=515 AND a>200;
+----
+stmt 0 err 1 -1 42 no such table: t2
+==== index7-2.104eqp
+
+  EXPLAIN QUERY PLAN
+  SELECT b FROM t2 WHERE a=515 AND a>200;
+----
+stmt 0 err 1 -1 63 no such table: t2
+==== index7-3.1
+
+  CREATE TABLE t3(a,b PRIMARY KEY) without rowid;
+  INSERT INTO t3 SELECT value, value FROM nums WHERE value<200;
+  UPDATE t3 SET a=999 WHERE b%5!=0;
+  CREATE UNIQUE INDEX t3a ON t3(a) WHERE a<>999;
+----
+stmt 0 ok
+stmt 50 err 1 -1 114 no such table: t3
+stmt 114 err 1 -1 150 no such table: t3
+stmt 150 err 1 -1 199 no such table: main.t3
+==== index7-3.4
+
+  SELECT count(*) FROM t3 WHERE a=999;
+----
+stmt 0 err 1 -1 39 no such table: t3
+==== index7-4.0
+
+  VACUUM;
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+stmt 10 ok
+==== index7-5.0
+
+  CREATE INDEX t3b ON t3(b) WHERE xyzzy.t3.b BETWEEN 5 AND 10;
+                               /* ^^^^^-- ignored */
+  ANALYZE;
+  SELECT count(*) FROM t3 WHERE t3.b BETWEEN 5 AND 10;
+  SELECT stat+0 FROM sqlite_stat1 WHERE idx='t3b';
+----
+stmt 0 err 1 -1 63 no such table: main.t3
+stmt 63 ok
+stmt 127 err 1 -1 182 no such table: t3
+stmt 182 err 1 -1 233 no such table: sqlite_stat1
+==== index7-6.1
+
+  CREATE TABLE t5(a, b);
+  CREATE TABLE t4(c, d);
+  INSERT INTO t5 VALUES(1, 'xyz');
+  INSERT INTO t4 VALUES('abc', 'not xyz');
+  SELECT * FROM (SELECT * FROM t5 WHERE a=1 AND b='xyz'), t4 WHERE c='abc';
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 85 no such table: t5
+stmt 85 err 1 -1 128 no such table: t4
+stmt 128 err 1 -1 204 no such table: t5
+==== index7-6.2
+
+  CREATE INDEX i4 ON t4(c) WHERE d='xyz';
+  SELECT * FROM (SELECT * FROM t5 WHERE a=1 AND b='xyz'), t4 WHERE c='abc';
+----
+stmt 0 err 1 -1 42 no such table: main.t4
+stmt 42 err 1 -1 118 no such table: t5
+==== index7-6.3
+
+  CREATE VIEW v4 AS SELECT * FROM t4;
+  INSERT INTO t4 VALUES('def', 'xyz');
+  SELECT * FROM v4 WHERE d='xyz' AND c='def'
+----
+stmt 0 ok
+stmt 38 err 1 -1 77 no such table: t4
+stmt 77 err 1 -1 123 no such table: v4
+==== index7-6.4
+
+  SELECT * FROM v4 WHERE d='xyz' AND c='def'
+----
+stmt 0 err 1 -1 46 no such table: v4
+==== index7-6.5
+
+  CREATE INDEX t5a ON t5(a) WHERE a=#1;
+----
+stmt 0 err 1 37 40 near "#1": syntax error
+==== index7-7.0
+
+  CREATE TABLE t6(x, y);
+  INSERT INTO t6 VALUES(1, 1);
+  INSERT INTO t6 VALUES(0, 0);
+  SELECT * FROM t6 WHERE y IS TRUE ORDER BY x;
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t6
+stmt 56 err 1 -1 87 no such table: t6
+stmt 87 err 1 -1 134 no such table: t6
+==== index7-7.1
+
+  CREATE INDEX i6 ON t6(x) WHERE y IS NOT TRUE;
+  SELECT * FROM t6 WHERE y IS TRUE ORDER BY x;
+----
+stmt 0 err 1 -1 48 no such table: main.t6
+stmt 48 err 1 -1 95 no such table: t6
+==== index7-8.1
+
+  CREATE TABLE t1(x INTEGER PRIMARY KEY, y);
+  CREATE INDEX t1y ON t1(y) WHERE y IS NOT NULL;
+  INSERT INTO t1(x) VALUES(1),(2);
+  ANALYZE;
+  EXPLAIN QUERY PLAN SELECT 1 FROM t1 WHERE y=5;
+----
+stmt 0 ok
+stmt 45 err 1 -1 94 no such table: main.t1
+stmt 94 err 1 -1 129 no such table: t1
+stmt 129 ok
+stmt 140 err 1 -1 189 no such table: t1

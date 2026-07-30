@@ -1,0 +1,104 @@
+==== fts3b-1.1
+
+    SELECT rowid FROM t1 WHERE c MATCH 'this';
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== fts3b-1.2
+
+    SELECT rowid FROM t1 WHERE c MATCH 'this';
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== fts3b-2.1
+
+    SELECT rowid FROM t2 WHERE c MATCH 'lorem';
+----
+stmt 0 err 1 -1 48 no such table: t2
+==== fts3b-2.2
+
+    SELECT rowid FROM t2 WHERE c MATCH 'lorem';
+----
+stmt 0 err 1 -1 48 no such table: t2
+==== fts3b-3.1
+
+    SELECT snippet(t3) FROM t3 WHERE t3 MATCH 'test';
+----
+stmt 0 err 1 -1 54 no such table: t3
+==== fts3b-3.2
+
+    SELECT * FROM t3 WHERE rowid = 1;
+----
+stmt 0 err 1 -1 38 no such table: t3
+==== fts3b-3.3
+
+    INSERT INTO t3 VALUES ('another test');
+----
+stmt 0 err 1 -1 44 no such table: t3
+==== fts3b-4.1
+
+    SELECT rowid FROM t4 WHERE rowid <> docid;
+----
+stmt 0 err 1 -1 47 no such table: t4
+==== fts3b-4.2
+
+    SELECT * FROM t4 WHERE rowid = 1;
+----
+stmt 0 err 1 -1 38 no such table: t4
+==== fts3b-4.3
+
+    SELECT docid, * FROM t4 WHERE rowid = 1;
+----
+stmt 0 err 1 -1 45 no such table: t4
+==== fts3b-4.4
+
+    SELECT docid, * FROM t4 WHERE docid = 1;
+----
+stmt 0 err 1 -1 45 no such table: t4
+==== fts3b-4.5
+
+    INSERT INTO t4 VALUES ('another test');
+----
+stmt 0 err 1 -1 44 no such table: t4
+==== fts3b-4.6
+
+    INSERT INTO t4 (docid, c) VALUES (10, 'yet another test');
+    SELECT * FROM t4 WHERE docid = 10;
+----
+stmt 0 err 1 -1 63 no such table: t4
+stmt 63 err 1 -1 102 no such table: t4
+==== fts3b-4.7
+
+    INSERT INTO t4 (docid, c) VALUES (12, 'still testing');
+    SELECT * FROM t4 WHERE docid = 12;
+----
+stmt 0 err 1 -1 60 no such table: t4
+stmt 60 err 1 -1 99 no such table: t4
+==== fts3b-4.8
+
+    INSERT INTO t4 (rowid, docid, c) VALUES (14, 15, 'bad test');
+    SELECT * FROM t4 WHERE docid = 14;
+----
+stmt 0 err 1 -1 66 no such table: t4
+stmt 66 err 1 -1 105 no such table: t4
+==== fts3b-4.9
+ SELECT docid FROM t4 WHERE t4 MATCH 'testing'
+----
+stmt 0 err 1 -1 47 no such table: t4
+==== fts3b-4.10
+ 
+    UPDATE t4 SET docid = 14 WHERE docid = 12;
+    SELECT docid FROM t4 WHERE t4 MATCH 'testing';
+----
+stmt 0 err 1 -1 48 no such table: t4
+stmt 48 err 1 -1 99 no such table: t4
+==== fts3b-4.11
+ SELECT * FROM t4 WHERE rowid = 14;
+----
+stmt 0 err 1 -1 35 no such table: t4
+==== fts3b-4.12
+ SELECT * FROM t4 WHERE rowid = 12;
+----
+stmt 0 err 1 -1 35 no such table: t4
+==== fts3b-4.13
+ SELECT docid FROM t4 WHERE t4 MATCH 'still';
+----
+stmt 0 err 1 -1 45 no such table: t4

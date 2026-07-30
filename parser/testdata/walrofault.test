@@ -1,0 +1,24 @@
+==== 1.0
+
+  CREATE TABLE t1(b);
+  PRAGMA journal_mode = wal;
+  INSERT INTO t1 VALUES('hello');
+  INSERT INTO t1 VALUES('world');
+  INSERT INTO t1 VALUES('!');
+  INSERT INTO t1 VALUES('world');
+  INSERT INTO t1 VALUES('hello');
+  PRAGMA cache_size = 10;
+  BEGIN;
+    WITH s(i) AS ( SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<30 ) 
+    INSERT INTO t1(b) SELECT randomblob(800) FROM s;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 51 err 1 -1 85 no such table: t1
+stmt 85 err 1 -1 119 no such table: t1
+stmt 119 err 1 -1 149 no such table: t1
+stmt 149 err 1 -1 183 no such table: t1
+stmt 183 err 1 -1 217 no such table: t1
+stmt 217 ok
+stmt 243 ok
+stmt 252 err 1 -1 375 no such table: t1

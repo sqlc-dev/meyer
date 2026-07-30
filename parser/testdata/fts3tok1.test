@@ -1,0 +1,90 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING fts3tokenize(simple);
+  CREATE VIRTUAL TABLE t2 USING fts3tokenize();
+  CREATE VIRTUAL TABLE t3 USING fts3tokenize(simple, '', 'xyz ');
+----
+stmt 0 ok
+stmt 54 ok
+stmt 102 ok
+==== 1.4
+
+  SELECT token FROM t3 WHERE input = '1x2x3x'
+----
+stmt 0 err 1 -1 47 no such table: t3
+==== 1.5
+
+  SELECT token FROM t1 WHERE input = '1x2x3x'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 1.6
+
+  SELECT token FROM t3 WHERE input = '1''2x3x'
+----
+stmt 0 err 1 -1 48 no such table: t3
+==== 1.7
+
+  SELECT token FROM t3 WHERE input = ''
+----
+stmt 0 err 1 -1 41 no such table: t3
+==== 1.8
+
+  SELECT token FROM t3 WHERE input = NULL
+----
+stmt 0 err 1 -1 43 no such table: t3
+==== 1.9
+
+  SELECT * FROM t3 WHERE input = 123
+----
+stmt 0 err 1 -1 38 no such table: t3
+==== 1.10
+
+  SELECT * FROM t1 WHERE input = 'a b c' AND token = 'b';
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 1.11
+
+  SELECT * FROM t1 WHERE token = 'b' AND input = 'a b c';
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 1.12
+
+  SELECT * FROM t1 WHERE input < 'b' AND input = 'a b c';
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== 1.13.1
+
+  CREATE TABLE c1(x);
+  INSERT INTO c1(x) VALUES('a b c');
+  INSERT INTO c1(x) VALUES('d e f');
+----
+stmt 0 ok
+stmt 22 err 1 -1 59 no such table: c1
+stmt 59 err 1 -1 96 no such table: c1
+==== 1.13.2
+
+  SELECT * FROM c1, t1 WHERE input = x AND c1.rowid=t1.rowid;
+----
+stmt 0 err 1 -1 62 no such table: c1
+==== 2.0
+
+  CREATE VIRTUAL TABLE tX USING fts3tokenize(nosuchtokenizer);
+----
+stmt 0 ok
+==== 2.1
+
+  CREATE VIRTUAL TABLE t4 USING fts3tokenize;
+  SELECT * FROM t4;
+----
+stmt 0 ok
+stmt 46 err 1 -1 66 no such table: t4
+==== 2.2
+
+  CREATE VIRTUAL TABLE t USING fts4(tokenize=simple"");
+----
+stmt 0 ok
+==== 2.3
+
+    CREATE VIRTUAL TABLE u USING fts4(tokenize=unicode61"");
+----
+stmt 0 ok

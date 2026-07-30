@@ -5,7 +5,7 @@
                               ON main.t4.a=t2.a+222)
                      ON t2.a=t1.a+111;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 185 no such table: t1
 ==== selectD-4.1
 
   CREATE TABLE t41(a INTEGER PRIMARY KEY, b INTEGER);
@@ -23,4 +23,4 @@ stmt 0 err 1 -1 no such table: t1
 stmt 0 ok
 stmt 54 ok
 stmt 108 ok
-stmt 162 err 1 -1 no such table: t41
+stmt 162 err 1 -1 402 no such table: t41

@@ -1,0 +1,20 @@
+==== sharedlock-1.1
+
+    CREATE TABLE t1(a, b);
+    INSERT INTO t1 VALUES(1, 'one');
+    INSERT INTO t1 VALUES(2, 'two');
+----
+stmt 0 ok
+stmt 27 err 1 -1 64 no such table: t1
+stmt 64 err 1 -1 101 no such table: t1
+==== 2.1
+
+    DROP TABLE IF EXISTS t2;
+    CREATE TABLE t2(x, y);
+    INSERT INTO t2 VALUES(1, 2);
+    INSERT INTO t2 VALUES(3, 4);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 56 err 1 -1 89 no such table: t2
+stmt 89 err 1 -1 122 no such table: t2

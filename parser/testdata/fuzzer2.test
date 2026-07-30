@@ -1,0 +1,27 @@
+==== 1.1.1
+
+  DROP TABLE IF EXISTS x1;
+  DROP TABLE IF EXISTS x1_rules;
+  CREATE TABLE x1_rules(ruleset, cFrom, cTo, cost);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 60 ok
+==== 1.2
+
+  SELECT count(*) FROM x1_rules WHERE cTo!=cFrom;
+----
+stmt 0 err 1 -1 50 no such table: x1_rules
+==== 1.2.1
+
+  CREATE VIRTUAL TABLE x1 USING fuzzer(x1_rules);
+  SELECT word FROM x1 WHERE word MATCH 'xx' LIMIT 10;
+----
+stmt 0 ok
+stmt 50 err 1 -1 104 no such table: x1
+==== 1.2.2
+
+  SELECT cTo FROM x1_rules WHERE cFrom='xx' 
+  ORDER BY cost asc, rowid asc LIMIT 9;
+----
+stmt 0 err 1 -1 85 no such table: x1_rules

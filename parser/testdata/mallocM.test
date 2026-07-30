@@ -1,0 +1,17 @@
+==== 1.0
+
+  CREATE TABLE t1(x);
+----
+stmt 0 ok
+==== 2.0.1
+ SELECT instr(x'', x'')
+----
+stmt 0 ok
+==== 2.0.2
+ SELECT instr(x'12345678', x'')
+----
+stmt 0 ok
+==== 2.0.3
+ SELECT instr(x'', x'1234')
+----
+stmt 0 ok

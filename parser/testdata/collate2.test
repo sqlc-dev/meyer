@@ -1,0 +1,632 @@
+==== collate2-1.1
+
+    SELECT a FROM collate2t1 WHERE a > 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 56 no such table: collate2t1
+==== collate2-1.1.1
+
+    SELECT a FROM collate2t1 WHERE a COLLATE binary > 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 71 no such table: collate2t1
+==== collate2-1.1.2
+
+    SELECT a FROM collate2t1 WHERE b COLLATE binary > 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 71 no such table: collate2t1
+==== collate2-1.1.3
+
+    SELECT a FROM collate2t1 WHERE c COLLATE binary > 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 71 no such table: collate2t1
+==== collate2-1.2
+
+    SELECT b FROM collate2t1 WHERE b > 'aa' ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 61 no such table: collate2t1
+==== collate2-1.2.1
+
+    SELECT b FROM collate2t1 WHERE a COLLATE nocase > 'aa'
+     ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 81 no such table: collate2t1
+==== collate2-1.2.2
+
+    SELECT b FROM collate2t1 WHERE b COLLATE nocase > 'aa'
+     ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 81 no such table: collate2t1
+==== collate2-1.2.3
+
+    SELECT b FROM collate2t1 WHERE c COLLATE nocase > 'aa'
+     ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 81 no such table: collate2t1
+==== collate2-1.2.4
+
+    SELECT b FROM collate2t1 WHERE b > 'aa' ORDER BY +b;
+----
+stmt 0 err 1 -1 57 no such table: collate2t1
+==== collate2-1.2.5
+
+    SELECT b FROM collate2t1 WHERE a COLLATE nocase > 'aa' ORDER BY +b;
+----
+stmt 0 err 1 -1 72 no such table: collate2t1
+==== collate2-1.2.6
+
+    SELECT b FROM collate2t1 WHERE b COLLATE nocase > 'aa' ORDER BY +b;
+----
+stmt 0 err 1 -1 72 no such table: collate2t1
+==== collate2-1.2.7
+
+    SELECT b FROM collate2t1 WHERE c COLLATE nocase > 'aa' ORDER BY +b;
+----
+stmt 0 err 1 -1 72 no such table: collate2t1
+==== collate2-1.3
+
+    SELECT c FROM collate2t1 WHERE c > 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 56 no such table: collate2t1
+==== collate2-1.3.1
+
+    SELECT c FROM collate2t1 WHERE a COLLATE backwards > 'aa'
+    ORDER BY 1;
+----
+stmt 0 err 1 -1 78 no such table: collate2t1
+==== collate2-1.3.2
+
+    SELECT c FROM collate2t1 WHERE b COLLATE backwards > 'aa'
+    ORDER BY 1;
+----
+stmt 0 err 1 -1 78 no such table: collate2t1
+==== collate2-1.3.3
+
+    SELECT c FROM collate2t1 WHERE c COLLATE backwards > 'aa'
+    ORDER BY 1;
+----
+stmt 0 err 1 -1 78 no such table: collate2t1
+==== collate2-1.4
+
+    SELECT a FROM collate2t1 WHERE a < 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 56 no such table: collate2t1
+==== collate2-1.5
+
+    SELECT b FROM collate2t1 WHERE b < 'aa' ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 61 no such table: collate2t1
+==== collate2-1.5.1
+
+    SELECT b FROM collate2t1 WHERE b < 'aa' ORDER BY +b;
+----
+stmt 0 err 1 -1 57 no such table: collate2t1
+==== collate2-1.6
+
+    SELECT c FROM collate2t1 WHERE c < 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 56 no such table: collate2t1
+==== collate2-1.7
+
+    SELECT a FROM collate2t1 WHERE a = 'aa';
+----
+stmt 0 err 1 -1 45 no such table: collate2t1
+==== collate2-1.8
+
+    SELECT b FROM collate2t1 WHERE b = 'aa' ORDER BY oid;
+----
+stmt 0 err 1 -1 58 no such table: collate2t1
+==== collate2-1.9
+
+    SELECT c FROM collate2t1 WHERE c = 'aa';
+----
+stmt 0 err 1 -1 45 no such table: collate2t1
+==== collate2-1.10
+
+    SELECT a FROM collate2t1 WHERE a >= 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 57 no such table: collate2t1
+==== collate2-1.11
+
+    SELECT b FROM collate2t1 WHERE b >= 'aa' ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 62 no such table: collate2t1
+==== collate2-1.12
+
+    SELECT c FROM collate2t1 WHERE c >= 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 57 no such table: collate2t1
+==== collate2-1.13
+
+    SELECT a FROM collate2t1 WHERE a <= 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 57 no such table: collate2t1
+==== collate2-1.14
+
+    SELECT b FROM collate2t1 WHERE b <= 'aa' ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 62 no such table: collate2t1
+==== collate2-1.15
+
+    SELECT c FROM collate2t1 WHERE c <= 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 57 no such table: collate2t1
+==== collate2-1.16
+
+    SELECT a FROM collate2t1 WHERE a BETWEEN 'Aa' AND 'Bb' ORDER BY 1;
+----
+stmt 0 err 1 -1 71 no such table: collate2t1
+==== collate2-1.17
+
+    SELECT b FROM collate2t1 WHERE b BETWEEN 'Aa' AND 'Bb' ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 76 no such table: collate2t1
+==== collate2-1.17.1
+
+    SELECT b FROM collate2t1 WHERE b BETWEEN 'Aa' AND 'Bb' ORDER BY +b;
+----
+stmt 0 err 1 -1 72 no such table: collate2t1
+==== collate2-1.18
+
+    SELECT c FROM collate2t1 WHERE c BETWEEN 'Aa' AND 'Bb' ORDER BY 1;
+----
+stmt 0 err 1 -1 71 no such table: collate2t1
+==== collate2-1.19
+
+    SELECT a FROM collate2t1 WHERE 
+      CASE a WHEN 'aa' THEN 1 ELSE 0 END
+        ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 102 no such table: collate2t1
+==== collate2-1.20
+
+    SELECT b FROM collate2t1 WHERE 
+      CASE b WHEN 'aa' THEN 1 ELSE 0 END
+        ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 102 no such table: collate2t1
+==== collate2-1.21
+
+    SELECT c FROM collate2t1 WHERE 
+      CASE c WHEN 'aa' THEN 1 ELSE 0 END
+        ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 102 no such table: collate2t1
+==== collate2-1.22
+
+      SELECT a FROM collate2t1 WHERE a IN ('aa', 'bb') ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 72 no such table: collate2t1
+==== collate2-1.23
+
+      SELECT b FROM collate2t1 WHERE b IN ('aa', 'bb') ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 72 no such table: collate2t1
+==== collate2-1.24
+
+      SELECT c FROM collate2t1 WHERE c IN ('aa', 'bb') ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 72 no such table: collate2t1
+==== collate2-1.25
+
+      SELECT a FROM collate2t1 
+        WHERE a IN (SELECT a FROM collate2t1 WHERE a IN ('aa', 'bb'));
+----
+stmt 0 err 1 -1 103 no such table: collate2t1
+==== collate2-1.26
+
+      SELECT b FROM collate2t1 
+        WHERE b IN (SELECT a FROM collate2t1 WHERE a IN ('aa', 'bb'));
+----
+stmt 0 err 1 -1 103 no such table: collate2t1
+==== collate2-1.27
+
+      SELECT c FROM collate2t1 
+        WHERE c IN (SELECT a FROM collate2t1 WHERE a IN ('aa', 'bb'));
+----
+stmt 0 err 1 -1 103 no such table: collate2t1
+==== collate2-2.1
+
+    SELECT a FROM collate2t1 WHERE NOT a > 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 60 no such table: collate2t1
+==== collate2-2.2
+
+    SELECT b FROM collate2t1 WHERE NOT b > 'aa' ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 65 no such table: collate2t1
+==== collate2-2.3
+
+    SELECT c FROM collate2t1 WHERE NOT c > 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 60 no such table: collate2t1
+==== collate2-2.4
+
+    SELECT a FROM collate2t1 WHERE NOT a < 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 60 no such table: collate2t1
+==== collate2-2.5
+
+    SELECT b FROM collate2t1 WHERE NOT b < 'aa' ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 65 no such table: collate2t1
+==== collate2-2.6
+
+    SELECT c FROM collate2t1 WHERE NOT c < 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 60 no such table: collate2t1
+==== collate2-2.7
+
+    SELECT a FROM collate2t1 WHERE NOT a = 'aa';
+----
+stmt 0 err 1 -1 49 no such table: collate2t1
+==== collate2-2.8
+
+    SELECT b FROM collate2t1 WHERE NOT b = 'aa';
+----
+stmt 0 err 1 -1 49 no such table: collate2t1
+==== collate2-2.9
+
+    SELECT c FROM collate2t1 WHERE NOT c = 'aa';
+----
+stmt 0 err 1 -1 49 no such table: collate2t1
+==== collate2-2.10
+
+    SELECT a FROM collate2t1 WHERE NOT a >= 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 61 no such table: collate2t1
+==== collate2-2.11
+
+    SELECT b FROM collate2t1 WHERE NOT b >= 'aa' ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 66 no such table: collate2t1
+==== collate2-2.12
+
+    SELECT c FROM collate2t1 WHERE NOT c >= 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 61 no such table: collate2t1
+==== collate2-2.13
+
+    SELECT a FROM collate2t1 WHERE NOT a <= 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 61 no such table: collate2t1
+==== collate2-2.14
+
+    SELECT b FROM collate2t1 WHERE NOT b <= 'aa' ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 66 no such table: collate2t1
+==== collate2-2.15
+
+    SELECT c FROM collate2t1 WHERE NOT c <= 'aa' ORDER BY 1;
+----
+stmt 0 err 1 -1 61 no such table: collate2t1
+==== collate2-2.16
+
+    SELECT a FROM collate2t1 WHERE a NOT BETWEEN 'Aa' AND 'Bb' ORDER BY 1;
+----
+stmt 0 err 1 -1 75 no such table: collate2t1
+==== collate2-2.17
+
+    SELECT b FROM collate2t1 WHERE b NOT BETWEEN 'Aa' AND 'Bb' ORDER BY 1, oid;
+----
+stmt 0 err 1 -1 80 no such table: collate2t1
+==== collate2-2.18
+
+    SELECT c FROM collate2t1 WHERE c NOT BETWEEN 'Aa' AND 'Bb' ORDER BY 1;
+----
+stmt 0 err 1 -1 75 no such table: collate2t1
+==== collate2-2.19
+
+    SELECT a FROM collate2t1 WHERE NOT CASE a WHEN 'aa' THEN 1 ELSE 0 END;
+----
+stmt 0 err 1 -1 75 no such table: collate2t1
+==== collate2-2.20
+
+    SELECT b FROM collate2t1 WHERE NOT CASE b WHEN 'aa' THEN 1 ELSE 0 END;
+----
+stmt 0 err 1 -1 75 no such table: collate2t1
+==== collate2-2.21
+
+    SELECT c FROM collate2t1 WHERE NOT CASE c WHEN 'aa' THEN 1 ELSE 0 END;
+----
+stmt 0 err 1 -1 75 no such table: collate2t1
+==== collate2-2.22
+
+      SELECT a FROM collate2t1 WHERE NOT a IN ('aa', 'bb');
+----
+stmt 0 err 1 -1 60 no such table: collate2t1
+==== collate2-2.23
+
+      SELECT b FROM collate2t1 WHERE NOT b IN ('aa', 'bb');
+----
+stmt 0 err 1 -1 60 no such table: collate2t1
+==== collate2-2.24
+
+      SELECT c FROM collate2t1 WHERE NOT c IN ('aa', 'bb');
+----
+stmt 0 err 1 -1 60 no such table: collate2t1
+==== collate2-2.25
+
+      SELECT a FROM collate2t1 
+        WHERE NOT a IN (SELECT a FROM collate2t1 WHERE a IN ('aa', 'bb'));
+----
+stmt 0 err 1 -1 107 no such table: collate2t1
+==== collate2-2.26
+
+      SELECT b FROM collate2t1 
+        WHERE NOT b IN (SELECT a FROM collate2t1 WHERE a IN ('aa', 'bb'));
+----
+stmt 0 err 1 -1 107 no such table: collate2t1
+==== collate2-2.27
+
+      SELECT c FROM collate2t1 
+        WHERE NOT c IN (SELECT a FROM collate2t1 WHERE a IN ('aa', 'bb'));
+----
+stmt 0 err 1 -1 107 no such table: collate2t1
+==== collate2-3.1
+
+    SELECT a > 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 37 no such table: collate2t1
+==== collate2-3.2
+
+    SELECT b > 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 37 no such table: collate2t1
+==== collate2-3.3
+
+    SELECT c > 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 37 no such table: collate2t1
+==== collate2-3.4
+
+    SELECT a < 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 37 no such table: collate2t1
+==== collate2-3.5
+
+    SELECT b < 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 37 no such table: collate2t1
+==== collate2-3.6
+
+    SELECT c < 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 37 no such table: collate2t1
+==== collate2-3.7
+
+    SELECT a = 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 37 no such table: collate2t1
+==== collate2-3.8
+
+    SELECT b = 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 37 no such table: collate2t1
+==== collate2-3.9
+
+    SELECT c = 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 37 no such table: collate2t1
+==== collate2-3.10
+
+    SELECT a <= 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 38 no such table: collate2t1
+==== collate2-3.11
+
+    SELECT b <= 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 38 no such table: collate2t1
+==== collate2-3.12
+
+    SELECT c <= 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 38 no such table: collate2t1
+==== collate2-3.13
+
+    SELECT a >= 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 38 no such table: collate2t1
+==== collate2-3.14
+
+    SELECT b >= 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 38 no such table: collate2t1
+==== collate2-3.15
+
+    SELECT c >= 'aa' FROM collate2t1;
+----
+stmt 0 err 1 -1 38 no such table: collate2t1
+==== collate2-3.16
+
+    SELECT a BETWEEN 'Aa' AND 'Bb' FROM collate2t1;
+----
+stmt 0 err 1 -1 52 no such table: collate2t1
+==== collate2-3.17
+
+    SELECT b BETWEEN 'Aa' AND 'Bb' FROM collate2t1;
+----
+stmt 0 err 1 -1 52 no such table: collate2t1
+==== collate2-3.18
+
+    SELECT c BETWEEN 'Aa' AND 'Bb' FROM collate2t1;
+----
+stmt 0 err 1 -1 52 no such table: collate2t1
+==== collate2-3.19
+
+    SELECT CASE a WHEN 'aa' THEN 1 ELSE 0 END FROM collate2t1;
+----
+stmt 0 err 1 -1 63 no such table: collate2t1
+==== collate2-3.20
+
+    SELECT CASE b WHEN 'aa' THEN 1 ELSE 0 END FROM collate2t1;
+----
+stmt 0 err 1 -1 63 no such table: collate2t1
+==== collate2-3.21
+
+    SELECT CASE c WHEN 'aa' THEN 1 ELSE 0 END FROM collate2t1;
+----
+stmt 0 err 1 -1 63 no such table: collate2t1
+==== collate2-3.22
+
+      SELECT a IN ('aa', 'bb') FROM collate2t1;
+----
+stmt 0 err 1 -1 48 no such table: collate2t1
+==== collate2-3.23
+
+      SELECT b IN ('aa', 'bb') FROM collate2t1;
+----
+stmt 0 err 1 -1 48 no such table: collate2t1
+==== collate2-3.24
+
+      SELECT c IN ('aa', 'bb') FROM collate2t1;
+----
+stmt 0 err 1 -1 48 no such table: collate2t1
+==== collate2-3.25
+
+      SELECT a IN (SELECT a FROM collate2t1 WHERE a IN ('aa', 'bb')) 
+        FROM collate2t1;
+----
+stmt 0 err 1 -1 95 no such table: collate2t1
+==== collate2-3.26
+
+      SELECT b IN (SELECT a FROM collate2t1 WHERE a IN ('aa', 'bb')) 
+        FROM collate2t1;
+----
+stmt 0 err 1 -1 95 no such table: collate2t1
+==== collate2-3.27
+
+      SELECT c IN (SELECT a FROM collate2t1 WHERE a IN ('aa', 'bb')) 
+        FROM collate2t1;
+----
+stmt 0 err 1 -1 95 no such table: collate2t1
+==== collate2-4.0
+
+    CREATE TABLE collate2t2(b COLLATE binary);
+    CREATE TABLE collate2t3(b text);
+    INSERT INTO collate2t2 VALUES('aa');
+    INSERT INTO collate2t3 VALUES('aa');
+----
+stmt 0 ok
+stmt 47 ok
+stmt 84 err 1 -1 125 no such table: collate2t2
+stmt 125 err 1 -1 166 no such table: collate2t3
+==== collate2-4.1
+
+    SELECT collate2t1.a FROM collate2t1, collate2t2 
+      WHERE collate2t1.b = collate2t2.b;
+----
+stmt 0 err 1 -1 94 no such table: collate2t1
+==== collate2-4.2
+
+    SELECT collate2t1.a FROM collate2t1, collate2t2 
+      WHERE collate2t2.b = collate2t1.b;
+----
+stmt 0 err 1 -1 94 no such table: collate2t1
+==== collate2-4.3
+
+    SELECT collate2t1.a FROM collate2t1, collate2t3 
+      WHERE collate2t1.b = collate2t3.b||''
+      ORDER BY +collate2t1.a DESC;
+----
+stmt 0 err 1 -1 132 no such table: collate2t1
+==== collate2-4.4
+
+    SELECT collate2t1.a FROM collate2t1, collate2t3 
+      WHERE collate2t3.b||'' = collate2t1.b
+      ORDER BY +collate2t1.a DESC;
+----
+stmt 0 err 1 -1 132 no such table: collate2t1
+==== collate2-4.5
+
+    DROP TABLE collate2t3;
+----
+stmt 0 err 1 -1 27 no such table: collate2t3
+==== collate2-5.0
+
+    SELECT collate2t1.b FROM collate2t1 JOIN collate2t2 USING (b);
+----
+stmt 0 err 1 -1 67 no such table: collate2t1
+==== collate2-5.1
+
+    SELECT collate2t1.b FROM collate2t2 JOIN collate2t1 USING (b);
+----
+stmt 0 err 1 -1 67 no such table: collate2t2
+==== collate2-5.2
+
+    SELECT collate2t1.b FROM collate2t1 NATURAL JOIN collate2t2;
+----
+stmt 0 err 1 -1 65 no such table: collate2t1
+==== collate2-5.3
+
+    SELECT collate2t1.b FROM collate2t2 NATURAL JOIN collate2t1;
+----
+stmt 0 err 1 -1 65 no such table: collate2t2
+==== collate2-5.4.1
+
+    SELECT collate2t2.b FROM collate2t1 LEFT JOIN collate2t2 USING (b) order by collate2t1.oid;
+----
+stmt 0 err 1 -1 96 no such table: collate2t1
+==== collate2-5.4.2
+
+    SELECT collate2t2.b FROM collate2t2 RIGHT JOIN collate2t1 ON collate2t1.b=collate2t2.b
+     ORDER BY collate2t1.oid;
+----
+stmt 0 err 1 -1 121 no such table: collate2t2
+==== collate2-5.4.3
+
+    SELECT collate2t2.b FROM collate2t1 LEFT JOIN collate2t2 ON collate2t2.b=collate2t1.b
+     ORDER BY collate2t1.oid;
+----
+stmt 0 err 1 -1 120 no such table: collate2t1
+==== collate2-5.5.1
+
+    SELECT collate2t1.b, collate2t2.b FROM collate2t2 LEFT OUTER JOIN collate2t1 USING (b);
+----
+stmt 0 err 1 -1 92 no such table: collate2t2
+==== collate2-5.5.2
+
+    SELECT collate2t1.b, collate2t2.b
+      FROM collate2t1 RIGHT JOIN collate2t2 ON collate2t2.b=collate2t1.b
+----
+stmt 0 err 1 -1 112 no such table: collate2t1
+==== 6.1
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES('b');
+  INSERT INTO t1 VALUES('B');
+----
+stmt 0 ok
+stmt 22 err 1 -1 52 no such table: t1
+stmt 52 err 1 -1 82 no such table: t1
+==== 6.2
+
+  SELECT * FROM t1 WHERE x COLLATE nocase BETWEEN 'a' AND 'c';
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== 6.3
+
+  SELECT * FROM t1 WHERE x BETWEEN 'a' COLLATE nocase AND 'c' COLLATE nocase;
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== 6.4
+
+  SELECT * FROM t1 
+  WHERE x COLLATE nocase BETWEEN 'a' COLLATE nocase AND 'c' COLLATE nocase;
+----
+stmt 0 err 1 -1 96 no such table: t1
+==== 6.5
+
+  SELECT * FROM t1 WHERE +x COLLATE nocase BETWEEN 'a' AND 'c';
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== 6.6
+
+  SELECT * FROM t1 WHERE +x BETWEEN 'a' COLLATE nocase AND 'c' COLLATE nocase;
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== 6.7
+
+  SELECT * FROM t1 
+  WHERE +x COLLATE nocase BETWEEN 'a' COLLATE nocase AND 'c' COLLATE nocase;
+----
+stmt 0 err 1 -1 97 no such table: t1

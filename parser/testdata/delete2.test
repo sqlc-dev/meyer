@@ -1,0 +1,33 @@
+==== delete2-1.2
+
+    SELECT * FROM q WHERE id='id.1';
+----
+stmt 0 err 1 -1 37 no such table: q
+==== delete2-1.6
+
+    DELETE FROM q WHERE rowid=1
+----
+stmt 0 err 1 -1 33 no such table: q
+==== delete2-1.8
+
+    SELECT * FROM q;
+----
+stmt 0 err 1 -1 21 no such table: q
+==== delete2-1.11
+
+    SELECT * FROM q;
+----
+stmt 0 err 1 -1 21 no such table: q
+==== delete2-2.1
+
+    CREATE TABLE t1(a, b);
+    CREATE TABLE t2(c, d);
+    INSERT INTO t1 VALUES(1, 2);
+    INSERT INTO t2 VALUES(3, 4);
+    INSERT INTO t2 VALUES(5, 6);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 err 1 -1 87 no such table: t1
+stmt 87 err 1 -1 120 no such table: t2
+stmt 120 err 1 -1 153 no such table: t2

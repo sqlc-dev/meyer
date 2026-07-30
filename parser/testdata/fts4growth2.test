@@ -1,0 +1,20 @@
+==== 1.0
+ CREATE TABLE t1(docid, words);
+----
+stmt 0 ok
+==== 1.1
+
+  CREATE VIRTUAL TABLE x1 USING fts4;
+  INSERT INTO x1(x1) VALUES('automerge=2');
+----
+stmt 0 ok
+stmt 38 err 1 -1 82 no such table: x1
+==== 2.1
+
+  DELETE FROM t1 WHERE rowid>16;
+  DROP TABLE IF EXISTS x1;
+  CREATE VIRTUAL TABLE x1 USING fts4;
+----
+stmt 0 err 1 -1 33 no such table: t1
+stmt 33 ok
+stmt 60 ok

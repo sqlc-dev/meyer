@@ -1,0 +1,9 @@
+==== 1.0
+
+  CREATE TABLE t1(a PRIMARY KEY, b, c, d, UNIQUE(b, c));
+  INSERT INTO t1 VALUES(1, 1, 1, 1);
+  INSERT INTO t1 VALUES(2, 2, 2, 2);
+----
+stmt 0 ok
+stmt 57 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 131 no such table: t1

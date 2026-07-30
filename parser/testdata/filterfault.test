@@ -1,0 +1,11 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c, d);
+  INSERT INTO t1 VALUES(1, 2, 3, 4);
+  INSERT INTO t1 VALUES(5, 6, 7, 8);
+  INSERT INTO t1 VALUES(9, 10, 11, 12);
+----
+stmt 0 ok
+stmt 31 err 1 -1 68 no such table: t1
+stmt 68 err 1 -1 105 no such table: t1
+stmt 105 err 1 -1 145 no such table: t1

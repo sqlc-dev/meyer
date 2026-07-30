@@ -1,0 +1,490 @@
+==== join2-1.1
+
+    CREATE TABLE t1(a,b);
+    INSERT INTO t1 VALUES(1,11);
+    INSERT INTO t1 VALUES(2,22);
+    INSERT INTO t1 VALUES(3,33);
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 26 err 1 -1 59 no such table: t1
+stmt 59 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 125 no such table: t1
+stmt 125 err 1 -1 147 no such table: t1
+==== join2-1.2
+
+    CREATE TABLE t2(b,c);
+    INSERT INTO t2 VALUES(11,111);
+    INSERT INTO t2 VALUES(33,333);
+    INSERT INTO t2 VALUES(44,444);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 26 err 1 -1 61 no such table: t2
+stmt 61 err 1 -1 96 no such table: t2
+stmt 96 err 1 -1 131 no such table: t2
+stmt 131 err 1 -1 153 no such table: t2
+==== join2-1.3
+
+    CREATE TABLE t3(c,d);
+    INSERT INTO t3 VALUES(111,1111);
+    INSERT INTO t3 VALUES(444,4444);
+    INSERT INTO t3 VALUES(555,5555);
+    SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 26 err 1 -1 63 no such table: t3
+stmt 63 err 1 -1 100 no such table: t3
+stmt 100 err 1 -1 137 no such table: t3
+stmt 137 err 1 -1 159 no such table: t3
+==== join2-1.4
+
+    SELECT * FROM
+      t1 NATURAL JOIN t2 NATURAL JOIN t3
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== join2-1.5
+
+    SELECT * FROM
+      t1 NATURAL JOIN t2 NATURAL LEFT OUTER JOIN t3
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== join2-1.6
+
+    SELECT * FROM
+      t1 NATURAL LEFT OUTER JOIN t2 NATURAL JOIN t3
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== join2-1.6-rj
+
+    SELECT * FROM
+      t2 NATURAL RIGHT OUTER JOIN t1 NATURAL JOIN t3
+----
+stmt 0 err 1 -1 72 no such table: t2
+==== join2-1.7
+
+      SELECT * FROM
+        t1 NATURAL LEFT OUTER JOIN (t2 NATURAL JOIN t3)
+----
+stmt 0 err 1 -1 77 no such table: t1
+==== join2-1.7-rj
+
+      SELECT a, b, c, d FROM
+        t2 NATURAL JOIN t3 NATURAL RIGHT JOIN t1
+----
+stmt 0 err 1 -1 79 no such table: t2
+==== 2.0
+
+  CREATE TABLE aa(a);
+  CREATE TABLE bb(b);
+  CREATE TABLE cc(c);
+  INSERT INTO aa VALUES('one');
+  INSERT INTO bb VALUES('one');
+  INSERT INTO cc VALUES('one');
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 ok
+stmt 66 err 1 -1 98 no such table: aa
+stmt 98 err 1 -1 130 no such table: bb
+stmt 130 err 1 -1 162 no such table: cc
+==== 2.1
+
+  SELECT * FROM aa LEFT JOIN cc ON (a=b) JOIN bb ON (b=coalesce(c,1));
+----
+stmt 0 err 1 -1 71 no such table: aa
+==== 2.1b
+
+  SELECT * FROM aa RIGHT JOIN cc ON (a=b) JOIN bb ON (b=coalesce(c,1));
+----
+stmt 0 err 1 -1 72 no such table: aa
+==== 2.2
+
+  SELECT * FROM aa JOIN cc ON (a=b) JOIN bb ON (b=c);
+----
+stmt 0 err 1 -1 54 no such table: aa
+==== 3.0
+
+  CREATE TABLE t1(k1 INTEGER PRIMARY KEY, k2, k3);
+  CREATE TABLE t2(k2 INTEGER PRIMARY KEY, v2);
+
+  -- Prior to this problem being fixed, table t3_2 would be omitted from
+  -- the join queries below, but if t3_1 were used in its place it would
+  -- not.
+  CREATE TABLE t3_1(k3 PRIMARY KEY, v3) WITHOUT ROWID;
+  CREATE TABLE t3_2(v3, k3 PRIMARY KEY) WITHOUT ROWID;
+----
+stmt 0 ok
+stmt 51 ok
+stmt 98 ok
+stmt 310 ok
+==== 3.1
+
+  SELECT v2 FROM t1 LEFT JOIN t2 USING (k2) LEFT JOIN t3_1 USING (k3);
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== 3.2
+
+  SELECT v2 FROM t1 LEFT JOIN t2 USING (k2) LEFT JOIN t3_2 USING (k3);
+----
+stmt 0 err 1 -1 71 no such table: t1
+==== 4.0
+
+  CREATE TABLE c1(k INTEGER PRIMARY KEY, v1);
+  CREATE TABLE c2(k INTEGER PRIMARY KEY, v2);
+  CREATE TABLE c3(k INTEGER PRIMARY KEY, v3);
+
+  INSERT INTO c1 VALUES(1, 2);
+  INSERT INTO c2 VALUES(2, 3);
+  INSERT INTO c3 VALUES(3, 'v3');
+
+  INSERT INTO c1 VALUES(111, 1112);
+  INSERT INTO c2 VALUES(112, 1113);
+  INSERT INTO c3 VALUES(113, 'v1113');
+----
+stmt 0 ok
+stmt 46 ok
+stmt 92 ok
+stmt 138 err 1 -1 170 no such table: c1
+stmt 170 err 1 -1 201 no such table: c2
+stmt 201 err 1 -1 235 no such table: c3
+stmt 235 err 1 -1 272 no such table: c1
+stmt 272 err 1 -1 308 no such table: c2
+stmt 308 err 1 -1 347 no such table: c3
+==== 4.1.1
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v2);
+----
+stmt 0 err 1 -1 77 no such table: c1
+==== 4.1.2
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v1+1);
+----
+stmt 0 err 1 -1 79 no such table: c1
+==== 4.1.3
+
+  SELECT DISTINCT v1, v3 FROM c1 LEFT JOIN c2 LEFT JOIN c3 ON (c3.k=v1+1);
+----
+stmt 0 err 1 -1 75 no such table: c1
+==== 4.1.4
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 LEFT JOIN c3 ON (c3.k=v1+1);
+----
+stmt 0 err 1 -1 66 no such table: c1
+==== 4.1.5
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v2);
+----
+stmt 0 err 1 -1 77 no such table: c1
+==== 4.1.6
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v1+1);
+----
+stmt 0 err 1 -1 79 no such table: c1
+==== 4.2.0
+
+  DROP TABLE c1;
+  DROP TABLE c2;
+  DROP TABLE c3;
+  CREATE TABLE c1(k UNIQUE, v1);
+  CREATE TABLE c2(k UNIQUE, v2);
+  CREATE TABLE c3(k UNIQUE, v3);
+
+  INSERT INTO c1 VALUES(1, 2);
+  INSERT INTO c2 VALUES(2, 3);
+  INSERT INTO c3 VALUES(3, 'v3');
+
+  INSERT INTO c1 VALUES(111, 1112);
+  INSERT INTO c2 VALUES(112, 1113);
+  INSERT INTO c3 VALUES(113, 'v1113');
+----
+stmt 0 err 1 -1 17 no such table: c1
+stmt 17 err 1 -1 34 no such table: c2
+stmt 34 err 1 -1 51 no such table: c3
+stmt 51 ok
+stmt 84 ok
+stmt 117 ok
+stmt 150 err 1 -1 182 no such table: c1
+stmt 182 err 1 -1 213 no such table: c2
+stmt 213 err 1 -1 247 no such table: c3
+stmt 247 err 1 -1 284 no such table: c1
+stmt 284 err 1 -1 320 no such table: c2
+stmt 320 err 1 -1 359 no such table: c3
+==== 4.2.1
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v2);
+----
+stmt 0 err 1 -1 77 no such table: c1
+==== 4.2.2
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v1+1);
+----
+stmt 0 err 1 -1 79 no such table: c1
+==== 4.2.3
+
+  SELECT DISTINCT v1, v3 FROM c1 LEFT JOIN c2 LEFT JOIN c3 ON (c3.k=v1+1);
+----
+stmt 0 err 1 -1 75 no such table: c1
+==== 4.2.4
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 LEFT JOIN c3 ON (c3.k=v1+1);
+----
+stmt 0 err 1 -1 66 no such table: c1
+==== 4.2.5
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v2);
+----
+stmt 0 err 1 -1 77 no such table: c1
+==== 4.2.6
+
+  SELECT v1, v3 FROM c1 LEFT JOIN c2 ON (c2.k=v1) LEFT JOIN c3 ON (c3.k=v1+1);
+----
+stmt 0 err 1 -1 79 no such table: c1
+==== 4.3.0
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1(x PRIMARY KEY) WITHOUT ROWID;
+  CREATE TABLE t2(x);
+  SELECT a.x
+    FROM t1 AS a
+    LEFT JOIN t1 AS b ON (a.x=b.x)
+    LEFT JOIN t2 AS c ON (a.x=c.x);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 102 ok
+stmt 124 err 1 -1 225 no such table: t1
+==== 4.3.1
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<10)
+    INSERT INTO t1(x) SELECT x FROM c;
+  INSERT INTO t2(x) SELECT x+9 FROM t1;
+  SELECT a.x, c.x
+    FROM t1 AS a
+    LEFT JOIN t1 AS b ON (a.x=b.x)
+    LEFT JOIN t2 AS c ON (a.x=c.x);
+----
+stmt 0 err 1 -1 115 no such table: t1
+stmt 115 err 1 -1 155 no such table: t2
+stmt 155 err 1 -1 261 no such table: t1
+==== 5.0
+
+  CREATE TABLE s1 (a INTEGER PRIMARY KEY);
+  CREATE TABLE s2 (a INTEGER PRIMARY KEY);
+  CREATE TABLE s3 (a INTEGER);
+  CREATE UNIQUE INDEX ndx on s3(a);
+----
+stmt 0 ok
+stmt 43 ok
+stmt 86 ok
+stmt 117 err 1 -1 153 no such table: main.s3
+==== 5.1
+
+  SELECT s1.a FROM s1 left join s2 using (a);
+----
+stmt 0 err 1 -1 46 no such table: s1
+==== 5.2
+
+  SELECT s1.a FROM s1 left join s3 using (a);
+----
+stmt 0 err 1 -1 46 no such table: s1
+==== 6.0
+
+  CREATE TABLE u1(a INTEGER PRIMARY KEY, b, c);
+  CREATE TABLE u2(a INTEGER PRIMARY KEY, b, c);
+  CREATE INDEX u1ab ON u1(b, c);
+----
+stmt 0 ok
+stmt 48 ok
+stmt 96 err 1 -1 129 no such table: main.u1
+==== 6.1
+
+  SELECT u2.* FROM u2 LEFT JOIN u1 ON( u1.a=u2.a AND u1.b=u2.b AND u1.c=u2.c );
+----
+stmt 0 err 1 -1 80 no such table: u2
+==== 7.0
+
+  CREATE TABLE t1(a,b);  INSERT INTO t1 VALUES(1,2),(3,4),(5,6);
+  CREATE TABLE t2(c,d);  INSERT INTO t2 VALUES(2,4),(3,6);
+  CREATE TABLE t3(x);    INSERT INTO t3 VALUES(9);
+  CREATE VIEW test AS
+    SELECT *, 'x'
+      FROM t1 LEFT JOIN (SELECT * FROM t2, t3) ON (c=b AND x=9)
+      WHERE c IS NULL;
+  SELECT * FROM test;
+----
+stmt 0 ok
+stmt 24 err 1 -1 65 no such table: t1
+stmt 65 ok
+stmt 89 err 1 -1 124 no such table: t2
+stmt 124 ok
+stmt 146 err 1 -1 175 no such table: t3
+stmt 175 ok
+stmt 302 err 1 -1 324 no such table: test
+==== 8.0
+
+  CREATE TABLE t0(c0);
+  CREATE TABLE t1(c0);
+----
+stmt 0 ok
+stmt 23 ok
+==== 8.1
+
+  SELECT * FROM t0 LEFT JOIN t1 
+  WHERE (t1.c0 BETWEEN 0 AND 0) > ('' AND t0.c0);
+----
+stmt 0 err 1 -1 83 no such table: t0
+==== 9.0
+
+  CREATE TABLE t0(c0 INT);
+  CREATE VIEW v0(c0) AS SELECT CAST(t0.c0 AS INTEGER) FROM t0;
+  INSERT INTO t0(c0) VALUES (0);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 90 err 1 -1 123 no such table: t0
+==== 9.1
+
+  SELECT typeof(c0), c0 FROM v0 WHERE c0>='0'
+----
+stmt 0 err 1 -1 47 no such table: v0
+==== 9.2
+
+  SELECT * FROM t0, v0 WHERE v0.c0 >= '0';
+----
+stmt 0 err 1 -1 43 no such table: t0
+==== 9.3
+
+  SELECT * FROM t0 LEFT JOIN v0 WHERE v0.c0 >= '0';
+----
+stmt 0 err 1 -1 52 no such table: t0
+==== 9.4
+
+  SELECT * FROM t0 LEFT JOIN v0 ON v0.c0 >= '0';
+----
+stmt 0 err 1 -1 49 no such table: t0
+==== 9.5
+
+  SELECT * FROM t0 LEFT JOIN v0 ON v0.c0 >= '0' WHERE TRUE 
+  UNION SELECT 0,0 WHERE 0;
+----
+stmt 0 err 1 -1 88 no such table: t0
+==== 9.10
+
+  CREATE TABLE t1 (aaa);
+  INSERT INTO t1 VALUES(23456);
+  CREATE TABLE t2(bbb);
+  CREATE VIEW v2(ccc) AS SELECT bbb IS 1234 FROM t2;
+  SELECT ccc, ccc IS NULL AS ddd FROM t1 LEFT JOIN v2;
+----
+stmt 0 ok
+stmt 25 err 1 -1 57 no such table: t1
+stmt 57 ok
+stmt 81 ok
+stmt 134 err 1 -1 189 no such table: t1
+==== 9.11
+
+  SELECT ccc, ccc IS NULL AS ddd FROM t1 LEFT JOIN v2;
+----
+stmt 0 err 1 -1 55 no such table: t1
+==== 10.1
+
+  CREATE TABLE t1 (x INTEGER);
+  INSERT INTO t1 VALUES(1);   -- Some true value
+  CREATE TABLE t2 (z TEXT);
+  INSERT INTO t2 VALUES('some value');
+  CREATE TABLE t3(w TEXT);
+  INSERT INTO t3 VALUES('some other value');
+----
+stmt 0 ok
+stmt 31 err 1 -1 59 no such table: t1
+stmt 59 ok
+stmt 108 err 1 -1 147 no such table: t2
+stmt 147 ok
+stmt 174 err 1 -1 219 no such table: t3
+==== 10.2
+
+  SELECT (
+    SELECT 1 FROM t2 LEFT JOIN (SELECT x AS v FROM t3) ON 500=v WHERE (v OR FALSE)
+  ) FROM t1;
+----
+stmt 0 err 1 -1 107 no such table: t1
+==== 10.3
+
+  SELECT (
+    SELECT 1 FROM t2 LEFT JOIN (SELECT x AS v FROM t3) ON 500=v WHERE (v)
+  ) FROM t1;
+----
+stmt 0 err 1 -1 98 no such table: t1
+==== 10.4
+
+  SELECT (
+    SELECT 1 FROM t2 LEFT JOIN (SELECT x AS v FROM t3) ON 500=v WHERE (v OR FALSE)
+  ) FROM t1;
+----
+stmt 0 err 1 -1 107 no such table: t1
+==== 11.1
+
+  DROP TABLE t1;
+  DROP TABLE t2;
+  DROP TABLE t3;
+  CREATE TABLE t1(x TEXT, y INTEGER);
+  INSERT INTO t1(x,y) VALUES(NULL,-2),(NULL,1),('0',2);
+  CREATE TABLE t2(z INTEGER);
+  INSERT INTO t2(z) VALUES(2),(-2);
+  CREATE VIEW t3 AS SELECT z, (SELECT count(*) FROM t1) AS w FROM t2;
+  SELECT * FROM t1 LEFT JOIN t3 ON y=z;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 err 1 -1 34 no such table: t2
+stmt 34 err 1 -1 51 no such table: t3
+stmt 51 ok
+stmt 89 err 1 -1 145 no such table: t1
+stmt 145 ok
+stmt 175 err 1 -1 211 no such table: t2
+stmt 211 ok
+stmt 281 err 1 -1 321 no such table: t1
+==== 12.1
+
+  DROP TABLE t1;
+  DROP TABLE t2;
+  DROP VIEW t3;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY);
+  WITH RECURSIVE c(n) AS (VALUES(1) UNION ALL SELECT n+1 FROM c WHERE n<100)
+    INSERT INTO t1(a) SELECT n FROM c;
+  CREATE VIEW t2(b) AS SELECT a FROM t1;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 err 1 -1 34 no such table: t2
+stmt 34 err 1 -1 50 no such view: t3
+stmt 50 ok
+stmt 92 err 1 -1 208 no such table: t1
+stmt 208 ok
+==== 12.3
+
+  SELECT * FROM t1 LEFT JOIN t2 ON a=b LIMIT 10 OFFSET 98;
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== 13.0
+
+  CREATE TABLE t1(a1 INTEGER PRIMARY KEY, b1 INT);
+  CREATE TABLE t2(c2 INT, d2 INTEGER PRIMARY KEY);
+  CREATE TABLE t3(e3 INTEGER PRIMARY KEY);
+  INSERT INTO t1 VALUES(33,0);
+  INSERT INTO t2 VALUES(33,1),(33,2);
+----
+stmt 0 ok
+stmt 51 ok
+stmt 102 ok
+stmt 145 err 1 -1 176 no such table: t1
+stmt 176 err 1 -1 214 no such table: t2
+==== 13.1
+
+  SELECT t1.a1, t2.d2
+    FROM (t1 LEFT JOIN t3 ON t3.e3=t1.b1) JOIN t2 ON t2.c2=t1.a1
+   WHERE t1.a1=33
+   ORDER BY t2.d2 DESC;
+----
+stmt 0 err 1 -1 129 no such table: t1

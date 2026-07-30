@@ -1,0 +1,140 @@
+==== malloc3-generated
+SELECT tbl_name FROM sqlite_master;
+----
+stmt 0 ok
+==== malloc3-generated.dup1
+SELECT tbl_name FROM sqlite_master;
+----
+stmt 0 ok
+==== malloc3-generated.dup2
+SELECT * FROM abc
+----
+stmt 0 err 1 -1 18 no such table: abc
+==== malloc3-generated.dup3
+SELECT * FROM abc
+----
+stmt 0 err 1 -1 18 no such table: abc
+==== malloc3-generated.dup4
+
+      SELECT * FROM abc ORDER BY a DESC;
+----
+stmt 0 err 1 -1 41 no such table: abc
+==== malloc3-generated.dup5
+
+      SELECT name, tbl_name FROM sqlite_master ORDER BY name;
+      SELECT * FROM abc;
+----
+stmt 0 ok
+stmt 62 err 1 -1 87 no such table: abc
+==== malloc3-generated.dup6
+SELECT count(*) FROM abc
+----
+stmt 0 err 1 -1 25 no such table: abc
+==== malloc3-generated.dup7
+
+      SELECT min(
+          (oid == a) AND 'String value ' || a == b AND a == length(c) 
+      ) FROM abc;
+----
+stmt 0 err 1 -1 107 no such table: abc
+==== malloc3-generated.dup8
+SELECT count(*) FROM abc
+----
+stmt 0 err 1 -1 25 no such table: abc
+==== malloc3-generated.dup9
+
+      SELECT min(
+          (oid == a) AND 'String value ' || a == b AND a == length(c) 
+      ) FROM abc;
+----
+stmt 0 err 1 -1 107 no such table: abc
+==== malloc3-generated.dup10
+SELECT count(*) FROM abc
+----
+stmt 0 err 1 -1 25 no such table: abc
+==== malloc3-generated.dup11
+
+      SELECT min(
+          (oid == a) AND 'String value ' || a == b AND a == length(c) 
+      ) FROM abc;
+----
+stmt 0 err 1 -1 107 no such table: abc
+==== malloc3-generated.dup12
+SELECT a, b, c FROM abc
+----
+stmt 0 err 1 -1 24 no such table: abc
+==== malloc3-generated.dup13
+SELECT a, b, c FROM abc
+----
+stmt 0 err 1 -1 24 no such table: abc
+==== malloc3-generated.dup14
+SELECT a, count(*) FROM abc GROUP BY a;
+----
+stmt 0 err 1 -1 39 no such table: abc
+==== malloc3-generated.dup15
+SELECT a, count(*) FROM abc GROUP BY a;
+----
+stmt 0 err 1 -1 39 no such table: abc
+==== malloc3-generated.dup16
+SELECT a, count(*) FROM abc GROUP BY a;
+----
+stmt 0 err 1 -1 39 no such table: abc
+==== malloc3-generated.dup17
+SELECT a, count(*) FROM abc GROUP BY a;
+----
+stmt 0 err 1 -1 39 no such table: abc
+==== malloc3-generated.dup18
+SELECT a, count(*) FROM abc GROUP BY a;
+----
+stmt 0 err 1 -1 39 no such table: abc
+==== malloc3-generated.dup19
+SELECT a, count(*) FROM abc GROUP BY a;
+----
+stmt 0 err 1 -1 39 no such table: abc
+==== malloc3-generated.dup20
+SELECT * FROM abc
+----
+stmt 0 err 1 -1 18 no such table: abc
+==== malloc3-generated.dup21
+SELECT a, count(*) FROM abc GROUP BY a;
+----
+stmt 0 err 1 -1 39 no such table: abc
+==== malloc3-generated.dup22
+
+      SELECT name, tbl_name FROM sqlite_master;
+----
+stmt 0 ok
+==== malloc3-generated.dup23
+
+      SELECT name, tbl_name FROM sqlite_master;
+----
+stmt 0 ok
+==== malloc3-generated.dup24
+
+      SELECT name, tbl_name FROM sqlite_master;
+----
+stmt 0 ok
+==== malloc3-generated.dup25
+
+      SELECT * FROM def, ghi WHERE d = g;
+----
+stmt 0 err 1 -1 42 no such table: def
+==== malloc3-generated.dup26
+
+      SELECT * FROM v1 WHERE d = g;
+----
+stmt 0 err 1 -1 36 no such table: v1
+==== malloc3-generated.dup27
+
+        SELECT * FROM tbl2, def WHERE d = x;
+----
+stmt 0 err 1 -1 45 no such table: tbl2
+==== malloc3-generated.dup28
+
+        SELECT * FROM tbl2, def WHERE d = x;
+----
+stmt 0 err 1 -1 45 no such table: tbl2
+==== malloc3-generated.dup29
+SELECT * FROM ghi
+----
+stmt 0 err 1 -1 18 no such table: ghi

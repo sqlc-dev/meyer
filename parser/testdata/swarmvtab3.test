@@ -1,0 +1,32 @@
+==== 1.0
+
+  CREATE TEMP TABLE swarm(id, tbl, minval, maxval);
+----
+stmt 0 ok
+==== swarmvtab3-generated
+
+    SELECT b FROM s WHERE a<10;
+----
+stmt 0 err 1 -1 32 no such table: s
+==== swarmvtab3-generated.dup1
+
+    SELECT b FROM s WHERE (b%10)=0;
+----
+stmt 0 err 1 -1 36 no such table: s
+==== 2.0
+
+  DROP TABLE IF EXISTS swarm;
+  CREATE TEMP TABLE swarm(file, tbl, minval, maxval, ctx);
+----
+stmt 0 ok
+stmt 30 ok
+==== swarmvtab3-generated.dup2
+
+    SELECT b FROM s WHERE a<10;
+----
+stmt 0 err 1 -1 32 no such table: s
+==== swarmvtab3-generated.dup3
+
+    SELECT b FROM s WHERE (b%10)=0;
+----
+stmt 0 err 1 -1 36 no such table: s

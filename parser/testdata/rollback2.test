@@ -1,0 +1,29 @@
+==== 1.0
+
+  SELECT int2hex(0), int2hex(100), int2hex(255)
+----
+stmt 0 err 1 10 49 no such function: int2hex
+==== 1.1
+
+  CREATE TABLE t1(i, h);
+  CREATE INDEX i1 ON t1(h);
+  WITH data(a, b) AS (
+    SELECT 1, int2hex(1)
+      UNION ALL
+    SELECT a+1, int2hex(a+1) FROM data WHERE a<40
+  )
+  INSERT INTO t1 SELECT * FROM data;
+----
+stmt 0 ok
+stmt 25 err 1 -1 53 no such table: main.t1
+stmt 53 err 1 -1 208 no such table: t1
+==== 3.1
+
+  SELECT i FROM t1 WHERE (i%2)==0 ORDER BY h DESC;
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== 4.2
+
+  SELECT i FROM t1 WHERE (i%2)==0 ORDER BY h ASC;
+----
+stmt 0 err 1 -1 50 no such table: t1

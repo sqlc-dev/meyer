@@ -1,0 +1,76 @@
+==== 1.0
+
+  PRAGMA page_size=1024;
+  PRAGMA auto_vacuum=NONE;
+  PRAGMA secure_delete=OFF;
+  VACUUM;
+  CREATE TABLE t1(x INTEGER PRIMARY KEY, y TEXT);
+  CREATE INDEX i1 ON t1(y);
+  PRAGMA journal_mode = wal;
+
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<1000
+  )
+  INSERT INTO t1 SELECT NULL, hex(myrandomblob(64)) FROM s;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 52 ok
+stmt 80 ok
+stmt 90 ok
+stmt 140 err 1 -1 168 no such table: main.t1
+stmt 168 ok
+stmt 197 err 1 -1 333 no such table: t1
+==== 1.1
+
+  PRAGMA wal_checkpoint = noop;
+----
+stmt 0 ok
+==== 1.2
+
+  PRAGMA wal_checkpoint = noop;
+----
+stmt 0 ok
+==== 1.3
+
+  PRAGMA wal_checkpoint = passive;
+----
+stmt 0 ok
+==== 1.4
+
+  PRAGMA wal_checkpoint = noop;
+----
+stmt 0 ok
+==== 1.5
+
+  PRAGMA wal_checkpoint = noop;
+----
+stmt 0 ok
+==== 1.6
+
+  PRAGMA wal_checkpoint = noop;
+----
+stmt 0 ok
+==== 1.7
+
+  BEGIN;
+    DELETE FROM t1;
+    PRAGMA wal_checkpoint = noop;
+----
+stmt 0 ok
+stmt 9 err 1 -1 29 no such table: t1
+stmt 29 ok
+==== 1.8
+
+  COMMIT;
+  PRAGMA wal_checkpoint = noop;
+----
+stmt 0 ok
+stmt 10 ok
+==== 1.10
+
+  PRAGMA journal_mode = delete;
+  PRAGMA wal_checkpoint = noop;
+----
+stmt 0 ok
+stmt 32 ok

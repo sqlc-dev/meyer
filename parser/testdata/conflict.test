@@ -1,0 +1,418 @@
+==== conflict-1.0
+
+    CREATE TABLE t1(a, b, c, UNIQUE(a,b));
+    CREATE TABLE t2(x);
+    SELECT c FROM t1 ORDER BY c;
+----
+stmt 0 ok
+stmt 43 ok
+stmt 67 err 1 -1 100 no such table: t1
+==== conflict-2.0
+
+    DROP TABLE t1;
+    DROP TABLE t2;
+    CREATE TABLE t1(a INTEGER PRIMARY KEY, b, c, UNIQUE(a,b));
+    CREATE TABLE t2(x);
+    SELECT c FROM t1 ORDER BY c;
+----
+stmt 0 err 1 -1 19 no such table: t1
+stmt 19 err 1 -1 38 no such table: t2
+stmt 38 ok
+stmt 101 ok
+stmt 125 err 1 -1 158 no such table: t1
+==== conflict-3.0
+
+    DROP TABLE t1;
+    DROP TABLE t2;
+    CREATE TABLE t1(a, b, c INTEGER, PRIMARY KEY(c), UNIQUE(a,b));
+    CREATE TABLE t2(x);
+    SELECT c FROM t1 ORDER BY c;
+----
+stmt 0 err 1 -1 19 no such table: t1
+stmt 19 err 1 -1 38 no such table: t2
+stmt 38 ok
+stmt 105 ok
+stmt 129 err 1 -1 162 no such table: t1
+==== conflict-4.0
+
+    DROP TABLE t2;
+    CREATE TABLE t2(x);
+    SELECT x FROM t2;
+----
+stmt 0 err 1 -1 19 no such table: t2
+stmt 19 ok
+stmt 43 err 1 -1 65 no such table: t2
+==== conflict-5.0
+
+    DROP TABLE t2;
+    CREATE TABLE t2(x);
+    SELECT x FROM t2;
+----
+stmt 0 err 1 -1 19 no such table: t2
+stmt 19 ok
+stmt 43 err 1 -1 65 no such table: t2
+==== conflict-6.0
+
+    DROP TABLE t2;
+    CREATE TABLE t2(a,b,c);
+    INSERT INTO t2 VALUES(1,2,1);
+    INSERT INTO t2 VALUES(2,3,2);
+    INSERT INTO t2 VALUES(3,4,1);
+    INSERT INTO t2 VALUES(4,5,4);
+    SELECT c FROM t2 ORDER BY b;
+    CREATE TABLE t3(x);
+    INSERT INTO t3 VALUES(1);
+----
+stmt 0 err 1 -1 19 no such table: t2
+stmt 19 ok
+stmt 47 err 1 -1 81 no such table: t2
+stmt 81 err 1 -1 115 no such table: t2
+stmt 115 err 1 -1 149 no such table: t2
+stmt 149 err 1 -1 183 no such table: t2
+stmt 183 err 1 -1 216 no such table: t2
+stmt 216 ok
+stmt 240 err 1 -1 270 no such table: t3
+==== conflict-7.2
+
+    PRAGMA count_changes=on;
+    UPDATE OR IGNORE t1 SET a=1000;
+----
+stmt 0 ok
+stmt 29 err 1 -1 65 no such table: t1
+==== conflict-7.3
+
+    SELECT b FROM t1 WHERE a=1000;
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== conflict-7.4
+
+    SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== conflict-7.5
+
+    PRAGMA count_changes=on;
+    UPDATE OR REPLACE t1 SET a=1001;
+----
+stmt 0 ok
+stmt 29 err 1 -1 66 no such table: t1
+==== conflict-7.6
+
+    SELECT b FROM t1 WHERE a=1001;
+----
+stmt 0 err 1 -1 35 no such table: t1
+==== conflict-7.7
+
+    SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== conflict-8.2
+
+    INSERT OR IGNORE INTO t1 VALUES(2,4);
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== conflict-8.3
+
+    INSERT OR REPLACE INTO t1 VALUES(2,4);
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== conflict-8.4
+
+    INSERT OR IGNORE INTO t1 SELECT * FROM t1;
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== conflict-8.5
+
+    INSERT OR IGNORE INTO t1 SELECT a+2,b+2 FROM t1;
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== conflict-8.6
+
+    INSERT OR IGNORE INTO t1 SELECT a+3,b+3 FROM t1;
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== conflict-9.1
+
+    PRAGMA count_changes=0;
+    CREATE TABLE t2(
+      a INTEGER UNIQUE ON CONFLICT IGNORE,
+      b INTEGER UNIQUE ON CONFLICT FAIL,
+      c INTEGER UNIQUE ON CONFLICT REPLACE,
+      d INTEGER UNIQUE ON CONFLICT ABORT,
+      e INTEGER UNIQUE ON CONFLICT ROLLBACK
+    );
+    CREATE TABLE t3(x);
+    INSERT INTO t3 VALUES(1);
+    SELECT * FROM t3;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 270 ok
+stmt 294 err 1 -1 324 no such table: t3
+stmt 324 err 1 -1 346 no such table: t3
+==== conflict-9.2
+
+    INSERT INTO t2 VALUES(1,1,1,1,1);
+    INSERT INTO t2 VALUES(2,2,2,2,2);
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 38 no such table: t2
+stmt 38 err 1 -1 76 no such table: t2
+stmt 76 err 1 -1 98 no such table: t2
+==== conflict-9.3
+
+    INSERT INTO t2 VALUES(1,3,3,3,3);
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 38 no such table: t2
+stmt 38 err 1 -1 60 no such table: t2
+==== conflict-9.4
+
+    UPDATE t2 SET a=a+1 WHERE a=1;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 35 no such table: t2
+stmt 35 err 1 -1 57 no such table: t2
+==== conflict-9.5
+
+    INSERT INTO t2 VALUES(3,1,3,3,3);
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 38 no such table: t2
+stmt 38 err 1 -1 60 no such table: t2
+==== conflict-9.6
+
+    UPDATE t2 SET b=b+1 WHERE b=1;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 35 no such table: t2
+stmt 35 err 1 -1 57 no such table: t2
+==== conflict-9.7
+
+    BEGIN;
+    UPDATE t3 SET x=x+1;
+    INSERT INTO t2 VALUES(3,1,3,3,3);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 36 no such table: t3
+stmt 36 err 1 -1 74 no such table: t2
+stmt 74 err 1 -1 96 no such table: t2
+==== conflict-9.9
+
+    BEGIN;
+    UPDATE t3 SET x=x+1;
+    UPDATE t2 SET b=b+1 WHERE b=1;
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 36 no such table: t3
+stmt 36 err 1 -1 71 no such table: t2
+stmt 71 err 1 -1 93 no such table: t2
+==== conflict-9.11
+
+    INSERT INTO t2 VALUES(3,3,3,1,3);
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 38 no such table: t2
+stmt 38 err 1 -1 60 no such table: t2
+==== conflict-9.12
+
+    UPDATE t2 SET d=d+1 WHERE d=1;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 35 no such table: t2
+stmt 35 err 1 -1 57 no such table: t2
+==== conflict-9.13
+
+    BEGIN;
+    UPDATE t3 SET x=x+1;
+    INSERT INTO t2 VALUES(3,3,3,1,3);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 36 no such table: t3
+stmt 36 err 1 -1 74 no such table: t2
+stmt 74 err 1 -1 96 no such table: t2
+==== conflict-9.15
+
+    BEGIN;
+    UPDATE t3 SET x=x+1;
+    UPDATE t2 SET d=d+1 WHERE d=1;
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 36 no such table: t3
+stmt 36 err 1 -1 71 no such table: t2
+stmt 71 err 1 -1 93 no such table: t2
+==== conflict-9.17
+
+    INSERT INTO t2 VALUES(3,3,3,3,1);
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 38 no such table: t2
+stmt 38 err 1 -1 60 no such table: t2
+==== conflict-9.18
+
+    UPDATE t2 SET e=e+1 WHERE e=1;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 35 no such table: t2
+stmt 35 err 1 -1 57 no such table: t2
+==== conflict-9.19
+
+    BEGIN;
+    UPDATE t3 SET x=x+1;
+    INSERT INTO t2 VALUES(3,3,3,3,1);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 36 no such table: t3
+stmt 36 err 1 -1 74 no such table: t2
+stmt 74 err 1 -1 96 no such table: t2
+==== conflict-9.21
+
+    BEGIN;
+    UPDATE t3 SET x=x+1;
+    UPDATE t2 SET e=e+1 WHERE e=1;
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 36 no such table: t3
+stmt 36 err 1 -1 71 no such table: t2
+stmt 71 err 1 -1 93 no such table: t2
+==== conflict-9.23
+
+    INSERT INTO t2 VALUES(3,3,1,3,3);
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 38 no such table: t2
+stmt 38 err 1 -1 60 no such table: t2
+==== conflict-9.24
+
+    UPDATE t2 SET c=c-1 WHERE c=2;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 35 no such table: t2
+stmt 35 err 1 -1 57 no such table: t2
+==== conflict-9.25
+
+    BEGIN;
+    UPDATE t3 SET x=x+1;
+    INSERT INTO t2 VALUES(3,3,1,3,3);
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 11 err 1 -1 36 no such table: t3
+stmt 36 err 1 -1 74 no such table: t2
+stmt 74 err 1 -1 96 no such table: t2
+==== conflict-12.1
+
+    CREATE TABLE t5(a INTEGER PRIMARY KEY, b text);
+    INSERT INTO t5 VALUES(1,'one');
+    INSERT INTO t5 VALUES(2,'two');
+    SELECT * FROM t5
+----
+stmt 0 ok
+stmt 52 err 1 -1 88 no such table: t5
+stmt 88 err 1 -1 124 no such table: t5
+stmt 124 err 1 -1 146 no such table: t5
+==== conflict-12.2
+
+    UPDATE OR IGNORE t5 SET a=a+1 WHERE a=1;
+    SELECT * FROM t5;
+----
+stmt 0 err 1 -1 45 no such table: t5
+stmt 45 err 1 -1 67 no such table: t5
+==== conflict-12.3
+
+    UPDATE t5 SET a=a+1 WHERE a=1;
+----
+stmt 0 err 1 -1 35 no such table: t5
+==== conflict-12.4
+
+    UPDATE OR REPLACE t5 SET a=a+1 WHERE a=1;
+    SELECT * FROM t5;
+----
+stmt 0 err 1 -1 46 no such table: t5
+stmt 46 err 1 -1 68 no such table: t5
+==== conflict-12.5
+
+    CREATE TABLE t5b(x);
+    INSERT INTO t5b(rowid, x) VALUES(1,10),(2,11);
+    UPDATE t5b SET rowid=rowid+1 WHERE x=10;
+----
+stmt 0 ok
+stmt 25 err 1 -1 76 no such table: t5b
+stmt 76 err 1 -1 121 no such table: t5b
+==== conflict-13.2
+
+    REPLACE INTO t13 VALUES(3);
+    COMMIT;
+    SELECT * FROM t13;
+----
+stmt 0 err 1 -1 32 no such table: t13
+stmt 32 ok
+stmt 44 err 1 -1 67 no such table: t13
+==== conflict-14.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x NOT NULL DEFAULT NULL);
+  REPLACE INTO t1 DEFAULT VALUES;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 71 err 1 -1 105 no such table: t1
+==== conflict-15.10
+
+  CREATE TABLE t1(
+    x PRIMARY KEY,
+    UNIQUE(x,x),
+    UNIQUE(x,x) ON CONFLICT REPLACE
+  );
+  INSERT INTO t1(x) VALUES(1);
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 96 err 1 -1 127 no such table: t1
+stmt 127 err 1 -1 147 no such table: t1
+==== conflict-15.20
+
+  INSERT INTO t1(x) VALUES(1);
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== conflict-15.30
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== conflict-16.1
+
+  -- ON CONFLICT clauses are not allowed on column CHECK constraints
+  CREATE TABLE t1(a INT CHECK( a!=5 ) ON CONFLICT ignore);
+----
+stmt 0 err 1 108 110 near "ON": syntax error
+==== conflict-16.2
+
+  -- ON CONFLICT is allowed on table CHECK constraints
+  CREATE TABLE t1(a INT, CHECK( a!=5 ) ON CONFLICT ignore);
+----
+stmt 0 ok
+==== conflict-16.3
+
+  -- The ON CONFLICT clause is in-op
+  INSERT INTO t1(a) VALUES(4),(5),(6);
+----
+stmt 0 err 1 -1 76 no such table: t1
+==== conflict-16.4
+
+  SELECT a FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== conflict-16.5
+
+  INSERT OR IGNORE INTO t1(a) VALUES(4),(5),(6);
+  SELECT a FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 49 no such table: t1
+stmt 49 err 1 -1 80 no such table: t1

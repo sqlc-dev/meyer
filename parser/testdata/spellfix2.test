@@ -1,0 +1,60 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE demo USING spellfix1;
+  INSERT INTO demo(word) VALUES ('amsterdam');
+  INSERT INTO demo(word) VALUES ('amsterdammetje');
+  INSERT INTO demo(word) VALUES ('amsterdamania');
+  INSERT INTO demo(word) VALUES ('amsterdamweg');
+  INSERT INTO demo(word) VALUES ('amsterdamsestraat');
+  INSERT INTO demo(word) VALUES ('amsterdamlaan');
+----
+stmt 0 ok
+stmt 45 err 1 -1 92 no such table: demo
+stmt 92 err 1 -1 144 no such table: demo
+stmt 144 err 1 -1 195 no such table: demo
+stmt 195 err 1 -1 245 no such table: demo
+stmt 245 err 1 -1 300 no such table: demo
+stmt 300 err 1 -1 351 no such table: demo
+==== 1.1
+
+  SELECT word, distance, matchlen FROM demo 
+  WHERE word MATCH 'amstedam*' AND top=3
+  ORDER BY +word;
+----
+stmt 0 err 1 -1 104 no such table: demo
+==== 1.2
+
+  SELECT word, distance, matchlen FROM demo WHERE 
+  word MATCH 'amstedam*' AND top=3 AND distance <= 100
+  ORDER BY +word;
+----
+stmt 0 err 1 -1 124 no such table: demo
+==== 1.3
+
+  SELECT word, distance, matchlen FROM demo WHERE 
+  word MATCH 'amstedam*' AND distance <= 100
+  ORDER BY +word;
+----
+stmt 0 err 1 -1 114 no such table: demo
+==== 1.5
+
+  SELECT count(*) FROM demo WHERE word MATCH 'amstedam*' AND distance <= 100;
+  SELECT count(*) FROM demo 
+  WHERE word MATCH 'amstedam*' AND distance <= 100 AND top=20;
+----
+stmt 0 err 1 -1 78 no such table: demo
+stmt 78 err 1 -1 170 no such table: demo
+==== 1.6
+
+  SELECT word, distance, matchlen FROM demo 
+  WHERE word MATCH 'amstedam*' AND distance <= 100
+  ORDER BY distance, word;
+----
+stmt 0 err 1 -1 123 no such table: demo
+==== 1.7
+
+  SELECT word, distance, matchlen FROM demo 
+  WHERE word MATCH 'amstedam*' AND distance <= 100 AND top=20
+  ORDER BY distance, word;
+----
+stmt 0 err 1 -1 134 no such table: demo

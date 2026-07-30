@@ -1,0 +1,18 @@
+==== 1.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b BLOB UNIQUE);
+  WITH s(i) AS (
+    VALUES(1) UNION ALL SELECT i+1 FROM s WHERE i<100
+  )
+  INSERT INTO t1 SELECT NULL, randomblob(900) FROM s;
+----
+stmt 0 ok
+stmt 57 err 1 -1 186 no such table: t1
+==== writecrash-generated
+ PRAGMA integrity_check
+----
+stmt 0 ok
+==== writecrash-generated.dup1
+ PRAGMA integrity_check
+----
+stmt 0 ok

@@ -7,103 +7,103 @@
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 66 err 1 -1 no such table: t3
-stmt 124 err 1 -1 no such table: t3
+stmt 66 err 1 -1 124 no such table: t3
+stmt 124 err 1 -1 182 no such table: t3
 ==== 1.1
 
   SELECT a, ntile(1) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 48 no such table: t3
 ==== 1.2
 
   SELECT a, ntile(2) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 48 no such table: t3
 ==== 1.3
 
   SELECT a, ntile(3) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 48 no such table: t3
 ==== 1.4
 
   SELECT a, ntile(4) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 48 no such table: t3
 ==== 1.5
 
   SELECT a, ntile(5) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 48 no such table: t3
 ==== 1.6
 
   SELECT a, ntile(6) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 48 no such table: t3
 ==== 1.7
 
   SELECT a, ntile(7) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 48 no such table: t3
 ==== 1.8
 
   SELECT a, ntile(8) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 48 no such table: t3
 ==== 1.9
 
   SELECT a, ntile(9) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 48 no such table: t3
 ==== 1.10
 
   SELECT a, ntile(10) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 49 no such table: t3
 ==== 1.11
 
   SELECT a, ntile(11) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 49 no such table: t3
 ==== 1.12
 
   SELECT a, ntile(12) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 49 no such table: t3
 ==== 1.13
 
   SELECT a, ntile(13) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 49 no such table: t3
 ==== 1.14
 
   SELECT a, ntile(14) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 49 no such table: t3
 ==== 1.15
 
   SELECT a, ntile(15) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 49 no such table: t3
 ==== 1.16
 
   SELECT a, ntile(16) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 49 no such table: t3
 ==== 1.17
 
   SELECT a, ntile(17) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 49 no such table: t3
 ==== 1.18
 
   SELECT a, ntile(18) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 49 no such table: t3
 ==== 1.19
 
   SELECT a, ntile(19) OVER (ORDER BY a) FROM t3
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 49 no such table: t3
 ==== 2.0
 
   DROP TABLE IF EXISTS t4;
@@ -121,58 +121,58 @@ stmt 0 err 1 -1 no such table: t3
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 88 err 1 -1 no such table: t4
-stmt 124 err 1 -1 no such table: t4
-stmt 160 err 1 -1 no such table: t4
-stmt 196 err 1 -1 no such table: t4
-stmt 233 err 1 -1 no such table: t4
-stmt 269 err 1 -1 no such table: t4
-stmt 305 err 1 -1 no such table: t4
-stmt 341 err 1 -1 no such table: t4
-stmt 377 err 1 -1 no such table: t4
-stmt 414 err 1 -1 no such table: t4
+stmt 88 err 1 -1 124 no such table: t4
+stmt 124 err 1 -1 160 no such table: t4
+stmt 160 err 1 -1 196 no such table: t4
+stmt 196 err 1 -1 233 no such table: t4
+stmt 233 err 1 -1 269 no such table: t4
+stmt 269 err 1 -1 305 no such table: t4
+stmt 305 err 1 -1 341 no such table: t4
+stmt 341 err 1 -1 377 no such table: t4
+stmt 377 err 1 -1 414 no such table: t4
+stmt 414 err 1 -1 451 no such table: t4
 ==== 2.1
 
   SELECT a, nth_value(b, c) OVER (ORDER BY a) FROM t4
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 55 no such table: t4
 ==== 2.2.1
 
   SELECT a, lead(b) OVER (ORDER BY a) FROM t4
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 47 no such table: t4
 ==== 2.2.2
 
   SELECT a, lead(b, 2) OVER (ORDER BY a) FROM t4
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 50 no such table: t4
 ==== 2.2.3
 
   SELECT a, lead(b, 3, 'abc') OVER (ORDER BY a) FROM t4
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 57 no such table: t4
 ==== 2.3.1
 
   SELECT a, lag(b) OVER (ORDER BY a) FROM t4
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 46 no such table: t4
 ==== 2.3.2
 
   SELECT a, lag(b, 2) OVER (ORDER BY a) FROM t4
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 49 no such table: t4
 ==== 2.3.3
 
   SELECT a, lag(b, 3, 'abc') OVER (ORDER BY a) FROM t4
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 56 no such table: t4
 ==== 2.4.1
 
   SELECT group_concat(b, '.') OVER (
     ORDER BY a ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM t4
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 114 no such table: t4
 ==== 3.0
 
   DROP TABLE IF EXISTS t5;
@@ -185,21 +185,21 @@ stmt 0 err 1 -1 no such table: t4
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 96 err 1 -1 no such table: t5
-stmt 141 err 1 -1 no such table: t5
-stmt 186 err 1 -1 no such table: t5
-stmt 231 err 1 -1 no such table: t5
-stmt 276 err 1 -1 no such table: t5
+stmt 96 err 1 -1 141 no such table: t5
+stmt 141 err 1 -1 186 no such table: t5
+stmt 186 err 1 -1 231 no such table: t5
+stmt 231 err 1 -1 276 no such table: t5
+stmt 276 err 1 -1 321 no such table: t5
 ==== 3.1
 
   SELECT a, nth_value(c, d) OVER (ORDER BY b) FROM t5
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 55 no such table: t5
 ==== 3.2
 
   SELECT a, nth_value(c, d) OVER (PARTITION BY b ORDER BY a) FROM t5
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 70 no such table: t5
 ==== 3.3
 
   SELECT a, count(*) OVER abc, count(*) OVER def FROM t5
@@ -207,49 +207,49 @@ stmt 0 err 1 -1 no such table: t5
          def AS (ORDER BY a DESC)
   ORDER BY a;
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 136 no such table: t5
 ==== 3.4
 
   SELECT a, max(a) FILTER (WHERE (a%2)=0) OVER w FROM t5 
   WINDOW w AS (ORDER BY a)
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 86 no such table: t5
 ==== 3.5.1
 
   SELECT a, max(c) OVER (ORDER BY a ROWS BETWEEN 1 PRECEDING AND 2 PRECEDING)
   FROM t5
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 89 no such table: t5
 ==== 3.5.2
 
   SELECT a, max(c) OVER (ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM t5
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 89 no such table: t5
 ==== 3.5.3
 
   SELECT a, max(c) OVER (ORDER BY a ROWS BETWEEN 0 PRECEDING AND 0 PRECEDING)
   FROM t5
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 89 no such table: t5
 ==== 3.6.1
 
   SELECT a, max(c) OVER (ORDER BY a ROWS BETWEEN 2 FOLLOWING AND 1 FOLLOWING)
   FROM t5
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 89 no such table: t5
 ==== 3.6.2
 
   SELECT a, max(c) OVER (ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 1 FOLLOWING)
   FROM t5
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 89 no such table: t5
 ==== 3.6.3
 
   SELECT a, max(c) OVER (ORDER BY a ROWS BETWEEN 0 FOLLOWING AND 0 FOLLOWING)
   FROM t5
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 89 no such table: t5
 ==== 4.0
 
   DROP TABLE IF EXISTS ttt;
@@ -268,1059 +268,1059 @@ stmt 0 err 1 -1 no such table: t5
 ----
 stmt 0 ok
 stmt 28 ok
-stmt 93 err 1 -1 no such table: ttt
-stmt 128 err 1 -1 no such table: ttt
-stmt 163 err 1 -1 no such table: ttt
-stmt 198 err 1 -1 no such table: ttt
-stmt 234 err 1 -1 no such table: ttt
-stmt 269 err 1 -1 no such table: ttt
-stmt 304 err 1 -1 no such table: ttt
-stmt 340 err 1 -1 no such table: ttt
-stmt 375 err 1 -1 no such table: ttt
+stmt 93 err 1 -1 128 no such table: ttt
+stmt 128 err 1 -1 163 no such table: ttt
+stmt 163 err 1 -1 198 no such table: ttt
+stmt 198 err 1 -1 234 no such table: ttt
+stmt 234 err 1 -1 269 no such table: ttt
+stmt 269 err 1 -1 304 no such table: ttt
+stmt 304 err 1 -1 340 no such table: ttt
+stmt 340 err 1 -1 375 no such table: ttt
+stmt 375 err 1 -1 410 no such table: ttt
 ==== 4.1
 
   SELECT max(c), max(b) OVER (ORDER BY b) FROM ttt GROUP BY b;
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 63 no such table: ttt
 ==== 4.2
 
   SELECT max(b) OVER (ORDER BY max(c)) FROM ttt GROUP BY b;
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 60 no such table: ttt
 ==== 4.3
 
   SELECT abs(max(b) OVER (ORDER BY b)) FROM ttt GROUP BY b;
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 60 no such table: ttt
 ==== 4.4
 
   SELECT sum(b) OVER (
     ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
   ) FROM ttt;
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 102 no such table: ttt
 ==== 4.5.1.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.1.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.2.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 219 no such table: ttt
 ==== 4.5.2.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 226 no such table: ttt
 ==== 4.5.3.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 202 no such table: ttt
 ==== 4.5.3.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 209 no such table: ttt
 ==== 4.5.4.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.4.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.5.1
 
   SELECT max(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 219 no such table: ttt
 ==== 4.5.5.2
 
   SELECT sum(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 226 no such table: ttt
 ==== 4.5.6.1
 
   SELECT max(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 222 no such table: ttt
 ==== 4.5.6.2
 
   SELECT sum(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 229 no such table: ttt
 ==== 4.5.7.1
 
   SELECT max(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.7.2
 
   SELECT sum(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 212 no such table: ttt
 ==== 4.5.8.1
 
   SELECT max(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 219 no such table: ttt
 ==== 4.5.8.2
 
   SELECT sum(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 226 no such table: ttt
 ==== 4.5.9.1
 
   SELECT max(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 202 no such table: ttt
 ==== 4.5.9.2
 
   SELECT sum(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 209 no such table: ttt
 ==== 4.5.10.1
 
   SELECT max(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.10.2
 
   SELECT sum(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 212 no such table: ttt
 ==== 4.5.11.1
 
   SELECT max(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 188 no such table: ttt
 ==== 4.5.11.2
 
   SELECT sum(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 195 no such table: ttt
 ==== 4.5.12.1
 
   SELECT max(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 202 no such table: ttt
 ==== 4.5.12.2
 
   SELECT sum(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 209 no such table: ttt
 ==== 4.5.13.1
 
   SELECT max(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.13.2
 
   SELECT sum(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.14.1
 
   SELECT max(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 219 no such table: ttt
 ==== 4.5.14.2
 
   SELECT sum(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b, a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 226 no such table: ttt
 ==== 4.5.15.1
 
   SELECT max(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 202 no such table: ttt
 ==== 4.5.15.2
 
   SELECT sum(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER ( ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 209 no such table: ttt
 ==== 4.5.16.1
 
   SELECT max(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.16.2
 
   SELECT sum(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY a ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.17.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.17.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.18.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 224 no such table: ttt
 ==== 4.5.18.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 231 no such table: ttt
 ==== 4.5.19.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 208 no such table: ttt
 ==== 4.5.19.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 215 no such table: ttt
 ==== 4.5.20.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.20.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.21.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 224 no such table: ttt
 ==== 4.5.21.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 231 no such table: ttt
 ==== 4.5.22.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 232 no such table: ttt
 ==== 4.5.22.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 239 no such table: ttt
 ==== 4.5.23.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.23.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.24.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 224 no such table: ttt
 ==== 4.5.24.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 231 no such table: ttt
 ==== 4.5.25.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 208 no such table: ttt
 ==== 4.5.25.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 215 no such table: ttt
 ==== 4.5.26.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.26.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.27.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 200 no such table: ttt
 ==== 4.5.27.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 207 no such table: ttt
 ==== 4.5.28.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 208 no such table: ttt
 ==== 4.5.28.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 215 no such table: ttt
 ==== 4.5.29.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.29.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.30.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 224 no such table: ttt
 ==== 4.5.30.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 231 no such table: ttt
 ==== 4.5.31.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 208 no such table: ttt
 ==== 4.5.31.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 215 no such table: ttt
 ==== 4.5.32.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.32.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.33.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.33.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.34.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.34.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.35.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.35.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.36.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.36.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.37.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 200 no such table: ttt
 ==== 4.5.37.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 207 no such table: ttt
 ==== 4.5.38.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.38.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.39.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.39.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.40.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.40.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.41.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.41.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.42.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 200 no such table: ttt
 ==== 4.5.42.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 207 no such table: ttt
 ==== 4.5.43.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.43.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.44.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.44.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.45.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.45.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.46.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.46.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.47.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 200 no such table: ttt
 ==== 4.5.47.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 207 no such table: ttt
 ==== 4.5.48.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.48.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.49.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.49.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.50.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.50.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.51.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 198 no such table: ttt
 ==== 4.5.51.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 205 no such table: ttt
 ==== 4.5.52.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 200 no such table: ttt
 ==== 4.5.52.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 207 no such table: ttt
 ==== 4.5.53.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 200 no such table: ttt
 ==== 4.5.53.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 1 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 207 no such table: ttt
 ==== 4.5.54.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 200 no such table: ttt
 ==== 4.5.54.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 3 PRECEDING AND 2 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 207 no such table: ttt
 ==== 4.5.55.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 200 no such table: ttt
 ==== 4.5.55.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 207 no such table: ttt
 ==== 4.5.56.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 200 no such table: ttt
 ==== 4.5.56.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 0 PRECEDING AND 1 PRECEDING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 207 no such table: ttt
 ==== 4.5.57.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING), 
   min(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 202 no such table: ttt
 ==== 4.5.57.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING), 
          sum(c) OVER (PARTITION BY b ORDER BY a ROWS BETWEEN 1 FOLLOWING AND 500 FOLLOWING)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 209 no such table: ttt
 ==== 4.5.58.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.58.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 223 no such table: ttt
 ==== 4.5.59.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 221 no such table: ttt
 ==== 4.5.59.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 228 no such table: ttt
 ==== 4.5.60.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 206 no such table: ttt
 ==== 4.5.60.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 213 no such table: ttt
 ==== 4.5.61.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 219 no such table: ttt
 ==== 4.5.61.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 226 no such table: ttt
 ==== 4.5.62.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 221 no such table: ttt
 ==== 4.5.62.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 228 no such table: ttt
 ==== 4.5.63.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 226 no such table: ttt
 ==== 4.5.63.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 233 no such table: ttt
 ==== 4.5.64.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 211 no such table: ttt
 ==== 4.5.64.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 218 no such table: ttt
 ==== 4.5.65.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 224 no such table: ttt
 ==== 4.5.65.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 231 no such table: ttt
 ==== 4.5.66.1
 
   SELECT max(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 206 no such table: ttt
 ==== 4.5.66.2
 
   SELECT sum(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 213 no such table: ttt
 ==== 4.5.67.1
 
   SELECT max(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 211 no such table: ttt
 ==== 4.5.67.2
 
   SELECT sum(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 218 no such table: ttt
 ==== 4.5.68.1
 
   SELECT max(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 196 no such table: ttt
 ==== 4.5.68.2
 
   SELECT sum(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 203 no such table: ttt
 ==== 4.5.69.1
 
   SELECT max(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 209 no such table: ttt
 ==== 4.5.69.2
 
   SELECT sum(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.70.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 219 no such table: ttt
 ==== 4.5.70.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 226 no such table: ttt
 ==== 4.5.71.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 224 no such table: ttt
 ==== 4.5.71.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 231 no such table: ttt
 ==== 4.5.72.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 209 no such table: ttt
 ==== 4.5.72.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b  RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 216 no such table: ttt
 ==== 4.5.73.1
 
   SELECT max(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
   min(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 222 no such table: ttt
 ==== 4.5.73.2
 
   SELECT sum(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW), 
          sum(c) OVER (PARTITION BY b ORDER BY b, a RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
   FROM ttt ORDER BY a
 ----
-stmt 0 err 1 -1 no such table: ttt
+stmt 0 err 1 -1 229 no such table: ttt
 ==== 7.0
 
   DROP TABLE IF EXISTS t1;
@@ -1333,29 +1333,29 @@ stmt 0 err 1 -1 no such table: ttt
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 68 err 1 -1 no such table: t1
-stmt 99 err 1 -1 no such table: t1
-stmt 130 err 1 -1 no such table: t1
-stmt 161 err 1 -1 no such table: t1
-stmt 192 err 1 -1 no such table: t1
+stmt 68 err 1 -1 99 no such table: t1
+stmt 99 err 1 -1 130 no such table: t1
+stmt 130 err 1 -1 161 no such table: t1
+stmt 161 err 1 -1 192 no such table: t1
+stmt 192 err 1 -1 224 no such table: t1
 ==== 7.1
 
   SELECT lead(y) OVER win FROM t1
   WINDOW win AS (ORDER BY x)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 64 no such table: t1
 ==== 7.2
 
   SELECT lead(y, 2) OVER win FROM t1
   WINDOW win AS (ORDER BY x)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 67 no such table: t1
 ==== 7.3
 
   SELECT lead(y, 3, -1) OVER win FROM t1
   WINDOW win AS (ORDER BY x)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 71 no such table: t1
 ==== 7.4
 
   SELECT 
@@ -1363,7 +1363,7 @@ stmt 0 err 1 -1 no such table: t1
   FROM t1
   WINDOW win AS (ORDER BY x)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 89 no such table: t1
 ==== 7.5
 
   SELECT 
@@ -1373,7 +1373,7 @@ stmt 0 err 1 -1 no such table: t1
   FROM t1
   WINDOW win AS (ORDER BY x)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 127 no such table: t1
 ==== 8.0
 
   DROP TABLE IF EXISTS t1;
@@ -1384,9 +1384,9 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 90 err 1 -1 no such table: t1
-stmt 127 err 1 -1 no such table: t1
-stmt 164 err 1 -1 no such table: t1
+stmt 90 err 1 -1 127 no such table: t1
+stmt 127 err 1 -1 164 no such table: t1
+stmt 164 err 1 -1 204 no such table: t1
 ==== 8.1
 
   SELECT row_number() OVER win,
@@ -1395,7 +1395,7 @@ stmt 164 err 1 -1 no such table: t1
   FROM t1
   WINDOW win AS (ORDER BY a)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 132 no such table: t1
 ==== 8.2
 
   SELECT row_number() OVER win,
@@ -1412,7 +1412,7 @@ stmt 0 err 1 -1 no such table: t1
     FROM t1
     WINDOW win AS (ORDER BY a)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 387 no such table: t1
 ==== 9.0
 
   DROP TABLE IF EXISTS t2;
@@ -1421,27 +1421,27 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 57 err 1 -1 no such table: t2
+stmt 57 err 1 -1 115 no such table: t2
 ==== 9.1
 
   SELECT rank() OVER () FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 33 no such table: t2
 ==== 9.2
 
   SELECT dense_rank() OVER (PARTITION BY x) FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 53 no such table: t2
 ==== 9.4
 
   SELECT x, rank() OVER (ORDER BY x) FROM t2 ORDER BY 1,2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 59 no such table: t2
 ==== 9.5
 
   SELECT DISTINCT x, rank() OVER (ORDER BY x) FROM t2 ORDER BY 1,2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 68 no such table: t2
 ==== 10.0
 
   DROP TABLE IF EXISTS t7;
@@ -1452,22 +1452,22 @@ stmt 0 err 1 -1 no such table: t2
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 92 err 1 -1 no such table: t7
+stmt 92 err 1 -1 206 no such table: t7
 ==== 10.1
 
   SELECT id, min(b) OVER (PARTITION BY a ORDER BY id) FROM t7;
 ----
-stmt 0 err 1 -1 no such table: t7
+stmt 0 err 1 -1 63 no such table: t7
 ==== 10.2
 
   SELECT id, lead(b, -1) OVER (PARTITION BY a ORDER BY id) FROM t7;
 ----
-stmt 0 err 1 -1 no such table: t7
+stmt 0 err 1 -1 68 no such table: t7
 ==== 10.3
 
   SELECT id, lag(b, -1) OVER (PARTITION BY a ORDER BY id) FROM t7;
 ----
-stmt 0 err 1 -1 no such table: t7
+stmt 0 err 1 -1 67 no such table: t7
 ==== 11.0
 
   DROP VIEW IF EXISTS v8;
@@ -1480,14 +1480,14 @@ stmt 0 err 1 -1 no such table: t7
 stmt 0 ok
 stmt 26 ok
 stmt 53 ok
-stmt 90 err 1 -1 no such table: t8
-stmt 120 err 1 -1 no such table: t8
-stmt 150 err 1 -1 no such table: t8
+stmt 90 err 1 -1 120 no such table: t8
+stmt 120 err 1 -1 150 no such table: t8
+stmt 150 err 1 -1 181 no such table: t8
 ==== 11.1
 
   SELECT NTILE(256) OVER (ORDER BY total) - 1 AS nt FROM t8;
 ----
-stmt 0 err 1 -1 no such table: t8
+stmt 0 err 1 -1 61 no such table: t8
 ==== 11.2
 
   CREATE VIEW v8 AS SELECT NTILE(256) OVER (ORDER BY total) - 1 AS nt FROM t8;
@@ -1497,34 +1497,34 @@ stmt 0 ok
 
   SELECT * FROM v8;
 ----
-stmt 0 err 1 -1 no such table: v8
+stmt 0 err 1 -1 20 no such table: v8
 ==== 11.4
 
   SELECT * FROM (
     SELECT NTILE(256) OVER (ORDER BY total) - 1 AS nt FROM t8
   ) sub;
 ----
-stmt 0 err 1 -1 no such table: t8
+stmt 0 err 1 -1 89 no such table: t8
 ==== 11.5
 
   SELECT sum( min(t) ) OVER () FROM t8 GROUP BY total;
 ----
-stmt 0 err 1 -1 no such table: t8
+stmt 0 err 1 -1 55 no such table: t8
 ==== 11.5.dup1
 
   SELECT sum( max(t) ) OVER () FROM t8 GROUP BY total;
 ----
-stmt 0 err 1 -1 no such table: t8
+stmt 0 err 1 -1 55 no such table: t8
 ==== 11.7
 
   SELECT sum( min(t) ) OVER () FROM t8;
 ----
-stmt 0 err 1 -1 no such table: t8
+stmt 0 err 1 -1 40 no such table: t8
 ==== 11.8
 
   SELECT sum( max(t) ) OVER () FROM t8;
 ----
-stmt 0 err 1 -1 no such table: t8
+stmt 0 err 1 -1 40 no such table: t8
 ==== 12.0
 
   DROP TABLE IF EXISTS t2;
@@ -1533,9 +1533,9 @@ stmt 0 err 1 -1 no such table: t8
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 57 err 1 -1 no such table: t2
+stmt 57 err 1 -1 95 no such table: t2
 ==== 12.1
 
   SELECT (SELECT min(a) OVER ()) FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 42 no such table: t2

@@ -7,32 +7,32 @@
 ----
 stmt 0 ok
 stmt 28 ok
-stmt 121 err 1 -1 no such table: t0
+stmt 121 err 1 -1 152 no such table: t0
 ==== 1.1
 
   SELECT ('500') IS (v0.c1) FROM v0;
 ----
-stmt 0 err 1 -1 no such table: v0
+stmt 0 err 1 -1 37 no such table: v0
 ==== 1.2
 
   SELECT (('500') IS (v0.c1)) FROM v0, t0;
 ----
-stmt 0 err 1 -1 no such table: v0
+stmt 0 err 1 -1 43 no such table: v0
 ==== 1.2.dup1
 
   SELECT (('500') IS (v0.c1)) IS FALSE FROM v0;
 ----
-stmt 0 err 1 -1 no such table: v0
+stmt 0 err 1 -1 48 no such table: v0
 ==== 1.3
 
   SELECT * FROM v0;
 ----
-stmt 0 err 1 -1 no such table: v0
+stmt 0 err 1 -1 20 no such table: v0
 ==== 1.4
 
   SELECT * FROM v0 WHERE ('500' IS v0.c1) IS FALSE;
 ----
-stmt 0 err 1 -1 no such table: v0
+stmt 0 err 1 -1 52 no such table: v0
 ==== 2.0
 
   CREATE TABLE t1(x);
@@ -40,23 +40,23 @@ stmt 0 err 1 -1 no such table: v0
   CREATE VIEW v1(a, b, c, d) AS SELECT 1, 2, TRUE, FALSE FROM t1;
 ----
 stmt 0 ok
-stmt 22 err 1 -1 no such table: t1
+stmt 22 err 1 -1 56 no such table: t1
 stmt 56 ok
 ==== 2.1
 
   SELECT 500 IS a, 500 IS b, 500 IS c, 500 IS d FROM v1
 ----
-stmt 0 err 1 -1 no such table: v1
+stmt 0 err 1 -1 57 no such table: v1
 ==== 2.2
 
   SELECT * FROM v1 WHERE 500 IS c;
 ----
-stmt 0 err 1 -1 no such table: v1
+stmt 0 err 1 -1 35 no such table: v1
 ==== 2.3
 
   SELECT * FROM v1 WHERE 500 IS d;
 ----
-stmt 0 err 1 -1 no such table: v1
+stmt 0 err 1 -1 35 no such table: v1
 ==== 2.4
 
   CREATE VIEW v2 AS SELECT max(x) OVER () AS a, TRUE AS c FROM t1;
@@ -66,9 +66,9 @@ stmt 0 ok
 
   SELECT 500 IS c FROM v2;
 ----
-stmt 0 err 1 -1 no such table: v2
+stmt 0 err 1 -1 27 no such table: v2
 ==== 2.6
 
   SELECT * FROM v2 WHERE 500 IS c;
 ----
-stmt 0 err 1 -1 no such table: v2
+stmt 0 err 1 -1 35 no such table: v2

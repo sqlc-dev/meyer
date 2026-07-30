@@ -1,0 +1,53 @@
+==== tkt2832-1.1
+
+    CREATE TABLE t1(a PRIMARY KEY);
+    INSERT INTO t1 VALUES(2);
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(3);
+----
+stmt 0 ok
+stmt 36 err 1 -1 66 no such table: t1
+stmt 66 err 1 -1 96 no such table: t1
+stmt 96 err 1 -1 126 no such table: t1
+==== tkt2832-1.2
+
+    UPDATE OR REPLACE t1 SET a = 1;
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 58 no such table: t1
+==== tkt2832-2.1
+
+    CREATE TABLE t2(a, b);
+    CREATE TRIGGER t2_t AFTER UPDATE ON t2 BEGIN
+      DELETE FROM t2 WHERE a = new.a + 1;
+    END;
+    INSERT INTO t2 VALUES(1, 2);
+    INSERT INTO t2 VALUES(2, 3);
+----
+stmt 0 ok
+stmt 27 err 1 -1 76 no such table: main.t2
+stmt 127 err 1 -1 160 no such table: t2
+stmt 160 err 1 -1 193 no such table: t2
+==== tkt2832-2.2
+ 
+    UPDATE t2 SET b = 5
+----
+stmt 0 err 1 -1 26 no such table: t2
+==== tkt2832-3.1
+
+    CREATE TABLE t3(a, b);
+    CREATE TRIGGER t3_t AFTER DELETE ON t3 BEGIN
+      DELETE FROM t3 WHERE a = old.a + 1;
+    END;
+    INSERT INTO t3 VALUES(1, 2);
+    INSERT INTO t3 VALUES(2, 3);
+----
+stmt 0 ok
+stmt 27 err 1 -1 76 no such table: main.t3
+stmt 127 err 1 -1 160 no such table: t3
+stmt 160 err 1 -1 193 no such table: t3
+==== tkt2832-3.2
+ DELETE FROM t3 WHERE 1
+----
+stmt 0 err 1 -1 24 no such table: t3

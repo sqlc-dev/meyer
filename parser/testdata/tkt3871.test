@@ -1,0 +1,8 @@
+==== tkt3871-1.2
+ SELECT * FROM e WHERE a = 1 OR a = 2
+----
+stmt 0 err 1 -1 38 no such table: e
+==== tkt3871-1.4
+ SELECT * FROM e WHERE a = 1 OR a = 2 OR b = 9
+----
+stmt 0 err 1 -1 47 no such table: e

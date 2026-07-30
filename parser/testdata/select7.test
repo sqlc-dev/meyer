@@ -10,11 +10,11 @@
         intersect select * from t1 where x like '__x';
 ----
 stmt 0 ok
-stmt 31 err 1 -1 no such table: t1
-stmt 67 err 1 -1 no such table: t1
-stmt 103 err 1 -1 no such table: t1
-stmt 139 err 1 -1 no such table: t1
-stmt 175 err 1 -1 no such table: t1
+stmt 31 err 1 -1 67 no such table: t1
+stmt 67 err 1 -1 103 no such table: t1
+stmt 103 err 1 -1 139 no such table: t1
+stmt 139 err 1 -1 175 no such table: t1
+stmt 175 err 1 -1 326 no such table: t1
 ==== select7-2.1
 
     CREATE TABLE x(id integer primary key, a TEXT NULL);
@@ -27,13 +27,13 @@ stmt 175 err 1 -1 no such table: t1
     SELECT * FROM tv2;
 ----
 stmt 0 ok
-stmt 57 err 1 -1 no such table: x
+stmt 57 err 1 -1 97 no such table: x
 stmt 97 ok
-stmt 158 err 1 -1 no such table: tempx
+stmt 158 err 1 -1 204 no such table: tempx
 stmt 204 ok
 stmt 282 ok
 stmt 361 ok
-stmt 428 err 1 -1 no such table: tv2
+stmt 428 err 1 -1 451 no such table: tv2
 ==== select7-3.1
 
       SELECT * FROM (SELECT * FROM sqlite_master) GROUP BY name
@@ -52,7 +52,7 @@ stmt 0 ok
 ----
 stmt 0 ok
 stmt 67 ok
-stmt 143 err 1 -1 no such table: PHOTO
+stmt 143 err 1 -1 363 no such table: PHOTO
 ==== select7-4.2
 
       INSERT INTO photo VALUES(1,1);
@@ -67,35 +67,35 @@ stmt 143 err 1 -1 no such table: PHOTO
            SELECT T3.pk from TAG T3 WHERE T3.fk = P.pk AND T3.name LIKE '%foo%'
       );
 ----
-stmt 0 err 1 -1 no such table: photo
-stmt 37 err 1 -1 no such table: photo
-stmt 74 err 1 -1 no such table: photo
-stmt 111 err 1 -1 no such table: tag
-stmt 153 err 1 -1 no such table: tag
-stmt 195 err 1 -1 no such table: tag
-stmt 239 err 1 -1 no such table: PHOTO
+stmt 0 err 1 -1 37 no such table: photo
+stmt 37 err 1 -1 74 no such table: photo
+stmt 74 err 1 -1 111 no such table: photo
+stmt 111 err 1 -1 153 no such table: tag
+stmt 153 err 1 -1 195 no such table: tag
+stmt 195 err 1 -1 239 no such table: tag
+stmt 239 err 1 -1 454 no such table: PHOTO
 ==== select7-5.1
 
       CREATE TABLE t2(a,b);
       SELECT 5 IN (SELECT a,b FROM t2);
 ----
 stmt 0 ok
-stmt 28 err 1 -1 no such table: t2
+stmt 28 err 1 -1 68 no such table: t2
 ==== select7-5.2
 
       SELECT 5 IN (SELECT * FROM t2);
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 38 no such table: t2
 ==== select7-5.3
 
       SELECT 5 IN (SELECT a,b FROM t2 UNION SELECT b,a FROM t2);
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 65 no such table: t2
 ==== select7-5.4
 
       SELECT 5 IN (SELECT * FROM t2 UNION SELECT * FROM t2);
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 61 no such table: t2
 ==== select7-6.5
 
   DROP TABLE IF EXISTS t1;
@@ -111,12 +111,12 @@ stmt 27 ok
     (0,"",NULL),  (0.0,NULL,X''),  ("",X'',NULL),  (NULL,0,""),
     (0,NULL,0),  (X'',X'',0.0);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 275 no such table: t1
 ==== select7-6.7
 
   SELECT count(*) FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 27 no such table: t1
 ==== select7-6.8
 
   INSERT INTO t1 VALUES
@@ -125,12 +125,12 @@ stmt 0 err 1 -1 no such table: t1
     (0,"",NULL),  (0.0,NULL,X''),  ("",X'',NULL),  (NULL,0,""),
     (0,NULL,0),  (X'',X'',0.0);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 275 no such table: t1
 ==== select7-6.9
 
   SELECT count(*) FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 27 no such table: t1
 ==== select7-7.1
 
     CREATE TABLE t3(a REAL);
@@ -138,8 +138,8 @@ stmt 0 err 1 -1 no such table: t1
     INSERT INTO t3 VALUES(56.0);
 ----
 stmt 0 ok
-stmt 29 err 1 -1 no such table: t3
-stmt 62 err 1 -1 no such table: t3
+stmt 29 err 1 -1 62 no such table: t3
+stmt 62 err 1 -1 95 no such table: t3
 ==== select7-7.2
 
     pragma vdbe_trace = 0;
@@ -147,7 +147,7 @@ stmt 62 err 1 -1 no such table: t3
     FROM t3 GROUP BY categ
 ----
 stmt 0 ok
-stmt 27 err 1 -1 no such table: t3
+stmt 27 err 1 -1 131 no such table: t3
 ==== select7-7.3
 
     CREATE TABLE t4(a REAL);
@@ -155,21 +155,21 @@ stmt 27 err 1 -1 no such table: t3
     INSERT INTO t4 VALUES( 3.0 );
 ----
 stmt 0 ok
-stmt 29 err 1 -1 no such table: t4
-stmt 63 err 1 -1 no such table: t4
+stmt 29 err 1 -1 63 no such table: t4
+stmt 63 err 1 -1 97 no such table: t4
 ==== select7-7.4
 
     SELECT (CASE WHEN a=0 THEN 'zero' ELSE a/2 END) AS t FROM t4 GROUP BY t;
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 77 no such table: t4
 ==== select7-7.5
  SELECT a=0, typeof(a) FROM t4
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 31 no such table: t4
 ==== select7-7.6
  SELECT a=0, typeof(a) FROM t4 GROUP BY a
 ----
-stmt 0 err 1 -1 no such table: t4
+stmt 0 err 1 -1 42 no such table: t4
 ==== select7-7.7
 
     CREATE TABLE t5(a TEXT, b INT);
@@ -177,8 +177,8 @@ stmt 0 err 1 -1 no such table: t4
     SELECT typeof(a), a FROM t5 GROUP BY a HAVING a<b;
 ----
 stmt 0 ok
-stmt 36 err 1 -1 no such table: t5
-stmt 73 err 1 -1 no such table: t5
+stmt 36 err 1 -1 73 no such table: t5
+stmt 73 err 1 -1 128 no such table: t5
 ==== 8.0
  
   CREATE TABLE t01(x, y);
@@ -192,11 +192,11 @@ stmt 27 ok
     SELECT * FROM t01 UNION SELECT x FROM t02
   ) WHERE y=1
 ----
-stmt 0 err 1 -1 no such table: t02
+stmt 0 err 1 -1 79 no such table: t02
 ==== 8.2
 
   CREATE VIEW v0 as SELECT x, y FROM t01 UNION SELECT x FROM t02;
   EXPLAIN QUERY PLAN SELECT * FROM v0 WHERE x='0' OR y;
 ----
 stmt 0 ok
-stmt 66 err 1 -1 no such table: v0
+stmt 66 err 1 -1 122 no such table: v0

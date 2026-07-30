@@ -1,0 +1,271 @@
+==== fkey1-1.0
+
+    CREATE TABLE t1(
+      a INTEGER PRIMARY KEY,
+      b INTEGER
+           REFERENCES t1 ON DELETE CASCADE
+           REFERENCES t2,
+      c TEXT,
+      FOREIGN KEY (b,c) REFERENCES t2(x,y) ON UPDATE CASCADE
+    );
+----
+stmt 0 ok
+==== fkey1-1.1
+
+    CREATE TABLE t2(
+      x INTEGER PRIMARY KEY,
+      y TEXT
+    );
+----
+stmt 0 ok
+==== fkey1-1.2
+
+    CREATE TABLE t3(
+      a INTEGER REFERENCES t2,
+      b INTEGER REFERENCES t1,
+      FOREIGN KEY (a,b) REFERENCES t2(x,y)
+    );
+----
+stmt 0 ok
+==== fkey1-2.1
+
+    CREATE TABLE t4(a integer primary key);
+    CREATE TABLE t5(x references t4);
+    CREATE TABLE t6(x references t4);
+    CREATE TABLE t7(x references t4);
+    CREATE TABLE t8(x references t4);
+    CREATE TABLE t9(x references t4);
+    CREATE TABLE t10(x references t4);
+    DROP TABLE t7;
+    DROP TABLE t9;
+    DROP TABLE t5;
+    DROP TABLE t8;
+    DROP TABLE t6;
+    DROP TABLE t10;
+----
+stmt 0 ok
+stmt 44 ok
+stmt 82 ok
+stmt 120 ok
+stmt 158 ok
+stmt 196 ok
+stmt 234 ok
+stmt 273 err 1 -1 292 no such table: t7
+stmt 292 err 1 -1 311 no such table: t9
+stmt 311 err 1 -1 330 no such table: t5
+stmt 330 err 1 -1 349 no such table: t8
+stmt 349 err 1 -1 368 no such table: t6
+stmt 368 err 1 -1 388 no such table: t10
+==== fkey1-3.1
+
+    CREATE TABLE t5(a PRIMARY KEY, b, c);
+    CREATE TABLE t6(
+      d REFERENCES t5,
+      e REFERENCES t5(c)
+    );
+    PRAGMA foreign_key_list(t6);
+----
+stmt 0 ok
+stmt 42 ok
+stmt 118 ok
+==== fkey1-3.2
+
+    CREATE TABLE t7(d, e, f,
+      FOREIGN KEY (d, e) REFERENCES t5(a, b)
+    );
+    PRAGMA foreign_key_list(t7);
+----
+stmt 0 ok
+stmt 81 ok
+==== fkey1-3.3
+
+    CREATE TABLE t8(d, e, f,
+      FOREIGN KEY (d, e) REFERENCES t5 ON DELETE CASCADE ON UPDATE SET NULL
+    );
+    PRAGMA foreign_key_list(t8);
+----
+stmt 0 ok
+stmt 112 ok
+==== fkey1-3.4
+
+    CREATE TABLE t9(d, e, f,
+      FOREIGN KEY (d, e) REFERENCES t5 ON DELETE CASCADE ON UPDATE SET DEFAULT
+    );
+    PRAGMA foreign_key_list(t9);
+----
+stmt 0 ok
+stmt 115 ok
+==== fkey1-4.0
+
+  PRAGMA foreign_keys=ON;
+  CREATE TABLE "xx1"("xx2" TEXT PRIMARY KEY, "xx3" TEXT);
+  INSERT INTO "xx1"("xx2","xx3") VALUES('abc','def');
+  CREATE TABLE "xx4"("xx5" TEXT REFERENCES "xx1" ON DELETE CASCADE);
+  INSERT INTO "xx4"("xx5") VALUES('abc');
+  INSERT INTO "xx1"("xx2","xx3") VALUES('uvw','xyz');
+  SELECT 1, "xx5" FROM "xx4";
+  DELETE FROM "xx1";
+  SELECT 2, "xx5" FROM "xx4";
+----
+stmt 0 ok
+stmt 26 ok
+stmt 84 err 1 -1 138 no such table: xx1
+stmt 138 ok
+stmt 207 err 1 -1 249 no such table: xx4
+stmt 249 err 1 -1 303 no such table: xx1
+stmt 303 err 1 -1 333 no such table: xx4
+stmt 333 err 1 -1 354 no such table: xx1
+stmt 354 err 1 -1 384 no such table: xx4
+==== fkey1-4.1
+
+  PRAGMA foreign_keys=ON;
+  CREATE TABLE """1"("""2" TEXT PRIMARY KEY, """3" TEXT);
+  INSERT INTO """1"("""2","""3") VALUES('abc','def');
+  CREATE TABLE """4"("""5" TEXT REFERENCES """1" ON DELETE CASCADE);
+  INSERT INTO """4"("""5") VALUES('abc');
+  INSERT INTO """1"("""2","""3") VALUES('uvw','xyz');
+  SELECT 1, """5" FROM """4";
+  DELETE FROM """1";
+  SELECT 2, """5" FROM """4";
+----
+stmt 0 ok
+stmt 26 ok
+stmt 84 err 1 -1 138 no such table: "1
+stmt 138 ok
+stmt 207 err 1 -1 249 no such table: "4
+stmt 249 err 1 -1 303 no such table: "1
+stmt 303 err 1 -1 333 no such table: "4
+stmt 333 err 1 -1 354 no such table: "1
+stmt 354 err 1 -1 384 no such table: "4
+==== fkey1-4.2
+
+  PRAGMA table_info="""1";
+----
+stmt 0 ok
+==== fkey1-5.1
+
+  CREATE TABLE t11(
+    x INTEGER PRIMARY KEY, 
+    parent REFERENCES t11 ON DELETE CASCADE
+  );
+  INSERT INTO t11 VALUES (1, NULL), (2, 1), (3, 2);
+----
+stmt 0 ok
+stmt 97 err 1 -1 149 no such table: t11
+==== fkey1-5.2
+
+  INSERT OR REPLACE INTO t11 VALUES (2, 3);
+----
+stmt 0 err 1 -1 44 no such table: t11
+==== fkey1-5.3
+
+  CREATE TABLE Foo (
+    Id INTEGER PRIMARY KEY, 
+    ParentId INTEGER REFERENCES Foo(Id) ON DELETE CASCADE, C1
+  );
+  INSERT OR REPLACE INTO Foo(Id, ParentId, C1) VALUES (1, null, 'A');
+  INSERT OR REPLACE INTO Foo(Id, ParentId, C1) VALUES (2, 1, 'A-2-1');
+  INSERT OR REPLACE INTO Foo(Id, ParentId, C1) VALUES (3, 2, 'A-3-2');
+  INSERT OR REPLACE INTO Foo(Id, ParentId, C1) VALUES (4, 3, 'A-4-3');
+----
+stmt 0 ok
+stmt 117 err 1 -1 187 no such table: Foo
+stmt 187 err 1 -1 258 no such table: Foo
+stmt 258 err 1 -1 329 no such table: Foo
+stmt 329 err 1 -1 400 no such table: Foo
+==== fkey1-5.4
+
+  INSERT OR REPLACE INTO Foo(Id, ParentId, C1) VALUES (2, 3, 'A-2-3');
+----
+stmt 0 err 1 -1 71 no such table: Foo
+==== 6.0
+
+  CREATE TABLE p1(x, y);
+  CREATE UNIQUE INDEX p1x ON p1(x) WHERE y<2;
+  INSERT INTO p1 VALUES(1, 1);
+  CREATE TABLE c1(a REFERENCES p1(x));
+----
+stmt 0 ok
+stmt 25 err 1 -1 71 no such table: main.p1
+stmt 71 err 1 -1 102 no such table: p1
+stmt 102 ok
+==== 6.1
+
+  INSERT INTO c1 VALUES(1);
+----
+stmt 0 err 1 -1 28 no such table: c1
+==== 6.2
+
+  CREATE UNIQUE INDEX p1x2 ON p1(x);
+  INSERT INTO c1 VALUES(1);
+----
+stmt 0 err 1 -1 37 no such table: main.p1
+stmt 37 err 1 -1 65 no such table: c1
+==== 7.1
+
+  PRAGMA foreign_keys=OFF;
+  CREATE TABLE t1(a,b,c,FOREIGN KEY(a,a,a,a,a,a,a,a,a,a,a,a,a,a) REFERENCES t0);
+  INSERT INTO t1 VALUES(1,2,3);
+  PRAGMA foreign_key_check;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 108 err 1 -1 140 no such table: t1
+stmt 140 ok
+==== 7.2
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a,b,c AS(1),d, FOREIGN KEY(c,d,b,a,b,d,b,c) REFERENCES t0);
+  PRAGMA foreign_key_check;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 95 ok
+==== 8.1
+
+  PRAGMA writable_schema=ON;
+  PRAGMA foreign_keys = ON;
+  CREATE TABLE sqlite_stat1 (tbl INTEGER PRIMARY KEY DESC, idx UNIQUE DEFAULT NULL) WITHOUT ROWID;
+  PRAGMA writable_schema=OFF;
+  CREATE TABLE sqlsim4(stat PRIMARY KEY);;
+  CREATE TABLE t1(sqlsim7 REFERENCES sqlite_stat1 ON DELETE CASCADE);
+  DROP table "sqlsim4";
+----
+stmt 0 ok
+stmt 29 ok
+stmt 57 ok
+stmt 156 ok
+stmt 186 ok
+stmt 229 ok
+stmt 299 err 1 -1 323 no such table: sqlsim4
+==== 8.2
+
+  CREATE TABLE t1(a REFERENCES sqlite_stat1 ON DELETE CASCADE);
+  CREATE TABLE t2(a TEXT PRIMARY KEY);
+  PRAGMA writable_schema=ON;
+  CREATE TABLE sqlite_stat1(tbl INTEGER PRIMARY KEY DESC, idx UNIQUE DEFAULT NULL) WITHOUT ROWID;
+  UPDATE sqlite_schema SET name='sqlite_autoindex_sqlite_stat1_1' WHERE name='sqlite_autoindex_sqlite_stat1_2';
+  PRAGMA writable_schema=RESET;
+----
+stmt 0 ok
+stmt 64 ok
+stmt 103 ok
+stmt 132 ok
+stmt 230 ok
+stmt 342 ok
+==== 8.3
+
+  REINDEX;
+----
+stmt 0 ok
+==== 9.1
+
+  PRAGMA foreign_keys = ON;
+  CREATE TABLE """1"("""2", """3" PRIMARY KEY);
+  CREATE TABLE """4"("""5" REFERENCES """1" ON DELETE RESTRICT);
+  DELETE FROM """1";
+----
+stmt 0 ok
+stmt 28 ok
+stmt 76 ok
+stmt 141 err 1 -1 162 no such table: "1

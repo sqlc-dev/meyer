@@ -1,0 +1,5 @@
+==== 1.2
+
+  SELECT sum(length(c2)) FROM t1;
+----
+stmt 0 err 1 -1 34 no such table: t1

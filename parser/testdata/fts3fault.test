@@ -1,0 +1,14 @@
+==== 2.0
+
+  CREATE VIRTUAL TABLE t1 USING fts3;
+  INSERT INTO t1 VALUES('test renaming the table');
+  INSERT INTO t1 VALUES(' after it has been written');
+----
+stmt 0 ok
+stmt 38 err 1 -1 90 no such table: t1
+stmt 90 err 1 -1 145 no such table: t1
+==== 11.0
+
+  CREATE VIRTUAL TABLE t1 USING fts3(a, b);
+----
+stmt 0 ok

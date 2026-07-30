@@ -1,0 +1,162 @@
+==== 1.1
+
+  BEGIN;
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(randomblob(102));
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --     2
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --     4
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --     8
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --    16
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --    32
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --    64
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --   128
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --   256
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --   512
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --  1024
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --  2048
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --  4096
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     --  8192
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     -- 16384
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     -- 32768
+    INSERT INTO t1 SELECT randomblob(102) FROM t1;     -- 65536
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 33 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 128 no such table: t1
+stmt 128 err 1 -1 192 no such table: t1
+stmt 192 err 1 -1 256 no such table: t1
+stmt 256 err 1 -1 320 no such table: t1
+stmt 320 err 1 -1 384 no such table: t1
+stmt 384 err 1 -1 448 no such table: t1
+stmt 448 err 1 -1 512 no such table: t1
+stmt 512 err 1 -1 576 no such table: t1
+stmt 576 err 1 -1 640 no such table: t1
+stmt 640 err 1 -1 704 no such table: t1
+stmt 704 err 1 -1 768 no such table: t1
+stmt 768 err 1 -1 832 no such table: t1
+stmt 832 err 1 -1 896 no such table: t1
+stmt 896 err 1 -1 960 no such table: t1
+stmt 960 err 1 -1 1024 no such table: t1
+stmt 1024 err 1 -1 1088 no such table: t1
+stmt 1088 ok
+==== 1.2
+
+  CREATE INDEX i1 ON t1(x);
+----
+stmt 0 err 1 -1 28 no such table: main.t1
+==== 1.3
+
+  PRAGMA integrity_check
+----
+stmt 0 ok
+==== 1.4
+
+    PRAGMA cache_size = 10;
+    CREATE INDEX i2 ON t1(x);
+----
+stmt 0 ok
+stmt 28 err 1 -1 58 no such table: main.t1
+==== 1.5
+
+    PRAGMA integrity_check
+----
+stmt 0 ok
+==== 1.6
+
+  BEGIN;
+    DROP TABLE t1;
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES('a');
+    INSERT INTO t1 VALUES('b');
+    INSERT INTO t1 VALUES('c');
+    INSERT INTO t1 VALUES('d');
+    INSERT INTO t1 VALUES('e');
+    INSERT INTO t1 VALUES('f');
+    INSERT INTO t1 VALUES('g');
+    INSERT INTO t1 VALUES(NULL);
+    INSERT INTO t1 SELECT randomblob(1202) FROM t1;     --    16
+    INSERT INTO t1 SELECT randomblob(2202) FROM t1;     --    32
+    INSERT INTO t1 SELECT randomblob(3202) FROM t1;     --    64
+    INSERT INTO t1 SELECT randomblob(4202) FROM t1;     --   128
+    INSERT INTO t1 SELECT randomblob(5202) FROM t1;     --   256
+  COMMIT;
+  CREATE INDEX i1 ON t1(x); 
+  PRAGMA integrity_check
+----
+stmt 0 ok
+stmt 9 err 1 -1 28 no such table: t1
+stmt 28 ok
+stmt 52 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 116 no such table: t1
+stmt 116 err 1 -1 148 no such table: t1
+stmt 148 err 1 -1 180 no such table: t1
+stmt 180 err 1 -1 212 no such table: t1
+stmt 212 err 1 -1 244 no such table: t1
+stmt 244 err 1 -1 276 no such table: t1
+stmt 276 err 1 -1 309 no such table: t1
+stmt 309 err 1 -1 361 no such table: t1
+stmt 361 err 1 -1 426 no such table: t1
+stmt 426 err 1 -1 491 no such table: t1
+stmt 491 err 1 -1 556 no such table: t1
+stmt 556 err 1 -1 621 no such table: t1
+stmt 621 ok
+stmt 644 err 1 -1 672 no such table: main.t1
+stmt 672 ok
+==== 1.7
+
+  BEGIN;
+    DROP TABLE t1;
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES('a');
+  COMMIT;
+  CREATE INDEX i1 ON t1(x); 
+  PRAGMA integrity_check
+----
+stmt 0 ok
+stmt 9 err 1 -1 28 no such table: t1
+stmt 28 ok
+stmt 52 err 1 -1 84 no such table: t1
+stmt 84 ok
+stmt 94 err 1 -1 122 no such table: main.t1
+stmt 122 ok
+==== 1.8
+
+  BEGIN;
+    DROP TABLE t1;
+    CREATE TABLE t1(x);
+  COMMIT;
+  CREATE INDEX i1 ON t1(x); 
+  PRAGMA integrity_check
+----
+stmt 0 ok
+stmt 9 err 1 -1 28 no such table: t1
+stmt 28 ok
+stmt 52 ok
+stmt 62 err 1 -1 90 no such table: main.t1
+stmt 90 ok
+==== 2.1
+
+  BEGIN;
+    CREATE TABLE t2(x);
+    INSERT INTO t2 VALUES(14);
+    INSERT INTO t2 VALUES(35);
+    INSERT INTO t2 VALUES(15);
+    INSERT INTO t2 VALUES(35);
+    INSERT INTO t2 VALUES(16);
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 33 err 1 -1 64 no such table: t2
+stmt 64 err 1 -1 95 no such table: t2
+stmt 95 err 1 -1 126 no such table: t2
+stmt 126 err 1 -1 157 no such table: t2
+stmt 157 err 1 -1 188 no such table: t2
+stmt 188 ok
+==== 2.2
+
+  CREATE UNIQUE INDEX i3 ON t2(x);
+----
+stmt 0 err 1 -1 35 no such table: main.t2

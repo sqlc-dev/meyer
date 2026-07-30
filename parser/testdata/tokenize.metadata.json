@@ -1,18 +1,1 @@
-{
-  "todo": {
-    "tokenize-1.1": true,
-    "tokenize-1.10": true,
-    "tokenize-1.11": true,
-    "tokenize-1.12": true,
-    "tokenize-1.2": true,
-    "tokenize-1.3": true,
-    "tokenize-1.4": true,
-    "tokenize-1.5": true,
-    "tokenize-1.6": true,
-    "tokenize-1.7": true,
-    "tokenize-1.8": true,
-    "tokenize-1.9": true,
-    "tokenize-2.1": true,
-    "tokenize-2.2": true
-  }
-}
+{}

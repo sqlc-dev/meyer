@@ -1,0 +1,183 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING fts3;
+  INSERT INTO t1 VALUES('hello');
+----
+stmt 0 ok
+stmt 38 err 1 -1 72 no such table: t1
+==== 1.3
+
+  INSERT INTO t1 VALUES('world');
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== 1.4
+ 
+  DROP TABLE t1;
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== 2.0
+
+  CREATE VIRTUAL TABLE t1 USING fts3;
+  BEGIN;
+    INSERT INTO t1 VALUES('hello');
+    INSERT INTO t1 VALUES('hello');
+    INSERT INTO t1 VALUES('hello');
+    INSERT INTO t1 VALUES('hello');
+    INSERT INTO t1 VALUES('hello');
+  COMMIT;
+----
+stmt 0 ok
+stmt 38 ok
+stmt 47 err 1 -1 83 no such table: t1
+stmt 83 err 1 -1 119 no such table: t1
+stmt 119 err 1 -1 155 no such table: t1
+stmt 155 err 1 -1 191 no such table: t1
+stmt 191 err 1 -1 227 no such table: t1
+stmt 227 ok
+==== 2.2
+
+  SELECT rowid FROM t1 WHERE t1 MATCH 'hello'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 3.0
+
+  DROP TABLE t1;
+  CREATE VIRTUAL TABLE t1 USING fts3;
+  BEGIN;
+    INSERT INTO t1 VALUES('hello');
+    INSERT INTO t1 VALUES('world');
+  COMMIT;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 55 ok
+stmt 64 err 1 -1 100 no such table: t1
+stmt 100 err 1 -1 136 no such table: t1
+stmt 136 ok
+==== 3.2
+
+  SELECT rowid FROM t1 WHERE t1 MATCH 'world'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== 4.0
+
+  DROP TABLE t1;
+  CREATE VIRTUAL TABLE t1 USING fts3;
+  INSERT INTO t1(t1) VALUES('nodesize=24');
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 55 err 1 -1 99 no such table: t1
+==== 4.2
+
+  UPDATE t1_segdir SET root = X'FFFFFFFFFFFFFFFF';
+  SELECT rowid FROM t1 WHERE t1 MATCH 'world';
+----
+stmt 0 err 1 -1 51 no such table: t1_segdir
+stmt 51 err 1 -1 98 no such table: t1
+==== 5.0
+
+  DROP TABLE t1;
+  CREATE VIRTUAL TABLE t1 USING fts4;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+==== 5.2
+
+  UPDATE t1_stat SET value = X'0000';
+  SELECT matchinfo(t1, 'nxa') FROM t1 WHERE t1 MATCH 't*';
+----
+stmt 0 err 1 -1 38 no such table: t1_stat
+stmt 38 err 1 -1 97 no such table: t1
+==== 5.3
+
+  UPDATE t1_stat SET value = NULL;
+  SELECT matchinfo(t1, 'nxa') FROM t1 WHERE t1 MATCH 't*';
+----
+stmt 0 err 1 -1 35 no such table: t1_stat
+stmt 35 err 1 -1 94 no such table: t1
+==== 6.10
+
+  CREATE VIRTUAL TABLE f using fts3(a,b);
+  CREATE TABLE f_stat(id INTEGER PRIMARY KEY, value BLOB);
+  INSERT INTO f_segdir VALUES (2000, 0,0,0, '16', '');
+  INSERT INTO f_segdir VALUES (1999, 0,0,0, '0 18',
+                               x'000131030102000103323334050101010200');
+  INSERT INTO f_segments (blockid) values (16);
+  INSERT INTO f_segments values (0, x'');
+  INSERT INTO f_stat VALUES (1,x'cf0f01');
+  INSERT INTO f(f) VALUES ('merge=1');
+----
+stmt 0 ok
+stmt 42 ok
+stmt 101 err 1 -1 156 no such table: f_segdir
+stmt 156 err 1 -1 281 no such table: f_segdir
+stmt 281 err 1 -1 329 no such table: f_segments
+stmt 329 err 1 -1 371 no such table: f_segments
+stmt 371 err 1 -1 414 no such table: f_stat
+stmt 414 err 1 -1 453 no such table: f
+==== 7.10
+
+  CREATE VIRTUAL TABLE f USING fts3(a,b);
+  INSERT INTO f_segdir VALUES (0,0,1,0,'0 0',x'01010101020101');
+  SELECT  matchinfo( f , 'pcx')  FROM f WHERE b MATCH x'c533';
+----
+stmt 0 ok
+stmt 42 err 1 -1 107 no such table: f_segdir
+stmt 107 err 1 -1 170 no such table: f
+==== 8.1
+
+  CREATE VIRTUAL TABLE f USING fts3(a);
+  INSERT INTO f(f) VALUES('nodesize=24');
+  BEGIN;
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz0123456789');
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz0123456789');
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz0123456789');
+
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz012345678X');
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz012345678X');
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz012345678X');
+  COMMIT;
+  BEGIN;
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz0123456789');
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz0123456789');
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz0123456789');
+
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz012345678X');
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz012345678X');
+    INSERT INTO f VALUES('abcdefghijklmnopqrstuvwxyz012345678X');
+  COMMIT;
+
+  SELECT count(*) FROM f_segments;
+----
+stmt 0 ok
+stmt 40 err 1 -1 82 no such table: f
+stmt 82 ok
+stmt 91 err 1 -1 157 no such table: f
+stmt 157 err 1 -1 223 no such table: f
+stmt 223 err 1 -1 289 no such table: f
+stmt 289 err 1 -1 356 no such table: f
+stmt 356 err 1 -1 422 no such table: f
+stmt 422 err 1 -1 488 no such table: f
+stmt 488 ok
+stmt 498 ok
+stmt 507 err 1 -1 573 no such table: f
+stmt 573 err 1 -1 639 no such table: f
+stmt 639 err 1 -1 705 no such table: f
+stmt 705 err 1 -1 772 no such table: f
+stmt 772 err 1 -1 838 no such table: f
+stmt 838 err 1 -1 904 no such table: f
+stmt 904 ok
+stmt 914 err 1 -1 950 no such table: f_segments
+==== 8.2
+
+  UPDATE f_segments SET block = (
+    SELECT block FROM f_segments WHERE blockid=1
+  ) WHERE blockid=2
+----
+stmt 0 err 1 -1 104 no such table: f_segments
+==== 8.3
+
+  INSERT INTO f(f) VALUES('merge=2,2');
+----
+stmt 0 err 1 -1 40 no such table: f

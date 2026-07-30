@@ -1,0 +1,24 @@
+==== 1.0
+
+  CREATE TABLE t1(x, y);
+----
+stmt 0 ok
+==== symlink-generated
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== symlink-generated.dup1
+
+    DELETE FROM t1;
+    PRAGMA journal_mode = delete;
+----
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 ok
+==== 5.0
+
+  CREATE TABLE xyz(x, y, z);
+  INSERT INTO xyz VALUES(1, 2, 3);
+----
+stmt 0 ok
+stmt 29 err 1 -1 64 no such table: xyz

@@ -1,0 +1,39 @@
+==== tkt-4c86b126f2-1.1
+
+  CREATE TABLE nodes(
+     local_relpath  TEXT PRIMARY KEY,
+     moved_to  TEXT
+  );
+  INSERT INTO nodes VALUES('A',NULL);
+  INSERT INTO nodes VALUES('A/B',NULL);
+  INSERT INTO nodes VALUES('',NULL);
+  INSERT INTO nodes VALUES('A/B/C-move',NULL);
+  INSERT INTO nodes VALUES('A/B/C','A/B/C-move');
+  INSERT INTO nodes VALUES('A/B-move',NULL);
+  INSERT INTO nodes VALUES('A/B-move/C-move',NULL);
+  INSERT INTO nodes VALUES('A/B-move/C','x');
+  SELECT local_relpath, moved_to
+   FROM nodes
+  WHERE (local_relpath = 'A/B' OR
+           ((local_relpath > 'A/B/') AND (local_relpath < 'A/B0')))
+    AND moved_to IS NOT NULL;
+----
+stmt 0 ok
+stmt 85 err 1 -1 123 no such table: nodes
+stmt 123 err 1 -1 163 no such table: nodes
+stmt 163 err 1 -1 200 no such table: nodes
+stmt 200 err 1 -1 247 no such table: nodes
+stmt 247 err 1 -1 297 no such table: nodes
+stmt 297 err 1 -1 342 no such table: nodes
+stmt 342 err 1 -1 394 no such table: nodes
+stmt 394 err 1 -1 440 no such table: nodes
+stmt 440 err 1 -1 619 no such table: nodes
+==== tkt-4c86b126f2-2.1
+
+  CREATE TABLE t1(x TEXT UNIQUE, y TEXT UNIQUE, z);
+  INSERT INTO t1 VALUES('ghi','jkl','y');
+  SELECT * FROM t1 WHERE (x='ghi' OR y='jkl') AND z IS NOT NULL;
+----
+stmt 0 ok
+stmt 52 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 159 no such table: t1

@@ -27,7 +27,7 @@ stmt 0 ok
     SELECT sql FROM sqlite_temp_master WHERE tbl_name = 't1';
 ----
 stmt 0 ok
-stmt 32 err 1 -1 no such table: t1
+stmt 32 err 1 -1 58 no such table: t1
 stmt 58 ok
 ==== alter4-1.4b
 
@@ -39,7 +39,7 @@ stmt 0 ok
     ALTER TABLE t1 ADD d CHECK (a>d);
     SELECT sql FROM sqlite_temp_master WHERE tbl_name = 't1';
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 31 no such table: t1
 stmt 38 ok
 ==== alter4-1.6
 
@@ -49,7 +49,7 @@ stmt 38 ok
        WHERE tbl_name = 't2' AND type = 'table';
 ----
 stmt 0 ok
-stmt 48 err 1 -1 no such table: t2
+stmt 48 err 1 -1 86 no such table: t2
 stmt 95 ok
 ==== alter4-1.7
 
@@ -59,43 +59,43 @@ stmt 95 ok
      WHERE tbl_name = 't3' AND type = 'table';
 ----
 stmt 0 ok
-stmt 51 err 1 -1 no such table: t3
+stmt 51 err 1 -1 100 no such table: t3
 stmt 100 ok
 ==== alter4-2.2
 
     ALTER TABLE t1 ADD c UNIQUE
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 32 no such table: t1
 ==== alter4-2.3
 
     ALTER TABLE t1 ADD b VARCHAR(10)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 38 no such table: t1
 ==== alter4-2.3.dup1
 
     ALTER TABLE t1 ADD c NOT NULL;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 29 no such table: t1
 ==== alter4-2.4
 
     ALTER TABLE t1 ADD c NOT NULL DEFAULT 10;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 29 no such table: t1
 ==== alter4-2.6
 
     alter table t1 add column d DEFAULT CURRENT_TIME;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 40 no such table: t1
 ==== alter4-2.7
 
     alter table t1 add column d default (-5+1);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 40 no such table: t1
 ==== alter4-2.99
 
     DROP TABLE t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 19 no such table: t1
 ==== alter4-3.1
 
     CREATE TEMP TABLE t1(a, b);
@@ -104,9 +104,9 @@ stmt 0 err 1 -1 no such table: t1
     SELECT * FROM t1;
 ----
 stmt 0 ok
-stmt 32 err 1 -1 no such table: t1
-stmt 67 err 1 -1 no such table: t1
-stmt 102 err 1 -1 no such table: t1
+stmt 32 err 1 -1 67 no such table: t1
+stmt 67 err 1 -1 102 no such table: t1
+stmt 102 err 1 -1 124 no such table: t1
 ==== alter4-3.1.dup1
 
     PRAGMA schema_version = 10;
@@ -117,8 +117,8 @@ stmt 0 ok
     ALTER TABLE t1 ADD c;
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 26 err 1 -1 no such table: t1
+stmt 0 err 1 -1 26 no such table: t1
+stmt 26 err 1 -1 48 no such table: t1
 ==== alter4-3.4
 
       PRAGMA schema_version;
@@ -134,8 +134,8 @@ stmt 0 ok
     ALTER TABLE t1 ADD c DEFAULT 'hello world';
     SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 48 err 1 -1 no such table: t1
+stmt 0 err 1 -1 33 no such table: t1
+stmt 48 err 1 -1 70 no such table: t1
 ==== alter4-4.4
 
       PRAGMA schema_version;
@@ -145,53 +145,53 @@ stmt 0 ok
 
     DROP TABLE t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 19 no such table: t1
 ==== alter4-5.2
 
       ALTER TABLE aux.t1 ADD COLUMN c VARCHAR(128);
       SELECT sql FROM aux.sqlite_master;
 ----
-stmt 0 err 1 -1 no such table: aux.t1
-stmt 52 err 1 -1 no such table: aux.sqlite_master
+stmt 0 err 1 -1 52 no such table: aux.t1
+stmt 52 err 1 -1 93 no such table: aux.sqlite_master
 ==== alter4-5.3
 
       SELECT * FROM aux.t1;
 ----
-stmt 0 err 1 -1 no such table: aux.t1
+stmt 0 err 1 -1 28 no such table: aux.t1
 ==== alter4-5.4
 
         PRAGMA aux.schema_version;
 ----
-stmt 0 err 1 16 unknown database aux
+stmt 0 err 1 16 35 unknown database aux
 ==== alter4-5.6
 
       ALTER TABLE aux.t1 ADD COLUMN d DEFAULT 1000;
       SELECT sql FROM aux.sqlite_master;
 ----
-stmt 0 err 1 -1 no such table: aux.t1
-stmt 52 err 1 -1 no such table: aux.sqlite_master
+stmt 0 err 1 -1 46 no such table: aux.t1
+stmt 52 err 1 -1 93 no such table: aux.sqlite_master
 ==== alter4-5.7
 
       SELECT * FROM aux.t1;
 ----
-stmt 0 err 1 -1 no such table: aux.t1
+stmt 0 err 1 -1 28 no such table: aux.t1
 ==== alter4-5.8
 
         PRAGMA aux.schema_version;
 ----
-stmt 0 err 1 16 unknown database aux
+stmt 0 err 1 16 35 unknown database aux
 ==== alter4-5.9
 
       SELECT * FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 24 no such table: t1
 ==== alter4-5.99
 
       DROP TABLE aux.t1;
       DROP TABLE t1;
 ----
-stmt 0 err 1 -1 no such table: aux.t1
-stmt 25 err 1 -1 no such table: t1
+stmt 0 err 1 -1 25 no such table: aux.t1
+stmt 25 err 1 -1 46 no such table: t1
 ==== alter4-6.1
 
       CREATE TEMP TABLE t1(a, b);
@@ -209,19 +209,19 @@ stmt 25 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 34 ok
-stmt 75 err 1 -1 no such table: main.t1
-stmt 189 err 1 -1 no such table: t1
-stmt 307 err 1 -1 no such table: t1
-stmt 345 err 1 -1 no such table: log
+stmt 75 err 1 -1 127 no such table: main.t1
+stmt 189 err 1 -1 245 no such table: t1
+stmt 307 err 1 -1 345 no such table: t1
+stmt 345 err 1 -1 390 no such table: log
 ==== alter4-6.2
 
       ALTER TABLE t1 ADD COLUMN c DEFAULT 'c';
       INSERT INTO t1(a, b) VALUES(3, 4);
       SELECT * FROM log ORDER BY trig, a, b;
 ----
-stmt 0 err 1 -1 no such table: t1
-stmt 47 err 1 -1 no such table: t1
-stmt 88 err 1 -1 no such table: log
+stmt 0 err 1 -1 42 no such table: t1
+stmt 47 err 1 -1 88 no such table: t1
+stmt 88 err 1 -1 133 no such table: log
 ==== alter4-8.1
 
     CREATE TEMP TABLE t4(c1);
@@ -241,18 +241,18 @@ stmt 0 ok
   INSERT INTO t5 DEFAULT VALUES;
 ----
 stmt 0 ok
-stmt 116 err 1 -1 no such table: t5
+stmt 116 err 1 -1 149 no such table: t5
 ==== alter4-9.2
  SELECT typeof(a), a, typeof(b), b FROM t5;
 ----
-stmt 0 err 1 -1 no such table: t5
+stmt 0 err 1 -1 43 no such table: t5
 ==== alter4-9.3
  
   ALTER TABLE t5 ADD COLUMN c INTEGER DEFAULT (-(-9223372036854775808));
   SELECT typeof(c), c FROM t5;
 ----
-stmt 0 err 1 -1 no such table: t5
-stmt 74 err 1 -1 no such table: t5
+stmt 0 err 1 -1 47 no such table: t5
+stmt 74 err 1 -1 105 no such table: t5
 ==== alter4-11.0
 
   CREATE TABLE t1(c INTEGER PRIMARY KEY, d);
@@ -261,24 +261,24 @@ stmt 74 err 1 -1 no such table: t5
   ALTER TABLE t1 ADD COLUMN e;
 ----
 stmt 0 ok
-stmt 45 err 1 -1 no such table: t1
+stmt 45 err 1 -1 80 no such table: t1
 stmt 80 ok
-stmt 108 err 1 -1 no such table: t1
+stmt 108 err 1 -1 139 no such table: t1
 ==== alter4-11.1
 
   ALTER TABLE t1 ADD COLUMN f REFERENCES t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 41 no such table: t1
 ==== alter4-11.2
 
   ALTER TABLE t1 ADD COLUMN g REFERENCES t1 DEFAULT 4;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 41 no such table: t1
 ==== alter4-11.3
 
   ALTER TABLE t2 ADD COLUMN g;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 31 no such table: t2
 ==== alter4-11.4
 
     CREATE VIRTUAL TABLE fff USING fts5(f);
@@ -288,4 +288,4 @@ stmt 0 ok
 
     ALTER TABLE fff ADD COLUMN g;
 ----
-stmt 0 err 1 -1 no such table: fff
+stmt 0 err 1 -1 34 no such table: fff

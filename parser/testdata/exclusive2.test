@@ -1,0 +1,25 @@
+==== exclusive2-1.1
+
+    BEGIN;
+    CREATE TABLE t1(a, b);
+    INSERT INTO t1(a, b) VALUES(randstr(10, 400), 0);
+    INSERT INTO t1(a, b) VALUES(randstr(10, 400), 0);
+    INSERT INTO t1(a, b) SELECT randstr(10, 400), 0 FROM t1;
+    INSERT INTO t1(a, b) SELECT randstr(10, 400), 0 FROM t1;
+    INSERT INTO t1(a, b) SELECT randstr(10, 400), 0 FROM t1;
+    INSERT INTO t1(a, b) SELECT randstr(10, 400), 0 FROM t1;
+    INSERT INTO t1(a, b) SELECT randstr(10, 400), 0 FROM t1;
+    COMMIT;
+    SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 38 err 1 -1 92 no such table: t1
+stmt 92 err 1 -1 146 no such table: t1
+stmt 146 err 1 -1 207 no such table: t1
+stmt 207 err 1 -1 268 no such table: t1
+stmt 268 err 1 -1 329 no such table: t1
+stmt 329 err 1 -1 390 no such table: t1
+stmt 390 err 1 -1 451 no such table: t1
+stmt 451 ok
+stmt 463 err 1 -1 492 no such table: t1

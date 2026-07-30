@@ -1,0 +1,69 @@
+==== 1.1
+
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES(1, 2);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: t1
+==== 1.2
+ 
+  PRAGMA journal_mode = WAL;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 30 err 1 -1 50 no such table: t1
+==== 1.4
+ 
+  PRAGMA locking_mode = exclusive;
+  PRAGMA journal_mode = WAL;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 36 ok
+stmt 65 err 1 -1 85 no such table: t1
+==== 1.6
+ INSERT INTO t1 VALUES(3, 4)
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== 1.7
+
+  PRAGMA locking_mode = normal;
+----
+stmt 0 ok
+==== 1.8
+
+  PRAGMA journal_mode = delete;
+  PRAGMA main.locking_mode;
+----
+stmt 0 ok
+stmt 32 ok
+==== 1.9
+
+  PRAGMA locking_mode = normal;
+----
+stmt 0 ok
+==== 1.10
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 2.1.1
+
+  CREATE TABLE t2(x, y);
+  INSERT INTO t2 VALUES('a', 'b');
+  INSERT INTO t2 VALUES('c', 'd');
+----
+stmt 0 ok
+stmt 25 err 1 -1 60 no such table: t2
+stmt 60 err 1 -1 95 no such table: t2
+==== 2.1.2
+
+  PRAGMA locking_mode = exclusive;
+  PRAGMA journal_mode = WAL;
+  INSERT INTO t2 VALUES('e', 'f');
+  INSERT INTO t2 VALUES('g', 'h');
+----
+stmt 0 ok
+stmt 35 ok
+stmt 64 err 1 -1 99 no such table: t2
+stmt 99 err 1 -1 134 no such table: t2

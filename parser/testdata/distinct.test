@@ -1,0 +1,283 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c, d);
+  CREATE UNIQUE INDEX i1 ON t1(b, c);
+  CREATE UNIQUE INDEX i2 ON t1(d COLLATE nocase);
+
+  CREATE TABLE t2(x INTEGER PRIMARY KEY, y);
+
+  CREATE TABLE t3(c1 PRIMARY KEY NOT NULL, c2 NOT NULL);
+  CREATE INDEX i3 ON t3(c2);
+
+  CREATE TABLE t4(a, b NOT NULL, c NOT NULL, d NOT NULL);
+  CREATE UNIQUE INDEX t4i1 ON t4(b, c);
+  CREATE UNIQUE INDEX t4i2 ON t4(d COLLATE nocase);
+----
+stmt 0 ok
+stmt 31 err 1 -1 69 no such table: main.t1
+stmt 69 err 1 -1 119 no such table: main.t1
+stmt 119 ok
+stmt 165 ok
+stmt 223 err 1 -1 252 no such table: main.t3
+stmt 252 ok
+stmt 311 err 1 -1 351 no such table: main.t4
+stmt 351 err 1 -1 403 no such table: main.t4
+==== 2.0
+
+  CREATE TABLE t1(a, b, c);
+
+  CREATE INDEX i1 ON t1(a, b);
+  CREATE INDEX i2 ON t1(b COLLATE nocase, c COLLATE nocase);
+
+  INSERT INTO t1 VALUES('a', 'b', 'c');
+  INSERT INTO t1 VALUES('A', 'B', 'C');
+  INSERT INTO t1 VALUES('a', 'b', 'c');
+  INSERT INTO t1 VALUES('A', 'B', 'C');
+----
+stmt 0 ok
+stmt 28 err 1 -1 60 no such table: main.t1
+stmt 60 err 1 -1 121 no such table: main.t1
+stmt 121 err 1 -1 162 no such table: t1
+stmt 162 err 1 -1 202 no such table: t1
+stmt 202 err 1 -1 242 no such table: t1
+stmt 242 err 1 -1 282 no such table: t1
+==== 2.A
+
+  SELECT (SELECT DISTINCT o.a FROM t1 AS i) FROM t1 AS o ORDER BY rowid;
+----
+stmt 0 err 1 -1 73 no such table: t1
+==== 4.1
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1(a INTEGER);
+  INSERT INTO t1 VALUES(3);
+  INSERT INTO t1 VALUES(2);
+  INSERT INTO t1 VALUES(1);
+  INSERT INTO t1 VALUES(2);
+  INSERT INTO t1 VALUES(3);
+  INSERT INTO t1 VALUES(1);
+  CREATE TABLE t2(x);
+  INSERT INTO t2
+    SELECT DISTINCT
+      CASE a WHEN 1 THEN x'0000000000'
+             WHEN 2 THEN zeroblob(5)
+             ELSE 'xyzzy' END
+      FROM t1;
+  SELECT quote(x) FROM t2 ORDER BY 1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 84 err 1 -1 112 no such table: t1
+stmt 112 err 1 -1 140 no such table: t1
+stmt 140 err 1 -1 168 no such table: t1
+stmt 168 err 1 -1 196 no such table: t1
+stmt 196 err 1 -1 224 no such table: t1
+stmt 224 err 1 -1 252 no such table: t1
+stmt 252 ok
+stmt 274 err 1 -1 432 no such table: t2
+stmt 432 err 1 -1 470 no such table: t2
+==== 5.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x);
+  INSERT INTO t1(x) VALUES(3),(1),(5),(2),(6),(4),(5),(1),(3);
+  CREATE INDEX t1x ON t1(x DESC);
+  SELECT DISTINCT x FROM t1 ORDER BY x ASC;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 49 err 1 -1 112 no such table: t1
+stmt 112 err 1 -1 146 no such table: main.t1
+stmt 146 err 1 -1 190 no such table: t1
+==== 5.2
+
+  SELECT DISTINCT x FROM t1 ORDER BY x DESC;
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== 5.3
+
+  SELECT DISTINCT x FROM t1 ORDER BY x;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== 5.4
+
+  DROP INDEX t1x;
+  CREATE INDEX t1x ON t1(x ASC);
+  SELECT DISTINCT x FROM t1 ORDER BY x ASC;
+----
+stmt 0 err 1 -1 18 no such index: t1x
+stmt 18 err 1 -1 51 no such table: main.t1
+stmt 51 err 1 -1 95 no such table: t1
+==== 5.5
+
+  SELECT DISTINCT x FROM t1 ORDER BY x DESC;
+----
+stmt 0 err 1 -1 45 no such table: t1
+==== 5.6
+
+  SELECT DISTINCT x FROM t1 ORDER BY x;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== 6.1
+
+  CREATE TABLE jjj(x);
+  SELECT (SELECT 'mmm' UNION SELECT DISTINCT max(name) ORDER BY 1) 
+    FROM sqlite_master;
+----
+stmt 0 ok
+stmt 23 ok
+==== 6.2
+
+  CREATE TABLE nnn(x);
+  SELECT (SELECT 'mmm' UNION SELECT DISTINCT max(name) ORDER BY 1) 
+    FROM sqlite_master;
+----
+stmt 0 ok
+stmt 23 ok
+==== 7.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY);
+  CREATE TABLE t3(a INTEGER PRIMARY KEY);
+
+  CREATE TABLE t4(x);
+  CREATE TABLE t5(y);
+  
+  INSERT INTO t5 VALUES(1), (2), (2);
+  INSERT INTO t1 VALUES(2);
+  INSERT INTO t3 VALUES(2);
+  INSERT INTO t4 VALUES(2);
+----
+stmt 0 ok
+stmt 42 ok
+stmt 84 ok
+stmt 107 ok
+stmt 129 err 1 -1 170 no such table: t5
+stmt 170 err 1 -1 198 no such table: t1
+stmt 198 err 1 -1 226 no such table: t3
+stmt 226 err 1 -1 254 no such table: t4
+==== 7.1
+
+  WITH t2(b) AS (
+    SELECT DISTINCT y FROM t5 ORDER BY y
+  )
+  SELECT * FROM 
+    t4 CROSS JOIN t3 CROSS JOIN t1 
+  WHERE (t1.a=t3.a) AND (SELECT count(*) FROM t2 AS y WHERE t4.x!='abc')=t1.a
+----
+stmt 0 err 1 -1 195 no such table: t4
+==== 8.0
+
+  CREATE TABLE person ( pid INT) ;
+  CREATE UNIQUE INDEX idx ON person ( pid ) WHERE pid == 1;
+  INSERT INTO person VALUES (1), (10), (10);
+  SELECT DISTINCT pid FROM person where pid = 10;
+----
+stmt 0 ok
+stmt 35 err 1 -1 95 no such table: main.person
+stmt 95 err 1 -1 140 no such table: person
+stmt 140 err 1 -1 190 no such table: person
+==== 9.0
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES('a', 'a');
+  INSERT INTO t1 VALUES('a', 'b');
+  INSERT INTO t1 VALUES('a', 'c');
+
+  INSERT INTO t1 VALUES('b', 'a');
+  INSERT INTO t1 VALUES('b', 'b');
+  INSERT INTO t1 VALUES('b', 'c');
+
+  INSERT INTO t1 VALUES('a', 'a');
+  INSERT INTO t1 VALUES('b', 'b');
+
+  INSERT INTO t1 VALUES('A', 'A');
+  INSERT INTO t1 VALUES('B', 'B');
+----
+stmt 0 ok
+stmt 25 err 1 -1 60 no such table: t1
+stmt 60 err 1 -1 95 no such table: t1
+stmt 95 err 1 -1 130 no such table: t1
+stmt 130 err 1 -1 166 no such table: t1
+stmt 166 err 1 -1 201 no such table: t1
+stmt 201 err 1 -1 236 no such table: t1
+stmt 236 err 1 -1 272 no such table: t1
+stmt 272 err 1 -1 307 no such table: t1
+stmt 307 err 1 -1 343 no such table: t1
+stmt 343 err 1 -1 378 no such table: t1
+==== distinct-generated
+
+    SELECT DISTINCT a, b FROM t1 ORDER BY a, b
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== distinct-generated.dup1
+
+    SELECT DISTINCT a COLLATE nocase, b COLLATE nocase FROM t1 
+    ORDER BY a COLLATE nocase, b COLLATE nocase
+----
+stmt 0 err 1 -1 113 no such table: t1
+==== 10.1
+
+  SELECT  DISTINCT
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1
+  ORDER  BY
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x';
+----
+stmt 0 ok
+==== 10.2
+
+  EXPLAIN
+  SELECT  DISTINCT
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1
+  ORDER  BY
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x','x','x','x','x','x','x',
+   'x','x','x','x';
+----
+stmt 0 ok
+==== 10.3
+
+  EXPLAIN  CREATE  TABLE t2 AS  SELECT  DISTINCT ':memory:', 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 ORDER  BY '%J%j%w%s', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', '%J%j%w%s', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 42e-300, 'unixepoch', 'unixepoch', 'unixepoch' LIMIT 0xda;
+----
+stmt 0 ok
+==== 10.4
+
+  DROP TABLE IF EXISTS t0;
+  CREATE  TABLE t0 AS  SELECT  DISTINCT 0xda, 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 0xda-0xda-42e-300, 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0', 'lit0' ORDER  BY '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%Y-%m-%d', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', 'lit0', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', 'auto', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', ':memory:', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '%%', '';
+  SELECT count(*) FROM t0;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 1003 err 1 -1 1030 no such table: t0
+==== 10.5
+
+  DROP TABLE IF EXISTS t2;
+  CREATE  TABLE t2 AS  SELECT  DISTINCT ':memory:', 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 0.0*7/0, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 ORDER  BY '%J%j%w%s', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', '%J%j%w%s', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 'unixepoch', 42e-300, 'unixepoch', 'unixepoch', 'unixepoch' LIMIT 0xda;
+  SELECT count(*) FROM t2;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 1126 err 1 -1 1153 no such table: t2

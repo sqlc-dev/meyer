@@ -1,0 +1,130 @@
+==== subselect-1.3a
+SELECT b from t1 where a = (SELECT a FROM t1 WHERE b=2)
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== subselect-1.3b
+SELECT b from t1 where a = (SELECT a FROM t1 WHERE b=4)
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== subselect-1.3c
+SELECT b from t1 where a = (SELECT a FROM t1 WHERE b=6)
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== subselect-1.3d
+SELECT b from t1 where a = (SELECT a FROM t1 WHERE b=8)
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== subselect-1.3e
+
+      SELECT b FROM t1
+       WHERE a = (SELECT a FROM t1 UNION SELECT b FROM t1 ORDER BY 1);
+----
+stmt 0 err 1 -1 94 no such table: t1
+==== subselect-1.4
+SELECT b from t1 where a = coalesce((SELECT a FROM t1 WHERE b=5),1)
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== subselect-2.1
+
+    SELECT (SELECT a FROM t1 ORDER BY a), (SELECT a FROM t1 ORDER BY a DESC)
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== subselect-2.2
+
+    SELECT 1 IN (SELECT a FROM t1 ORDER BY a);
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== subselect-2.3
+
+    SELECT 2 IN (SELECT a FROM t1 ORDER BY a DESC);
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== subselect-3.1
+
+    CREATE TABLE t3(x int);
+    INSERT INTO t3 SELECT a FROM t1 UNION ALL SELECT b FROM t1;
+    SELECT * FROM t3 ORDER BY x;
+----
+stmt 0 ok
+stmt 28 err 1 -1 92 no such table: t3
+stmt 92 err 1 -1 125 no such table: t3
+==== subselect-3.1.dup1
+
+    CREATE TABLE t3(x int);
+    INSERT INTO t3 SELECT a FROM t1; 
+    INSERT INTO t3 SELECT b FROM t1;
+    SELECT * FROM t3 ORDER BY x;
+----
+stmt 0 ok
+stmt 28 err 1 -1 65 no such table: t3
+stmt 65 err 1 -1 103 no such table: t3
+stmt 103 err 1 -1 136 no such table: t3
+==== subselect-3.2
+
+    SELECT sum(x) FROM (SELECT x FROM t3 ORDER BY x LIMIT 2);
+----
+stmt 0 err 1 -1 62 no such table: t3
+==== subselect-3.3
+
+    SELECT sum(x) FROM (SELECT x FROM t3 ORDER BY x DESC LIMIT 2);
+----
+stmt 0 err 1 -1 67 no such table: t3
+==== subselect-3.4
+
+    SELECT (SELECT x FROM t3 ORDER BY x);
+----
+stmt 0 err 1 -1 42 no such table: t3
+==== subselect-3.5
+
+    SELECT (SELECT x FROM t3 ORDER BY x DESC);
+----
+stmt 0 err 1 -1 47 no such table: t3
+==== subselect-3.6
+
+    SELECT (SELECT x FROM t3 ORDER BY x LIMIT 1);
+----
+stmt 0 err 1 -1 50 no such table: t3
+==== subselect-3.7
+
+    SELECT (SELECT x FROM t3 ORDER BY x DESC LIMIT 1);
+----
+stmt 0 err 1 -1 55 no such table: t3
+==== subselect-3.8
+
+    SELECT (SELECT x FROM t3 ORDER BY x LIMIT 1 OFFSET 2);
+----
+stmt 0 err 1 -1 59 no such table: t3
+==== subselect-3.9
+
+    SELECT (SELECT x FROM t3 ORDER BY x DESC LIMIT 1 OFFSET 2);
+----
+stmt 0 err 1 -1 64 no such table: t3
+==== subselect-3.10
+
+    SELECT x FROM t3 WHERE x IN
+       (SELECT x FROM t3 ORDER BY x DESC LIMIT 1 OFFSET 2);
+----
+stmt 0 err 1 -1 92 no such table: t3
+==== subselect-4.1
+
+    CREATE TABLE t4(a TEXT, b TEXT);
+    INSERT INTO t4 VALUES('a','1');
+    INSERT INTO t4 VALUES('b','2');
+    INSERT INTO t4 VALUES('c','3');
+    SELECT a FROM t4 WHERE b IN (SELECT b FROM t4 ORDER BY b);
+----
+stmt 0 ok
+stmt 37 err 1 -1 73 no such table: t4
+stmt 73 err 1 -1 109 no such table: t4
+stmt 109 err 1 -1 145 no such table: t4
+stmt 145 err 1 -1 208 no such table: t4
+==== subselect-4.2
+
+    SELECT a FROM t4 WHERE b IN (SELECT b FROM t4 ORDER BY b LIMIT 1);
+----
+stmt 0 err 1 -1 71 no such table: t4
+==== subselect-4.3
+
+    SELECT a FROM t4 WHERE b IN (SELECT b FROM t4 ORDER BY b DESC LIMIT 1);
+----
+stmt 0 err 1 -1 76 no such table: t4

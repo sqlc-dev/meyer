@@ -1,0 +1,69 @@
+==== in6-1.4
+
+ SELECT d FROM t1
+  WHERE a=100
+    AND b IN (200,201,202,204)
+    AND c IN (300,302,301,305)
+  ORDER BY +d;
+----
+stmt 0 err 1 -1 109 no such table: t1
+==== in6-2.1
+
+  CREATE TABLE t2(e INT UNIQUE, f TEXT);
+  SELECT d, f FROM t1 LEFT JOIN t2 ON (e=d)
+  WHERE a=100
+    AND b IN (200,201,202,204)
+    AND c IN (300,302,301,305)
+  ORDER BY +d;
+----
+stmt 0 ok
+stmt 41 err 1 -1 176 no such table: t1
+==== in6-3.100
+
+  CREATE TABLE t1(a);
+  INSERT INTO t1 VALUES(0);
+  CREATE TABLE t2(b, c, d);
+  INSERT INTO t2(b,c,d) VALUES(4,5,3),(4,5,4),(4,5,8);
+  CREATE INDEX t2bcd ON t2(b, c, d);
+  SELECT * FROM t1 LEFT JOIN t2 ON b=NULL AND c=5 AND d IN (2,3,4);
+----
+stmt 0 ok
+stmt 22 err 1 -1 50 no such table: t1
+stmt 50 ok
+stmt 78 err 1 -1 133 no such table: t2
+stmt 133 err 1 -1 170 no such table: main.t2
+stmt 170 err 1 -1 238 no such table: t1
+==== in6-3.110
+
+  CREATE TABLE v0(v1);
+  CREATE TABLE v3(v5, v4);
+  INSERT INTO v0 VALUES(0);
+  CREATE INDEX v9 ON v3(v4, v4, v5);
+  SELECT quote(v5) FROM v0 LEFT JOIN v3 ON v4 = NULL AND v5 IN(0);
+----
+stmt 0 ok
+stmt 23 ok
+stmt 50 err 1 -1 78 no such table: v0
+stmt 78 err 1 -1 115 no such table: main.v3
+stmt 115 err 1 -1 182 no such table: v0
+==== in6-3.120
+
+  CREATE TABLE t1(a TEXT, b TEXT);
+  INSERT INTO t1 VALUES(null,10),(0,10),(10,10);
+  CREATE INDEX t1ab ON t1(a,b);
+  SELECT quote(a), quote(b), '|' FROM t1 WHERE b in (SELECT a FROM t1) AND a=0;
+----
+stmt 0 ok
+stmt 35 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 116 no such table: main.t1
+stmt 116 err 1 -1 196 no such table: t1
+==== in6-3.130
+
+  CREATE TABLE t2(x TEXT);
+  INSERT INTO t2(x) VALUES(NULL),(0),(10);
+  SELECT quote(x), quote(a), quote(b), 'x'
+    FROM t2 LEFT JOIN t1 ON a=x AND b in (null,0,10);
+----
+stmt 0 ok
+stmt 27 err 1 -1 70 no such table: t2
+stmt 70 err 1 -1 167 no such table: t2

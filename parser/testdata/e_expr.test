@@ -131,7 +131,7 @@ stmt 0 ok
 ==== e_expr-9.1
  SELECT  'abcd' < 'bbbb'    COLLATE reverse
 ----
-stmt 0 err 1 -1 no such collation sequence: reverse
+stmt 0 err 1 -1 44 no such collation sequence: reverse
 ==== e_expr-9.2
  SELECT ('abcd' < 'bbbb')   COLLATE reverse
 ----
@@ -139,7 +139,7 @@ stmt 0 ok
 ==== e_expr-9.3
  SELECT  'abcd' <= 'bbbb'   COLLATE reverse
 ----
-stmt 0 err 1 -1 no such collation sequence: reverse
+stmt 0 err 1 -1 44 no such collation sequence: reverse
 ==== e_expr-9.4
  SELECT ('abcd' <= 'bbbb')  COLLATE reverse
 ----
@@ -147,7 +147,7 @@ stmt 0 ok
 ==== e_expr-9.5
  SELECT  'abcd' > 'bbbb'    COLLATE reverse
 ----
-stmt 0 err 1 -1 no such collation sequence: reverse
+stmt 0 err 1 -1 44 no such collation sequence: reverse
 ==== e_expr-9.6
  SELECT ('abcd' > 'bbbb')   COLLATE reverse
 ----
@@ -155,7 +155,7 @@ stmt 0 ok
 ==== e_expr-9.7
  SELECT  'abcd' >= 'bbbb'   COLLATE reverse
 ----
-stmt 0 err 1 -1 no such collation sequence: reverse
+stmt 0 err 1 -1 44 no such collation sequence: reverse
 ==== e_expr-9.8
  SELECT ('abcd' >= 'bbbb')  COLLATE reverse
 ----
@@ -226,25 +226,25 @@ stmt 0 ok
   INSERT INTO t24 VALUES('ccc', 3);
 ----
 stmt 0 ok
-stmt 42 err 1 -1 no such table: t24
-stmt 78 err 1 -1 no such table: t24
-stmt 114 err 1 -1 no such table: t24
+stmt 42 err 1 -1 78 no such table: t24
+stmt 78 err 1 -1 114 no such table: t24
+stmt 114 err 1 -1 150 no such table: t24
 ==== e_expr-9.25
  SELECT 'BBB' = a FROM t24
 ----
-stmt 0 err 1 -1 no such table: t24
+stmt 0 err 1 -1 27 no such table: t24
 ==== e_expr-9.25.dup1
  SELECT a = 'BBB' FROM t24
 ----
-stmt 0 err 1 -1 no such table: t24
+stmt 0 err 1 -1 27 no such table: t24
 ==== e_expr-9.25.dup2
  SELECT 'BBB' = a COLLATE binary FROM t24
 ----
-stmt 0 err 1 -1 no such table: t24
+stmt 0 err 1 -1 42 no such table: t24
 ==== e_expr-9.25.dup3
  SELECT a COLLATE binary = 'BBB' FROM t24
 ----
-stmt 0 err 1 -1 no such table: t24
+stmt 0 err 1 -1 42 no such table: t24
 ==== e_expr-10.1.1
  SELECT typeof(5)
 ----
@@ -734,20 +734,20 @@ stmt 0 ok
  
     SELECT regexp('abc', 'def')
 ----
-stmt 0 err 1 13 no such function: regexp
+stmt 0 err 1 13 34 no such function: regexp
 ==== e_expr-18.1.2
  
     SELECT 'abc' REGEXP 'def'
 ----
-stmt 0 err 1 19 no such function: REGEXP
+stmt 0 err 1 19 32 no such function: REGEXP
 ==== e_expr-18.2.1
  SELECT 'abc' REGEXP 'def'
 ----
-stmt 0 err 1 14 no such function: REGEXP
+stmt 0 err 1 14 27 no such function: REGEXP
 ==== e_expr-18.2.3
  SELECT 'X' NOT REGEXP 'Y'
 ----
-stmt 0 err 1 16 no such function: REGEXP
+stmt 0 err 1 16 27 no such function: REGEXP
 ==== e_expr-19.1.1
  
   SELECT 'abc' MATCH 'def'
@@ -782,7 +782,7 @@ stmt 0 ok
               WHEN var('b') THEN 'B' 
               WHEN var('c') THEN 'C' END
 ----
-stmt 0 err 1 20 no such function: var
+stmt 0 err 1 20 118 no such function: var
 ==== e_expr-21.1.3
 
   SELECT CASE WHEN var('c') THEN 'C' 
@@ -791,7 +791,7 @@ stmt 0 err 1 20 no such function: var
               ELSE 'no result'
   END
 ----
-stmt 0 err 1 20 no such function: var
+stmt 0 err 1 20 152 no such function: var
 ==== e_expr-21.2.1
 
   SELECT CASE WHEN var('a') THEN 'A' 
@@ -800,7 +800,7 @@ stmt 0 err 1 20 no such function: var
               ELSE 'no result'
   END
 ----
-stmt 0 err 1 20 no such function: var
+stmt 0 err 1 20 152 no such function: var
 ==== e_expr-21.2.2
 
   SELECT CASE WHEN var('a') THEN 'A' 
@@ -809,7 +809,7 @@ stmt 0 err 1 20 no such function: var
               ELSE 'no result'
   END
 ----
-stmt 0 err 1 20 no such function: var
+stmt 0 err 1 20 151 no such function: var
 ==== e_expr-21.2.3
 
   SELECT CASE WHEN var('a') THEN 'A' 
@@ -818,7 +818,7 @@ stmt 0 err 1 20 no such function: var
               ELSE 'no result'
   END
 ----
-stmt 0 err 1 20 no such function: var
+stmt 0 err 1 20 151 no such function: var
 ==== e_expr-21.3.1
 
   SELECT CASE WHEN var('a') THEN 'A' 
@@ -827,7 +827,7 @@ stmt 0 err 1 20 no such function: var
               ELSE 'no result'
   END
 ----
-stmt 0 err 1 20 no such function: var
+stmt 0 err 1 20 151 no such function: var
 ==== e_expr-21.3.2
 
   SELECT CASE WHEN var('a') THEN 'A' 
@@ -835,7 +835,7 @@ stmt 0 err 1 20 no such function: var
               WHEN var('c') THEN 'C'
   END
 ----
-stmt 0 err 1 20 no such function: var
+stmt 0 err 1 20 120 no such function: var
 ==== e_expr-21.4.1a
 
   SELECT CASE WHEN NULL THEN 'A' WHEN 1 THEN 'B' END, iif(NULL,8,99);
@@ -860,7 +860,7 @@ stmt 0 ok
 
   SELECT CASE var('a') WHEN 1 THEN 'A' WHEN 2 THEN 'B' WHEN 3 THEN 'C' END
 ----
-stmt 0 err 1 15 no such function: var
+stmt 0 err 1 15 76 no such function: var
 ==== e_expr-22.2.1
 
   SELECT CASE 23 WHEN 1 THEN 'A' WHEN 23 THEN 'B' WHEN 23 THEN 'C' END
@@ -896,28 +896,28 @@ stmt 0 ok
   );
   INSERT INTO t1 VALUES('abc', 'cba', 55, 34.5);
 ----
-stmt 0 err 1 -1 no such collation sequence: REVERSE
-stmt 113 err 1 -1 no such table: t1
+stmt 0 err 1 -1 82 no such collation sequence: REVERSE
+stmt 113 err 1 -1 162 no such table: t1
 ==== e_expr-23.1.2
 
   SELECT CASE a WHEN 'xyz' THEN 'A' WHEN 'AbC' THEN 'B' END FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 69 no such table: t1
 ==== e_expr-23.1.3
 
   SELECT CASE 'AbC' WHEN 'abc' THEN 'A' WHEN a THEN 'B' END FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 69 no such table: t1
 ==== e_expr-23.1.4
 
   SELECT CASE a WHEN b THEN 'A' ELSE 'B' END FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 54 no such table: t1
 ==== e_expr-23.1.5
 
   SELECT CASE b WHEN a THEN 'A' ELSE 'B' END FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 54 no such table: t1
 ==== e_expr-23.1.6
 
   SELECT CASE 55 WHEN '55' THEN 'A' ELSE 'B' END
@@ -927,12 +927,12 @@ stmt 0 ok
 
   SELECT CASE c WHEN '55' THEN 'A' ELSE 'B' END FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 57 no such table: t1
 ==== e_expr-23.1.8
 
   SELECT CASE '34.5' WHEN d THEN 'A' ELSE 'B' END FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 59 no such table: t1
 ==== e_expr-23.1.9
 
   SELECT CASE NULL WHEN NULL THEN 'A' ELSE 'B' END
@@ -955,7 +955,7 @@ stmt 0 ok
               WHEN var('c') THEN 'C' 
   END
 ----
-stmt 0 err 1 20 no such function: var
+stmt 0 err 1 20 121 no such function: var
 ==== e_expr-25.1.3
 
   SELECT CASE '0' WHEN var('a') THEN 'A' 
@@ -963,7 +963,7 @@ stmt 0 err 1 20 no such function: var
                   WHEN var('c') THEN 'C' 
   END
 ----
-stmt 0 err 1 24 no such function: var
+stmt 0 err 1 24 133 no such function: var
 ==== e_expr-26.1.1
 
   CREATE TABLE t2(x, w1, r1, w2, r2, r3);
@@ -972,24 +972,24 @@ stmt 0 err 1 24 no such function: var
   INSERT INTO t2 VALUES(3, 1, 'R1', 2, 'R2', 'R3');
 ----
 stmt 0 ok
-stmt 42 err 1 -1 no such table: t2
-stmt 94 err 1 -1 no such table: t2
-stmt 146 err 1 -1 no such table: t2
+stmt 42 err 1 -1 94 no such table: t2
+stmt 94 err 1 -1 146 no such table: t2
+stmt 146 err 1 -1 198 no such table: t2
 ==== e_expr-26.1.2
 
   SELECT CASE x WHEN w1 THEN r1 WHEN w2 THEN r2 ELSE r3 END FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 69 no such table: t2
 ==== e_expr-26.1.3
 
   SELECT CASE WHEN x=w1 THEN r1 WHEN x=w2 THEN r2 ELSE r3 END FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 71 no such table: t2
 ==== e_expr-26.1.4
 
   SELECT CASE ceval(x) WHEN w1 THEN r1 WHEN w2 THEN r2 ELSE r3 END FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 76 no such table: t2
 ==== e_expr-26.1.6
 
   SELECT CASE 
@@ -998,7 +998,7 @@ stmt 0 err 1 -1 no such table: t2
     ELSE r3 END 
   FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 103 no such table: t2
 ==== e_expr-27.1.1
 
   CREATE TABLE t3(a TEXT, b REAL, c INTEGER);
@@ -1006,8 +1006,8 @@ stmt 0 err 1 -1 no such table: t2
   SELECT typeof(a), a, typeof(b), b, typeof(c), c FROM t3;
 ----
 stmt 0 ok
-stmt 46 err 1 -1 no such table: t3
-stmt 98 err 1 -1 no such table: t3
+stmt 46 err 1 -1 98 no such table: t3
+stmt 98 err 1 -1 157 no such table: t3
 ==== e_expr-27.1.2
 
   SELECT 
@@ -1046,10 +1046,10 @@ stmt 0 ok
   INSERT INTO t1 VALUES(NULL, NULL);
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: t1
-stmt 56 err 1 -1 no such table: t1
-stmt 90 err 1 -1 no such table: t1
-stmt 124 err 1 -1 no such table: t1
+stmt 25 err 1 -1 56 no such table: t1
+stmt 56 err 1 -1 90 no such table: t1
+stmt 90 err 1 -1 124 no such table: t1
+stmt 124 err 1 -1 161 no such table: t1
 ==== e_expr-35.0
 
     CREATE TABLE t2(a, b);
@@ -1058,9 +1058,9 @@ stmt 124 err 1 -1 no such table: t1
     INSERT INTO t2 VALUES(4, 5.0);
 ----
 stmt 0 ok
-stmt 27 err 1 -1 no such table: t2
-stmt 68 err 1 -1 no such table: t2
-stmt 110 err 1 -1 no such table: t2
+stmt 27 err 1 -1 68 no such table: t2
+stmt 68 err 1 -1 110 no such table: t2
+stmt 110 err 1 -1 145 no such table: t2
 ==== e_expr-36.3.1
 
   CREATE TABLE t4(x, y);
@@ -1069,9 +1069,9 @@ stmt 110 err 1 -1 no such table: t2
   INSERT INTO t4 VALUES(3, 'three');
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: t4
-stmt 60 err 1 -1 no such table: t4
-stmt 95 err 1 -1 no such table: t4
+stmt 25 err 1 -1 60 no such table: t4
+stmt 60 err 1 -1 95 no such table: t4
+stmt 95 err 1 -1 132 no such table: t4
 ==== e_expr-37.1
 
    SELECT CASE WHEN NULL THEN 'true' ELSE 'false' END, iif(NULL,'true','false');

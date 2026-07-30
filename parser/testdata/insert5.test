@@ -1,0 +1,39 @@
+==== insert5-1.1
+
+      INSERT INTO B 
+        SELECT * FROM B UNION ALL 
+        SELECT * FROM MAIN WHERE exists (select * FROM B WHERE B.Id = MAIN.Id);
+      SELECT * FROM B;
+----
+stmt 0 err 1 -1 136 no such table: B
+stmt 136 err 1 -1 159 no such table: B
+==== insert5-1.1.dup1
+
+      INSERT INTO B SELECT * FROM B;
+      INSERT INTO B
+        SELECT * FROM MAIN WHERE exists (select * FROM B WHERE B.Id = MAIN.Id);
+      SELECT * FROM B;
+----
+stmt 0 err 1 -1 37 no such table: B
+stmt 37 err 1 -1 137 no such table: B
+stmt 137 err 1 -1 160 no such table: B
+==== insert5-2.9
+ 
+    INSERT INTO b 
+    SELECT * FROM main 
+    WHERE id > 10 AND (SELECT count(*) FROM v2 GROUP BY main.id)
+----
+stmt 0 err 1 -1 110 no such table: b
+==== insert5-2.10
+
+  CREATE TABLE t1(a INT);
+  INSERT INTO t1 VALUES(2);
+  CREATE TABLE t2(c INT, d INT);
+  INSERT INTO t2 VALUES(3,4),(10,NULL);
+  SELECT (SELECT c FROM t2 ORDER BY coalesce(d,a) LIMIT 1) FROM t1;
+----
+stmt 0 ok
+stmt 26 err 1 -1 54 no such table: t1
+stmt 54 ok
+stmt 87 err 1 -1 127 no such table: t2
+stmt 127 err 1 -1 195 no such table: t1

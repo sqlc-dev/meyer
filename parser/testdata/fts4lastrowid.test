@@ -1,0 +1,73 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE t1 USING fts4(str);
+----
+stmt 0 ok
+==== 1.1
+
+  INSERT INTO t1 VALUES('one string');
+  INSERT INTO t1 VALUES('two string');
+  INSERT INTO t1 VALUES('three string');
+  SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 39 no such table: t1
+stmt 39 err 1 -1 78 no such table: t1
+stmt 78 err 1 -1 119 no such table: t1
+stmt 119 ok
+==== 1.2
+
+  BEGIN;
+    INSERT INTO t1 VALUES('one string');
+    INSERT INTO t1 VALUES('two string');
+    INSERT INTO t1 VALUES('three string');
+  COMMIT;
+  SELECT last_insert_rowid();
+----
+stmt 0 ok
+stmt 9 err 1 -1 50 no such table: t1
+stmt 50 err 1 -1 91 no such table: t1
+stmt 91 err 1 -1 134 no such table: t1
+stmt 134 ok
+stmt 144 ok
+==== 1.3
+
+  INSERT INTO t1(rowid, str) VALUES(-22, 'some more text');
+  SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 60 no such table: t1
+stmt 60 ok
+==== 1.4
+
+  BEGIN;
+    INSERT INTO t1(rowid, str) VALUES(45, 'some more text');
+    INSERT INTO t1(rowid, str) VALUES(46, 'some more text');
+    INSERT INTO t1(rowid, str) VALUES(222, 'some more text');
+    SELECT last_insert_rowid();
+  COMMIT;
+  SELECT last_insert_rowid();
+----
+stmt 0 ok
+stmt 9 err 1 -1 70 no such table: t1
+stmt 70 err 1 -1 131 no such table: t1
+stmt 131 err 1 -1 193 no such table: t1
+stmt 193 ok
+stmt 225 ok
+stmt 235 ok
+==== 1.5
+
+  CREATE TABLE x1(x);
+  INSERT INTO x1 VALUES('john'), ('paul'), ('george'), ('ringo');
+  INSERT INTO t1 SELECT x FROM x1;
+  SELECT last_insert_rowid();
+----
+stmt 0 ok
+stmt 22 err 1 -1 88 no such table: x1
+stmt 88 err 1 -1 123 no such table: t1
+stmt 123 ok
+==== 1.6
+
+  INSERT INTO t1(rowid, str) SELECT rowid+10, x FROM x1;
+  SELECT last_insert_rowid();
+----
+stmt 0 err 1 -1 57 no such table: t1
+stmt 57 ok

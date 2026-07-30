@@ -1,0 +1,19 @@
+==== notify3-1.1
+ 
+    CREATE TABLE t1(a, b); 
+    INSERT INTO t1 VALUES('t1 A', 't1 B');
+----
+stmt 0 ok
+stmt 28 err 1 -1 72 no such table: t1
+==== notify3-1.4
+ ATTACH 'test.db2' AS aux
+----
+stmt 0 ok
+==== notify3-1.5
+ SELECT * FROM t2
+----
+stmt 0 err 1 -1 18 no such table: t2
+==== notify3-1.9
+ SELECT * FROM t2
+----
+stmt 0 err 1 -1 18 no such table: t2

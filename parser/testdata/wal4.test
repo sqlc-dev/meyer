@@ -1,0 +1,13 @@
+==== wal4-1.1
+
+    PRAGMA journal_mode=WAL;
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(2);
+    SELECT x FROM t1 ORDER BY x;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 53 err 1 -1 83 no such table: t1
+stmt 83 err 1 -1 113 no such table: t1
+stmt 113 err 1 -1 146 no such table: t1

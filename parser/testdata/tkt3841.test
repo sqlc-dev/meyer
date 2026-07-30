@@ -1,0 +1,32 @@
+==== tkt3841.1
+
+    CREATE TABLE table2 (key TEXT, x TEXT);
+    CREATE TABLE list (key TEXT, value TEXT);
+  
+    INSERT INTO table2 VALUES ("a", "alist");
+    INSERT INTO table2 VALUES ("b", "blist");
+    INSERT INTO list VALUES ("a", 1);
+    INSERT INTO list VALUES ("a", 2);
+    INSERT INTO list VALUES ("a", 3);
+    INSERT INTO list VALUES ("b", 4);
+    INSERT INTO list VALUES ("b", 5);
+    INSERT INTO list VALUES ("b", 6);
+
+    SELECT
+      table2.x,
+      (SELECT group_concat(list.value)
+        FROM list
+        WHERE list.key = table2.key)
+    FROM table2;
+----
+stmt 0 ok
+stmt 44 ok
+stmt 90 err 1 -1 139 no such table: table2
+stmt 139 err 1 -1 185 no such table: table2
+stmt 185 err 1 -1 223 no such table: list
+stmt 223 err 1 -1 261 no such table: list
+stmt 261 err 1 -1 299 no such table: list
+stmt 299 err 1 -1 337 no such table: list
+stmt 337 err 1 -1 375 no such table: list
+stmt 375 err 1 -1 413 no such table: list
+stmt 413 err 1 -1 552 no such table: table2

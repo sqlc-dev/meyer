@@ -1,0 +1,43 @@
+==== tkt3935.1
+
+    CREATE TABLE t1(a, b);
+    CREATE TABLE t2(c, d);
+----
+stmt 0 ok
+stmt 27 ok
+==== tkt3935.2
+ SELECT j1.b FROM ( SELECT * FROM t1 INNER JOIN t2 ON a=c ) AS j1
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== tkt3935.3
+ SELECT j1.b FROM (t1 INNER JOIN t2 ON a=c) AS j1
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== tkt3935.4
+ SELECT a FROM (t1) AS t ON b USING(a)
+----
+stmt 0 err 1 30 35 near "USING": syntax error
+==== tkt3935.5
+ SELECT a FROM (t1) AS t ON b
+----
+stmt 0 err 1 -1 30 a JOIN clause is required before ON
+==== tkt3935.6
+ SELECT a FROM (SELECT * FROM t1) AS t ON b USING(a)
+----
+stmt 0 err 1 44 49 near "USING": syntax error
+==== tkt3935.7
+ SELECT a FROM (SELECT * FROM t1) AS t ON b
+----
+stmt 0 err 1 -1 44 a JOIN clause is required before ON
+==== tkt3935.8
+ SELECT a FROM t1 AS t ON b
+----
+stmt 0 err 1 -1 28 a JOIN clause is required before ON
+==== tkt3935.9
+ SELECT a FROM t1 AS t ON b USING(a)
+----
+stmt 0 err 1 28 33 near "USING": syntax error
+==== tkt3935.10
+ SELECT a FROM t1 AS t USING(a)
+----
+stmt 0 err 1 -1 32 a JOIN clause is required before USING

@@ -12,11 +12,11 @@
 ----
 stmt 0 ok
 stmt 21 ok
-stmt 49 err 1 -1 no such table: t1
+stmt 49 err 1 -1 89 no such table: t1
 stmt 89 ok
-stmt 117 err 1 -1 no such table: t2
-stmt 158 err 1 -1 no such table: t2
-stmt 198 err 1 -1 no such table: main.t1
+stmt 117 err 1 -1 158 no such table: t2
+stmt 158 err 1 -1 198 no such table: t2
+stmt 198 err 1 -1 230 no such table: main.t1
 stmt 230 ok
 ==== 2
 
@@ -25,4 +25,4 @@ stmt 230 ok
   SELECT * FROM t1 WHERE a<5 
   ORDER BY 2, 1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 79 no such table: t1

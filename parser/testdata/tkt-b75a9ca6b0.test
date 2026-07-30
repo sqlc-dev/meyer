@@ -1,0 +1,16 @@
+==== 1
+
+  CREATE TABLE t1 (x, y);
+  INSERT INTO t1 VALUES (1, 3); 
+  INSERT INTO t1 VALUES (2, 2);
+  INSERT INTO t1 VALUES (3, 1);
+----
+stmt 0 ok
+stmt 26 err 1 -1 58 no such table: t1
+stmt 58 err 1 -1 91 no such table: t1
+stmt 91 err 1 -1 123 no such table: t1
+==== 1.1
+
+  CREATE INDEX i1 ON t1(x, y);
+----
+stmt 0 err 1 -1 31 no such table: main.t1

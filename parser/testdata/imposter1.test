@@ -1,0 +1,69 @@
+==== imposter-1.1
+
+  SELECT rowid FROM xt1 WHERE a IS NOT NULL;
+----
+stmt 0 err 1 -1 45 no such table: xt1
+==== imposter-1.2
+
+  SELECT a,b,c,d FROM t1 EXCEPT SELECT rowid,b,c,d FROM xt1;
+  SELECT rowid,b,c,d FROM xt1 EXCEPT SELECT a,b,c,d FROM t1;
+----
+stmt 0 err 1 -1 61 no such table: xt1
+stmt 61 err 1 -1 122 no such table: t1
+==== imposter-1.3
+
+  PRAGMA writable_schema=on;
+  DELETE FROM xt1 WHERE rowid=5;
+  INSERT INTO xt1(rowid,a,b,c,d) VALUES(99,'hello',1099,2022,NULL);
+  SELECT * FROM chnglog ORDER BY rowid;
+----
+stmt 0 ok
+stmt 29 err 1 -1 62 no such table: xt1
+stmt 62 err 1 -1 130 no such table: xt1
+stmt 130 err 1 -1 170 no such table: chnglog
+==== imposter-1.4a
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== imposter-1.4b
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== imposter-1.4c
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok
+==== imposter-2.0
+
+  DELETE FROM t1;
+  WITH RECURSIVE c(i) AS (VALUES(1) UNION ALL SELECT i+1 FROM c WHERE i<10)
+   INSERT INTO t1(a,b,c,d) SELECT i,i,i,i FROM c;
+  UPDATE xt1c SET c=NULL WHERE rowid=5;
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 144 no such table: t1
+stmt 144 err 1 -1 184 no such table: xt1c
+stmt 184 ok
+==== imposter-2.1
+
+  DELETE FROM t1;
+  WITH RECURSIVE c(i) AS (VALUES(1) UNION ALL SELECT i+1 FROM c WHERE i<10)
+   INSERT INTO t1(a,b,c,d) SELECT i,i,i,i FROM c;
+  UPDATE xt1c SET c=99 WHERE rowid IN (5,7,9);
+  SELECT c FROM t1 ORDER BY c;
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 144 no such table: t1
+stmt 144 err 1 -1 191 no such table: xt1c
+stmt 191 err 1 -1 222 no such table: t1
+==== imposter-2.2
+
+  UPDATE xt1 SET c=99 WHERE rowid IN (5,7,9);
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 46 no such table: xt1
+stmt 46 ok

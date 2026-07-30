@@ -1,0 +1,9 @@
+==== vtab_shared-1.8.1
+ 
+    BEGIN;
+    INSERT INTO t1 VALUES(4, 5, 6);
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 12 err 1 -1 48 no such table: t1
+stmt 48 err 1 -1 70 no such table: t1

@@ -1,0 +1,50 @@
+==== loadext2-1.1
+
+    SELECT sqr(2)
+----
+stmt 0 err 1 12 19 no such function: sqr
+==== loadext2-1.2
+
+    SELECT cube(2)
+----
+stmt 0 err 1 12 20 no such function: cube
+==== loadext2-1.4
+
+    SELECT cube(2)
+----
+stmt 0 err 1 12 20 no such function: cube
+==== loadext2-1.6
+
+    SELECT cube(2)
+----
+stmt 0 err 1 12 20 no such function: cube
+==== loadext2-1.7.5
+
+    SELECT sqr(2)
+----
+stmt 0 err 1 12 19 no such function: sqr
+==== loadext2-1.8
+
+    SELECT cube(2)
+----
+stmt 0 err 1 12 20 no such function: cube
+==== loadext2-1.10
+
+    SELECT cube(2)
+----
+stmt 0 err 1 12 20 no such function: cube
+==== loadext2-1.12
+
+    SELECT cube(2)
+----
+stmt 0 err 1 12 20 no such function: cube
+==== loadext2-1.14
+
+    SELECT sqr(2)
+----
+stmt 0 err 1 12 19 no such function: sqr
+==== loadext2-1.15
+
+    SELECT cube(2)
+----
+stmt 0 err 1 12 20 no such function: cube

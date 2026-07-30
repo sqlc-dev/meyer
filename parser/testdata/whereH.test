@@ -1,0 +1,178 @@
+==== whereH-1.1
+
+  CREATE TABLE t1(a,b,c,d);
+  CREATE INDEX t1abc ON t1(a,b,c);
+  CREATE INDEX t1bc ON t1(b,c);
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c>=? ORDER BY c;
+----
+stmt 0 ok
+stmt 28 err 1 -1 63 no such table: main.t1
+stmt 63 err 1 -1 95 no such table: main.t1
+stmt 95 err 1 -1 175 no such table: t1
+==== whereH-1.2
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c>=? ORDER BY c;
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== whereH-2.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a,b,c,d);
+  CREATE INDEX t1bc ON t1(b,c);
+  CREATE INDEX t1abc ON t1(a,b,c);
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c>=? ORDER BY c;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 45 err 1 -1 77 no such table: main.t1
+stmt 77 err 1 -1 112 no such table: main.t1
+stmt 112 err 1 -1 192 no such table: t1
+==== whereH-2.2
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c>=? ORDER BY c;
+----
+stmt 0 err 1 -1 79 no such table: t1
+==== whereH-3.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a,b,c,d,e);
+  CREATE INDEX t1cd ON t1(c,d);
+  CREATE INDEX t1bcd ON t1(b,c,d);
+  CREATE INDEX t1abcd ON t1(a,b,c,d);
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 47 err 1 -1 79 no such table: main.t1
+stmt 79 err 1 -1 114 no such table: main.t1
+stmt 114 err 1 -1 152 no such table: main.t1
+stmt 152 err 1 -1 240 no such table: t1
+==== whereH-3.2
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 87 no such table: t1
+==== whereH-4.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a,b,c,d,e);
+  CREATE INDEX t1cd ON t1(c,d);
+  CREATE INDEX t1abcd ON t1(a,b,c,d);
+  CREATE INDEX t1bcd ON t1(b,c,d);
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 47 err 1 -1 79 no such table: main.t1
+stmt 79 err 1 -1 117 no such table: main.t1
+stmt 117 err 1 -1 152 no such table: main.t1
+stmt 152 err 1 -1 240 no such table: t1
+==== whereH-4.2
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 87 no such table: t1
+==== whereH-5.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a,b,c,d,e);
+  CREATE INDEX t1bcd ON t1(b,c,d);
+  CREATE INDEX t1cd ON t1(c,d);
+  CREATE INDEX t1abcd ON t1(a,b,c,d);
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 47 err 1 -1 82 no such table: main.t1
+stmt 82 err 1 -1 114 no such table: main.t1
+stmt 114 err 1 -1 152 no such table: main.t1
+stmt 152 err 1 -1 240 no such table: t1
+==== whereH-5.2
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 87 no such table: t1
+==== whereH-6.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a,b,c,d,e);
+  CREATE INDEX t1bcd ON t1(b,c,d);
+  CREATE INDEX t1abcd ON t1(a,b,c,d);
+  CREATE INDEX t1cd ON t1(c,d);
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 47 err 1 -1 82 no such table: main.t1
+stmt 82 err 1 -1 120 no such table: main.t1
+stmt 120 err 1 -1 152 no such table: main.t1
+stmt 152 err 1 -1 240 no such table: t1
+==== whereH-6.2
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 87 no such table: t1
+==== whereH-7.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a,b,c,d,e);
+  CREATE INDEX t1abcd ON t1(a,b,c,d);
+  CREATE INDEX t1bcd ON t1(b,c,d);
+  CREATE INDEX t1cd ON t1(c,d);
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 47 err 1 -1 85 no such table: main.t1
+stmt 85 err 1 -1 120 no such table: main.t1
+stmt 120 err 1 -1 152 no such table: main.t1
+stmt 152 err 1 -1 240 no such table: t1
+==== whereH-7.2
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 87 no such table: t1
+==== whereH-8.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a,b,c,d,e);
+  CREATE INDEX t1abcd ON t1(a,b,c,d);
+  CREATE INDEX t1cd ON t1(c,d);
+  CREATE INDEX t1bcd ON t1(b,c,d);
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 47 err 1 -1 85 no such table: main.t1
+stmt 85 err 1 -1 117 no such table: main.t1
+stmt 117 err 1 -1 152 no such table: main.t1
+stmt 152 err 1 -1 240 no such table: t1
+==== whereH-8.2
+
+  EXPLAIN QUERY PLAN
+  SELECT d FROM t1 WHERE a=? AND b=? AND c=? AND d>=? ORDER BY d;
+----
+stmt 0 err 1 -1 87 no such table: t1

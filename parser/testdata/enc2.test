@@ -1,0 +1,113 @@
+==== enc2-generated
+
+    SELECT * FROM t1 WHERE a = 'one';
+----
+stmt 0 err 1 -1 38 no such table: t1
+==== enc2-generated.dup1
+
+    SELECT * FROM t1 WHERE a = 'four';
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== enc2-generated.dup2
+
+      SELECT * FROM t1 WHERE a IN ('one', 'two');
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== enc2-4.3
+
+      ATTACH 'test2.db' as aux;
+----
+stmt 0 ok
+==== enc2-5.0
+
+    CREATE TABLE t5(a);
+    INSERT INTO t5 VALUES('one');
+    INSERT INTO t5 VALUES('two');
+    INSERT INTO t5 VALUES('five');
+    INSERT INTO t5 VALUES('three');
+    INSERT INTO t5 VALUES('four');
+----
+stmt 0 ok
+stmt 24 err 1 -1 58 no such table: t5
+stmt 58 err 1 -1 92 no such table: t5
+stmt 92 err 1 -1 127 no such table: t5
+stmt 127 err 1 -1 163 no such table: t5
+stmt 163 err 1 -1 198 no such table: t5
+==== enc2-5.4
+
+    CREATE TABLE t5(a);
+    INSERT INTO t5 VALUES('one');
+    INSERT INTO t5 VALUES('two');
+    INSERT INTO t5 VALUES('five');
+    INSERT INTO t5 VALUES('three');
+    INSERT INTO t5 VALUES('four');
+----
+stmt 0 ok
+stmt 24 err 1 -1 58 no such table: t5
+stmt 58 err 1 -1 92 no such table: t5
+stmt 92 err 1 -1 127 no such table: t5
+stmt 127 err 1 -1 163 no such table: t5
+stmt 163 err 1 -1 198 no such table: t5
+==== enc2-5.8
+
+    CREATE TABLE t5(a);
+    INSERT INTO t5 VALUES('one');
+    INSERT INTO t5 VALUES('two');
+    INSERT INTO t5 VALUES('five');
+    INSERT INTO t5 VALUES('three');
+    INSERT INTO t5 VALUES('four');
+----
+stmt 0 ok
+stmt 24 err 1 -1 58 no such table: t5
+stmt 58 err 1 -1 92 no such table: t5
+stmt 92 err 1 -1 127 no such table: t5
+stmt 127 err 1 -1 163 no such table: t5
+stmt 163 err 1 -1 198 no such table: t5
+==== enc2-5.16
+CREATE TABLE t1(a varchar collate test_collate);
+----
+stmt 0 err 1 -1 47 no such collation sequence: test_collate
+==== enc2-6.0
+
+    CREATE TABLE t5(a);
+    INSERT INTO t5 VALUES('one');
+----
+stmt 0 ok
+stmt 24 err 1 -1 58 no such table: t5
+==== enc2-6.3
+
+    CREATE TABLE t5(a);
+    INSERT INTO t5 VALUES('sqlite');
+----
+stmt 0 ok
+stmt 24 err 1 -1 61 no such table: t5
+==== enc2-6.7
+
+    CREATE TABLE t5(a);
+    INSERT INTO t5 VALUES('sqlite');
+----
+stmt 0 ok
+stmt 24 err 1 -1 61 no such table: t5
+==== enc2-7.4
+
+    SELECT * FROM sqlite_master;
+----
+stmt 0 ok
+==== enc2-7.5
+
+    PRAGMA encoding;
+----
+stmt 0 ok
+==== enc2-11.10
+
+  PRAGMA encoding=UTF8;
+  CREATE TEMP TABLE t1(x);
+  INSERT INTO t1 VALUES('this is a test');
+  PRAGMA encoding=UTF16;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 24 ok
+stmt 51 err 1 -1 94 no such table: t1
+stmt 94 ok
+stmt 119 err 1 -1 139 no such table: t1

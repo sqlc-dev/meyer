@@ -1,0 +1,91 @@
+==== 100
+
+  PRAGMA recursive_triggers = 1;
+  
+  CREATE TABLE t1(a);
+  CREATE INDEX i1 ON t1(a);
+  INSERT INTO t1(a) VALUES(0),(2),(3),(8),(9);
+  CREATE TABLE t2(b);
+  CREATE TABLE t3(c);
+  
+  CREATE TRIGGER tr AFTER INSERT ON t3 BEGIN
+    INSERT INTO t3 SELECT new.c+1 WHERE new.c<5;
+    INSERT INTO t2 SELECT new.c*100+a FROM t1 WHERE a IN (1, 2, 3, 4);
+  END;
+  
+  INSERT INTO t3 VALUES(2);
+  SELECT c FROM t3 ORDER BY c;;
+----
+stmt 0 ok
+stmt 33 ok
+stmt 58 err 1 -1 86 no such table: main.t1
+stmt 86 err 1 -1 133 no such table: t1
+stmt 133 ok
+stmt 155 ok
+stmt 177 err 1 -1 225 no such table: main.t3
+stmt 352 err 1 -1 383 no such table: t3
+stmt 383 err 1 -1 414 no such table: t3
+==== 110
+
+  SELECT b FROM t2 ORDER BY b;
+----
+stmt 0 err 1 -1 31 no such table: t2
+==== 200
+
+  DELETE FROM t1;
+  INSERT INTO t1(a) VALUES(0),(2),(3),(8),(9);
+  DELETE FROM t2;
+  DELETE FROM t3;
+  DROP TRIGGER tr;
+  CREATE TRIGGER tr AFTER INSERT ON t3 BEGIN
+    INSERT INTO t3 SELECT new.c+1 WHERE new.c<5;
+    INSERT INTO t2 SELECT new.c*10000+xx.a*100+yy.a
+                     FROM t1 AS xx, t1 AS yy
+                    WHERE xx.a IN (1,2,3,4)
+                      AND yy.a IN (2,3,4,5);
+  END;
+
+  INSERT INTO t3 VALUES(2);
+  SELECT b FROM t2 ORDER BY b;
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 83 no such table: t2
+stmt 83 err 1 -1 101 no such table: t3
+stmt 101 err 1 -1 120 no such trigger: tr
+stmt 120 err 1 -1 165 no such table: main.t3
+stmt 407 err 1 -1 436 no such table: t3
+stmt 436 err 1 -1 467 no such table: t2
+==== 300
+
+  CREATE TABLE t4(x);
+  CREATE TRIGGER tr4 AFTER INSERT ON t4 BEGIN
+    SELECT 0x2147483648e0e0099 AS y WHERE y;
+  END;
+----
+stmt 0 ok
+stmt 22 err 1 -1 68 no such table: main.t4
+==== 310
+
+  INSERT INTO t4 VALUES(1);
+----
+stmt 0 err 1 -1 28 no such table: t4
+==== 400
+
+  CREATE VIEW v0(a) AS SELECT 1234;
+  CREATE TRIGGER t0001 INSTEAD OF DELETE ON v0 BEGIN
+    SELECT old.a;
+  END;
+----
+stmt 0 ok
+stmt 36 err 1 -1 89 no such table: main.v0
+==== 405
+
+  SELECT a FROM v0;
+----
+stmt 0 err 1 -1 20 no such table: v0
+==== 410
+
+  DELETE FROM v0;
+----
+stmt 0 err 1 -1 18 no such table: v0

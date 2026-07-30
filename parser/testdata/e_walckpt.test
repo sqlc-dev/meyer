@@ -1,0 +1,15 @@
+==== e_walckpt-generated
+
+      CREATE TABLE t1(a, b);
+      CREATE TABLE t2(a, b);
+      PRAGMA journal_mode = wal;
+      INSERT INTO t1 VALUES(1, 2);
+      INSERT INTO t1 VALUES(3, 4);
+      INSERT INTO t1 VALUES(5, 6);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 58 ok
+stmt 91 err 1 -1 126 no such table: t1
+stmt 126 err 1 -1 161 no such table: t1
+stmt 161 err 1 -1 196 no such table: t1

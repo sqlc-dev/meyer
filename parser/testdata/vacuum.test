@@ -1,0 +1,85 @@
+==== vacuum-2.1.1
+
+      BEGIN;
+      VACUUM;
+----
+stmt 0 ok
+stmt 13 ok
+==== vacuum-2.8
+
+    INSERT INTO t7 SELECT * FROM t6;
+    SELECT count(*) FROM t7;
+----
+stmt 0 err 1 -1 37 no such table: t7
+stmt 37 err 1 -1 66 no such table: t7
+==== vacuum-5.2
+
+    VACUUM;
+----
+stmt 0 ok
+==== vacuum-6.1
+
+    CREATE TABLE "abc abc"(a, b, c);
+    INSERT INTO "abc abc" VALUES(1, 2, 3);
+    VACUUM;
+----
+stmt 0 ok
+stmt 37 err 1 -1 80 no such table: abc abc
+stmt 80 ok
+==== vacuum-6.2
+
+    select * from "abc abc";
+----
+stmt 0 err 1 -1 29 no such table: abc abc
+==== vacuum-6.3
+
+      DELETE FROM "abc abc";
+      INSERT INTO "abc abc" VALUES(X'00112233', NULL, NULL);
+      VACUUM;
+----
+stmt 0 err 1 -1 29 no such table: abc abc
+stmt 29 err 1 -1 90 no such table: abc abc
+stmt 90 ok
+==== vacuum-6.4
+
+      select count(*) from "abc abc" WHERE a = X'00112233';
+----
+stmt 0 err 1 -1 60 no such table: abc abc
+==== vacuum-7.1
+
+    CREATE TABLE t2(t);
+    CREATE TABLE t3(t);
+    DROP TABLE t2;
+    PRAGMA freelist_count;
+----
+stmt 0 ok
+stmt 24 ok
+stmt 48 err 1 -1 67 no such table: t2
+stmt 67 ok
+==== vacuum-11.1
+
+  PRAGMA page_size=1024;
+  VACUUM;
+  PRAGMA page_size;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 35 ok
+==== vacuum-11.2
+
+  PRAGMA page_size=2048;
+  VACUUM;
+  PRAGMA page_size;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 35 ok
+==== vacuum-11.3
+
+  PRAGMA page_size=4096;
+  VACUUM;
+  PRAGMA page_size;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 35 ok

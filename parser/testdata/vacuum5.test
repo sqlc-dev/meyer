@@ -1,0 +1,102 @@
+==== vacuum5-1.1
+
+  PRAGMA auto_vacuum = 0;
+  CREATE TABLE main.t1(a,b);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<1000)
+    INSERT INTO t1(a,b) SELECT x, randomblob(1000) FROM c;
+  CREATE TEMP TABLE ttemp(x,y);
+  INSERT INTO ttemp SELECT * FROM t1;
+  ATTACH 'test2.db' AS x2;
+  ATTACH 'test3.db' AS x3;
+  CREATE TABLE x2.t2(c,d);
+  INSERT INTO t2 SELECT * FROM t1;
+  CREATE TABLE x3.t3(e,f);
+  INSERT INTO t3 SELECT * FROM t1;
+  DELETE FROM t1 WHERE (rowid%3)!=0;
+  DELETE FROM t2 WHERE (rowid%4)!=0;
+  DELETE FROM t3 WHERE (rowid%5)!=0;
+  PRAGMA main.integrity_check;
+  PRAGMA x2.integrity_check;
+  PRAGMA x3.integrity_check;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 55 err 1 -1 192 no such table: t1
+stmt 192 ok
+stmt 224 err 1 -1 262 no such table: ttemp
+stmt 262 ok
+stmt 289 ok
+stmt 316 err 1 332 338 unknown database x2
+stmt 343 err 1 -1 378 no such table: t2
+stmt 378 err 1 394 400 unknown database x3
+stmt 405 err 1 -1 440 no such table: t3
+stmt 440 err 1 -1 477 no such table: t1
+stmt 477 err 1 -1 514 no such table: t2
+stmt 514 err 1 -1 551 no such table: t3
+stmt 551 ok
+stmt 582 err 1 592 611 unknown database x2
+stmt 611 err 1 621 640 unknown database x3
+==== vacuum5-1.2.1
+
+  VACUUM main;
+----
+stmt 0 ok
+==== vacuum-1.2.5
+
+  DELETE FROM t1;
+  PRAGMA main.integrity_check;
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 ok
+==== vacuum5-1.3.1
+
+  VACUUM x2;
+----
+stmt 0 err 1 10 13 unknown database x2
+==== vacuum-1.3.5
+
+  DELETE FROM t2;
+  PRAGMA x2.integrity_check;
+----
+stmt 0 err 1 -1 18 no such table: t2
+stmt 18 err 1 28 47 unknown database x2
+==== vacuum5-1.4.1
+
+  VACUUM x3;
+----
+stmt 0 err 1 10 13 unknown database x3
+==== vacuum5-1.4.1.dup1
+
+  VACUUM temp;
+----
+stmt 0 ok
+==== vacuum5-1.4.2
+
+  PRAGMA temp.page_count;
+----
+stmt 0 ok
+==== vacuum5-2.0
+
+  VACUUM olaf;
+----
+stmt 0 err 1 10 15 unknown database olaf
+==== 3.0
+
+    PRAGMA temp_store = file;
+    PRAGMA page_size = 1024;
+    PRAGMA cache_size = 50;
+    CREATE TABLE t1(i INTEGER PRIMARY KEY, j UNIQUE);
+    WITH s(i) AS (
+      VALUES(1) UNION ALL SELECT i+1 FROM s WHERE i<1000
+    )
+    INSERT INTO t1 SELECT NULL, randomblob(100) FROM s;
+----
+stmt 0 ok
+stmt 30 ok
+stmt 59 ok
+stmt 87 ok
+stmt 141 err 1 -1 279 no such table: t1
+==== 3.1
+ VACUUM
+----
+stmt 0 ok

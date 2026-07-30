@@ -1,0 +1,135 @@
+==== 1.0
+
+  SELECT (1, 2) IN ( (3, 4), (5, 6), (1, 3) );
+----
+stmt 0 ok
+==== 1.1
+
+  SELECT (1, 2) IN ( (3, 4), (5, 6), (1, 2) );
+----
+stmt 0 ok
+==== 1.2
+
+  SELECT (1, 2) IN ( (3, 2) );
+----
+stmt 0 ok
+==== 1.3
+
+  SELECT (1, 2) IN ( (1, 2) );
+----
+stmt 0 ok
+==== 1.4
+
+  SELECT (1, 2) IN ( );
+----
+stmt 0 ok
+==== 1.5
+
+  SELECT (1, 2) NOT IN ( );
+----
+stmt 0 ok
+==== 2.0
+
+  SELECT (1, 2) IN ( (1, 2), (3, 4, 5), (5, 6) )
+----
+stmt 0 err 1 -1 50 IN(...) element has 3 terms - expected 2
+==== 2.1
+
+  SELECT (1, 2) IN ( (1, 2), 4, (5, 6) )
+----
+stmt 0 err 1 -1 42 IN(...) element has 1 term - expected 2
+==== 2.2
+
+  SELECT (1, 2, 3) IN ( (1, 2), (3, 4), (5, 6) )
+----
+stmt 0 err 1 -1 50 IN(...) element has 2 terms - expected 3
+==== 2.3
+
+  SELECT 2 IN ( (1, 2), (3, 4), (5, 6) )
+----
+stmt 0 err 1 -1 42 row value misused
+==== 3.0
+
+  CREATE TABLE x2 (x, y);
+  INSERT INTO x2 VALUES (1234, 'abc');
+
+  CREATE TABLE x1 (a, b PRIMARY KEY COLLATE NOCASE) WITHOUT ROWID;
+  INSERT INTO x1 VALUES (1234, 'ABCD');
+----
+stmt 0 ok
+stmt 26 err 1 -1 65 no such table: x2
+stmt 65 ok
+stmt 133 err 1 -1 173 no such table: x1
+==== 3.1
+
+  SELECT * FROM x2 CROSS JOIN x1 WHERE (1234, x2.y) > (x1.a, x1.b);
+----
+stmt 0 err 1 -1 68 no such table: x2
+==== 3.2
+
+  CREATE INDEX x1a ON x1(a);
+----
+stmt 0 err 1 -1 29 no such table: main.x1
+==== 3.3
+
+  SELECT * FROM x2 CROSS JOIN x1 WHERE (1234, x2.y) > (x1.a, x1.b);
+----
+stmt 0 err 1 -1 68 no such table: x2
+==== 4.0
+
+  CREATE TABLE t1 (a PRIMARY KEY, b COLLATE NOCASE) WITHOUT ROWID;
+  INSERT INTO t1 VALUES ('BBB', 'a');
+----
+stmt 0 ok
+stmt 67 err 1 -1 105 no such table: t1
+==== 4.1
+
+  SELECT * FROM t1 WHERE (t1.a, t1.b) <= ('BBB', 'CCC');
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== 4.2
+
+  DROP TABLE t1;
+  CREATE TABLE t0 (c0);
+  INSERT INTO t0 VALUES ('True');
+
+  CREATE TABLE t1 (c0 COLLATE NOCASE, c1 PRIMARY KEY) WITHOUT ROWID;
+  INSERT INTO t1 VALUES ('a', 1);
+  INSERT INTO t1 VALUES ('a', 'True');
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 41 err 1 -1 75 no such table: t0
+stmt 75 ok
+stmt 145 err 1 -1 179 no such table: t1
+stmt 179 err 1 -1 218 no such table: t1
+==== 4.3
+
+  SELECT * FROM t0, t1 WHERE (t1.c1, t1.c0) <= (t0.c0, t0.c0);
+----
+stmt 0 err 1 -1 63 no such table: t0
+==== 5.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a TEXT, b TEXT);
+  CREATE INDEX t1_ab ON t1(a COLLATE NOCASE, b COLLATE NOCASE);
+  INSERT INTO t1 VALUES('a',null),('b', 'ABCD');
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 52 err 1 -1 116 no such table: main.t1
+stmt 116 err 1 -1 165 no such table: t1
+==== 5.2
+
+  SELECT * FROM t1
+   WHERE ('B' COLLATE nocase,'abc')>(a,b)
+   ORDER BY +a;
+----
+stmt 0 err 1 -1 77 no such table: t1
+==== 5.3
+
+  SELECT * FROM t1 NOT INDEXED
+   WHERE ('B' COLLATE nocase,'abc')>(a,b)
+   ORDER BY +a;
+----
+stmt 0 err 1 -1 89 no such table: t1

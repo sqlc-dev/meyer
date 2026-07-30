@@ -16,86 +16,86 @@
     SELECT d FROM t2 WHERE a IN t1x AND b IN t1y AND c IN t1z ORDER BY c;
 ----
 stmt 0 ok
-stmt 45 err 1 -1 no such table: t1x
+stmt 45 err 1 -1 92 no such table: t1x
 stmt 92 ok
-stmt 132 err 1 -1 no such table: t1y
+stmt 132 err 1 -1 175 no such table: t1y
 stmt 175 ok
-stmt 212 err 1 -1 no such table: t1z
+stmt 212 err 1 -1 263 no such table: t1z
 stmt 263 ok
-stmt 322 err 1 -1 no such table: t2
-stmt 496 err 1 -1 no such table: t1x
-stmt 539 err 1 -1 no such table: t1y
-stmt 582 err 1 -1 no such table: t1z
-stmt 625 err 1 -1 no such table: t2
+stmt 322 err 1 -1 496 no such table: t2
+stmt 496 err 1 -1 539 no such table: t1x
+stmt 539 err 1 -1 582 no such table: t1y
+stmt 582 err 1 -1 625 no such table: t1z
+stmt 625 err 1 -1 699 no such table: t2
 ==== in5-1.2
 
     SELECT d FROM t2 WHERE a IN t1y AND b IN t1x AND c IN t1z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 74 no such table: t2
 ==== in5-1.3
 
     SELECT d FROM t2 WHERE a IN t3x AND b IN t3y AND c IN t3z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 74 no such table: t2
 ==== in5-2.1
 
     CREATE INDEX t2abc ON t2(a,b,c);
     SELECT d FROM t2 WHERE a IN t1x AND b IN t1y AND c IN t1z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such table: main.t2
-stmt 37 err 1 -1 no such table: t2
+stmt 0 err 1 -1 37 no such table: main.t2
+stmt 37 err 1 -1 111 no such table: t2
 ==== in5-2.2
 
     SELECT d FROM t2 WHERE a IN t1y AND b IN t1x AND c IN t1z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 74 no such table: t2
 ==== in5-2.4
 
     SELECT d FROM t2 WHERE a IN t3x AND b IN t3y AND c IN t3z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 74 no such table: t2
 ==== in5-3.1
 
     DROP INDEX t2abc;
     CREATE INDEX t2ab ON t2(a,b);
     SELECT d FROM t2 WHERE a IN t1x AND b IN t1y AND c IN t1z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such index: t2abc
-stmt 22 err 1 -1 no such table: main.t2
-stmt 56 err 1 -1 no such table: t2
+stmt 0 err 1 -1 22 no such index: t2abc
+stmt 22 err 1 -1 56 no such table: main.t2
+stmt 56 err 1 -1 130 no such table: t2
 ==== in5-3.2
 
     SELECT d FROM t2 WHERE a IN t1y AND b IN t1x AND c IN t1z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 74 no such table: t2
 ==== in5-4.1
 
     DROP INDEX t2ab;
     CREATE INDEX t2abcd ON t2(a,b,c,d);
     SELECT d FROM t2 WHERE a IN t1x AND b IN t1y AND c IN t1z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such index: t2ab
-stmt 21 err 1 -1 no such table: main.t2
-stmt 61 err 1 -1 no such table: t2
+stmt 0 err 1 -1 21 no such index: t2ab
+stmt 21 err 1 -1 61 no such table: main.t2
+stmt 61 err 1 -1 135 no such table: t2
 ==== in5-4.2
 
     SELECT d FROM t2 WHERE a IN t1y AND b IN t1x AND c IN t1z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 74 no such table: t2
 ==== in5-5.1
 
     DROP INDEX t2abcd;
     CREATE INDEX t2cbad ON t2(c,b,a,d);
     SELECT d FROM t2 WHERE a IN t1x AND b IN t1y AND c IN t1z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such index: t2abcd
-stmt 23 err 1 -1 no such table: main.t2
-stmt 63 err 1 -1 no such table: t2
+stmt 0 err 1 -1 23 no such index: t2abcd
+stmt 23 err 1 -1 63 no such table: main.t2
+stmt 63 err 1 -1 137 no such table: t2
 ==== in5-5.2
 
     SELECT d FROM t2 WHERE a IN t1y AND b IN t1x AND c IN t1z ORDER BY d;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 74 no such table: t2
 ==== 6.1.1
 
   CREATE TABLE t1(a COLLATE nocase);
@@ -103,13 +103,13 @@ stmt 0 err 1 -1 no such table: t2
   INSERT INTO t1 VALUES('ONE');
 ----
 stmt 0 ok
-stmt 37 err 1 -1 no such table: t1
-stmt 69 err 1 -1 no such table: t1
+stmt 37 err 1 -1 69 no such table: t1
+stmt 69 err 1 -1 101 no such table: t1
 ==== 6.1.2
 
   SELECT count(*) FROM t1 WHERE a COLLATE BINARY IN (SELECT DISTINCT a FROM t1)
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 81 no such table: t1
 ==== 6.2.1
 
   CREATE TABLE t3(a, b);
@@ -124,25 +124,25 @@ stmt 0 err 1 -1 no such table: t1
   INSERT INTO t3 VALUES(3, 9);
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: t3
-stmt 56 err 1 -1 no such table: t3
-stmt 87 err 1 -1 no such table: t3
-stmt 118 err 1 -1 no such table: t3
-stmt 149 err 1 -1 no such table: t3
-stmt 180 err 1 -1 no such table: t3
-stmt 211 err 1 -1 no such table: t3
-stmt 242 err 1 -1 no such table: t3
-stmt 273 err 1 -1 no such table: t3
+stmt 25 err 1 -1 56 no such table: t3
+stmt 56 err 1 -1 87 no such table: t3
+stmt 87 err 1 -1 118 no such table: t3
+stmt 118 err 1 -1 149 no such table: t3
+stmt 149 err 1 -1 180 no such table: t3
+stmt 180 err 1 -1 211 no such table: t3
+stmt 211 err 1 -1 242 no such table: t3
+stmt 242 err 1 -1 273 no such table: t3
+stmt 273 err 1 -1 304 no such table: t3
 ==== 6.2.2
 
   SELECT count(*) FROM t3 WHERE b IN (SELECT DISTINCT a FROM t3 LIMIT 5);
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 74 no such table: t3
 ==== 6.2.3
 
   SELECT count(*) FROM t3 WHERE b IN (SELECT          a FROM t3 LIMIT 5);
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 74 no such table: t3
 ==== 6.3.1
 
   CREATE TABLE x1(a);
@@ -153,9 +153,9 @@ stmt 0 err 1 -1 no such table: t3
 ----
 stmt 0 ok
 stmt 22 ok
-stmt 44 err 1 -1 no such table: x1
-stmt 82 err 1 -1 no such table: x2
-stmt 115 err 1 -1 no such table: x2
+stmt 44 err 1 -1 82 no such table: x1
+stmt 82 err 1 -1 115 no such table: x2
+stmt 115 err 1 -1 189 no such table: x2
 ==== 7.1
 
   CREATE TABLE y1(a, b);
@@ -171,75 +171,75 @@ stmt 115 err 1 -1 no such table: x2
 ----
 stmt 0 ok
 stmt 25 ok
-stmt 47 err 1 -1 no such table: y1
-stmt 87 err 1 -1 no such table: y1
-stmt 126 err 1 -1 no such table: y1
-stmt 167 err 1 -1 no such table: y2
-stmt 200 err 1 -1 no such table: y2
-stmt 232 err 1 -1 no such table: y2
+stmt 47 err 1 -1 87 no such table: y1
+stmt 87 err 1 -1 126 no such table: y1
+stmt 126 err 1 -1 167 no such table: y1
+stmt 167 err 1 -1 200 no such table: y2
+stmt 200 err 1 -1 232 no such table: y2
+stmt 232 err 1 -1 266 no such table: y2
 ==== 7.2.1
 
   SELECT a FROM y1 WHERE b NOT IN (SELECT a FROM y2);
 ----
-stmt 0 err 1 -1 no such table: y1
+stmt 0 err 1 -1 54 no such table: y1
 ==== 7.2.2
 
   SELECT a FROM y1 WHERE b IN (SELECT a FROM y2);
 ----
-stmt 0 err 1 -1 no such table: y1
+stmt 0 err 1 -1 50 no such table: y1
 ==== 7.3.1
 
   CREATE INDEX y2c ON y2(c);
   SELECT a FROM y1 WHERE b NOT IN (SELECT a FROM y2);
 ----
-stmt 0 err 1 -1 no such table: main.y2
-stmt 29 err 1 -1 no such table: y1
+stmt 0 err 1 -1 29 no such table: main.y2
+stmt 29 err 1 -1 83 no such table: y1
 ==== 7.3.2
 
   SELECT a FROM y1 WHERE b IN (SELECT a FROM y2);
 ----
-stmt 0 err 1 -1 no such table: y1
+stmt 0 err 1 -1 50 no such table: y1
 ==== 8.0
 
   CREATE TABLE n1(a INTEGER PRIMARY KEY, b VARCHAR(500));
   CREATE UNIQUE INDEX n1a ON n1(a);
 ----
 stmt 0 ok
-stmt 58 err 1 -1 no such table: main.n1
+stmt 58 err 1 -1 94 no such table: main.n1
 ==== 8.1
 
   SELECT count(*) FROM n1 WHERE a IN (1, 2, 3)
 ----
-stmt 0 err 1 -1 no such table: n1
+stmt 0 err 1 -1 48 no such table: n1
 ==== 8.2
 
   SELECT count(*) FROM n1 WHERE a IN (SELECT +a FROM n1)
 ----
-stmt 0 err 1 -1 no such table: n1
+stmt 0 err 1 -1 58 no such table: n1
 ==== 8.3
 
   INSERT INTO n1 VALUES(1, NULL), (2, NULL), (3, NULL);
   SELECT count(*) FROM n1 WHERE a IN (1, 2, 3)
 ----
-stmt 0 err 1 -1 no such table: n1
-stmt 56 err 1 -1 no such table: n1
+stmt 0 err 1 -1 56 no such table: n1
+stmt 56 err 1 -1 104 no such table: n1
 ==== 8.4
 
   SELECT count(*) FROM n1 WHERE a IN (SELECT +a FROM n1)
 ----
-stmt 0 err 1 -1 no such table: n1
+stmt 0 err 1 -1 58 no such table: n1
 ==== 9.0
 
   CREATE TABLE t9(a INTEGER PRIMARY KEY);
   INSERT INTO t9 VALUES (44), (45);
 ----
 stmt 0 ok
-stmt 42 err 1 -1 no such table: t9
+stmt 42 err 1 -1 78 no such table: t9
 ==== 9.1
 
   SELECT * FROM t9 WHERE a IN (44, 45, 44, 45)
 ----
-stmt 0 err 1 -1 no such table: t9
+stmt 0 err 1 -1 48 no such table: t9
 ==== 9.0.dup1
 
   CREATE TABLE t0(c0);
@@ -248,17 +248,17 @@ stmt 0 err 1 -1 no such table: t9
 ----
 stmt 0 ok
 stmt 23 ok
-stmt 92 err 1 -1 no such table: t0
+stmt 92 err 1 -1 128 no such table: t0
 ==== 9.1.dup1
 
   SELECT lower('1e500') FROM t0 WHERE rowid NOT IN (0, 0, lower('1e500'));
 ----
-stmt 0 err 1 -1 no such table: t0
+stmt 0 err 1 -1 75 no such table: t0
 ==== 9.2
 
   SELECT lower('1e500') FROM t0 WHERE rowid != lower('1e500');
 ----
-stmt 0 err 1 -1 no such table: t0
+stmt 0 err 1 -1 63 no such table: t0
 ==== 10.0
 
   CREATE TABLE t1(a, b TEXT COLLATE NOCASE);
@@ -266,20 +266,20 @@ stmt 0 err 1 -1 no such table: t0
   INSERT INTO t1 VALUES('ghi', 'jkl');
 ----
 stmt 0 ok
-stmt 45 err 1 -1 no such table: t1
-stmt 84 err 1 -1 no such table: t1
+stmt 45 err 1 -1 84 no such table: t1
+stmt 84 err 1 -1 123 no such table: t1
 ==== 10.1
 
   SELECT rowid FROM t1 WHERE (a, b) IN ( VALUES('abc', 'def'), ('ghi', 'JKL') );
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 81 no such table: t1
 ==== 10.2
 
   CREATE INDEX i1 ON t1(a, b COLLATE BINARY);
 ----
-stmt 0 err 1 -1 no such table: main.t1
+stmt 0 err 1 -1 46 no such table: main.t1
 ==== 10.3
 
   SELECT rowid FROM t1 WHERE (a, b) IN ( VALUES('abc', 'def'), ('ghi', 'JKL') );
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 81 no such table: t1

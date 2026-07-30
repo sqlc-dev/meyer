@@ -1,0 +1,23 @@
+==== softheap1-1.0
+PRAGMA soft_heap_limit
+----
+stmt 0 ok
+==== softheap1-1.1
+PRAGMA soft_heap_limit=123456; PRAGMA soft_heap_limit;
+----
+stmt 0 ok
+stmt 30 ok
+==== softheap1-1.3
+PRAGMA soft_heap_limit(-1); PRAGMA soft_heap_limit;
+----
+stmt 0 ok
+stmt 27 ok
+==== softheap1-1.4
+PRAGMA soft_heap_limit(0); PRAGMA soft_heap_limit;
+----
+stmt 0 ok
+stmt 26 ok
+==== softheap1-2.0
+PRAGMA soft_heap_limit
+----
+stmt 0 ok

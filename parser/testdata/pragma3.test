@@ -1,0 +1,84 @@
+==== pragma3-100
+
+  PRAGMA data_version;
+----
+stmt 0 ok
+==== pragma3-101
+
+  PRAGMA temp.data_version;
+----
+stmt 0 ok
+==== pragma3-102
+
+  PRAGMA main.data_version=1234;
+  PRAGMA main.data_version;
+----
+stmt 0 ok
+stmt 33 ok
+==== pragma3-110
+
+  PRAGMA data_version;
+  BEGIN IMMEDIATE;
+  PRAGMA data_version;
+  CREATE TABLE t1(a);
+  INSERT INTO t1 VALUES(100),(200),(300);
+  PRAGMA data_version;
+  COMMIT;
+  SELECT * FROM t1;
+  PRAGMA data_version;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 42 ok
+stmt 65 ok
+stmt 87 err 1 -1 129 no such table: t1
+stmt 129 ok
+stmt 152 ok
+stmt 162 err 1 -1 182 no such table: t1
+stmt 182 ok
+==== pragma3-130
+
+  PRAGMA data_version;
+  BEGIN IMMEDIATE;
+  PRAGMA data_version;
+  INSERT INTO t1 VALUES(400),(500);
+  PRAGMA data_version;
+  COMMIT;
+  SELECT * FROM t1;
+  PRAGMA data_version;
+  PRAGMA shrink_memory;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 42 ok
+stmt 65 err 1 -1 101 no such table: t1
+stmt 101 ok
+stmt 124 ok
+stmt 134 err 1 -1 154 no such table: t1
+stmt 154 ok
+stmt 177 ok
+==== pragma3-150
+
+  SELECT * FROM t1;
+  PRAGMA data_version;
+----
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 ok
+==== pragma3-generated
+
+    CREATE TABLE t1(x, y);
+    INSERT INTO t1 VALUES(1, 2);
+    PRAGMA data_version;
+----
+stmt 0 ok
+stmt 27 err 1 -1 60 no such table: t1
+stmt 60 ok
+==== pragma3-generated.dup1
+
+    BEGIN EXCLUSIVE;
+    COMMIT;
+    PRAGMA data_version;
+----
+stmt 0 ok
+stmt 21 ok
+stmt 33 ok

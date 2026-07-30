@@ -1,0 +1,35 @@
+==== 3.1
+
+  PRAGMA cache_size = 10;
+  CREATE TABLE t3(a INTEGER PRIMARY KEY, b);
+  CREATE TABLE t4(a);
+----
+stmt 0 ok
+stmt 26 ok
+stmt 71 ok
+==== 3.2
+
+  INSERT INTO t3 VALUES(NULL, randomblob(500));
+  INSERT INTO t3 SELECT NULL, b||b FROM t3;     -- 2
+  INSERT INTO t3 SELECT NULL, b||b FROM t3;     -- 4
+  INSERT INTO t3 SELECT NULL, b||b FROM t3;     -- 8
+  INSERT INTO t3 SELECT NULL, b||b FROM t3;     -- 16
+  INSERT INTO t3 SELECT NULL, b||b FROM t3;     -- 32
+  INSERT INTO t3 SELECT NULL, b||b FROM t3;     -- 64
+  INSERT INTO t3 SELECT NULL, b||b FROM t3;     -- 128
+----
+stmt 0 err 1 -1 48 no such table: t3
+stmt 48 err 1 -1 92 no such table: t3
+stmt 92 err 1 -1 145 no such table: t3
+stmt 145 err 1 -1 198 no such table: t3
+stmt 198 err 1 -1 251 no such table: t3
+stmt 251 err 1 -1 305 no such table: t3
+stmt 305 err 1 -1 359 no such table: t3
+stmt 359 err 1 -1 413 no such table: t3
+==== 3.3
+
+  BEGIN;
+    INSERT INTO t4 VALUES('xyz');
+----
+stmt 0 ok
+stmt 9 err 1 -1 43 no such table: t4

@@ -1,0 +1,65 @@
+==== 3.1
+
+    WITH contents(name,mtime,data) AS (
+        VALUES('a.txt', 1000000, 'contents of a.txt') UNION ALL
+        VALUES('b.txt', 1000000, 'contents of b.txt')
+    ) SELECT quote( zipfile(name,NULL,mtime,data) ) FROM contents;
+----
+stmt 0 err 1 179 225 no such function: zipfile
+==== 6.0
+
+  CREATE VIRTUAL TABLE temp.zip USING zipfile('test.zip'); 
+  INSERT INTO temp.zip (name,data) VALUES ('test1','test'); 
+  INSERT INTO temp.zip (name,data) VALUES ('test2','test');
+----
+stmt 0 ok
+stmt 59 err 1 -1 120 no such table: temp.zip
+stmt 120 err 1 -1 181 no such table: temp.zip
+==== 6.1
+
+  UPDATE temp.zip SET name='test1' WHERE name='test2'
+----
+stmt 0 err 1 -1 55 no such table: temp.zip
+==== 6.2
+
+  DROP TABLE zip;
+  CREATE VIRTUAL TABLE temp.zip USING zipfile('test.zip'); 
+  INSERT INTO temp.zip (name,data) VALUES ('test','test'); 
+  UPDATE  temp.zip set name=name||'new' where name='test'; 
+  INSERT INTO temp.zip (name,data) VALUES ('test','test'); 
+  UPDATE  temp.zip set name=name||'new' where name='test';
+----
+stmt 0 err 1 -1 18 no such table: zip
+stmt 18 ok
+stmt 77 err 1 -1 137 no such table: temp.zip
+stmt 137 err 1 -1 197 no such table: temp.zip
+stmt 197 err 1 -1 257 no such table: temp.zip
+stmt 257 err 1 -1 317 no such table: temp.zip
+==== 6.3
+
+  INSERT INTO temp.zip (name,data) VALUES ('test1','test'); 
+  INSERT INTO temp.zip (name,data) VALUES ('test2','test'); 
+  UPDATE OR REPLACE zip SET name='test2' WHERE name='test1';
+  SELECT name FROM zip;
+----
+stmt 0 err 1 -1 60 no such table: temp.zip
+stmt 60 err 1 -1 121 no such table: temp.zip
+stmt 121 err 1 -1 183 no such table: zip
+stmt 183 err 1 -1 207 no such table: zip
+==== 7.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE VIRTUAL TABLE t1 USING zipfile('test.zip');
+----
+stmt 0 ok
+stmt 27 ok
+==== 7.1
+
+  SELECT length(name) FROM t1;
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== 8.0
+
+    SELECT name,sz FROM zipfile(readfile('test.zip'));
+----
+stmt 0 err 1 -1 55 no such table: zipfile

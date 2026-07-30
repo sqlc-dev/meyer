@@ -1,0 +1,34 @@
+==== 1.0
+
+  CREATE TABLE t1(id int, value text);
+  CREATE TABLE t2(ctx int, id int, value text); 
+
+  INSERT INTO t1 VALUES(1,'try');
+  INSERT INTO t2 VALUES(1,1,'good');
+  INSERT INTO t2 VALUES(2,2,'evil');
+
+  CREATE VIRTUAL TABLE vt1 USING tcl(vtab_command t1);
+  CREATE VIRTUAL TABLE vt2 USING tcl(vtab_command t2);
+----
+stmt 0 ok
+stmt 39 ok
+stmt 87 err 1 -1 123 no such table: t1
+stmt 123 err 1 -1 160 no such table: t2
+stmt 160 err 1 -1 197 no such table: t2
+stmt 197 ok
+stmt 253 ok
+==== 1.1
+
+  select * from t2 left join t1 on t1.id=t2.ctx where t1.value is null;
+----
+stmt 0 err 1 -1 72 no such table: t2
+==== 1.2
+
+  select * from vt2 left join vt1 on vt1.id=vt2.ctx where vt1.value is null;
+----
+stmt 0 err 1 -1 77 no such table: vt2
+==== 1.4
+
+  select * from t2 left join vt1 on vt1.id=t2.ctx where vt1.value = 3
+----
+stmt 0 err 1 -1 71 no such table: t2

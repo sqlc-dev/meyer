@@ -1,0 +1,8 @@
+==== lock3-3.3
+END TRANSACTION
+----
+stmt 0 ok
+==== lock3-4.3
+END TRANSACTION
+----
+stmt 0 ok

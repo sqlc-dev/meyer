@@ -1,0 +1,5760 @@
+==== joinB-1
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-2
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-3
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-4
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-5
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-6
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinB-7
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-8
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 185 no such table: t1
+==== joinB-9
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-10
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-11
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-12
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-13
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-14
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-15
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-16
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-17
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-18
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-19
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-20
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-21
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-22
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinB-23
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-24
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 185 no such table: t1
+==== joinB-25
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-26
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-27
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-28
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-29
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-30
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-31
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-32
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-33
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-34
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-35
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-36
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-37
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-38
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-39
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-40
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-41
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-42
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-43
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-44
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-45
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-46
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-47
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-48
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-49
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-50
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-51
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-52
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-53
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-54
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-55
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-56
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-57
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-58
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-59
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-60
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-61
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-62
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-63
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-64
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-65
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-66
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-67
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-68
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-69
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-70
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinB-71
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-72
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 185 no such table: t1
+==== joinB-73
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-74
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-75
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-76
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-77
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-78
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-79
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-80
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-81
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-82
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-83
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-84
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-85
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-86
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinB-87
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-88
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 185 no such table: t1
+==== joinB-89
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-90
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-91
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-92
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-93
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-94
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-95
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-96
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-97
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-98
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-99
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-100
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-101
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-102
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-103
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-104
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-105
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-106
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-107
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-108
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-109
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-110
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-111
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-112
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-113
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-114
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-115
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-116
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-117
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-118
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-119
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-120
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-121
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-122
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-123
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-124
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  INNER JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-125
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-126
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  INNER JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-127
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  INNER JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-128
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL INNER JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-129
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-130
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-131
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-132
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-133
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-134
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-135
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-136
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-137
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-138
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-139
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-140
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-141
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-142
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-143
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-144
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-145
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-146
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-147
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-148
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-149
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-150
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-151
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-152
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-153
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-154
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-155
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-156
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-157
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-158
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-159
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-160
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-161
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-162
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-163
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-164
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-165
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-166
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-167
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-168
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-169
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-170
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 181 no such table: t1
+==== joinB-171
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-172
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 172 no such table: t1
+==== joinB-173
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-174
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 197 no such table: t1
+==== joinB-175
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-176
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-177
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-178
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-179
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-180
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-181
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-182
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-183
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-184
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-185
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-186
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 181 no such table: t1
+==== joinB-187
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-188
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 172 no such table: t1
+==== joinB-189
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-190
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 197 no such table: t1
+==== joinB-191
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-192
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-193
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-194
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-195
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-196
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-197
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-198
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-199
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-200
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-201
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-202
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-203
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-204
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-205
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-206
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-207
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-208
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-209
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-210
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-211
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-212
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-213
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-214
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-215
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-216
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-217
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-218
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-219
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-220
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-221
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-222
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-223
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-224
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-225
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-226
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-227
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-228
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-229
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-230
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-231
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-232
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-233
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-234
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 181 no such table: t1
+==== joinB-235
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-236
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 172 no such table: t1
+==== joinB-237
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-238
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 197 no such table: t1
+==== joinB-239
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-240
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-241
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-242
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-243
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-244
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-245
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-246
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-247
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-248
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-249
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-250
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 181 no such table: t1
+==== joinB-251
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-252
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  LEFT JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 172 no such table: t1
+==== joinB-253
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-254
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  LEFT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 197 no such table: t1
+==== joinB-255
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  LEFT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-256
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL LEFT JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-257
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-258
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-259
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-260
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-261
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-262
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinB-263
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-264
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 185 no such table: t1
+==== joinB-265
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-266
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-267
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-268
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-269
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-270
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-271
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-272
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-273
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-274
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-275
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-276
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-277
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-278
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinB-279
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-280
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 185 no such table: t1
+==== joinB-281
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-282
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-283
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-284
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-285
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-286
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-287
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-288
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-289
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-290
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-291
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-292
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-293
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-294
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-295
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-296
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-297
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-298
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-299
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-300
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-301
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-302
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-303
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-304
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-305
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-306
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-307
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-308
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-309
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-310
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-311
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-312
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-313
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-314
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-315
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-316
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-317
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-318
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-319
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-320
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-321
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-322
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-323
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-324
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-325
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-326
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinB-327
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-328
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 185 no such table: t1
+==== joinB-329
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-330
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-331
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-332
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-333
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-334
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-335
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-336
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-337
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-338
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-339
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-340
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-341
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 177 no such table: t1
+==== joinB-342
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 200 no such table: t1
+==== joinB-343
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-344
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 185 no such table: t1
+==== joinB-345
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-346
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-347
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-348
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-349
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-350
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-351
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-352
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-353
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-354
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-355
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-356
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-357
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-358
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-359
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-360
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-361
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-362
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-363
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-364
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-365
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-366
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-367
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-368
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-369
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-370
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-371
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-372
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-373
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-374
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-375
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-376
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-377
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-378
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-379
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-380
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-381
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-382
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  RIGHT JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-383
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  RIGHT JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-384
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL RIGHT JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-385
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-386
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-387
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-388
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-389
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-390
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-391
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-392
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-393
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-394
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-395
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-396
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-397
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-398
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-399
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-400
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-401
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-402
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-403
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-404
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-405
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-406
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-407
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-408
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-409
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-410
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-411
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-412
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 INNER JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-413
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-414
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  INNER JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-415
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  INNER JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-416
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL INNER JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-417
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-418
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-419
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-420
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-421
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-422
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-423
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-424
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-425
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-426
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 181 no such table: t1
+==== joinB-427
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-428
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 172 no such table: t1
+==== joinB-429
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-430
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 197 no such table: t1
+==== joinB-431
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-432
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-433
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-434
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-435
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-436
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-437
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-438
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-439
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-440
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-441
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-442
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 181 no such table: t1
+==== joinB-443
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-444
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 LEFT JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 172 no such table: t1
+==== joinB-445
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-446
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  LEFT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 197 no such table: t1
+==== joinB-447
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  LEFT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-448
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL LEFT JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-449
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-450
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-451
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-452
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-453
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-454
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-455
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-456
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-457
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-458
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-459
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-460
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-461
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-462
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-463
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-464
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-465
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-466
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-467
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-468
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-469
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== joinB-470
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 199 no such table: t1
+==== joinB-471
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-472
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 184 no such table: t1
+==== joinB-473
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-474
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-475
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-476
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 RIGHT JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-477
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-478
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  RIGHT JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-479
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  RIGHT JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-480
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL RIGHT JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-481
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-482
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-483
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-484
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  INNER JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-485
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-486
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  INNER JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-487
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  INNER JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-488
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL INNER JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-489
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-490
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 181 no such table: t1
+==== joinB-491
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-492
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  LEFT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 172 no such table: t1
+==== joinB-493
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-494
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  LEFT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 197 no such table: t1
+==== joinB-495
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  LEFT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-496
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL LEFT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-497
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-498
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1
+==== joinB-499
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-500
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  RIGHT JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-501
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 175 no such table: t1
+==== joinB-502
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  RIGHT JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 198 no such table: t1
+==== joinB-503
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  RIGHT JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-504
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL RIGHT JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 183 no such table: t1
+==== joinB-505
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  INNER JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-506
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  INNER JOIN t5 USING(a,b)
+  WHERE a<>13
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 181 no such table: t1
+==== joinB-507
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  LEFT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-508
+
+  SELECT a, c, d, e, f, g
+  FROM t1
+  FULL JOIN (t2 FULL JOIN t3 USING(a)) USING(a)
+  FULL JOIN (t4 LEFT JOIN t5 USING(a)) USING(a)
+  WHERE a<=18
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 172 no such table: t1
+==== joinB-509
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  RIGHT JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 174 no such table: t1
+==== joinB-510
+
+  SELECT a, b, c, d, e, f, g
+  FROM t1
+  FULL JOIN t2 USING(a,b)
+  FULL JOIN t3 USING(a,b)
+  FULL JOIN t4 USING(a,b)
+  RIGHT JOIN t5 USING(a,b)
+  WHERE d<>33 OR d IS NULL
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 197 no such table: t1
+==== joinB-511
+
+  SELECT a, t1.a, t2.a, t3.a, t4.a, t5.a
+  FROM t1
+  FULL JOIN t2 USING(a)
+  FULL JOIN t3 USING(a)
+  FULL JOIN t4 USING(a)
+  FULL JOIN t5 USING(a)
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 173 no such table: t1
+==== joinB-512
+
+  SELECT b, c, d, e, f, g
+  FROM t1
+  NATURAL FULL JOIN t2
+  NATURAL FULL JOIN t3
+  NATURAL FULL JOIN t4
+  NATURAL FULL JOIN t5
+  WHERE b BETWEEN 12 AND 17
+  ORDER BY 1 NULLS FIRST;
+----
+stmt 0 err 1 -1 182 no such table: t1

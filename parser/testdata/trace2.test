@@ -1,0 +1,9 @@
+==== 2.1
+
+    CREATE VIRTUAL TABLE x1 USING fts4;
+    INSERT INTO x1 VALUES('Cloudy, with a high near 16');
+    INSERT INTO x1 VALUES('Wind chill values as low as -13');
+----
+stmt 0 ok
+stmt 40 err 1 -1 98 no such table: x1
+stmt 98 err 1 -1 160 no such table: x1

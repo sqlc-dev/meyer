@@ -1,0 +1,27 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE fts USING fts3( tags TEXT);
+  INSERT INTO fts (tags) VALUES ('tag1');
+  SELECT * FROM fts WHERE tags MATCH 'tag1';
+----
+stmt 0 ok
+stmt 51 err 1 -1 93 no such table: fts
+stmt 93 err 1 -1 138 no such table: fts
+==== 2.0
+
+  CREATE VIRTUAL TABLE fts USING fts3(tags TEXT);
+  INSERT INTO fts (docid, tags) VALUES (1, 'tag1');
+  INSERT INTO fts (docid, tags) VALUES (2, NULL);
+  INSERT INTO fts (docid, tags) VALUES (3, 'three');
+----
+stmt 0 ok
+stmt 50 err 1 -1 102 no such table: fts
+stmt 102 err 1 -1 152 no such table: fts
+stmt 152 err 1 -1 205 no such table: fts
+==== 2.1
+
+    UPDATE fts SET tags = 'two' WHERE rowid = 2;
+    SELECT * FROM fts WHERE tags MATCH 'two';
+----
+stmt 0 err 1 -1 49 no such table: fts
+stmt 49 err 1 -1 95 no such table: fts

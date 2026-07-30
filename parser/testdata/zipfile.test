@@ -1,0 +1,599 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE temp.zz USING zipfile('test.zip');
+  PRAGMA table_info(zz);
+----
+stmt 0 ok
+stmt 58 ok
+==== 1.1.0.1
+
+  INSERT INTO zz(name, mode, mtime, sz, rawdata, method) 
+  VALUES('f.txt', '-rw-r--r--', 1000000000, 5, 'abcde', 0);
+----
+stmt 0 err 1 -1 118 no such table: zz
+==== 1.1.0.2
+
+  INSERT INTO zz(name, mtime, sz, data, method) 
+  VALUES('g.txt', 1000000002, 5, '12345', 0);
+----
+stmt 0 err 1 -1 95 no such table: zz
+==== 1.1.0.3
+
+  INSERT INTO zz(name, mtime, rawdata, method) 
+  VALUES('g.txt', 1000000002, '12345', 0);
+----
+stmt 0 err 1 -1 91 no such table: zz
+==== 1.1.0.4
+
+  INSERT INTO zz(name, data, method) 
+  VALUES('g.txt', '12345', 7);
+----
+stmt 0 err 1 -1 69 no such table: zz
+==== 1.1.1
+
+  INSERT INTO zz(name, mode, mtime, data, method) 
+  VALUES('f.txt', '-rw-r--r--', 1000000000, 'abcde', 0);
+----
+stmt 0 err 1 -1 108 no such table: zz
+==== 1.1.2
+
+  INSERT INTO zz(name, mode, mtime, data, method) 
+  VALUES('g.txt', NULL, 1000000002, '12345', 0);
+----
+stmt 0 err 1 -1 100 no such table: zz
+==== 1.2
+
+  SELECT name, mtime, data FROM zipfile('test.zip')
+----
+stmt 0 err 1 -1 53 no such table: zipfile
+==== 1.3
+
+  INSERT INTO zz(name, mode, mtime, data) VALUES('h.txt', 
+    '-rw-r--r--', 1000000004, 'aaaaaaaaaabbbbbbbbbb'
+  );
+----
+stmt 0 err 1 -1 117 no such table: zz
+==== 1.4
+
+  SELECT name, mtime, data, method FROM zipfile('test.zip');
+----
+stmt 0 err 1 -1 61 no such table: zipfile
+==== 1.4.2
+
+  SELECT zipfile_cds(mode) FROM zipfile('test.zip');
+----
+stmt 0 err 1 -1 53 no such table: zipfile
+==== 1.5.1
+
+  BEGIN;
+    INSERT INTO zz(name, mode, mtime, data, method)
+    VALUES('i.txt', '-rw-r--r--', 1000000006, 'zxcvb', 0);
+    SELECT name FROM zz;
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 err 1 -1 120 no such table: zz
+stmt 120 err 1 -1 145 no such table: zz
+stmt 145 ok
+==== 1.5.2
+
+  SELECT name FROM zz;
+----
+stmt 0 err 1 -1 23 no such table: zz
+==== 1.5.3
+
+  SELECT data FROM zz WHERE name='i.txt';
+----
+stmt 0 err 1 -1 42 no such table: zz
+==== 1.6.0
+
+  DELETE FROM zz WHERE name='g.txt';
+  SELECT name FROM zz;
+----
+stmt 0 err 1 -1 37 no such table: zz
+stmt 37 err 1 -1 60 no such table: zz
+==== 1.6.1
+
+  SELECT name, mode, mtime, data, method FROM zipfile('test.zip');
+----
+stmt 0 err 1 -1 67 no such table: zipfile
+==== 1.6.2
+
+  UPDATE zz SET mtime=4 WHERE name='i.txt';
+  SELECT name, mode, mtime, data, method FROM zipfile('test.zip');
+----
+stmt 0 err 1 -1 44 no such table: zz
+stmt 44 err 1 -1 111 no such table: zipfile
+==== 1.6.4
+
+  UPDATE zz SET name = 'blue.txt' WHERE name='f.txt';
+  SELECT name, mode, mtime, data, method FROM zipfile('test.zip');
+----
+stmt 0 err 1 -1 54 no such table: zz
+stmt 54 err 1 -1 121 no such table: zipfile
+==== 1.6.5
+
+  UPDATE zz SET data = 'edcba' WHERE name='blue.txt';
+  SELECT name, mode, mtime, data, method FROM zipfile('test.zip');
+----
+stmt 0 err 1 -1 54 no such table: zz
+stmt 54 err 1 -1 121 no such table: zipfile
+==== 1.6.6
+
+  UPDATE zz SET mode=NULL, data = NULL WHERE name='blue.txt';
+  SELECT name, mode, mtime, data, method FROM zipfile('test.zip');
+----
+stmt 0 err 1 -1 62 no such table: zz
+stmt 62 err 1 -1 129 no such table: zipfile
+==== 1.6.7
+
+  UPDATE zz SET data=NULL WHERE name='i.txt'
+----
+stmt 0 err 1 -1 46 no such table: zz
+==== 1.6.8
+
+  SELECT name, mode, mtime, data, method FROM zipfile('test.zip');
+----
+stmt 0 err 1 -1 67 no such table: zipfile
+==== 1.6.9
+
+  UPDATE zz SET data = '' WHERE name='i.txt';
+  SELECT name,mode,mtime,data,method from zipfile('test.zip');
+----
+stmt 0 err 1 -1 46 no such table: zz
+stmt 46 err 1 -1 109 no such table: zipfile
+==== 1.6.10
+
+  SELECT a.name, a.data 
+  FROM zz AS a, zz AS b 
+  WHERE a.name=+b.name AND +a.mode=b.mode
+----
+stmt 0 err 1 -1 93 no such table: zz
+==== 1.6.11
+
+  SELECT name, data FROM zz WHERE name LIKE '%txt'
+----
+stmt 0 err 1 -1 52 no such table: zz
+==== 1.7
+
+  DELETE FROM zz;
+  SELECT * FROM zz;
+----
+stmt 0 err 1 -1 18 no such table: zz
+stmt 18 err 1 -1 38 no such table: zz
+==== 2.1
+
+  CREATE VIRTUAL TABLE zzz USING zipfile('test.zip');
+  INSERT INTO zzz(name, mode) VALUES('dirname', 'drwxr-xr-x');
+  SELECT name, mode, data FROM zzz;
+----
+stmt 0 ok
+stmt 54 err 1 -1 117 no such table: zzz
+stmt 117 err 1 -1 153 no such table: zzz
+==== 2.2
+
+  INSERT INTO zzz(name, data) VALUES('dirname2', NULL);
+  INSERT INTO zzz(name, data) VALUES('dirname2/file1.txt', 'abcdefghijklmnop');
+  SELECT name, mode, data FROM zzz;
+----
+stmt 0 err 1 -1 56 no such table: zzz
+stmt 56 err 1 -1 136 no such table: zzz
+stmt 136 err 1 -1 172 no such table: zzz
+==== 2.3
+
+  UPDATE zzz SET name = 'dirname3' WHERE name = 'dirname/';
+----
+stmt 0 err 1 -1 60 no such table: zzz
+==== 2.4
+
+  SELECT name, mode, data FROM zzz;
+----
+stmt 0 err 1 -1 36 no such table: zzz
+==== 3.0
+
+  CREATE VIRTUAL TABLE temp.x1 USING zipfile('test.zip');
+  INSERT INTO x1(name, data) VALUES('dir1/', NULL);
+  INSERT INTO x1(name, data) VALUES('file1', '1234');
+  INSERT INTO x1(name, data) VALUES('dir1/file2', '5678');
+----
+stmt 0 ok
+stmt 58 err 1 -1 110 no such table: x1
+stmt 110 err 1 -1 164 no such table: x1
+stmt 164 err 1 -1 223 no such table: x1
+==== 3.2
+
+  SELECT rowid FROM x1
+----
+stmt 0 err 1 -1 24 no such table: x1
+==== 4.1
+
+  CREATE VIRTUAL TABLE yyy USING zipfile();
+----
+stmt 0 ok
+==== 4.2
+
+  CREATE VIRTUAL TABLE yyy USING zipfile('test.zip', 'test.zip');
+----
+stmt 0 ok
+==== 4.3
+
+  SELECT * FROM zipfile()
+----
+stmt 0 err 1 -1 27 no such table: zipfile
+==== 4.4
+
+  SELECT * FROM zipfile('/path/that/does/not/exist')
+----
+stmt 0 err 1 -1 54 no such table: zipfile
+==== 4.6
+
+  WITH c(name,data) AS ( SELECT 'a.txt', 'abc')
+  SELECT zipfile(name) FROM c
+----
+stmt 0 err 1 58 79 no such function: zipfile
+==== 4.7
+
+  WITH c(name,data) AS ( 
+    SELECT 'a.txt', 'abc' UNION ALL
+    SELECT NULL, 'def'
+  )
+  SELECT zipfile(name,data) FROM c
+----
+stmt 0 err 1 99 125 no such function: zipfile
+==== 4.8
+
+  WITH c(name,data,method) AS ( 
+    SELECT 'a.txt', 'abc', 0
+    UNION SELECT 'b.txt', 'def', 8
+    UNION SELECT 'c.txt', 'ghi', 16
+  )
+  SELECT zipfile(name,NULL,NULL,data,method) FROM c
+----
+stmt 0 err 1 147 190 no such function: zipfile
+==== 4.9
+
+  WITH c(name,data) AS ( 
+    SELECT 'a.txt', 'abc'
+    UNION SELECT 'b.txt', 'def'
+    UNION SELECT 'c.txt/', 'ghi'
+  )
+  SELECT zipfile(name,NULL,NULL,data) FROM c
+----
+stmt 0 err 1 131 167 no such function: zipfile
+==== 5.0
+
+  WITH c(name,mtime,data) AS (
+    SELECT 'a.txt', 946684800, 'abc'
+  )
+  SELECT name,mtime,data FROM zipfile(
+    ( SELECT rt( zipfile(name,NULL,mtime,data,NULL) ) FROM c )
+  )
+----
+stmt 0 err 1 -1 179 no such table: zipfile
+==== 6.1
+
+    SELECT name, mtime, data FROM zipfile('test1.zip')
+----
+stmt 0 err 1 -1 56 no such table: zipfile
+==== 6.3
+
+    SELECT name, mtime, sz, rawdata, data FROM zipfile('test2.zip')
+----
+stmt 0 err 1 -1 69 no such table: zipfile
+==== 8.0.1
+
+  CREATE VIRTUAL TABLE zz USING zipfile('test.zip');
+  BEGIN;
+    INSERT INTO zz(name, data) VALUES('a.txt', '1');
+    INSERT INTO zz(name, data) VALUES('b.txt', '2');
+    INSERT INTO zz(name, data) VALUES('c.txt', '1');
+    INSERT INTO zz(name, data) VALUES('d.txt', '2');
+    SELECT name, data FROM zz;
+----
+stmt 0 ok
+stmt 53 ok
+stmt 62 err 1 -1 115 no such table: zz
+stmt 115 err 1 -1 168 no such table: zz
+stmt 168 err 1 -1 221 no such table: zz
+stmt 221 err 1 -1 274 no such table: zz
+stmt 274 err 1 -1 305 no such table: zz
+==== 8.1.1
+
+  CREATE VIRTUAL TABLE nogood USING zipfile('test_unzip');
+----
+stmt 0 ok
+==== 8.1.2
+
+  INSERT INTO nogood(name, data) VALUES('abc', 'def');
+----
+stmt 0 err 1 -1 55 no such table: nogood
+==== 8.2.1
+
+  DROP TABLE nogood;
+  BEGIN;
+    CREATE VIRTUAL TABLE nogood USING zipfile('test_unzip');
+----
+stmt 0 err 1 -1 21 no such table: nogood
+stmt 21 ok
+stmt 30 ok
+==== 8.2.2
+
+    INSERT INTO nogood(name, data) VALUES('abc', 'def');
+----
+stmt 0 err 1 -1 57 no such table: nogood
+==== 8.2.3
+
+  COMMIT;
+----
+stmt 0 ok
+==== 8.3.1
+
+  BEGIN;
+    CREATE VIRTUAL TABLE ok USING zipfile('test.zip');
+    INSERT INTO ok(name, data) VALUES ('sqlite3', 'elf');
+  COMMIT;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 64 err 1 -1 122 no such table: ok
+stmt 122 ok
+==== 9.0
+
+  WITH src(nm) AS (
+    VALUES('dir1') UNION ALL
+    VALUES('dir2/') UNION ALL
+    VALUES('dir3//') UNION ALL
+    VALUES('dir4///') UNION ALL
+    VALUES('/') 
+  )
+  SELECT name FROM zipfile((SELECT zipfile(nm, NULL) FROM src))
+----
+stmt 0 err 1 -1 228 no such table: zipfile
+==== 10.0
+
+  CREATE VIRTUAL TABLE z USING zipfile('test.zip');
+----
+stmt 0 ok
+==== 10.1
+
+  INSERT INTO z(name,data) VALUES('a0','one'),('a0','two');
+----
+stmt 0 err 1 -1 60 no such table: z
+==== 10.2
+
+  SELECT name, data FROM z;
+----
+stmt 0 err 1 -1 28 no such table: z
+==== 10.3
+
+  REPLACE INTO z(name,data) VALUES('a0','three'),('a0','four');
+----
+stmt 0 err 1 -1 64 no such table: z
+==== 10.4
+
+  SELECT name, data FROM z;
+----
+stmt 0 err 1 -1 28 no such table: z
+==== 10.5
+
+  INSERT OR IGNORE INTO z(name,data) VALUES('a0','five'),('a0','six');
+----
+stmt 0 err 1 -1 71 no such table: z
+==== 10.6
+
+  SELECT name, data FROM z;
+----
+stmt 0 err 1 -1 28 no such table: z
+==== 11.1
+
+  DELETE FROM z;
+----
+stmt 0 err 1 -1 17 no such table: z
+==== 11.2
+
+  SELECT name, data FROM z;
+----
+stmt 0 err 1 -1 28 no such table: z
+==== 11.3
+
+  INSERT INTO z (name,data) VALUES ('b0','one');
+  SELECT name, data FROM z;
+----
+stmt 0 err 1 -1 49 no such table: z
+stmt 49 err 1 -1 77 no such table: z
+==== 11.4
+
+  UPDATE z SET name = 'b1' WHERE name = 'b0';
+  SELECT name, data FROM z;
+----
+stmt 0 err 1 -1 46 no such table: z
+stmt 46 err 1 -1 74 no such table: z
+==== 11.5
+
+  INSERT INTO z (name,data) VALUES ('b0','one');
+  SELECT name, data FROM z ORDER BY name;
+----
+stmt 0 err 1 -1 49 no such table: z
+stmt 49 err 1 -1 91 no such table: z
+==== 11.6
+
+  UPDATE z SET name = 'b1' WHERE name = 'b0';
+----
+stmt 0 err 1 -1 46 no such table: z
+==== 11.7
+
+  UPDATE z SET data = 'two' WHERE name = 'b0';
+  SELECT name, data FROM z ORDER BY name;
+----
+stmt 0 err 1 -1 47 no such table: z
+stmt 47 err 1 -1 89 no such table: z
+==== 11.8
+
+  UPDATE z SET name = 'b1';
+----
+stmt 0 err 1 -1 28 no such table: z
+==== 11.9
+
+  UPDATE z SET name = 'b2';
+----
+stmt 0 err 1 -1 28 no such table: z
+==== 11.10
+
+  UPDATE z SET name = name;
+  SELECT name, data FROM z ORDER BY name;
+----
+stmt 0 err 1 -1 28 no such table: z
+stmt 28 err 1 -1 70 no such table: z
+==== 11.11
+
+  UPDATE z SET name = name || 'suffix';
+  SELECT name, data FROM z ORDER BY name;
+----
+stmt 0 err 1 -1 40 no such table: z
+stmt 40 err 1 -1 82 no such table: z
+==== 12.1
+
+    SELECT name FROM fsdir('subdir') ORDER BY 1;
+----
+stmt 0 err 1 -1 49 no such table: fsdir
+==== 12.2
+
+    CREATE TABLE d AS SELECT 'subdir' d;
+    CREATE TABLE x AS SELECT 1 x;
+----
+stmt 0 ok
+stmt 41 ok
+==== 12.4
+
+    SELECT name FROM d JOIN x JOIN fsdir(d) ORDER BY 1;
+----
+stmt 0 err 1 -1 56 no such table: d
+==== 12.5
+
+    SELECT name FROM d JOIN x JOIN fsdir('.', d) ORDER BY 1;
+----
+stmt 0 err 1 -1 61 no such table: d
+==== 13.10
+
+  DROP TABLE IF EXISTS t0;
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t0(a,b,c,d,e,f,g);
+  REPLACE INTO t0(c,b,f) VALUES(10,10,10);
+  CREATE VIRTUAL TABLE t1 USING zipfile('h.zip');
+  REPLACE INTO t1 SELECT * FROM t0;
+  SELECT quote(name),quote(mode),quote(mtime),quote(sz),quote(rawdata),
+         quote(data),quote(method) FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 88 err 1 -1 131 no such table: t0
+stmt 131 ok
+stmt 181 err 1 -1 217 no such table: t1
+stmt 217 err 1 -1 333 no such table: t1
+==== 14.10
+
+  DROP TABLE t1;
+  CREATE TABLE t1(x char);
+  INSERT INTO t1(x) VALUES('1');
+  INSERT INTO t1(x) SELECT zipfile(x, 'xyz') FROM t1;
+  INSERT INTO t1(x) SELECT zipfile(x, 'uvw') FROM t1;
+  SELECT count(*) FROM t1;
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 44 err 1 -1 77 no such table: t1
+stmt 77 err 1 -1 131 no such table: t1
+stmt 131 err 1 -1 185 no such table: t1
+stmt 185 err 1 -1 212 no such table: t1
+stmt 212 ok
+==== 15.10
+
+  DROP TABLE IF EXISTS t1;
+  CREATE VIRTUAL TABLE t1 USING zipfile(null);
+  REPLACE INTO t1 VALUES(null,null,0,null,null,null,null);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 74 err 1 -1 133 no such table: t1
+==== 15.20
+
+  DROP TABLE IF EXISTS t2;
+  CREATE VIRTUAL TABLE t2 USING zipfile(null);
+  REPLACE INTO t2 values(null,null,null,null,null,10,null);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 74 err 1 -1 134 no such table: t2
+==== 16.10
+
+  DELETE FROM zipfile;
+----
+stmt 0 err 1 -1 23 no such table: zipfile
+==== 16.20
+
+  REPLACE INTO zipfile VALUES(null,null,null,null,null,123,null);
+----
+stmt 0 err 1 -1 66 no such table: zipfile
+==== 17.1
+
+  WITH vlist(x) AS (
+     VALUES(9223372036854775807),
+           (-9223372036854775808),
+           (9223372036854775806),
+           (-9223372036854775807)
+  )
+  SELECT DISTINCT typeof(zipfile(0,0,x,0)) FROM vlist;
+----
+stmt 0 err 1 188 217 no such function: zipfile
+==== 18.1
+
+  SELECT * FROM zipfile(NULL);
+----
+stmt 0 err 1 -1 31 no such table: zipfile
+==== 20.0
+
+  SELECT * FROM zipfile(X'504b050600000000010001004000000000a3e1110000');
+----
+stmt 0 err 1 -1 74 no such table: zipfile
+==== 20.1
+
+  SELECT * FROM zipfile(unhex('
+504b0304140000080000a60d3e5bd42728f602000000020000000500090068
+2e74787455540500012836db682120504b01021e03140000080000a60d3e5b
+d42728f602000000020000000500ffff0000000000000000a4810000000068
+2e74787455540500012836db68504b050600000000010001003c0000002e00
+00000000',char(0x0a,0x0d)));
+----
+stmt 0 err 1 -1 313 no such table: zipfile
+==== 20.2
+
+  SELECT * FROM zipfile(unhex('504b0304140000000000000000008b9ed9d30100000001000000010000007841504b01021e03140000000000000000008b9ed9d3010000000100000001001e000000000000000000a4810000000078504b050600000000010001002f000000200000000000'));
+----
+stmt 0 err 1 -1 238 no such table: zipfile
+==== 21.0
+
+  SELECT * FROM zipfile(X'504B03040A0000000000000000000000000000000000000000000100000078504B010200000A0000000000000000000000000000000000000000000100000000000000000000000000E2FFFFFF78504B050600000000010001002F0000001F0000000000');
+----
+stmt 0 err 1 -1 230 no such table: zipfile
+==== 23.0
+
+    SELECT length(zipfile(name,0,0,data,0)) FROM (
+        SELECT 'a' AS name, zeroblob(1000000000) AS data
+        UNION ALL SELECT 'b', zeroblob(1200000000)
+    );
+----
+stmt 0 err 1 19 166 no such function: zipfile
+==== 25.0
+
+  WITH t(v) AS (
+    SELECT unhex(
+     '504B03041400000000000000000000000000000000000000000001000000
+      61504B01021E031400000000000000000000000000000000000000000001
+      000000000000000000000000000000000061504B05060000000001000100
+      2F0000001F0000000000',char(10,13,32))
+    UNION ALL SELECT 'x'
+  ) SELECT z.name FROM t, zipfile(t.v) AS z;
+----
+stmt 0 err 1 -1 350 no such table: zipfile

@@ -1,0 +1,395 @@
+==== 1.1
+
+  CREATE TABLE t(i,j,k,m,n);
+  CREATE INDEX ijk ON t(i,j,k);
+  CREATE INDEX jmn ON t(j,m,n);
+
+  INSERT INTO t VALUES(3, 3, 'three', 3, 'tres');
+  INSERT INTO t VALUES(2, 2, 'two', 2, 'dos');
+  INSERT INTO t VALUES(1, 1, 'one', 1, 'uno');
+  INSERT INTO t VALUES(4, 4, 'four', 4, 'cuatro');
+----
+stmt 0 ok
+stmt 29 err 1 -1 61 no such table: main.t
+stmt 61 err 1 -1 93 no such table: main.t
+stmt 93 err 1 -1 144 no such table: t
+stmt 144 err 1 -1 191 no such table: t
+stmt 191 err 1 -1 238 no such table: t
+stmt 238 err 1 -1 289 no such table: t
+==== 1.2
+
+  SELECT k FROM t WHERE (i=1 AND j=1) OR (i=2 AND j=2);
+----
+stmt 0 err 1 -1 56 no such table: t
+==== 1.3
+
+  SELECT k FROM t WHERE (i=1 AND j=1) OR (+i=2 AND j=2);
+----
+stmt 0 err 1 -1 57 no such table: t
+==== 1.4
+
+  SELECT n FROM t WHERE (i=1 AND j=1) OR (i=2 AND j=2);
+----
+stmt 0 err 1 -1 56 no such table: t
+==== 1.5
+
+  SELECT k, n FROM t WHERE (i=1 AND j=1) OR (i=2 AND j=2);
+----
+stmt 0 err 1 -1 59 no such table: t
+==== 1.6
+
+  SELECT k FROM t WHERE (i=1 AND j=1) OR (i=2 AND j=2) OR (i=3 AND j=3);
+----
+stmt 0 err 1 -1 73 no such table: t
+==== 1.7
+
+  SELECT n FROM t WHERE (i=1 AND j=1) OR (i=2 AND j=2) OR (i=3 AND j=3);
+----
+stmt 0 err 1 -1 73 no such table: t
+==== 1.8
+
+  SELECT k FROM t WHERE (i=1 AND j=1) OR (j=2 AND m=2);
+----
+stmt 0 err 1 -1 56 no such table: t
+==== 1.9
+
+  SELECT k FROM t WHERE (i=1 AND j=1) OR (i=2 AND j=2) OR (j=3 AND m=3);
+----
+stmt 0 err 1 -1 73 no such table: t
+==== 1.10
+
+  SELECT n FROM t WHERE (i=1 AND j=1) OR (i=2 AND j=2) OR (j=3 AND m=3);
+----
+stmt 0 err 1 -1 73 no such table: t
+==== 1.11
+
+  SELECT k FROM t WHERE (i=1 AND j=1) OR (j=2 AND m=2) OR (i=3 AND j=3);
+----
+stmt 0 err 1 -1 73 no such table: t
+==== 1.12
+
+  SELECT n FROM t WHERE (i=1 AND j=1) OR (j=2 AND m=2) OR (i=3 AND j=3);
+----
+stmt 0 err 1 -1 73 no such table: t
+==== 1.13
+
+  SELECT k FROM t WHERE (j=1 AND m=1) OR (i=2 AND j=2) OR (i=3 AND j=3);
+----
+stmt 0 err 1 -1 73 no such table: t
+==== 1.14
+
+  SELECT k FROM t WHERE (i=1 AND j=1) OR (j=2 AND i=2) OR (i=3 AND j=3);
+----
+stmt 0 err 1 -1 73 no such table: t
+==== 1.15
+
+  SELECT k FROM t WHERE (i=1 AND j=2) OR (i=2 AND j=1) OR (i=3 AND j=4);
+----
+stmt 0 err 1 -1 73 no such table: t
+==== 1.16
+
+  SELECT k FROM t WHERE (i=1 AND (j=1 or j=2)) OR (i=3 AND j=3);
+----
+stmt 0 err 1 -1 65 no such table: t
+==== 2.0
+
+  CREATE TABLE t1(a,b,c,d);
+  CREATE INDEX t1b ON t1(b);
+  CREATE INDEX t1c ON t1(c);
+  CREATE INDEX t1d ON t1(d);
+  CREATE TABLE t2(x,y);
+  CREATE INDEX t2y ON t2(y);
+  
+  INSERT INTO t1 VALUES(1,2,3,4);
+  INSERT INTO t1 VALUES(5,6,7,8);
+  INSERT INTO t2 VALUES(1,2);
+  INSERT INTO t2 VALUES(2,7);
+  INSERT INTO t2 VALUES(3,4);
+----
+stmt 0 ok
+stmt 28 err 1 -1 57 no such table: main.t1
+stmt 57 err 1 -1 86 no such table: main.t1
+stmt 86 err 1 -1 115 no such table: main.t1
+stmt 115 ok
+stmt 139 err 1 -1 168 no such table: main.t2
+stmt 168 err 1 -1 205 no such table: t1
+stmt 205 err 1 -1 239 no such table: t1
+stmt 239 err 1 -1 269 no such table: t2
+stmt 269 err 1 -1 299 no such table: t2
+stmt 299 err 1 -1 329 no such table: t2
+==== 2.1
+
+  SELECT a, x FROM t1 JOIN t2 ON +y=d OR x=7 ORDER BY a, x;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== 2.2
+
+  SELECT a, x FROM t1 JOIN t2 ON y=d OR x=7 ORDER BY a, x;
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== 3.0
+
+  CREATE TABLE t3(a, b, c);
+  CREATE UNIQUE INDEX i3 ON t3(a, b);
+  INSERT INTO t3 VALUES(1, 'one', 'i');
+  INSERT INTO t3 VALUES(3, 'three', 'iii');
+  INSERT INTO t3 VALUES(6, 'six', 'vi');
+  INSERT INTO t3 VALUES(2, 'two', 'ii');
+  INSERT INTO t3 VALUES(4, 'four', 'iv');
+  INSERT INTO t3 VALUES(5, 'five', 'v');
+
+  CREATE TABLE t4(x PRIMARY KEY, y);
+  INSERT INTO t4 VALUES('a', 'one');
+  INSERT INTO t4 VALUES('b', 'two');
+----
+stmt 0 ok
+stmt 28 err 1 -1 66 no such table: main.t3
+stmt 66 err 1 -1 106 no such table: t3
+stmt 106 err 1 -1 150 no such table: t3
+stmt 150 err 1 -1 191 no such table: t3
+stmt 191 err 1 -1 232 no such table: t3
+stmt 232 err 1 -1 274 no such table: t3
+stmt 274 err 1 -1 315 no such table: t3
+stmt 315 ok
+stmt 353 err 1 -1 390 no such table: t4
+stmt 390 err 1 -1 427 no such table: t4
+==== 4.4
+
+  CREATE TABLE t44(a INTEGER, b INTEGER);
+  INSERT INTO t44 VALUES(1,2);
+  INSERT INTO t44 VALUES(3,4);
+  SELECT *
+    FROM t44 AS x
+       LEFT JOIN (SELECT a AS c, b AS d FROM t44) AS y ON a=c
+   WHERE d=4 OR d IS NULL;
+----
+stmt 0 ok
+stmt 42 err 1 -1 73 no such table: t44
+stmt 73 err 1 -1 104 no such table: t44
+stmt 104 err 1 -1 222 no such table: t44
+==== 4.5
+
+  SELECT *
+    FROM t44 AS x
+       LEFT JOIN (SELECT a AS c, b AS d FROM t44) AS y ON a=c
+   WHERE d=4 OR d IS NULL
+   ORDER BY a;
+----
+stmt 0 err 1 -1 132 no such table: t44
+==== 4.6
+
+  CREATE TABLE t46(c INTEGER, d INTEGER);
+  INSERT INTO t46 SELECT a, b FROM t44;
+  SELECT * FROM t44 LEFT JOIN t46 ON a=c
+   WHERE d=4 OR d IS NULL;
+----
+stmt 0 ok
+stmt 42 err 1 -1 82 no such table: t46
+stmt 82 err 1 -1 150 no such table: t44
+==== 4.7
+
+  SELECT * FROM t44 LEFT JOIN t46 ON a=c
+   WHERE d=4 OR d IS NULL
+   ORDER BY a;
+----
+stmt 0 err 1 -1 82 no such table: t44
+==== 5.1
+
+  DROP TABLE IF EXISTS t;
+  CREATE TABLE t(c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17);
+  CREATE INDEX tc0 ON t(c0);
+  CREATE INDEX tc1 ON t(c1);
+  CREATE INDEX tc2 ON t(c2);
+  CREATE INDEX tc3 ON t(c3);
+  CREATE INDEX tc4 ON t(c4);
+  CREATE INDEX tc5 ON t(c5);
+  CREATE INDEX tc6 ON t(c6);
+  CREATE INDEX tc7 ON t(c7);
+  CREATE INDEX tc8 ON t(c8);
+  CREATE INDEX tc9 ON t(c9);
+  CREATE INDEX tc10 ON t(c10);
+  CREATE INDEX tc11 ON t(c11);
+  CREATE INDEX tc12 ON t(c12);
+  CREATE INDEX tc13 ON t(c13);
+  CREATE INDEX tc14 ON t(c14);
+  CREATE INDEX tc15 ON t(c15);
+  CREATE INDEX tc16 ON t(c16);
+  CREATE INDEX tc17 ON t(c17);
+  
+  INSERT INTO t(c0, c16) VALUES (1,1);
+  
+  SELECT * FROM t WHERE
+    c0=1 or  c1=1 or  c2=1 or  c3=1 or
+    c4=1 or  c5=1 or  c6=1 or  c7=1 or
+    c8=1 or  c9=1 or c10=1 or c11=1 or
+    c12=1 or c13=1 or c14=1 or c15=1 or
+    c16=1 or c17=1;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 107 err 1 -1 136 no such table: main.t
+stmt 136 err 1 -1 165 no such table: main.t
+stmt 165 err 1 -1 194 no such table: main.t
+stmt 194 err 1 -1 223 no such table: main.t
+stmt 223 err 1 -1 252 no such table: main.t
+stmt 252 err 1 -1 281 no such table: main.t
+stmt 281 err 1 -1 310 no such table: main.t
+stmt 310 err 1 -1 339 no such table: main.t
+stmt 339 err 1 -1 368 no such table: main.t
+stmt 368 err 1 -1 397 no such table: main.t
+stmt 397 err 1 -1 428 no such table: main.t
+stmt 428 err 1 -1 459 no such table: main.t
+stmt 459 err 1 -1 490 no such table: main.t
+stmt 490 err 1 -1 521 no such table: main.t
+stmt 521 err 1 -1 552 no such table: main.t
+stmt 552 err 1 -1 583 no such table: main.t
+stmt 583 err 1 -1 614 no such table: main.t
+stmt 614 err 1 -1 645 no such table: main.t
+stmt 645 err 1 -1 687 no such table: t
+stmt 687 err 1 -1 891 no such table: t
+==== 5.2
+
+  DELETE FROM t;
+  INSERT INTO t(c0,c17) VALUES(1,1);
+  SELECT * FROM t WHERE
+    c0=1 or  c1=1 or  c2=1 or  c3=1 or
+    c4=1 or  c5=1 or  c6=1 or  c7=1 or
+    c8=1 or  c9=1 or c10=1 or c11=1 or
+    c12=1 or c13=1 or c14=1 or c15=1 or
+    c16=1 or c17=1;
+----
+stmt 0 err 1 -1 17 no such table: t
+stmt 17 err 1 -1 54 no such table: t
+stmt 54 err 1 -1 255 no such table: t
+==== 5.3
+
+  DELETE FROM t;
+  INSERT INTO t(c0,c15) VALUES(1,1);
+  SELECT * FROM t WHERE
+    c0=1 or  c1=1 or  c2=1 or  c3=1 or
+    c4=1 or  c5=1 or  c6=1 or  c7=1 or
+    c8=1 or  c9=1 or c10=1 or c11=1 or
+    c12=1 or c13=1 or c14=1 or c15=1 or
+    c16=1 or c17=1;
+----
+stmt 0 err 1 -1 17 no such table: t
+stmt 17 err 1 -1 54 no such table: t
+stmt 54 err 1 -1 255 no such table: t
+==== 6.1
+
+  CREATE TABLE x1(a, b, c, d, e);
+  CREATE INDEX x1a  ON x1(a);
+  CREATE INDEX x1bc ON x1(b, c);
+  CREATE INDEX x1cd ON x1(c, d);
+
+  INSERT INTO x1 VALUES(1, 2, 3, 4, 'A');
+  INSERT INTO x1 VALUES(5, 6, 7, 8, 'B');
+  INSERT INTO x1 VALUES(9, 10, 11, 12, 'C');
+  INSERT INTO x1 VALUES(13, 14, 15, 16, 'D');
+----
+stmt 0 ok
+stmt 34 err 1 -1 64 no such table: main.x1
+stmt 64 err 1 -1 97 no such table: main.x1
+stmt 97 err 1 -1 130 no such table: main.x1
+stmt 130 err 1 -1 173 no such table: x1
+stmt 173 err 1 -1 215 no such table: x1
+stmt 215 err 1 -1 260 no such table: x1
+stmt 260 err 1 -1 306 no such table: x1
+==== 6.7
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1(a UNIQUE, b UNIQUE);
+  INSERT INTO t1(a,b) VALUES(null,2);
+  CREATE VIEW t2 AS SELECT * FROM t1 WHERE b<10 OR a<7 ORDER BY b;
+  SELECT t1.* FROM t1 LEFT JOIN t2 ON abs(t1.a)=abs(t2.b);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 93 err 1 -1 131 no such table: t1
+stmt 131 ok
+stmt 198 err 1 -1 257 no such table: t1
+==== 7.0
+
+  CREATE TABLE y1(a, b);
+  CREATE TABLE y2(x, y);
+  CREATE INDEX y2xy ON y2(x, y);
+  INSERT INTO y1 VALUES(1, 1);
+  INSERT INTO y2 VALUES(3, 3);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 83 no such table: main.y2
+stmt 83 err 1 -1 114 no such table: y1
+stmt 114 err 1 -1 145 no such table: y2
+==== 7.1
+
+  SELECT * FROM y1 LEFT JOIN y2 ON ((x=1 AND y=b) OR (x=2 AND y=b))
+----
+stmt 0 err 1 -1 69 no such table: y1
+==== 7.3
+
+  CREATE TABLE foo (Id INTEGER PRIMARY KEY, fa INTEGER, fb INTEGER); 
+  CREATE TABLE bar (Id INTEGER PRIMARY KEY, ba INTEGER, bb INTEGER);
+
+  INSERT INTO foo VALUES(1, 1, 1);
+  INSERT INTO foo VALUES(2, 1, 2);
+  INSERT INTO foo VALUES(3, 1, 3);
+  INSERT INTO foo VALUES(4, 1, 4);
+  INSERT INTO foo VALUES(5, 1, 5);
+  INSERT INTO foo VALUES(6, 1, 6);
+  INSERT INTO foo VALUES(7, 1, 7);
+  INSERT INTO foo VALUES(8, 1, 8);
+  INSERT INTO foo VALUES(9, 1, 9);
+
+  INSERT INTO bar VALUES(NULL, 1, 1);
+  INSERT INTO bar VALUES(NULL, 2, 2);
+  INSERT INTO bar VALUES(NULL, 3, 3);
+  INSERT INTO bar VALUES(NULL, 1, 4);
+  INSERT INTO bar VALUES(NULL, 2, 5);
+  INSERT INTO bar VALUES(NULL, 3, 6);
+  INSERT INTO bar VALUES(NULL, 1, 7);
+  INSERT INTO bar VALUES(NULL, 2, 8);
+  INSERT INTO bar VALUES(NULL, 3, 9);
+----
+stmt 0 ok
+stmt 69 ok
+stmt 139 err 1 -1 175 no such table: foo
+stmt 175 err 1 -1 210 no such table: foo
+stmt 210 err 1 -1 245 no such table: foo
+stmt 245 err 1 -1 280 no such table: foo
+stmt 280 err 1 -1 315 no such table: foo
+stmt 315 err 1 -1 350 no such table: foo
+stmt 350 err 1 -1 385 no such table: foo
+stmt 385 err 1 -1 420 no such table: foo
+stmt 420 err 1 -1 455 no such table: foo
+stmt 455 err 1 -1 494 no such table: bar
+stmt 494 err 1 -1 532 no such table: bar
+stmt 532 err 1 -1 570 no such table: bar
+stmt 570 err 1 -1 608 no such table: bar
+stmt 608 err 1 -1 646 no such table: bar
+stmt 646 err 1 -1 684 no such table: bar
+stmt 684 err 1 -1 722 no such table: bar
+stmt 722 err 1 -1 760 no such table: bar
+stmt 760 err 1 -1 798 no such table: bar
+==== 7.4
+
+  SELECT 
+    bar.Id, bar.ba, bar.bb, foo.fb
+    FROM foo LEFT JOIN bar
+           ON (bar.ba = 1 AND bar.bb = foo.fb)
+           OR (bar.ba = 5 AND bar.bb = foo.fb);
+----
+stmt 0 err 1 -1 167 no such table: foo
+==== 7.5
+
+  CREATE INDEX idx_bar ON bar(ba, bb);
+  SELECT 
+    bar.Id, bar.ba, bar.bb, foo.fb
+    FROM foo LEFT JOIN bar
+           ON (bar.ba = 1 AND bar.bb = foo.fb)
+           OR (bar.ba = 5 AND bar.bb = foo.fb);
+----
+stmt 0 err 1 -1 39 no such table: main.bar
+stmt 39 err 1 -1 206 no such table: foo

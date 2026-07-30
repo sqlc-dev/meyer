@@ -1,0 +1,45 @@
+==== tkt-5e10420e8d.1
+
+  PRAGMA page_size = 1024;
+  PRAGMA auto_vacuum = incremental;
+
+  CREATE TABLE t1(x);
+  CREATE TABLE t2(x);
+  CREATE TABLE t3(x);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 63 ok
+stmt 86 ok
+stmt 108 ok
+==== tkt-5e10420e8d.2
+
+  INSERT INTO t3 VALUES(randomblob(500 + 1024*248));
+  INSERT INTO t1 VALUES(randomblob(1500));
+  INSERT INTO t2 VALUES(randomblob(500 + 1024*248));
+
+  DELETE FROM t3;
+  DELETE FROM t2;
+  DELETE FROM t1;
+----
+stmt 0 err 1 -1 53 no such table: t3
+stmt 53 err 1 -1 96 no such table: t1
+stmt 96 err 1 -1 149 no such table: t2
+stmt 149 err 1 -1 168 no such table: t3
+stmt 168 err 1 -1 186 no such table: t2
+stmt 186 err 1 -1 204 no such table: t1
+==== tkt-5e10420e8d.3
+
+  PRAGMA incremental_vacuum(248)
+----
+stmt 0 ok
+==== tkt-5e10420e8d.4
+
+  PRAGMA incremental_vacuum(1)
+----
+stmt 0 ok
+==== tkt-5e10420e8d.5
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok

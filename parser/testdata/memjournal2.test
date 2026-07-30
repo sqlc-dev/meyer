@@ -1,0 +1,38 @@
+==== 1.0
+
+  PRAGMA journal_mode = memory;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b UNIQUE);
+----
+stmt 0 ok
+stmt 32 ok
+==== memjournal2-generated
+
+      SAVEPOINT two;
+        UPDATE t1 SET b=randomblob(700) WHERE a==1;
+      ROLLBACK TO two;
+      RELEASE two;
+----
+stmt 0 ok
+stmt 21 err 1 -1 73 no such table: t1
+stmt 73 ok
+stmt 96 ok
+==== memjournal2-generated.dup1
+
+      SAVEPOINT two;
+        UPDATE t1 SET b=randomblob(700) WHERE a==1;
+      ROLLBACK TO two;
+      RELEASE two;
+----
+stmt 0 ok
+stmt 21 err 1 -1 73 no such table: t1
+stmt 73 ok
+stmt 96 ok
+==== memjournal2-generated.dup2
+
+    PRAGMA integrity_check;
+    ROLLBACK TO one;
+    RELEASE one;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 49 ok

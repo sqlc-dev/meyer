@@ -1,0 +1,29 @@
+==== 1.1
+ PRAGMA lock_status
+----
+stmt 0 ok
+==== 1.2
+ PRAGMA lock_status
+----
+stmt 0 ok
+==== 1.3
+ PRAGMA lock_status
+----
+stmt 0 ok
+==== 2.3.3
+ SELECT * FROM x1 WHERE a = 15
+----
+stmt 0 err 1 -1 31 no such table: x1
+==== 2.3.5
+ SELECT a, val() FROM x1 LIMIT 1
+----
+stmt 0 err 1 -1 33 no such table: x1
+==== 3.4
+ PRAGMA lock_status
+----
+stmt 0 ok
+==== 3.5
+
+  SELECT * FROM x1 WHERE a IN (1, -10);
+----
+stmt 0 err 1 -1 40 no such table: x1

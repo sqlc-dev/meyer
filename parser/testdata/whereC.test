@@ -1,0 +1,53 @@
+==== 1.0
+
+  CREATE TABLE t1(i INTEGER PRIMARY KEY, a, b INTEGER);
+
+  INSERT INTO t1 VALUES(1, 1, 1);
+  INSERT INTO t1 VALUES(2, 1, 1);
+  INSERT INTO t1 VALUES(3, 1, 2);
+  INSERT INTO t1 VALUES(4, 1, 2);
+  INSERT INTO t1 VALUES(5, 1, 2);
+  INSERT INTO t1 VALUES(6, 1, 3);
+  INSERT INTO t1 VALUES(7, 1, 3);
+
+  INSERT INTO t1 VALUES(8, 2, 1);
+  INSERT INTO t1 VALUES(9, 2, 1);
+  INSERT INTO t1 VALUES(10, 2, 2);
+  INSERT INTO t1 VALUES(11, 2, 2);
+  INSERT INTO t1 VALUES(12, 2, 2);
+  INSERT INTO t1 VALUES(13, 2, 3);
+  INSERT INTO t1 VALUES(14, 2, 3);
+
+  INSERT INTO t1 VALUES(15, 2, 1);
+  INSERT INTO t1 VALUES(16, 2, 1);
+  INSERT INTO t1 VALUES(17, 2, 2);
+  INSERT INTO t1 VALUES(18, 2, 2);
+  INSERT INTO t1 VALUES(19, 2, 2);
+  INSERT INTO t1 VALUES(20, 2, 3);
+  INSERT INTO t1 VALUES(21, 2, 3);
+
+  CREATE INDEX i1 ON t1(a, b);
+----
+stmt 0 ok
+stmt 56 err 1 -1 91 no such table: t1
+stmt 91 err 1 -1 125 no such table: t1
+stmt 125 err 1 -1 159 no such table: t1
+stmt 159 err 1 -1 193 no such table: t1
+stmt 193 err 1 -1 227 no such table: t1
+stmt 227 err 1 -1 261 no such table: t1
+stmt 261 err 1 -1 295 no such table: t1
+stmt 295 err 1 -1 330 no such table: t1
+stmt 330 err 1 -1 364 no such table: t1
+stmt 364 err 1 -1 399 no such table: t1
+stmt 399 err 1 -1 434 no such table: t1
+stmt 434 err 1 -1 469 no such table: t1
+stmt 469 err 1 -1 504 no such table: t1
+stmt 504 err 1 -1 539 no such table: t1
+stmt 539 err 1 -1 575 no such table: t1
+stmt 575 err 1 -1 610 no such table: t1
+stmt 610 err 1 -1 645 no such table: t1
+stmt 645 err 1 -1 680 no such table: t1
+stmt 680 err 1 -1 715 no such table: t1
+stmt 715 err 1 -1 750 no such table: t1
+stmt 750 err 1 -1 785 no such table: t1
+stmt 785 err 1 -1 817 no such table: main.t1

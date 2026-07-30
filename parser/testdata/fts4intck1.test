@@ -1,0 +1,52 @@
+==== 1.0
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b TEXT, c TEXT AS (slang(b)));
+  INSERT INTO t1(b) VALUES('the quick fox jumps over the lazy brown dog');
+  SELECT c FROM t1;
+----
+stmt 0 err 1 61 72 no such function: slang
+stmt 72 err 1 -1 147 no such table: t1
+stmt 147 err 1 -1 167 no such table: t1
+==== 1.1
+
+  CREATE VIRTUAL TABLE t2 USING fts4(content="t1", c);
+  INSERT INTO t2(t2) VALUES('rebuild');
+  SELECT docid FROM t2 WHERE t2 MATCH 'deh';
+----
+stmt 0 ok
+stmt 55 err 1 -1 95 no such table: t2
+stmt 95 err 1 -1 140 no such table: t2
+==== 1.2
+
+  PRAGMA integrity_check(t2);
+----
+stmt 0 err 1 -1 30 no such table: t2
+==== 2.1
+
+  PRAGMA integrity_check(t2);
+----
+stmt 0 err 1 -1 30 no such table: t2
+==== 2.2
+
+  PRAGMA integrity_check(t2);
+----
+stmt 0 err 1 -1 30 no such table: t2
+==== 2.3
+
+  PRAGMA integrity_check(t2);
+----
+stmt 0 err 1 -1 30 no such table: t2
+==== 3.0
+
+  CREATE VIRTUAL TABLE x1 USING fts4(a, b);
+  INSERT INTO x1 VALUES('one', 'two');
+  INSERT INTO x1 VALUES('three', 'four');
+----
+stmt 0 ok
+stmt 44 err 1 -1 83 no such table: x1
+stmt 83 err 1 -1 125 no such table: x1
+==== 3.1
+
+  PRAGMA integrity_check;
+----
+stmt 0 ok

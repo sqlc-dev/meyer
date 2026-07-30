@@ -1,0 +1,126 @@
+==== trigger4-1.1
+
+    create table test1(id integer primary key,a);
+    create table test2(id integer,b);
+    create view test as
+      select test1.id as id,a as a,b as b
+      from test1 join test2 on test2.id =  test1.id;
+    create trigger I_test instead of insert on test
+      begin
+        insert into test1 (id,a) values (NEW.id,NEW.a);
+        insert into test2 (id,b) values (NEW.id,NEW.b);
+      end;
+    insert into test values(1,2,3);
+    select * from test1;
+----
+stmt 0 ok
+stmt 50 ok
+stmt 88 ok
+stmt 207 err 1 -1 271 no such table: main.test
+stmt 394 err 1 -1 430 no such table: test
+stmt 430 err 1 -1 455 no such table: test1
+==== trigger4-1.2
+
+    select * from test2;
+----
+stmt 0 err 1 -1 25 no such table: test2
+==== trigger4-1.4
+
+    select * from test2;
+----
+stmt 0 err 1 -1 25 no such table: test2
+==== trigger4-2.1
+
+    create trigger U_test instead of update on test
+      begin
+        update test1 set a=NEW.a where id=NEW.id;
+        update test2 set b=NEW.b where id=NEW.id;
+      end;
+    update test set a=22 where id=1;
+    select * from test1;
+----
+stmt 0 err 1 -1 64 no such table: main.test
+stmt 175 err 1 -1 212 no such table: test
+stmt 212 err 1 -1 237 no such table: test1
+==== trigger4-2.2
+
+    select * from test2;
+----
+stmt 0 err 1 -1 25 no such table: test2
+==== trigger4-2.4
+
+    select * from test2;
+----
+stmt 0 err 1 -1 25 no such table: test2
+==== trigger4-3.1
+
+    drop table test2;
+    insert into test values(7,8,9);
+----
+stmt 0 err 1 -1 22 no such table: test2
+stmt 22 err 1 -1 58 no such table: test
+==== trigger4-3.3
+
+    update test set a=222 where id=1;
+----
+stmt 0 err 1 -1 38 no such table: test
+==== trigger4-3.4
+
+    select * from test1;
+----
+stmt 0 err 1 -1 25 no such table: test1
+==== trigger4-3.5
+
+    create table test2(id,b);
+    insert into test values(7,8,9);
+    select * from test1;
+----
+stmt 0 ok
+stmt 30 err 1 -1 66 no such table: test
+stmt 66 err 1 -1 91 no such table: test1
+==== trigger4-3.6
+
+    select * from test2;
+----
+stmt 0 err 1 -1 25 no such table: test2
+==== trigger4-4.2
+select a, b from vw where a<103 or a>226 order by a
+----
+stmt 0 err 1 -1 52 no such table: vw
+==== trigger4-5.1
+delete from vw where a>101 and a<2000
+----
+stmt 0 err 1 -1 38 no such table: vw
+==== trigger4-5.2
+select * from vw
+----
+stmt 0 err 1 -1 17 no such table: vw
+==== trigger4-6.1
+
+	insert into vw values(102,1002);
+	insert into vw select a+2, b+2 from vw;
+	insert into vw select a+4, b+4 from vw;
+	insert into vw select a+8, b+8 from vw;
+	insert into vw select a+16, b+16 from vw;
+	insert into vw select a+32, b+32 from vw;
+	insert into vw select a+64, b+64 from vw;
+----
+stmt 0 err 1 -1 34 no such table: vw
+stmt 34 err 1 -1 75 no such table: vw
+stmt 75 err 1 -1 116 no such table: vw
+stmt 116 err 1 -1 157 no such table: vw
+stmt 157 err 1 -1 200 no such table: vw
+stmt 200 err 1 -1 243 no such table: vw
+stmt 243 err 1 -1 286 no such table: vw
+==== trigger4-6.2
+select count(*) from vw
+----
+stmt 0 err 1 -1 24 no such table: vw
+==== trigger4-7.1
+update vw set b=b+1000 where a>101 and a<2000
+----
+stmt 0 err 1 -1 46 no such table: vw
+==== trigger4-7.2
+select a, b from vw where a<=102 or a>=227 order by a
+----
+stmt 0 err 1 -1 54 no such table: vw

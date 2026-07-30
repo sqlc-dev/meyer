@@ -1,0 +1,26 @@
+==== fts3aj-1.1
+
+    ATTACH DATABASE 'test2.db' AS two;
+    SELECT rowid FROM t1 WHERE t1 MATCH 'hello';
+    DETACH DATABASE two;
+----
+stmt 0 ok
+stmt 39 err 1 -1 88 no such table: t1
+stmt 88 ok
+==== fts3aj-1.2
+
+    ATTACH DATABASE 'test2.db' AS two;
+    CREATE VIRTUAL TABLE two.t2 USING fts3(content);
+    INSERT INTO t2 (rowid, content) VALUES(1, 'hello world');
+    INSERT INTO t2 (rowid, content) VALUES(2, 'hello there');
+    INSERT INTO t2 (rowid, content) VALUES(3, 'cruel world');
+    SELECT rowid FROM t2 WHERE t2 MATCH 'hello';
+    DETACH DATABASE two;
+----
+stmt 0 ok
+stmt 39 err 1 65 83 unknown database two
+stmt 92 err 1 -1 154 no such table: t2
+stmt 154 err 1 -1 216 no such table: t2
+stmt 216 err 1 -1 278 no such table: t2
+stmt 278 err 1 -1 327 no such table: t2
+stmt 327 ok

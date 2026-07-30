@@ -1,0 +1,18 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX t1_b ON t1(b);
+  CREATE TABLE t2(x, y, PRIMARY KEY(x, y)) WITHOUT ROWID;
+  CREATE INDEX t2_y ON t2(y);
+----
+stmt 0 ok
+stmt 25 err 1 -1 55 no such table: main.t1
+stmt 55 ok
+stmt 113 err 1 -1 143 no such table: main.t2
+==== 1.2.1
+
+  DELETE FROM t1;
+  DELETE FROM t2;
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 36 no such table: t2

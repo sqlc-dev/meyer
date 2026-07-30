@@ -1,27 +1,27 @@
 ==== select2-2.1
 SELECT count(*) FROM tbl2
 ----
-stmt 0 err 1 -1 no such table: tbl2
+stmt 0 err 1 -1 26 no such table: tbl2
 ==== select2-2.2
 SELECT count(*) FROM tbl2 WHERE f2>1000
 ----
-stmt 0 err 1 -1 no such table: tbl2
+stmt 0 err 1 -1 40 no such table: tbl2
 ==== select2-3.1
 SELECT f1 FROM tbl2 WHERE 1000=f2
 ----
-stmt 0 err 1 -1 no such table: tbl2
+stmt 0 err 1 -1 34 no such table: tbl2
 ==== select2-3.2a
 CREATE INDEX idx1 ON tbl2(f2)
 ----
-stmt 0 err 1 -1 no such table: main.tbl2
+stmt 0 err 1 -1 30 no such table: main.tbl2
 ==== select2-3.2b
 SELECT f1 FROM tbl2 WHERE 1000=f2
 ----
-stmt 0 err 1 -1 no such table: tbl2
+stmt 0 err 1 -1 34 no such table: tbl2
 ==== select2-3.2c
 SELECT f1 FROM tbl2 WHERE f2=1000
 ----
-stmt 0 err 1 -1 no such table: tbl2
+stmt 0 err 1 -1 34 no such table: tbl2
 ==== select2-4.1
 
     CREATE TABLE aa(a);
@@ -34,40 +34,40 @@ stmt 0 err 1 -1 no such table: tbl2
 ----
 stmt 0 ok
 stmt 24 ok
-stmt 48 err 1 -1 no such table: aa
-stmt 78 err 1 -1 no such table: aa
-stmt 108 err 1 -1 no such table: bb
-stmt 138 err 1 -1 no such table: bb
-stmt 168 err 1 -1 no such table: aa
+stmt 48 err 1 -1 78 no such table: aa
+stmt 78 err 1 -1 108 no such table: aa
+stmt 108 err 1 -1 138 no such table: bb
+stmt 138 err 1 -1 168 no such table: bb
+stmt 168 err 1 -1 211 no such table: aa
 ==== select2-4.2
 
     INSERT INTO bb VALUES(0);
     SELECT * FROM aa CROSS JOIN bb WHERE b;
 ----
-stmt 0 err 1 -1 no such table: bb
-stmt 30 err 1 -1 no such table: aa
+stmt 0 err 1 -1 30 no such table: bb
+stmt 30 err 1 -1 74 no such table: aa
 ==== select2-4.3
 
     SELECT * FROM aa CROSS JOIN bb WHERE NOT b;
 ----
-stmt 0 err 1 -1 no such table: aa
+stmt 0 err 1 -1 48 no such table: aa
 ==== select2-4.4
 
     SELECT * FROM aa, bb WHERE min(a,b);
 ----
-stmt 0 err 1 -1 no such table: aa
+stmt 0 err 1 -1 41 no such table: aa
 ==== select2-4.5
 
     SELECT * FROM aa, bb WHERE NOT min(a,b);
 ----
-stmt 0 err 1 -1 no such table: aa
+stmt 0 err 1 -1 45 no such table: aa
 ==== select2-4.6
 
     SELECT * FROM aa, bb WHERE CASE WHEN a=b-1 THEN 1 END;
 ----
-stmt 0 err 1 -1 no such table: aa
+stmt 0 err 1 -1 59 no such table: aa
 ==== select2-4.7
 
     SELECT * FROM aa, bb WHERE CASE WHEN a=b-1 THEN 0 ELSE 1 END;
 ----
-stmt 0 err 1 -1 no such table: aa
+stmt 0 err 1 -1 66 no such table: aa

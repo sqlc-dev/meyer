@@ -1,0 +1,10 @@
+==== 7.3
+ 
+  INSERT INTO t2 VALUES('c', 'd')
+----
+stmt 0 err 1 -1 36 no such table: t2
+==== 7.4
+ 
+  INSERT INTO t1 VALUES(3, 4)
+----
+stmt 0 err 1 -1 32 no such table: t1

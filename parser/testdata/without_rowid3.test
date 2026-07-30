@@ -1,0 +1,1332 @@
+==== without_rowid3-generated
+PRAGMA foreign_key_check(t1)
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== without_rowid3-generated.dup1
+PRAGMA foreign_key_check(t2)
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== without_rowid3-generated.dup2
+PRAGMA foreign_key_check(t3)
+----
+stmt 0 err 1 -1 29 no such table: t3
+==== without_rowid3-generated.dup3
+PRAGMA foreign_key_check(t4)
+----
+stmt 0 err 1 -1 29 no such table: t4
+==== without_rowid3-generated.dup4
+PRAGMA foreign_key_check(t7)
+----
+stmt 0 err 1 -1 29 no such table: t7
+==== without_rowid3-generated.dup5
+PRAGMA foreign_key_check(t8)
+----
+stmt 0 err 1 -1 29 no such table: t8
+==== without_rowid3-generated.dup6
+PRAGMA foreign_key_check(t1)
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== without_rowid3-generated.dup7
+PRAGMA foreign_key_check(t2)
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== without_rowid3-generated.dup8
+PRAGMA foreign_key_check(t3)
+----
+stmt 0 err 1 -1 29 no such table: t3
+==== without_rowid3-generated.dup9
+PRAGMA foreign_key_check(t4)
+----
+stmt 0 err 1 -1 29 no such table: t4
+==== without_rowid3-generated.dup10
+PRAGMA foreign_key_check(t7)
+----
+stmt 0 err 1 -1 29 no such table: t7
+==== without_rowid3-generated.dup11
+PRAGMA foreign_key_check(t8)
+----
+stmt 0 err 1 -1 29 no such table: t8
+==== without_rowid3-generated.dup12
+PRAGMA foreign_key_check(t1)
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== without_rowid3-generated.dup13
+PRAGMA foreign_key_check(t2)
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== without_rowid3-generated.dup14
+PRAGMA foreign_key_check(t3)
+----
+stmt 0 err 1 -1 29 no such table: t3
+==== without_rowid3-generated.dup15
+PRAGMA foreign_key_check(t4)
+----
+stmt 0 err 1 -1 29 no such table: t4
+==== without_rowid3-generated.dup16
+PRAGMA foreign_key_check(t7)
+----
+stmt 0 err 1 -1 29 no such table: t7
+==== without_rowid3-generated.dup17
+PRAGMA foreign_key_check(t8)
+----
+stmt 0 err 1 -1 29 no such table: t8
+==== without_rowid3-1.5.1
+
+    CREATE TABLE i(i INT PRIMARY KEY) WITHOUT rowid;
+    CREATE TABLE j(j REFERENCES i);
+    INSERT INTO i VALUES(35);
+    INSERT INTO j VALUES('35.0');
+    SELECT j, typeof(j) FROM j;
+----
+stmt 0 ok
+stmt 53 ok
+stmt 89 err 1 -1 119 no such table: i
+stmt 119 err 1 -1 153 no such table: j
+stmt 153 err 1 -1 185 no such table: j
+==== without_rowid3-1.5.2
+ DELETE FROM i
+----
+stmt 0 err 1 -1 15 no such table: i
+==== without_rowid3-1.6.1
+
+    CREATE TABLE i(i INT UNIQUE);
+    CREATE TABLE j(j REFERENCES i(i));
+    INSERT INTO i VALUES('35.0');
+    INSERT INTO j VALUES('35.0');
+    SELECT j, typeof(j) FROM j;
+    SELECT i, typeof(i) FROM i;
+----
+stmt 0 ok
+stmt 34 ok
+stmt 73 err 1 -1 107 no such table: i
+stmt 107 err 1 -1 141 no such table: j
+stmt 141 err 1 -1 173 no such table: j
+stmt 173 err 1 -1 205 no such table: i
+==== without_rowid3-1.6.2
+ DELETE FROM i
+----
+stmt 0 err 1 -1 15 no such table: i
+==== without_rowid3-3.1.1
+
+    CREATE TABLE ab(a PRIMARY KEY, b) WITHOUT rowid;
+    CREATE TABLE cd(
+      c PRIMARY KEY REFERENCES ab ON UPDATE CASCADE ON DELETE CASCADE, 
+      d
+    ) WITHOUT rowid;
+    CREATE TABLE ef(
+      e REFERENCES cd ON UPDATE CASCADE, 
+      f, CHECK (e!=5)
+    );
+----
+stmt 0 ok
+stmt 53 ok
+stmt 175 ok
+==== without_rowid3-3.1.2
+
+    INSERT INTO ab VALUES(1, 'b');
+    INSERT INTO cd VALUES(1, 'd');
+    INSERT INTO ef VALUES(1, 'e');
+----
+stmt 0 err 1 -1 35 no such table: ab
+stmt 35 err 1 -1 70 no such table: cd
+stmt 70 err 1 -1 105 no such table: ef
+==== without_rowid3-3.1.3
+ UPDATE ab SET a = 5
+----
+stmt 0 err 1 -1 21 no such table: ab
+==== without_rowid3-3.1.4
+ SELECT * FROM ab
+----
+stmt 0 err 1 -1 18 no such table: ab
+==== without_rowid3-4.1
+
+    CREATE TABLE t1(
+      node PRIMARY KEY, 
+      parent REFERENCES t1 ON DELETE CASCADE
+    ) WITHOUT rowid;
+    CREATE TABLE t2(node PRIMARY KEY, parent) WITHOUT rowid;
+    CREATE TRIGGER t2t AFTER DELETE ON t2 BEGIN
+      DELETE FROM t2 WHERE parent = old.node;
+    END;
+    INSERT INTO t1 VALUES(1, NULL);
+    INSERT INTO t1 VALUES(2, 1);
+    INSERT INTO t1 VALUES(3, 1);
+    INSERT INTO t1 VALUES(4, 2);
+    INSERT INTO t1 VALUES(5, 2);
+    INSERT INTO t1 VALUES(6, 3);
+    INSERT INTO t1 VALUES(7, 3);
+    INSERT INTO t2 SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 112 ok
+stmt 173 err 1 -1 221 no such table: main.t2
+stmt 276 err 1 -1 312 no such table: t1
+stmt 312 err 1 -1 345 no such table: t1
+stmt 345 err 1 -1 378 no such table: t1
+stmt 378 err 1 -1 411 no such table: t1
+stmt 411 err 1 -1 444 no such table: t1
+stmt 444 err 1 -1 477 no such table: t1
+stmt 477 err 1 -1 510 no such table: t1
+stmt 510 err 1 -1 547 no such table: t2
+==== without_rowid3-4.3
+ 
+      DELETE FROM t2 WHERE node = 1;
+      SELECT node FROM t2;
+    ROLLBACK;
+----
+stmt 0 err 1 -1 38 no such table: t2
+stmt 38 err 1 -1 65 no such table: t2
+stmt 65 ok
+==== without_rowid3-4.3.dup1
+ 
+      DELETE FROM t2 WHERE node = 1;
+      SELECT node FROM t2;
+    ROLLBACK;
+----
+stmt 0 err 1 -1 38 no such table: t2
+stmt 38 err 1 -1 65 no such table: t2
+stmt 65 ok
+==== without_rowid3-5.1
+
+      CREATE TABLE t1(a PRIMARY KEY, b) WITHOUT rowid;
+      CREATE TABLE t2(a PRIMARY KEY, b REFERENCES t1(a)) WITHOUT rowid;
+      INSERT INTO t1 VALUES('hello', 'world');
+      INSERT INTO t2 VALUES('key', 'hello');
+----
+stmt 0 ok
+stmt 55 ok
+stmt 127 err 1 -1 174 no such table: t1
+stmt 174 err 1 -1 219 no such table: t2
+==== without_rowid3-5.5
+ PRAGMA foreign_keys = on
+----
+stmt 0 ok
+==== without_rowid3-6.1
+
+      CREATE TABLE t1(a REFERENCES t2(c), b);
+      CREATE TABLE t2(c UNIQUE, b);
+      INSERT INTO t2 VALUES(1, 2);
+      INSERT INTO t1 VALUES(1, 2);
+      VACUUM;
+----
+stmt 0 ok
+stmt 46 ok
+stmt 82 err 1 -1 117 no such table: t2
+stmt 117 err 1 -1 152 no such table: t1
+stmt 152 ok
+==== without_rowid3-7.1
+
+    CREATE TABLE t1(a PRIMARY KEY, b) WITHOUT rowid;
+    CREATE TABLE t2(c INT PRIMARY KEY REFERENCES t1, b) WITHOUT rowid;
+----
+stmt 0 ok
+stmt 53 ok
+==== without_rowid3-7.2
+ INSERT INTO t2 VALUES(1, 'A');
+----
+stmt 0 err 1 -1 31 no such table: t2
+==== without_rowid3-7.3
+ 
+    INSERT INTO t1 VALUES(1, 2);
+    INSERT INTO t1 VALUES(2, 3);
+    INSERT INTO t2 VALUES(1, 'A');
+----
+stmt 0 err 1 -1 34 no such table: t1
+stmt 34 err 1 -1 67 no such table: t1
+stmt 67 err 1 -1 102 no such table: t2
+==== without_rowid3-7.4
+ UPDATE t2 SET c = 2
+----
+stmt 0 err 1 -1 21 no such table: t2
+==== without_rowid3-7.5
+ UPDATE t2 SET c = 3
+----
+stmt 0 err 1 -1 21 no such table: t2
+==== without_rowid3-7.6
+ DELETE FROM t1 WHERE a = 2
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== without_rowid3-7.7
+ DELETE FROM t1 WHERE a = 1
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== without_rowid3-7.8
+ UPDATE t1 SET a = 3
+----
+stmt 0 err 1 -1 21 no such table: t1
+==== without_rowid3-9.1.1
+
+    CREATE TABLE t1(a INT PRIMARY KEY, b) WITHOUT rowid;
+    CREATE TABLE t2(
+      c INT PRIMARY KEY,
+      d INTEGER DEFAULT 1 REFERENCES t1 ON DELETE SET DEFAULT
+    ) WITHOUT rowid;
+    DELETE FROM t1;
+----
+stmt 0 ok
+stmt 57 ok
+stmt 186 err 1 -1 206 no such table: t1
+==== without_rowid3-9.1.2
+
+    INSERT INTO t1 VALUES(1, 'one');
+    INSERT INTO t1 VALUES(2, 'two');
+    INSERT INTO t2 VALUES(1, 2);
+    SELECT * FROM t2;
+    DELETE FROM t1 WHERE a = 2;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 37 no such table: t1
+stmt 37 err 1 -1 74 no such table: t1
+stmt 74 err 1 -1 107 no such table: t2
+stmt 107 err 1 -1 129 no such table: t2
+stmt 129 err 1 -1 161 no such table: t1
+stmt 161 err 1 -1 183 no such table: t2
+==== without_rowid3-9.1.3
+
+    INSERT INTO t1 VALUES(2, 'two');
+    UPDATE t2 SET d = 2;
+    DELETE FROM t1 WHERE a = 1;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 37 no such table: t1
+stmt 37 err 1 -1 62 no such table: t2
+stmt 62 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 116 no such table: t2
+==== without_rowid3-9.1.4
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== without_rowid3-9.1.5
+ DELETE FROM t1
+----
+stmt 0 err 1 -1 16 no such table: t1
+==== without_rowid3-9.2.1
+
+    CREATE TABLE pp(a, b, c, PRIMARY KEY(b, c)) WITHOUT rowid;
+    CREATE TABLE cc(d DEFAULT 3, e DEFAULT 1, f DEFAULT 2,
+        FOREIGN KEY(f, d) REFERENCES pp 
+        ON UPDATE SET DEFAULT 
+        ON DELETE SET NULL
+    );
+    INSERT INTO pp VALUES(1, 2, 3);
+    INSERT INTO pp VALUES(4, 5, 6);
+    INSERT INTO pp VALUES(7, 8, 9);
+----
+stmt 0 ok
+stmt 63 ok
+stmt 228 err 1 -1 264 no such table: pp
+stmt 264 err 1 -1 300 no such table: pp
+stmt 300 err 1 -1 336 no such table: pp
+==== without_rowid3-9.2.2
+
+    INSERT INTO cc VALUES(6, 'A', 5);
+    INSERT INTO cc VALUES(6, 'B', 5);
+    INSERT INTO cc VALUES(9, 'A', 8);
+    INSERT INTO cc VALUES(9, 'B', 8);
+    UPDATE pp SET b = 1 WHERE a = 7;
+    SELECT * FROM cc;
+----
+stmt 0 err 1 -1 38 no such table: cc
+stmt 38 err 1 -1 76 no such table: cc
+stmt 76 err 1 -1 114 no such table: cc
+stmt 114 err 1 -1 152 no such table: cc
+stmt 152 err 1 -1 189 no such table: pp
+stmt 189 err 1 -1 211 no such table: cc
+==== without_rowid3-9.2.3
+
+    DELETE FROM pp WHERE a = 4;
+    SELECT * FROM cc;
+----
+stmt 0 err 1 -1 32 no such table: pp
+stmt 32 err 1 -1 54 no such table: cc
+==== without_rowid3-11.1.1
+
+    CREATE TABLE t1(a INT PRIMARY KEY, b) WITHOUT rowid;
+    CREATE TABLE t2(c, d, FOREIGN KEY(c) REFERENCES t1(a) ON UPDATE CASCADE);
+
+    INSERT INTO t1 VALUES(10, 100);
+    INSERT INTO t2 VALUES(10, 100);
+    UPDATE t1 SET a = 15;
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 57 ok
+stmt 135 err 1 -1 172 no such table: t1
+stmt 172 err 1 -1 208 no such table: t2
+stmt 208 err 1 -1 234 no such table: t1
+stmt 234 err 1 -1 256 no such table: t2
+==== without_rowid3-12.1.1
+
+    CREATE TABLE t1(a, b PRIMARY KEY) WITHOUT rowid;
+    CREATE TABLE t2(
+      x REFERENCES t1 ON UPDATE RESTRICT DEFERRABLE INITIALLY DEFERRED 
+    );
+    INSERT INTO t1 VALUES(1, 'one');
+    INSERT INTO t1 VALUES(2, 'two');
+    INSERT INTO t1 VALUES(3, 'three');
+----
+stmt 0 ok
+stmt 53 ok
+stmt 153 err 1 -1 190 no such table: t1
+stmt 190 err 1 -1 227 no such table: t1
+stmt 227 err 1 -1 266 no such table: t1
+==== without_rowid3-12.1.7
+
+    INSERT INTO t1 VALUES(2, 'two');
+    COMMIT;
+----
+stmt 0 err 1 -1 37 no such table: t1
+stmt 37 ok
+==== without_rowid3-12.2.1
+
+    CREATE TABLE t1(x COLLATE NOCASE PRIMARY KEY) WITHOUT rowid;
+    CREATE TRIGGER tt1 AFTER DELETE ON t1 
+      WHEN EXISTS ( SELECT 1 FROM t2 WHERE old.x = y )
+    BEGIN
+      INSERT INTO t1 VALUES(old.x);
+    END;
+    CREATE TABLE t2(y REFERENCES t1);
+    INSERT INTO t1 VALUES('A');
+    INSERT INTO t1 VALUES('B');
+    INSERT INTO t2 VALUES('a');
+    INSERT INTO t2 VALUES('b');
+
+    SELECT * FROM t1;
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 65 err 1 -1 173 no such table: main.t1
+stmt 218 ok
+stmt 256 err 1 -1 288 no such table: t1
+stmt 288 err 1 -1 320 no such table: t1
+stmt 320 err 1 -1 352 no such table: t2
+stmt 352 err 1 -1 384 no such table: t2
+stmt 384 err 1 -1 407 no such table: t1
+stmt 407 err 1 -1 429 no such table: t2
+==== without_rowid3-12.2.4
+
+    SELECT * FROM t1;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 22 no such table: t1
+stmt 22 err 1 -1 44 no such table: t2
+==== without_rowid3-12.3.1
+
+    CREATE TABLE up(
+      c00, c01, c02, c03, c04, c05, c06, c07, c08, c09,
+      c10, c11, c12, c13, c14, c15, c16, c17, c18, c19,
+      c20, c21, c22, c23, c24, c25, c26, c27, c28, c29,
+      c30, c31, c32, c33, c34, c35, c36, c37, c38, c39,
+      PRIMARY KEY(c34, c35)
+    ) WITHOUT rowid;
+    CREATE TABLE down(
+      c00, c01, c02, c03, c04, c05, c06, c07, c08, c09,
+      c10, c11, c12, c13, c14, c15, c16, c17, c18, c19,
+      c20, c21, c22, c23, c24, c25, c26, c27, c28, c29,
+      c30, c31, c32, c33, c34, c35, c36, c37, c38, c39,
+      FOREIGN KEY(c39, c38) REFERENCES up ON UPDATE CASCADE
+    );
+----
+stmt 0 ok
+stmt 294 ok
+==== without_rowid3-12.3.2
+
+    INSERT INTO up(c34, c35) VALUES('yes', 'no');
+    INSERT INTO down(c39, c38) VALUES('yes', 'no');
+    UPDATE up SET c34 = 'possibly';
+    SELECT c38, c39 FROM down;
+    DELETE FROM down;
+----
+stmt 0 err 1 -1 50 no such table: up
+stmt 50 err 1 -1 102 no such table: down
+stmt 102 err 1 -1 138 no such table: up
+stmt 138 err 1 -1 169 no such table: down
+stmt 169 err 1 -1 191 no such table: down
+==== without_rowid3-12.3.3
+ INSERT INTO down(c39, c38) VALUES('yes', 'no')
+----
+stmt 0 err 1 -1 48 no such table: down
+==== without_rowid3-12.3.5
+ 
+    DELETE FROM up WHERE c34 = 'possibly';
+    SELECT c34, c35 FROM up;
+    SELECT c39, c38 FROM down;
+----
+stmt 0 err 1 -1 44 no such table: up
+stmt 44 err 1 -1 73 no such table: up
+stmt 73 err 1 -1 104 no such table: down
+==== without_rowid3-13.1.1
+
+    CREATE TABLE pp(a UNIQUE, b, c, PRIMARY KEY(b, c)) WITHOUT rowid;
+    CREATE TABLE cc(d, e, f UNIQUE, FOREIGN KEY(d, e) REFERENCES pp);
+    INSERT INTO pp VALUES(1, 2, 3);
+    INSERT INTO cc VALUES(2, 3, 1);
+----
+stmt 0 ok
+stmt 70 ok
+stmt 140 err 1 -1 176 no such table: pp
+stmt 176 err 1 -1 212 no such table: cc
+==== without_rowid3-generated.dup18
+
+      SELECT * FROM pp;
+      SELECT * FROM cc;
+----
+stmt 0 err 1 -1 24 no such table: pp
+stmt 24 err 1 -1 48 no such table: cc
+==== without_rowid3-generated.dup19
+
+      COMMIT;
+      SELECT * FROM pp;
+      SELECT * FROM cc;
+----
+stmt 0 ok
+stmt 14 err 1 -1 38 no such table: pp
+stmt 38 err 1 -1 62 no such table: cc
+==== without_rowid3-14.1.2
+ ALTER TABLE t2 ADD COLUMN d DEFAULT NULL REFERENCES t1
+----
+stmt 0 err 1 -1 36 no such table: t2
+==== without_rowid3-14.1.3
+ ALTER TABLE t2 ADD COLUMN e REFERENCES t1 DEFAULT NULL
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== without_rowid3-14.1.4
+ ALTER TABLE t2 ADD COLUMN f REFERENCES t1 DEFAULT 'text'
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== without_rowid3-14.1.5
+ ALTER TABLE t2 ADD COLUMN g DEFAULT CURRENT_TIME REFERENCES t1
+----
+stmt 0 err 1 -1 36 no such table: t2
+==== without_rowid3-14.1.6
+ 
+      PRAGMA foreign_keys = off;
+      ALTER TABLE t2 ADD COLUMN h DEFAULT 'text' REFERENCES t1;
+      PRAGMA foreign_keys = on;
+      SELECT sql FROM sqlite_schema WHERE name='t2';
+----
+stmt 0 ok
+stmt 34 err 1 -1 76 no such table: t2
+stmt 98 ok
+stmt 130 ok
+==== without_rowid3-14.2.2.3
+ INSERT INTO t3 VALUES(1, 2, 3)
+----
+stmt 0 err 1 -1 32 no such table: t3
+==== without_rowid3-14.2.2.4
+ INSERT INTO t4 VALUES(1, NULL)
+----
+stmt 0 err 1 -1 32 no such table: t4
+==== without_rowid3-14.2.2.5
+ UPDATE t4 SET b = 5
+----
+stmt 0 err 1 -1 21 no such table: t4
+==== without_rowid3-14.2.2.6
+ UPDATE t4 SET b = 1
+----
+stmt 0 err 1 -1 21 no such table: t4
+==== without_rowid3-14.2.2.7
+ INSERT INTO t3 VALUES(1, NULL, 1)
+----
+stmt 0 err 1 -1 35 no such table: t3
+==== without_rowid3-14.1tmp.2
+ ALTER TABLE t2 ADD COLUMN d DEFAULT NULL REFERENCES t1
+----
+stmt 0 err 1 -1 36 no such table: t2
+==== without_rowid3-14.1tmp.3
+ ALTER TABLE t2 ADD COLUMN e REFERENCES t1 DEFAULT NULL
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== without_rowid3-14.1tmp.4
+ ALTER TABLE t2 ADD COLUMN f REFERENCES t1 DEFAULT 'text'
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== without_rowid3-14.1tmp.5
+ ALTER TABLE t2 ADD COLUMN g DEFAULT CURRENT_TIME REFERENCES t1
+----
+stmt 0 err 1 -1 36 no such table: t2
+==== without_rowid3-14.1tmp.6
+ 
+      PRAGMA foreign_keys = off;
+      ALTER TABLE t2 ADD COLUMN h DEFAULT 'text' REFERENCES t1;
+      PRAGMA foreign_keys = on;
+      SELECT sql FROM temp.sqlite_schema WHERE name='t2';
+----
+stmt 0 ok
+stmt 34 err 1 -1 76 no such table: t2
+stmt 98 ok
+stmt 130 ok
+==== without_rowid3-14.2tmp.2.3
+ INSERT INTO t3 VALUES(1, 2, 3)
+----
+stmt 0 err 1 -1 32 no such table: t3
+==== without_rowid3-14.2tmp.2.4
+ INSERT INTO t4 VALUES(1, NULL)
+----
+stmt 0 err 1 -1 32 no such table: t4
+==== without_rowid3-14.2tmp.2.5
+ UPDATE t4 SET b = 5
+----
+stmt 0 err 1 -1 21 no such table: t4
+==== without_rowid3-14.2tmp.2.6
+ UPDATE t4 SET b = 1
+----
+stmt 0 err 1 -1 21 no such table: t4
+==== without_rowid3-14.2tmp.2.7
+ INSERT INTO t3 VALUES(1, NULL, 1)
+----
+stmt 0 err 1 -1 35 no such table: t3
+==== without_rowid3-14.1aux.2
+ ALTER TABLE t2 ADD COLUMN d DEFAULT NULL REFERENCES t1
+----
+stmt 0 err 1 -1 36 no such table: t2
+==== without_rowid3-14.1aux.3
+ ALTER TABLE t2 ADD COLUMN e REFERENCES t1 DEFAULT NULL
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== without_rowid3-14.1aux.4
+ ALTER TABLE t2 ADD COLUMN f REFERENCES t1 DEFAULT 'text'
+----
+stmt 0 err 1 -1 39 no such table: t2
+==== without_rowid3-14.1aux.5
+ ALTER TABLE t2 ADD COLUMN g DEFAULT CURRENT_TIME REFERENCES t1
+----
+stmt 0 err 1 -1 36 no such table: t2
+==== without_rowid3-14.1aux.6
+ 
+      PRAGMA foreign_keys = off;
+      ALTER TABLE t2 ADD COLUMN h DEFAULT 'text' REFERENCES t1;
+      PRAGMA foreign_keys = on;
+      SELECT sql FROM aux.sqlite_schema WHERE name='t2';
+----
+stmt 0 ok
+stmt 34 err 1 -1 76 no such table: t2
+stmt 98 ok
+stmt 130 err 1 -1 187 no such table: aux.sqlite_schema
+==== without_rowid3-14.2aux.2.3
+ INSERT INTO t3 VALUES(1, 2, 3)
+----
+stmt 0 err 1 -1 32 no such table: t3
+==== without_rowid3-14.2aux.2.4
+ INSERT INTO t4 VALUES(1, NULL)
+----
+stmt 0 err 1 -1 32 no such table: t4
+==== without_rowid3-14.2aux.2.5
+ UPDATE t4 SET b = 5
+----
+stmt 0 err 1 -1 21 no such table: t4
+==== without_rowid3-14.2aux.2.6
+ UPDATE t4 SET b = 1
+----
+stmt 0 err 1 -1 21 no such table: t4
+==== without_rowid3-14.2aux.2.7
+ INSERT INTO t3 VALUES(1, NULL, 1)
+----
+stmt 0 err 1 -1 35 no such table: t3
+==== without_rowid3-2.14.3.2
+
+    CREATE TABLE t1(a PRIMARY KEY, b) WITHOUT rowid;
+    INSERT INTO t1 VALUES('a', 1);
+    CREATE TABLE t2(x REFERENCES t1);
+    INSERT INTO t2 VALUES('a');
+----
+stmt 0 ok
+stmt 53 err 1 -1 88 no such table: t1
+stmt 88 ok
+stmt 126 err 1 -1 158 no such table: t2
+==== without_rowid3-2.14.3.3
+ DROP TABLE t1
+----
+stmt 0 err 1 -1 15 no such table: t1
+==== without_rowid3-2.14.3.4
+
+    DELETE FROM t2;
+    DROP TABLE t1;
+----
+stmt 0 err 1 -1 20 no such table: t2
+stmt 20 err 1 -1 39 no such table: t1
+==== without_rowid3-2.14.3.4.dup1
+ INSERT INTO t2 VALUES('x')
+----
+stmt 0 err 1 -1 28 no such table: t2
+==== without_rowid3-2.14.3.6
+ DROP TABLE t1
+----
+stmt 0 err 1 -1 15 no such table: t1
+==== without_rowid3-2.14.3.7
+
+    DROP TABLE t2;
+    DROP TABLE t1;
+----
+stmt 0 err 1 -1 19 no such table: t2
+stmt 19 err 1 -1 38 no such table: t1
+==== without_rowid3-2.14.3.9
+ DROP TABLE cc
+----
+stmt 0 err 1 -1 15 no such table: cc
+==== without_rowid3-2.14.3.11
+ 
+    BEGIN;
+      DROP TABLE cc;
+      DROP TABLE pp;
+    COMMIT;
+----
+stmt 0 ok
+stmt 12 err 1 -1 33 no such table: cc
+stmt 33 err 1 -1 54 no such table: pp
+stmt 54 ok
+==== without_rowid3-2.14.3.12
+
+    CREATE TABLE b1(a, b);
+    CREATE TABLE b2(a, b REFERENCES b1);
+    DROP TABLE b1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 68 err 1 -1 87 no such table: b1
+==== without_rowid3-2.14.3.13
+
+    CREATE TABLE b3(a, b REFERENCES b2 DEFERRABLE INITIALLY DEFERRED);
+    DROP TABLE b2;
+----
+stmt 0 ok
+stmt 71 err 1 -1 90 no such table: b2
+==== without_rowid3-2.14.4.1
+
+    CREATE TABLE t1(x REFERENCES v); 
+    CREATE VIEW v AS SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 37 ok
+==== without_rowid3-2.14.4.2
+
+    DROP VIEW v;
+----
+stmt 0 err 1 -1 17 no such view: v
+==== without_rowid3-2.14.4.3
+ CREATE VIRTUAL TABLE v USING echo(t1)
+----
+stmt 0 ok
+==== without_rowid3-2.14.4.2.dup1
+
+      DROP TABLE v;
+----
+stmt 0 err 1 -1 20 no such table: v
+==== without_rowid3-15.1.1
+
+    CREATE TABLE pp(a PRIMARY KEY, b) WITHOUT rowid;
+    CREATE TABLE cc(x, y REFERENCES pp DEFERRABLE INITIALLY DEFERRED);
+    INSERT INTO pp VALUES(1, 'one');
+    INSERT INTO pp VALUES(2, 'two');
+    INSERT INTO cc VALUES('neung', 1);
+    INSERT INTO cc VALUES('song', 2);
+----
+stmt 0 ok
+stmt 53 ok
+stmt 124 err 1 -1 161 no such table: pp
+stmt 161 err 1 -1 198 no such table: pp
+stmt 198 err 1 -1 237 no such table: cc
+stmt 237 err 1 -1 275 no such table: cc
+==== without_rowid3-generated.dup20
+ UPDATE self SET a = 14, b = 14
+----
+stmt 0 err 1 -1 32 no such table: self
+==== without_rowid3-generated.dup21
+ UPDATE self SET b = 15
+----
+stmt 0 err 1 -1 24 no such table: self
+==== without_rowid3-generated.dup22
+ UPDATE self SET a = 15
+----
+stmt 0 err 1 -1 24 no such table: self
+==== without_rowid3-generated.dup23
+ UPDATE self SET a = 15, b = 16
+----
+stmt 0 err 1 -1 32 no such table: self
+==== without_rowid3-generated.dup24
+ UPDATE self SET a = 17, b = 17
+----
+stmt 0 err 1 -1 32 no such table: self
+==== without_rowid3-generated.dup25
+ DELETE FROM self
+----
+stmt 0 err 1 -1 18 no such table: self
+==== without_rowid3-generated.dup26
+ INSERT INTO self VALUES(20, 21)
+----
+stmt 0 err 1 -1 33 no such table: self
+==== without_rowid3-16.4.1.1
+
+  PRAGMA foreign_keys=ON;
+  CREATE TABLE t1(a,b,c,d,e,f,
+     UNIQUE (a,b),
+     PRIMARY KEY (e,c),
+     FOREIGN KEY (d,f) REFERENCES t1(e,c)
+  ) WITHOUT rowid;
+  INSERT INTO t1 VALUES(1,2,3,5,5,3);
+  INSERT INTO t1 VALUES(2,3,4,6,6,4);
+  INSERT INTO t1 VALUES('x','y',1.5,'fizzle','fizzle',1.5);
+  SELECT *, '|' FROM t1 ORDER BY a, b;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 161 err 1 -1 199 no such table: t1
+stmt 199 err 1 -1 237 no such table: t1
+stmt 237 err 1 -1 297 no such table: t1
+stmt 297 err 1 -1 336 no such table: t1
+==== without_rowid3-16.4.1.2
+
+  UPDATE t1 SET c=99, f=99 WHERE a=1;
+  SELECT *, '|' FROM t1 ORDER BY a, b;
+----
+stmt 0 err 1 -1 38 no such table: t1
+stmt 38 err 1 -1 77 no such table: t1
+==== without_rowid3-16.4.1.3
+
+  UPDATE t1 SET e=876, d=876 WHERE a=2;
+  SELECT *, '|' FROM t1 ORDER BY a, b;
+----
+stmt 0 err 1 -1 40 no such table: t1
+stmt 40 err 1 -1 79 no such table: t1
+==== without_rowid3-16.4.1.4
+
+    UPDATE t1 SET c=11, e=22 WHERE a=1;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== without_rowid3-16.4.1.5
+
+    UPDATE t1 SET d=11, f=22 WHERE a=1;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== without_rowid3-16.4.1.6
+
+  DELETE FROM t1 WHERE a=1;
+  SELECT *, '|' FROM t1 ORDER BY a, b;
+----
+stmt 0 err 1 -1 28 no such table: t1
+stmt 28 err 1 -1 67 no such table: t1
+==== without_rowid3-16.4.2.1
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a,b,c,d,e,f,
+     PRIMARY KEY (a,b),
+     UNIQUE (e,c),
+     FOREIGN KEY (d,f) REFERENCES t1(e,c)
+  ) WITHOUT rowid;
+  INSERT INTO t1 VALUES(1,2,3,5,5,3);
+  INSERT INTO t1 VALUES(2,3,4,6,6,4);
+  INSERT INTO t1 VALUES('x','y',1.5,'fizzle','fizzle',1.5);
+  SELECT *, '|' FROM t1 ORDER BY a, b;
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 152 err 1 -1 190 no such table: t1
+stmt 190 err 1 -1 228 no such table: t1
+stmt 228 err 1 -1 288 no such table: t1
+stmt 288 err 1 -1 327 no such table: t1
+==== without_rowid3-16.4.2.2
+
+  UPDATE t1 SET c=99, f=99 WHERE a=1;
+  SELECT *, '|' FROM t1 ORDER BY a, b;
+----
+stmt 0 err 1 -1 38 no such table: t1
+stmt 38 err 1 -1 77 no such table: t1
+==== without_rowid3-16.4.2.3
+
+  UPDATE t1 SET e=876, d=876 WHERE a=2;
+  SELECT *, '|' FROM t1 ORDER BY a, b;
+----
+stmt 0 err 1 -1 40 no such table: t1
+stmt 40 err 1 -1 79 no such table: t1
+==== without_rowid3-16.4.2.4
+
+    UPDATE t1 SET c=11, e=22 WHERE a=1;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== without_rowid3-16.4.2.5
+
+    UPDATE t1 SET d=11, f=22 WHERE a=1;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== without_rowid3-16.4.2.6
+
+  DELETE FROM t1 WHERE a=1;
+  SELECT *, '|' FROM t1 ORDER BY a, b;
+----
+stmt 0 err 1 -1 28 no such table: t1
+stmt 28 err 1 -1 67 no such table: t1
+==== without_rowid3-17.1.5
+
+    INSERT INTO one VALUES(2, 3, 4);
+    INSERT INTO one VALUES(3, 4, 5);
+    INSERT INTO two VALUES(1, 2, 3);
+    INSERT INTO two VALUES(2, 3, 4);
+    INSERT INTO two VALUES(3, 4, 5);
+----
+stmt 0 err 1 -1 37 no such table: one
+stmt 37 err 1 -1 74 no such table: one
+stmt 74 err 1 -1 111 no such table: two
+stmt 111 err 1 -1 148 no such table: two
+stmt 148 err 1 -1 185 no such table: two
+==== without_rowid3-17.1.6
+
+    BEGIN;
+      INSERT INTO one VALUES(0, 0, 0);
+      UPDATE two SET e=e+1, f=f+1;
+----
+stmt 0 ok
+stmt 11 err 1 -1 50 no such table: one
+stmt 50 err 1 -1 85 no such table: two
+==== without_rowid3-17.1.7
+ SELECT * FROM one
+----
+stmt 0 err 1 -1 19 no such table: one
+==== without_rowid3-17.1.8
+ SELECT * FROM two
+----
+stmt 0 err 1 -1 19 no such table: two
+==== without_rowid3-17.1.10
+
+    CREATE TABLE three(
+      g, h, i, 
+      FOREIGN KEY(h, i) REFERENCES one(b, c) DEFERRABLE INITIALLY DEFERRED
+    );
+----
+stmt 0 ok
+==== without_rowid3-17.2.1
+
+    CREATE TABLE high("a'b!" PRIMARY KEY, b) WITHOUT rowid;
+    CREATE TABLE low(
+      c, 
+      "d&6" REFERENCES high ON UPDATE CASCADE ON DELETE CASCADE
+    );
+----
+stmt 0 ok
+stmt 60 ok
+==== without_rowid3-17.2.3
+ UPDATE high SET "a'b!" = 'c'
+----
+stmt 0 err 1 -1 30 no such table: high
+==== without_rowid3-17.2.6
+ SELECT * FROM high ; SELECT * FROM low
+----
+stmt 0 err 1 -1 21 no such table: high
+stmt 21 err 1 -1 40 no such table: low
+==== without_rowid3-17.2.7
+ DELETE FROM high
+----
+stmt 0 err 1 -1 18 no such table: high
+==== without_rowid3-17.2.10
+ SELECT * FROM high ; SELECT * FROM low
+----
+stmt 0 err 1 -1 21 no such table: high
+stmt 21 err 1 -1 40 no such table: low
+==== without_rowid3-18.1
+
+      CREATE TABLE long(a, b PRIMARY KEY, c) WITHOUT rowid;
+      CREATE TABLE short(d, e, f REFERENCES long);
+      CREATE TABLE mid(g, h, i REFERENCES long DEFERRABLE INITIALLY DEFERRED);
+----
+stmt 0 ok
+stmt 60 ok
+stmt 111 ok
+==== without_rowid3-18.6
+SELECT * FROM cross
+----
+stmt 0 err 1 -1 20 no such table: cross
+==== without_rowid3-18.8
+ INSERT INTO short VALUES(1, 3, 2)
+----
+stmt 0 err 1 -1 35 no such table: short
+==== without_rowid3-18.9
+ INSERT INTO short VALUES(1, 3, NULL)
+----
+stmt 0 err 1 -1 38 no such table: short
+==== without_rowid3-18.10
+ SELECT * FROM short
+----
+stmt 0 err 1 -1 21 no such table: short
+==== without_rowid3-18.11
+ UPDATE short SET f = 2 WHERE f IS NULL
+----
+stmt 0 err 1 -1 40 no such table: short
+==== without_rowid3-19.1
+
+    CREATE TABLE main(id INT PRIMARY KEY) WITHOUT rowid;
+    CREATE TABLE sub(id INT REFERENCES main(id));
+    INSERT INTO main VALUES(1);
+    INSERT INTO main VALUES(2);
+    INSERT INTO sub VALUES(2);
+----
+stmt 0 ok
+stmt 57 ok
+stmt 107 err 1 -1 139 no such table: main
+stmt 139 err 1 -1 171 no such table: main
+stmt 171 err 1 -1 202 no such table: sub
+==== without_rowid3-20.1
+
+    CREATE TABLE pp(a PRIMARY KEY, b) WITHOUT rowid;
+    CREATE TABLE cc(c PRIMARY KEY, d REFERENCES pp) WITHOUT rowid;
+----
+stmt 0 ok
+stmt 53 ok
+==== without_rowid3-generated.dup27
+ SELECT * FROM cc
+----
+stmt 0 err 1 -1 18 no such table: cc
+==== without_rowid3-generated.dup28
+ COMMIT ; SELECT * FROM cc
+----
+stmt 0 ok
+stmt 9 err 1 -1 27 no such table: cc
+==== without_rowid3-generated.dup29
+ DELETE FROM cc ; DELETE FROM pp
+----
+stmt 0 err 1 -1 17 no such table: cc
+stmt 17 err 1 -1 33 no such table: pp
+==== without_rowid3-generated.dup30
+
+      INSERT INTO pp VALUES(2, 'two');
+      INSERT INTO cc VALUES(1, 2);
+----
+stmt 0 err 1 -1 39 no such table: pp
+stmt 39 err 1 -1 74 no such table: cc
+==== without_rowid3-generated.dup31
+ SELECT * FROM pp
+----
+stmt 0 err 1 -1 18 no such table: pp
+==== without_rowid3-generated.dup32
+ SELECT * FROM cc
+----
+stmt 0 err 1 -1 18 no such table: cc
+==== without_rowid3-generated.dup33
+ COMMIT ; SELECT * FROM pp
+----
+stmt 0 ok
+stmt 9 err 1 -1 27 no such table: pp
+==== without_rowid3-generated.dup34
+ COMMIT ; SELECT * FROM cc
+----
+stmt 0 ok
+stmt 9 err 1 -1 27 no such table: cc
+==== without_rowid3-generated.dup35
+ DELETE FROM cc ; DELETE FROM pp
+----
+stmt 0 err 1 -1 17 no such table: cc
+stmt 17 err 1 -1 33 no such table: pp
+==== without_rowid3-genfkey.1.1
+
+    CREATE TABLE t1(a INT PRIMARY KEY, b, c, UNIQUE(b, c)) WITHOUT rowid;
+    CREATE TABLE t2(e REFERENCES t1, f);
+    CREATE TABLE t3(g, h, i, FOREIGN KEY (h, i) REFERENCES t1(b, c));
+----
+stmt 0 ok
+stmt 74 ok
+stmt 115 ok
+==== without_rowid3-genfkey.1.2
+ INSERT INTO t2 VALUES(1, 2)
+----
+stmt 0 err 1 -1 29 no such table: t2
+==== without_rowid3-genfkey.1.3
+
+    INSERT INTO t1 VALUES(1, 2, 3);
+    INSERT INTO t2 VALUES(1, 2);
+----
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 69 no such table: t2
+==== without_rowid3-genfkey.1.4
+ INSERT INTO t2 VALUES(NULL, 3)
+----
+stmt 0 err 1 -1 32 no such table: t2
+==== without_rowid3-genfkey.1.5
+ UPDATE t2 SET e = 5 WHERE e IS NULL
+----
+stmt 0 err 1 -1 37 no such table: t2
+==== without_rowid3-genfkey.1.6
+ UPDATE t2 SET e = 1 WHERE e IS NULL
+----
+stmt 0 err 1 -1 37 no such table: t2
+==== without_rowid3-genfkey.1.7
+ UPDATE t2 SET e = NULL WHERE f = 3
+----
+stmt 0 err 1 -1 36 no such table: t2
+==== without_rowid3-genfkey.1.8
+ UPDATE t1 SET a = 10
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== without_rowid3-genfkey.1.9
+ UPDATE t1 SET a = NULL
+----
+stmt 0 err 1 -1 24 no such table: t1
+==== without_rowid3-genfkey.1.10
+ DELETE FROM t1
+----
+stmt 0 err 1 -1 16 no such table: t1
+==== without_rowid3-genfkey.1.11
+ UPDATE t2 SET e = NULL
+----
+stmt 0 err 1 -1 24 no such table: t2
+==== without_rowid3-genfkey.1.12
+ 
+    UPDATE t1 SET a = 10;
+    DELETE FROM t1;
+    DELETE FROM t2;
+----
+stmt 0 err 1 -1 27 no such table: t1
+stmt 27 err 1 -1 47 no such table: t1
+stmt 47 err 1 -1 67 no such table: t2
+==== without_rowid3-genfkey.1.13
+
+    INSERT INTO t3 VALUES(1, NULL, NULL);
+    INSERT INTO t3 VALUES(1, 2, NULL);
+    INSERT INTO t3 VALUES(1, NULL, 3);
+----
+stmt 0 err 1 -1 42 no such table: t3
+stmt 42 err 1 -1 81 no such table: t3
+stmt 81 err 1 -1 120 no such table: t3
+==== without_rowid3-genfkey.1.14
+ INSERT INTO t3 VALUES(3, 1, 4)
+----
+stmt 0 err 1 -1 32 no such table: t3
+==== without_rowid3-genfkey.1.15
+ 
+    INSERT INTO t1 VALUES(1, 1, 4);
+    INSERT INTO t3 VALUES(3, 1, 4);
+----
+stmt 0 err 1 -1 37 no such table: t1
+stmt 37 err 1 -1 73 no such table: t3
+==== without_rowid3-genfkey.1.16
+ DELETE FROM t1
+----
+stmt 0 err 1 -1 16 no such table: t1
+==== without_rowid3-genfkey.1.17
+ UPDATE t1 SET b = 10
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== without_rowid3-genfkey.1.18
+ UPDATE t1 SET a = 10
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== without_rowid3-genfkey.1.19
+ UPDATE t3 SET h = 'hello' WHERE i = 3
+----
+stmt 0 err 1 -1 39 no such table: t3
+==== without_rowid3-genfkey.2.1
+
+    CREATE TABLE t1(a INT PRIMARY KEY, b, c, UNIQUE(b, c)) WITHOUT rowid;
+    CREATE TABLE t2(e REFERENCES t1 ON UPDATE CASCADE ON DELETE CASCADE, f);
+    CREATE TABLE t3(g, h, i, 
+        FOREIGN KEY (h, i) 
+        REFERENCES t1(b, c) ON UPDATE CASCADE ON DELETE CASCADE
+    );
+----
+stmt 0 ok
+stmt 74 ok
+stmt 151 ok
+==== without_rowid3-genfkey.2.2
+
+    INSERT INTO t1 VALUES(1, 2, 3);
+    INSERT INTO t1 VALUES(4, 5, 6);
+    INSERT INTO t2 VALUES(1, 'one');
+    INSERT INTO t2 VALUES(4, 'four');
+----
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 72 no such table: t1
+stmt 72 err 1 -1 109 no such table: t2
+stmt 109 err 1 -1 147 no such table: t2
+==== without_rowid3-genfkey.2.3
+
+    UPDATE t1 SET a = 2 WHERE a = 1;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 37 no such table: t1
+stmt 37 err 1 -1 59 no such table: t2
+==== without_rowid3-genfkey.2.4
+
+    DELETE FROM t1 WHERE a = 4;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 32 no such table: t1
+stmt 32 err 1 -1 54 no such table: t2
+==== without_rowid3-genfkey.2.5
+
+    INSERT INTO t3 VALUES('hello', 2, 3);
+    UPDATE t1 SET c = 2;
+    SELECT * FROM t3;
+----
+stmt 0 err 1 -1 42 no such table: t3
+stmt 42 err 1 -1 67 no such table: t1
+stmt 67 err 1 -1 89 no such table: t3
+==== without_rowid3-genfkey.2.6
+
+    DELETE FROM t1;
+    SELECT * FROM t3;
+----
+stmt 0 err 1 -1 20 no such table: t1
+stmt 20 err 1 -1 42 no such table: t3
+==== without_rowid3-genfkey.3.1
+
+    CREATE TABLE t1(a INTEGER PRIMARY KEY, b, c, UNIQUE(c, b)) WITHOUT rowid;
+    CREATE TABLE t2(e REFERENCES t1 ON UPDATE SET NULL ON DELETE SET NULL, f);
+    CREATE TABLE t3(g, h, i, 
+        FOREIGN KEY (h, i) 
+        REFERENCES t1(b, c) ON UPDATE SET NULL ON DELETE SET NULL
+    );
+----
+stmt 0 ok
+stmt 78 ok
+stmt 157 ok
+==== without_rowid3-genfkey.3.2
+
+    INSERT INTO t1 VALUES(1, 2, 3);
+    INSERT INTO t1 VALUES(4, 5, 6);
+    INSERT INTO t2 VALUES(1, 'one');
+    INSERT INTO t2 VALUES(4, 'four');
+----
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 72 no such table: t1
+stmt 72 err 1 -1 109 no such table: t2
+stmt 109 err 1 -1 147 no such table: t2
+==== without_rowid3-genfkey.3.3
+
+    UPDATE t1 SET a = 2 WHERE a = 1;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 37 no such table: t1
+stmt 37 err 1 -1 59 no such table: t2
+==== without_rowid3-genfkey.3.4
+
+    DELETE FROM t1 WHERE a = 4;
+    SELECT * FROM t2;
+----
+stmt 0 err 1 -1 32 no such table: t1
+stmt 32 err 1 -1 54 no such table: t2
+==== without_rowid3-genfkey.3.5
+
+    INSERT INTO t3 VALUES('hello', 2, 3);
+    UPDATE t1 SET c = 2;
+    SELECT * FROM t3;
+----
+stmt 0 err 1 -1 42 no such table: t3
+stmt 42 err 1 -1 67 no such table: t1
+stmt 67 err 1 -1 89 no such table: t3
+==== without_rowid3-genfkey.3.6
+
+    UPDATE t3 SET h = 2, i = 2;
+    DELETE FROM t1;
+    SELECT * FROM t3;
+----
+stmt 0 err 1 -1 32 no such table: t3
+stmt 32 err 1 -1 52 no such table: t1
+stmt 52 err 1 -1 74 no such table: t3
+==== without_rowid3-dd08e5.1.1
+
+    PRAGMA foreign_keys=ON;
+    CREATE TABLE tdd08(a INTEGER PRIMARY KEY, b) WITHOUT rowid;
+    CREATE UNIQUE INDEX idd08 ON tdd08(a,b);
+    INSERT INTO tdd08 VALUES(200,300);
+
+    CREATE TABLE tdd08_b(w,x,y, FOREIGN KEY(x,y) REFERENCES tdd08(a,b));
+    INSERT INTO tdd08_b VALUES(100,200,300);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 92 err 1 -1 137 no such table: main.tdd08
+stmt 137 err 1 -1 176 no such table: tdd08
+stmt 176 ok
+stmt 250 err 1 -1 295 no such table: tdd08_b
+==== without_rowid3-dd08e5.1.2
+
+    DELETE FROM tdd08;
+----
+stmt 0 err 1 -1 23 no such table: tdd08
+==== without_rowid3-dd08e5.1.3
+
+    SELECT * FROM tdd08;
+----
+stmt 0 err 1 -1 25 no such table: tdd08
+==== without_rowid3-dd08e5.1.4
+
+    INSERT INTO tdd08_b VALUES(400,500,300);
+----
+stmt 0 err 1 -1 45 no such table: tdd08_b
+==== without_rowid3-dd08e5.1.5
+
+    UPDATE tdd08_b SET x=x+1;
+----
+stmt 0 err 1 -1 30 no such table: tdd08_b
+==== without_rowid3-dd08e5.1.6
+
+    UPDATE tdd08 SET a=a+1;
+----
+stmt 0 err 1 -1 28 no such table: tdd08
+==== without_rowid3-ce7c13.1.1
+
+    CREATE TABLE tce71(a INTEGER PRIMARY KEY, b) WITHOUT rowid;
+    CREATE UNIQUE INDEX ice71 ON tce71(a,b);
+    INSERT INTO tce71 VALUES(100,200);
+    CREATE TABLE tce72(w, x, y, FOREIGN KEY(x,y) REFERENCES tce71(a,b));
+    INSERT INTO tce72 VALUES(300,100,200);
+    UPDATE tce71 set b = 200 where a = 100;
+    SELECT * FROM tce71, tce72;
+----
+stmt 0 ok
+stmt 64 err 1 -1 109 no such table: main.tce71
+stmt 109 err 1 -1 148 no such table: tce71
+stmt 148 ok
+stmt 221 err 1 -1 264 no such table: tce72
+stmt 264 err 1 -1 308 no such table: tce71
+stmt 308 err 1 -1 340 no such table: tce71
+==== without_rowid3-ce7c13.1.2
+
+    UPDATE tce71 set b = 201 where a = 100;
+----
+stmt 0 err 1 -1 44 no such table: tce71
+==== without_rowid3-ce7c13.1.3
+
+    UPDATE tce71 set a = 101 where a = 100;
+----
+stmt 0 err 1 -1 44 no such table: tce71
+==== without_rowid3-ce7c13.1.4
+
+    CREATE TABLE tce73(a INTEGER PRIMARY KEY, b, UNIQUE(a,b)) WITHOUT rowid;
+    INSERT INTO tce73 VALUES(100,200);
+    CREATE TABLE tce74(w, x, y, FOREIGN KEY(x,y) REFERENCES tce73(a,b));
+    INSERT INTO tce74 VALUES(300,100,200);
+    UPDATE tce73 set b = 200 where a = 100;
+    SELECT * FROM tce73, tce74;
+----
+stmt 0 ok
+stmt 77 err 1 -1 116 no such table: tce73
+stmt 116 ok
+stmt 189 err 1 -1 232 no such table: tce74
+stmt 232 err 1 -1 276 no such table: tce73
+stmt 276 err 1 -1 308 no such table: tce73
+==== without_rowid3-ce7c13.1.5
+
+    UPDATE tce73 set b = 201 where a = 100;
+----
+stmt 0 err 1 -1 44 no such table: tce73
+==== without_rowid3-ce7c13.1.6
+
+    UPDATE tce73 set a = 101 where a = 100;
+----
+stmt 0 err 1 -1 44 no such table: tce73
+==== without_rowid3-30.1
+
+  CREATE TABLE t1(a,b,PRIMARY KEY(a,b)) WITHOUT ROWID;
+  CREATE TABLE t2(a,b,PRIMARY KEY(a,b)) WITHOUT ROWID;
+  INSERT INTO t1 VALUES(1,2),(3,4),(5,6);
+  SELECT changes();
+----
+stmt 0 ok
+stmt 55 ok
+stmt 110 err 1 -1 152 no such table: t1
+stmt 152 ok
+==== without_rowid3-30.2
+
+  INSERT INTO t2 SELECT * FROM t1;
+  SELECT changes();
+----
+stmt 0 err 1 -1 35 no such table: t2
+stmt 35 ok

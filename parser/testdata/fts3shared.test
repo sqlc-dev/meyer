@@ -1,0 +1,28 @@
+==== fts3shared-1.1
+
+  CREATE VIRTUAL TABLE t1 USING fts3(x);
+  BEGIN;
+  INSERT INTO t1 VALUES('We listened and looked sideways up!');
+  INSERT INTO t1 VALUES('Fear at my heart, as at a cup,');
+  INSERT INTO t1 VALUES('My life-blood seemed to sip!');
+  INSERT INTO t1 VALUES('The stars were dim, and thick the night');
+  COMMIT;
+----
+stmt 0 ok
+stmt 41 ok
+stmt 50 err 1 -1 114 no such table: t1
+stmt 114 err 1 -1 173 no such table: t1
+stmt 173 err 1 -1 230 no such table: t1
+stmt 230 err 1 -1 298 no such table: t1
+stmt 298 ok
+==== fts3shared-1.2
+
+  BEGIN;
+    INSERT INTO t1 VALUES('The steersman''s face by his lamp gleamed white;');
+----
+stmt 0 ok
+stmt 9 err 1 -1 88 no such table: t1
+==== fts3shared-1.5
+ COMMIT
+----
+stmt 0 ok

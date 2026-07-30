@@ -1,0 +1,176 @@
+==== resolver01-1.1
+
+    CREATE TABLE t1(x, y); INSERT INTO t1 VALUES(11,22);
+    CREATE TABLE t2(y, z); INSERT INTO t2 VALUES(33,44);
+    SELECT 1 AS y FROM t1, t2 ORDER BY y;
+----
+stmt 0 ok
+stmt 27 err 1 -1 57 no such table: t1
+stmt 57 ok
+stmt 84 err 1 -1 114 no such table: t2
+stmt 114 err 1 -1 156 no such table: t1
+==== resolver01-1.2
+
+    SELECT 1 AS yy FROM t1, t2 ORDER BY y;
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== resolver01-1.3
+
+    CREATE TABLE t3(x,y); INSERT INTO t3 VALUES(11,44),(33,22);
+    SELECT x AS y FROM t3 ORDER BY y;
+----
+stmt 0 ok
+stmt 26 err 1 -1 64 no such table: t3
+stmt 64 err 1 -1 102 no such table: t3
+==== resolver01-1.4
+
+    SELECT x AS yy FROM t3 ORDER BY y;
+----
+stmt 0 err 1 -1 39 no such table: t3
+==== resolver01-1.5
+
+    SELECT x AS yy FROM t3 ORDER BY yy;
+----
+stmt 0 err 1 -1 40 no such table: t3
+==== resolver01-1.6
+
+    SELECT x AS yy FROM t3 ORDER BY 1;
+----
+stmt 0 err 1 -1 39 no such table: t3
+==== resolver01-2.1
+
+    SELECT 2 AS y FROM t1, t2 ORDER BY y COLLATE nocase;
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== resolver01-2.2
+
+    SELECT 2 AS yy FROM t1, t2 ORDER BY y COLLATE nocase;
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== resolver01-2.3
+
+    SELECT x AS y FROM t3 ORDER BY y COLLATE nocase;
+----
+stmt 0 err 1 -1 53 no such table: t3
+==== resolver01-2.4
+
+    SELECT x AS yy FROM t3 ORDER BY y COLLATE nocase;
+----
+stmt 0 err 1 -1 54 no such table: t3
+==== resolver01-2.5
+
+    SELECT x AS yy FROM t3 ORDER BY yy COLLATE nocase;
+----
+stmt 0 err 1 -1 55 no such table: t3
+==== resolver01-2.6
+
+    SELECT x AS yy FROM t3 ORDER BY 1 COLLATE nocase;
+----
+stmt 0 err 1 -1 54 no such table: t3
+==== resolver01-3.1
+
+    SELECT 3 AS y FROM t1, t2 ORDER BY +y;
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== resolver01-3.2
+
+    SELECT 2 AS yy FROM t1, t2 ORDER BY +y;
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== resolver01-3.3
+
+    SELECT x AS y FROM t3 ORDER BY +y;
+----
+stmt 0 err 1 -1 39 no such table: t3
+==== resolver01-3.4
+
+    SELECT x AS yy FROM t3 ORDER BY +y;
+----
+stmt 0 err 1 -1 40 no such table: t3
+==== resolver01-3.5
+
+    SELECT x AS yy FROM t3 ORDER BY +yy
+----
+stmt 0 err 1 -1 41 no such table: t3
+==== resolver01-4.1
+
+  CREATE TABLE t4(m CHAR(2));
+  INSERT INTO t4 VALUES('az');
+  INSERT INTO t4 VALUES('by');
+  INSERT INTO t4 VALUES('cx');
+  SELECT '1', substr(m,2) AS m FROM t4 ORDER BY m;
+  SELECT '2', substr(m,2) AS m FROM t4 ORDER BY m COLLATE binary;
+  SELECT '3', substr(m,2) AS m FROM t4 ORDER BY lower(m);
+----
+stmt 0 ok
+stmt 30 err 1 -1 61 no such table: t4
+stmt 61 err 1 -1 92 no such table: t4
+stmt 92 err 1 -1 123 no such table: t4
+stmt 123 err 1 -1 174 no such table: t4
+stmt 174 err 1 -1 240 no such table: t4
+stmt 240 err 1 -1 298 no such table: t4
+==== resolver01-5.1
+
+  CREATE TABLE t5(m CHAR(2));
+  INSERT INTO t5 VALUES('ax');
+  INSERT INTO t5 VALUES('bx');
+  INSERT INTO t5 VALUES('cy');
+  SELECT count(*), substr(m,2,1) AS m FROM t5 GROUP BY m ORDER BY 1, 2;
+----
+stmt 0 ok
+stmt 30 err 1 -1 61 no such table: t5
+stmt 61 err 1 -1 92 no such table: t5
+stmt 92 err 1 -1 123 no such table: t5
+stmt 123 err 1 -1 195 no such table: t5
+==== resolver01-5.2
+
+  SELECT count(*), substr(m,2,1) AS mx FROM t5 GROUP BY m ORDER BY 1, 2;
+----
+stmt 0 err 1 -1 73 no such table: t5
+==== resolver01-5.3
+
+  SELECT count(*), substr(m,2,1) AS mx FROM t5 GROUP BY mx ORDER BY 1, 2;
+----
+stmt 0 err 1 -1 74 no such table: t5
+==== resolver01-5.4
+
+  SELECT count(*), substr(m,2,1) AS mx FROM t5
+   GROUP BY substr(m,2,1) ORDER BY 1, 2;
+----
+stmt 0 err 1 -1 88 no such table: t5
+==== resolver01-6.1
+
+  CREATE TABLE t61(name);
+  SELECT min(name) FROM t61 GROUP BY lower(name);
+----
+stmt 0 ok
+stmt 26 err 1 -1 76 no such table: t61
+==== resolver01-6.2
+
+  SELECT min(name) AS name FROM t61 GROUP BY lower(name);
+----
+stmt 0 err 1 -1 58 no such table: t61
+==== resolver01-6.3
+
+  CREATE TABLE t63(name);
+  INSERT INTO t63 VALUES (NULL);
+  INSERT INTO t63 VALUES ('abc');
+  SELECT count(),
+       NULLIF(name,'abc') AS name
+    FROM t63
+   GROUP BY lower(name);
+----
+stmt 0 ok
+stmt 26 err 1 -1 59 no such table: t63
+stmt 59 err 1 -1 93 no such table: t63
+stmt 93 err 1 -1 183 no such table: t63
+==== resolver01-7.1
+
+  SELECT 2 AS x WHERE (SELECT x AS y WHERE 3>y);
+----
+stmt 0 ok
+==== resolver01-7.2
+
+  SELECT 2 AS x WHERE (SELECT x AS y WHERE 1>y);
+----
+stmt 0 ok

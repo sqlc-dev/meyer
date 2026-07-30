@@ -1,0 +1,111 @@
+==== wherelimit-0.1
+DELETE FROM t1 ORDER BY x
+----
+stmt 0 err 1 15 20 near "ORDER": syntax error
+==== wherelimit-0.2
+DELETE FROM t1 WHERE x=1 ORDER BY x
+----
+stmt 0 err 1 25 30 near "ORDER": syntax error
+==== wherelimit-0.3
+UPDATE t1 SET y=1 WHERE x=1 ORDER BY x
+----
+stmt 0 err 1 28 33 near "ORDER": syntax error
+==== wherelimit-0.4
+DELETE FROM t1 AS a WHERE a.x=1
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== wherelimit-0.5.1
+UPDATE t1 AS a SET y=1 WHERE x=1
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== wherelimit-0.5.2
+UPDATE t1 AS a SET y=1 WHERE t1.x=1
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== wherelimit-0.6
+DELETE FROM t1 WHERE x=1 OFFSET 2
+----
+stmt 0 err 1 25 31 near "OFFSET": syntax error
+==== wherelimit-0.7
+UPDATE t1 SET y=1 WHERE x=1 OFFSET 2
+----
+stmt 0 err 1 28 34 near "OFFSET": syntax error
+==== wherelimit-1.0
+SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 24 no such table: t1
+==== wherelimit-1.3c
+SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 24 no such table: t1
+==== wherelimit-1.4cnt
+SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 24 no such table: t1
+==== wherelimit-2.0
+SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 24 no such table: t1
+==== wherelimit-3.0
+SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 24 no such table: t1
+==== wherelimit-3.2
+UPDATE t1 SET y=1 WHERE x=1 RETURNING x, y, '|' LIMIT 5
+----
+stmt 0 err 1 48 53 near "LIMIT": syntax error
+==== wherelimit-3.2cnt
+SELECT count(*) FROM t1 WHERE y=1
+----
+stmt 0 err 1 -1 34 no such table: t1
+==== wherelimit-4.1
+
+    CREATE TABLE t1(a int);
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(2);
+    INSERT INTO t1 VALUES(3);
+    CREATE TABLE t2(a int);
+    INSERT INTO t2 SELECT a+100 FROM t1;
+    CREATE VIEW tv(r,a) AS
+       SELECT rowid, a FROM t2 UNION ALL SELECT rowid, a FROM t1;
+    CREATE TRIGGER tv_del INSTEAD OF DELETE ON tv
+    BEGIN
+      DELETE FROM t1 WHERE rowid=old.r;
+      DELETE FROM t2 WHERE rowid=old.r;
+    END;
+----
+stmt 0 ok
+stmt 28 err 1 -1 58 no such table: t1
+stmt 58 err 1 -1 88 no such table: t1
+stmt 88 err 1 -1 118 no such table: t1
+stmt 118 ok
+stmt 146 err 1 -1 187 no such table: t2
+stmt 187 ok
+stmt 280 err 1 -1 340 no such table: main.tv
+==== wherelimit-4.2
+
+    DELETE FROM tv WHERE 1 LIMIT 2;
+----
+stmt 0 err 1 28 33 near "LIMIT": syntax error
+==== wherelimit-4.3
+
+    DELETE FROM tv WHERE 1 ORDER BY a LIMIT 2;
+----
+stmt 0 err 1 28 33 near "ORDER": syntax error
+==== wherelimit-4.10
+
+    CREATE TABLE t3(a,b,c,d TEXT, PRIMARY KEY(a,b)) WITHOUT ROWID;
+    INSERT INTO t3(a,b,c,d) VALUES(1,2,3,4),(5,6,7,8),(9,10,11,12);
+----
+stmt 0 ok
+stmt 67 err 1 -1 135 no such table: t3
+==== wherelimit-4.11
+
+    DELETE FROM t3 WHERE a=5 LIMIT 2;
+----
+stmt 0 err 1 30 35 near "LIMIT": syntax error
+==== wherelimit-4.12
+
+    SELECT a,b,c,d FROM t3 ORDER BY 1;
+----
+stmt 0 err 1 -1 39 no such table: t3

@@ -1,0 +1,56 @@
+==== vacuum2-1.1
+
+    CREATE TABLE t1(x INTEGER PRIMARY KEY AUTOINCREMENT, y);
+    DROP TABLE t1;
+    VACUUM;
+----
+stmt 0 ok
+stmt 61 err 1 -1 80 no such table: t1
+stmt 80 ok
+==== vacuum2-4.2
+
+      pragma auto_vacuum=1;
+      vacuum;
+      pragma auto_vacuum;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 42 ok
+==== vacuum2-4.3
+
+      pragma integrity_check
+----
+stmt 0 ok
+==== vacuum2-4.6
+
+      pragma integrity_check
+----
+stmt 0 ok
+==== vacuum2-5.1
+
+  CREATE TABLE t1(a PRIMARY KEY, b UNIQUE);
+  INSERT INTO t1 VALUES(1, randomblob(500));
+  INSERT INTO t1 SELECT a+1, randomblob(500) FROM t1;      -- 2
+  INSERT INTO t1 SELECT a+2, randomblob(500) FROM t1;      -- 4 
+  INSERT INTO t1 SELECT a+4, randomblob(500) FROM t1;      -- 8 
+  INSERT INTO t1 SELECT a+8, randomblob(500) FROM t1;      -- 16
+----
+stmt 0 ok
+stmt 44 err 1 -1 89 no such table: t1
+stmt 89 err 1 -1 143 no such table: t1
+stmt 143 err 1 -1 207 no such table: t1
+stmt 207 err 1 -1 272 no such table: t1
+stmt 272 err 1 -1 337 no such table: t1
+==== 6.0
+
+  CREATE TABLE t6(x PRIMARY KEY COLLATE cmp, y) WITHOUT ROWID;
+  CREATE INDEX t6y ON t6(y);
+  INSERT INTO t6 VALUES('i', 'one');
+  INSERT INTO t6 VALUES('ii', 'one');
+  INSERT INTO t6 VALUES('iii', 'one');
+----
+stmt 0 err 1 -1 45 no such collation sequence: cmp
+stmt 63 err 1 -1 92 no such table: main.t6
+stmt 92 err 1 -1 129 no such table: t6
+stmt 129 err 1 -1 167 no such table: t6
+stmt 167 err 1 -1 206 no such table: t6

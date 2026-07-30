@@ -1,0 +1,239 @@
+==== 1.%TN%.0
+
+    CREATE TABLE log(t TEXT);
+    CREATE TABLE t1(x INTEGER PRIMARY KEY, y, z UNIQUE) %WO%;
+    CREATE INDEX t1y ON t1(y);
+
+    INSERT INTO t1 VALUES(1, 'i',   'one');
+    INSERT INTO t1 VALUES(2, 'ii',  'two');
+    INSERT INTO t1 VALUES(3, 'iii', 'three');
+    INSERT INTO t1 VALUES(4, 'iv',  'four');
+----
+stmt 0 ok
+stmt 30 err 1 87 88 near "%": syntax error
+stmt 92 err 1 -1 123 no such table: main.t1
+stmt 123 err 1 -1 168 no such table: t1
+stmt 168 err 1 -1 212 no such table: t1
+stmt 212 err 1 -1 258 no such table: t1
+stmt 258 err 1 -1 303 no such table: t1
+==== 1.%TN%.1
+
+    CREATE TABLE x1(o, n);
+    INSERT INTO x1 VALUES(1, 11);
+    INSERT INTO x1 VALUES(2, 12);
+    INSERT INTO x1 VALUES(3, 13);
+    INSERT INTO x1 VALUES(4, 14);
+    UPDATE t1 SET x=n FROM x1 WHERE x=o;
+    SELECT x, y, z FROM t1 ORDER BY 1;
+----
+stmt 0 ok
+stmt 27 err 1 -1 61 no such table: x1
+stmt 61 err 1 -1 95 no such table: x1
+stmt 95 err 1 -1 129 no such table: x1
+stmt 129 err 1 -1 163 no such table: x1
+stmt 163 err 1 -1 204 no such table: t1
+stmt 204 err 1 -1 243 no such table: t1
+==== 1.%TN%.3
+
+    INSERT INTO x1 VALUES(11, 21);
+    INSERT INTO x1 VALUES(12, 22);
+    INSERT INTO x1 VALUES(13, 23);
+    INSERT INTO x1 VALUES(14, 24);
+
+    INSERT INTO x1 VALUES(21, 31);
+    INSERT INTO x1 VALUES(22, 32);
+    INSERT INTO x1 VALUES(23, 33);
+    INSERT INTO x1 VALUES(24, 34);
+    UPDATE t1 SET x=n FROM x1 WHERE x=o;
+    SELECT x, y, z FROM t1 ORDER BY 1;
+----
+stmt 0 err 1 -1 35 no such table: x1
+stmt 35 err 1 -1 70 no such table: x1
+stmt 70 err 1 -1 105 no such table: x1
+stmt 105 err 1 -1 140 no such table: x1
+stmt 140 err 1 -1 176 no such table: x1
+stmt 176 err 1 -1 211 no such table: x1
+stmt 211 err 1 -1 246 no such table: x1
+stmt 246 err 1 -1 281 no such table: x1
+stmt 281 err 1 -1 322 no such table: t1
+stmt 322 err 1 -1 361 no such table: t1
+==== 1.%TN%.4
+
+    UPDATE t1 SET x=n FROM x1 WHERE x=o;
+    SELECT x, y, z FROM t1 ORDER BY 1;
+----
+stmt 0 err 1 -1 41 no such table: t1
+stmt 41 err 1 -1 80 no such table: t1
+==== 1.%TN%.5
+
+    INSERT INTO x1 VALUES(31, 32);
+    INSERT INTO x1 VALUES(33, 34);
+    UPDATE OR REPLACE t1 SET x=n FROM x1 WHERE x=o;
+    SELECT x, y, z FROM t1 ORDER BY 1;
+----
+stmt 0 err 1 -1 35 no such table: x1
+stmt 35 err 1 -1 70 no such table: x1
+stmt 70 err 1 -1 122 no such table: t1
+stmt 122 err 1 -1 161 no such table: t1
+==== 1.%TN%.6
+
+    INSERT INTO t1 VALUES(33, 'ii', 'two');
+    INSERT INTO t1 VALUES(35, 'iv', 'four');
+----
+stmt 0 err 1 -1 44 no such table: t1
+stmt 44 err 1 -1 89 no such table: t1
+==== 1.%TN%.7
+
+    CREATE TABLE x2(o, n, zz);
+    INSERT INTO x2 VALUES(32, 41, 'four');
+    INSERT INTO x2 VALUES(33, 42, 'three');
+    UPDATE OR IGNORE t1 SET x=n, z=zz FROM x2 WHERE x=o;
+    SELECT x, y, z FROM t1 ORDER BY 1;
+----
+stmt 0 ok
+stmt 31 err 1 -1 74 no such table: x2
+stmt 74 err 1 -1 118 no such table: x2
+stmt 118 err 1 -1 175 no such table: t1
+stmt 175 err 1 -1 214 no such table: t1
+==== 1.%TN%.8
+
+    UPDATE OR REPLACE t1 SET x=n, z=zz FROM x2 WHERE x=o;
+    SELECT x, y, z FROM t1 ORDER BY 1;
+----
+stmt 0 err 1 -1 58 no such table: t1
+stmt 58 err 1 -1 97 no such table: t1
+==== 2.1.1
+
+  CREATE TABLE u1(a, b, c, PRIMARY KEY(b, c)) WITHOUT ROWID;
+  INSERT INTO u1 VALUES(0, 0, 0);
+  INSERT INTO u1 VALUES(1, 0, 1);
+  INSERT INTO u1 VALUES(2, 1, 0);
+  INSERT INTO u1 VALUES(3, 1, 1);
+----
+stmt 0 ok
+stmt 61 err 1 -1 95 no such table: u1
+stmt 95 err 1 -1 129 no such table: u1
+stmt 129 err 1 -1 163 no such table: u1
+stmt 163 err 1 -1 197 no such table: u1
+==== 2.1.2
+
+  CREATE TABLE map(f, t);
+  INSERT INTO map VALUES(0, 10);
+  INSERT INTO map VALUES(1, 11);
+  UPDATE u1 SET c=t FROM map WHERE c=f;
+  SELECT * FROM u1 ORDER BY a;
+----
+stmt 0 ok
+stmt 26 err 1 -1 59 no such table: map
+stmt 59 err 1 -1 92 no such table: map
+stmt 92 err 1 -1 132 no such table: u1
+stmt 132 err 1 -1 163 no such table: u1
+==== 2.1.3
+
+  UPDATE u1 SET b=t FROM map WHERE b=f;
+  SELECT * FROM u1 ORDER BY a;
+----
+stmt 0 err 1 -1 40 no such table: u1
+stmt 40 err 1 -1 71 no such table: u1
+==== 2.1.4
+
+  CREATE TABLE map2(o1, o2, n1, n2);
+  INSERT INTO map2 VALUES
+    (10, 10, 50, 50), (10, 11, 50, 60), 
+    (11, 10, 60, 50), (11, 11, 60, 60);
+  UPDATE u1 SET b=n1, c=n2 FROM map2 WHERE b=o1 AND c=o2;
+  SELECT * FROM u1 ORDER BY a;
+----
+stmt 0 ok
+stmt 37 err 1 -1 144 no such table: map2
+stmt 144 err 1 -1 202 no such table: u1
+stmt 202 err 1 -1 233 no such table: u1
+==== upfrom3-generated
+
+      CREATE TABLE g1(a, b, c, PRIMARY KEY(a, b)) %WO%;
+      INSERT INTO g1 VALUES(1, 1, 1);
+
+      ATTACH 'test.db2' AS aux;
+      CREATE TABLE aux.g1(a, b, c, PRIMARY KEY(a, b)) %WO%;
+      INSERT INTO aux.g1 VALUES(10, 1, 10);
+      INSERT INTO aux.g1 VALUES(20, 2, 20);
+      INSERT INTO aux.g1 VALUES(30, 3, 30);
+----
+stmt 0 err 1 51 52 near "%": syntax error
+stmt 56 err 1 -1 94 no such table: g1
+stmt 94 ok
+stmt 127 err 1 147 154 unknown database aux
+stmt 187 err 1 -1 231 no such table: aux.g1
+stmt 231 err 1 -1 275 no such table: aux.g1
+stmt 275 err 1 -1 319 no such table: aux.g1
+==== upfrom3-generated.dup1
+
+      UPDATE aux.g1 SET c=101 FROM main.g1;
+----
+stmt 0 err 1 -1 44 no such table: aux.g1
+==== upfrom3-generated.dup2
+
+      SELECT * FROM aux.g1;
+----
+stmt 0 err 1 -1 28 no such table: aux.g1
+==== upfrom3-generated.dup3
+
+      UPDATE g1 SET c=101 FROM g1 AS g2;
+----
+stmt 0 err 1 -1 41 no such table: g1
+==== upfrom3-generated.dup4
+
+      SELECT * FROM g1;
+----
+stmt 0 err 1 -1 24 no such table: g1
+==== upfrom3-generated.dup5
+
+      CREATE TABLE p1(a INTEGER PRIMARY KEY, b) %WO%;
+      CREATE TABLE c1(x PRIMARY KEY, y REFERENCES p1 ON UPDATE CASCADE) %WO%;
+      PRAGMA foreign_keys = 1;
+
+      INSERT INTO p1 VALUES(1, 'one');
+      INSERT INTO p1 VALUES(11, 'eleven');
+      INSERT INTO p1 VALUES(111, 'eleventyone');
+
+      INSERT INTO c1 VALUES('a', 1);
+      INSERT INTO c1 VALUES('b', 11);
+      INSERT INTO c1 VALUES('c', 111);
+----
+stmt 0 err 1 49 50 near "%": syntax error
+stmt 54 err 1 127 128 near "%": syntax error
+stmt 132 ok
+stmt 163 err 1 -1 203 no such table: p1
+stmt 203 err 1 -1 246 no such table: p1
+stmt 246 err 1 -1 295 no such table: p1
+stmt 295 err 1 -1 333 no such table: c1
+stmt 333 err 1 -1 371 no such table: c1
+stmt 371 err 1 -1 410 no such table: c1
+==== upfrom3-generated.dup6
+
+      CREATE TABLE map(f, t);
+      INSERT INTO map VALUES('a', 111);
+      INSERT INTO map VALUES('c', 112);
+----
+stmt 0 ok
+stmt 30 err 1 -1 70 no such table: map
+stmt 70 err 1 -1 110 no such table: map
+==== upfrom3-generated.dup7
+
+      UPDATE c1 SET y=t FROM map WHERE x=f;
+----
+stmt 0 err 1 -1 44 no such table: c1
+==== upfrom3-generated.dup8
+
+      INSERT INTO map VALUES('eleven', 12);
+      INSERT INTO map VALUES('eleventyone', 112);
+      UPDATE p1 SET a=t FROM map WHERE b=f;
+----
+stmt 0 err 1 -1 44 no such table: map
+stmt 44 err 1 -1 94 no such table: map
+stmt 94 err 1 -1 138 no such table: p1
+==== upfrom3-generated.dup9
+
+      SELECT * FROM c1
+----
+stmt 0 err 1 -1 24 no such table: c1

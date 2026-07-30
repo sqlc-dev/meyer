@@ -1,0 +1,677 @@
+==== 1.1.1
+
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES('w x', 'x y', 'y z');
+  CREATE VIRTUAL TABLE ft1 USING fts4(content=t1);
+----
+stmt 0 ok
+stmt 28 err 1 -1 74 no such table: t1
+stmt 74 ok
+==== 1.1.2
+
+  PRAGMA table_info(ft1);
+----
+stmt 0 ok
+==== 1.1.3
+ SELECT *, rowid FROM ft1
+----
+stmt 0 err 1 -1 26 no such table: ft1
+==== 1.1.4
+ SELECT a, c FROM ft1 WHERE rowid=1
+----
+stmt 0 err 1 -1 36 no such table: ft1
+==== 1.1.5
+ INSERT INTO ft1(ft1) VALUES('rebuild')
+----
+stmt 0 err 1 -1 40 no such table: ft1
+==== 1.1.6
+ SELECT rowid FROM ft1 WHERE ft1 MATCH 'x'
+----
+stmt 0 err 1 -1 43 no such table: ft1
+==== 1.1.7
+ SELECT rowid FROM ft1 WHERE ft1 MATCH 'a'
+----
+stmt 0 err 1 -1 43 no such table: ft1
+==== 1.2.1
+
+  DROP TABLE ft1;
+  CREATE VIRTUAL TABLE ft1 USING fts4(content=t1, b);
+  PRAGMA table_info(ft1);
+----
+stmt 0 err 1 -1 18 no such table: ft1
+stmt 18 ok
+stmt 72 ok
+==== 1.2.2
+ 
+  SELECT *, rowid FROM ft1
+----
+stmt 0 err 1 -1 29 no such table: ft1
+==== 2.0
+
+  CREATE TABLE t2(x);
+  INSERT INTO t2 VALUES('O S W W F U C R Q I C N P Z Y Y E Y Y E');  -- 1
+  INSERT INTO t2 VALUES('Y X U V L B E H Y J C Y A I A P V F V K');  -- 2
+  INSERT INTO t2 VALUES('P W I N J H I I N I F B K D U Q B Z S F');  -- 3
+  INSERT INTO t2 VALUES('N R O R H J R H G M D I U U B O M P A U');  -- 4
+  INSERT INTO t2 VALUES('Y O V O G T P N G T N F I V B U M J M G');  -- 5
+  INSERT INTO t2 VALUES('J O B N K N E C H Z R K J O U G M K L S');  -- 6
+  INSERT INTO t2 VALUES('S Z S R I Q U A P W R X H K C Z U L S P');  -- 7
+  INSERT INTO t2 VALUES('J C H N R C K R V N M O F Z M Z A I H W');  -- 8
+  INSERT INTO t2 VALUES('O Y G I S J U U W O D Z F J K N R P R L');  -- 9
+  INSERT INTO t2 VALUES('B G L K U R U P V X Z I H V R W C Q A S');  -- 10
+  INSERT INTO t2 VALUES('T F T J F F Y V F W N X K Q A Y L X W G');  -- 11
+  INSERT INTO t2 VALUES('C J U H B Q X L C M M Y E G V F W V Z C');  -- 12
+  INSERT INTO t2 VALUES('B W L T F S G X D P H N G M R I O A X I');  -- 13
+  INSERT INTO t2 VALUES('N G Y O K Q K Z N M H U J E D H U W R K');  -- 14
+  INSERT INTO t2 VALUES('U D T R U Y F J D S J X E H Q G V A S Z');  -- 15
+  INSERT INTO t2 VALUES('M I W P J S H R J D Q I C G P C T P H R');  -- 16
+  INSERT INTO t2 VALUES('J M N I S L X Q C A B F C B Y D H V R J');  -- 17
+  INSERT INTO t2 VALUES('F V Z W J Q L P X Y E W B U Q N H X K T');  -- 18
+  INSERT INTO t2 VALUES('R F S R Y O F Q E I E G H C B H R X Y N');  -- 19
+  INSERT INTO t2 VALUES('U Q Q Q T E P D M F X P J G H X C Q D L');  -- 20
+----
+stmt 0 ok
+stmt 22 err 1 -1 90 no such table: t2
+stmt 90 err 1 -1 164 no such table: t2
+stmt 164 err 1 -1 238 no such table: t2
+stmt 238 err 1 -1 312 no such table: t2
+stmt 312 err 1 -1 386 no such table: t2
+stmt 386 err 1 -1 460 no such table: t2
+stmt 460 err 1 -1 534 no such table: t2
+stmt 534 err 1 -1 608 no such table: t2
+stmt 608 err 1 -1 682 no such table: t2
+stmt 682 err 1 -1 756 no such table: t2
+stmt 756 err 1 -1 831 no such table: t2
+stmt 831 err 1 -1 906 no such table: t2
+stmt 906 err 1 -1 981 no such table: t2
+stmt 981 err 1 -1 1056 no such table: t2
+stmt 1056 err 1 -1 1131 no such table: t2
+stmt 1131 err 1 -1 1206 no such table: t2
+stmt 1206 err 1 -1 1281 no such table: t2
+stmt 1281 err 1 -1 1356 no such table: t2
+stmt 1356 err 1 -1 1431 no such table: t2
+stmt 1431 err 1 -1 1506 no such table: t2
+==== 2.1
+
+  CREATE VIRTUAL TABLE ft2 USING fts4(content=t2);
+  INSERT INTO ft2(ft2) VALUES('rebuild');
+
+  -- Modify the backing table a bit: Row 17 is missing and the contents 
+  -- of row 20 do not match the FTS index contents. 
+  DELETE FROM t2 WHERE rowid = 17;
+  UPDATE t2 SET x = 'a b c d e f g h i j' WHERE rowid = 20;
+----
+stmt 0 ok
+stmt 51 err 1 -1 93 no such table: ft2
+stmt 93 err 1 -1 255 no such table: t2
+stmt 255 err 1 -1 315 no such table: t2
+==== 3.1
+
+  CREATE TABLE t3(x, y);
+  CREATE VIRTUAL TABLE ft3 USING fts4(content=t3);
+----
+stmt 0 ok
+stmt 25 ok
+==== 3.1.1
+
+  INSERT INTO ft3 VALUES('a b c', 'd e f');
+----
+stmt 0 err 1 -1 44 no such table: ft3
+==== 3.1.2
+
+  INSERT INTO ft3(docid, x, y) VALUES(21, 'a b c', 'd e f');
+  SELECT rowid FROM ft3 WHERE ft3 MATCH '"a b c"';
+----
+stmt 0 err 1 -1 61 no such table: ft3
+stmt 61 err 1 -1 112 no such table: ft3
+==== 3.1.3
+ SELECT * FROM t3
+----
+stmt 0 err 1 -1 18 no such table: t3
+==== 3.1.4
+ 
+  DELETE FROM ft3;
+  SELECT rowid FROM ft3 WHERE ft3 MATCH '"a b c"';
+----
+stmt 0 err 1 -1 20 no such table: ft3
+stmt 20 err 1 -1 71 no such table: ft3
+==== 3.1.5
+
+  INSERT INTO t3(rowid, x, y) VALUES(21, 'a b c', 'd e f');
+  DELETE FROM ft3;
+  SELECT rowid FROM ft3 WHERE ft3 MATCH '"a b c"';
+----
+stmt 0 err 1 -1 60 no such table: t3
+stmt 60 err 1 -1 79 no such table: ft3
+stmt 79 err 1 -1 130 no such table: ft3
+==== 3.1.6
+ SELECT rowid FROM t3
+----
+stmt 0 err 1 -1 22 no such table: t3
+==== 3.2.1
+
+  INSERT INTO ft3(rowid, x, y) VALUES(0, 'R T M S M', 'A F O K H');
+  INSERT INTO ft3(rowid, x, y) VALUES(1, 'C Z J O X', 'U S Q D K');
+  INSERT INTO ft3(rowid, x, y) VALUES(2, 'N G H P O', 'N O P O C');
+  INSERT INTO ft3(rowid, x, y) VALUES(3, 'V H S D R', 'K N G E C');
+  INSERT INTO ft3(rowid, x, y) VALUES(4, 'J T R V U', 'U X S L C');
+  INSERT INTO ft3(rowid, x, y) VALUES(5, 'N A Y N G', 'X D G P Y');
+  INSERT INTO ft3(rowid, x, y) VALUES(6, 'I Q I S P', 'D R O Q B');
+  INSERT INTO ft3(rowid, x, y) VALUES(7, 'T K T Z J', 'B W D G O');
+  INSERT INTO ft3(rowid, x, y) VALUES(8, 'Y K F X T', 'D F G V G');
+  INSERT INTO ft3(rowid, x, y) VALUES(9, 'E L E T L', 'P W N F Z');
+  INSERT INTO ft3(rowid, x, y) VALUES(10, 'O G J G X', 'G J F E P');
+  INSERT INTO ft3(rowid, x, y) VALUES(11, 'O L N N Z', 'K E Z F D');
+  INSERT INTO ft3(rowid, x, y) VALUES(12, 'R Z M R J', 'X G I M Z');
+  INSERT INTO ft3(rowid, x, y) VALUES(13, 'L X N N X', 'R R N S T');
+  INSERT INTO ft3(rowid, x, y) VALUES(14, 'F L B J H', 'K W F L C');
+  INSERT INTO ft3(rowid, x, y) VALUES(15, 'P E B M V', 'E A A B U');
+  INSERT INTO ft3(rowid, x, y) VALUES(16, 'V E C F P', 'L U T V K');
+  INSERT INTO ft3(rowid, x, y) VALUES(17, 'T N O Z N', 'T P Q X N');
+  INSERT INTO ft3(rowid, x, y) VALUES(18, 'V W U W R', 'H O A A V');
+  INSERT INTO ft3(rowid, x, y) VALUES(19, 'A H N L F', 'I G H B O');
+----
+stmt 0 err 1 -1 68 no such table: ft3
+stmt 68 err 1 -1 136 no such table: ft3
+stmt 136 err 1 -1 204 no such table: ft3
+stmt 204 err 1 -1 272 no such table: ft3
+stmt 272 err 1 -1 340 no such table: ft3
+stmt 340 err 1 -1 408 no such table: ft3
+stmt 408 err 1 -1 476 no such table: ft3
+stmt 476 err 1 -1 544 no such table: ft3
+stmt 544 err 1 -1 612 no such table: ft3
+stmt 612 err 1 -1 680 no such table: ft3
+stmt 680 err 1 -1 749 no such table: ft3
+stmt 749 err 1 -1 818 no such table: ft3
+stmt 818 err 1 -1 887 no such table: ft3
+stmt 887 err 1 -1 956 no such table: ft3
+stmt 956 err 1 -1 1025 no such table: ft3
+stmt 1025 err 1 -1 1094 no such table: ft3
+stmt 1094 err 1 -1 1163 no such table: ft3
+stmt 1163 err 1 -1 1232 no such table: ft3
+stmt 1232 err 1 -1 1301 no such table: ft3
+stmt 1301 err 1 -1 1370 no such table: ft3
+==== 3.3.1
+
+  INSERT INTO t3(rowid, x, y) VALUES(0, 'R T M S M', 'A F O K H');
+  INSERT INTO t3(rowid, x, y) VALUES(1, 'C Z J O X', 'U S Q D K');
+  INSERT INTO t3(rowid, x, y) VALUES(2, 'N G H P O', 'N O P O C');
+  INSERT INTO t3(rowid, x, y) VALUES(3, 'V H S D R', 'K N G E C');
+  INSERT INTO t3(rowid, x, y) VALUES(4, 'J T R V U', 'U X S L C');
+  INSERT INTO t3(rowid, x, y) VALUES(5, 'N A Y N G', 'X D G P Y');
+  UPDATE ft3 SET x = y, y = x;
+  DELETE FROM t3;
+----
+stmt 0 err 1 -1 67 no such table: t3
+stmt 67 err 1 -1 134 no such table: t3
+stmt 134 err 1 -1 201 no such table: t3
+stmt 201 err 1 -1 268 no such table: t3
+stmt 268 err 1 -1 335 no such table: t3
+stmt 335 err 1 -1 402 no such table: t3
+stmt 402 err 1 -1 433 no such table: ft3
+stmt 433 err 1 -1 451 no such table: t3
+==== 3.3.1.dup1
+
+  INSERT INTO t3(rowid, x, y) VALUES(15, 'P E B M V', 'E A A B U');
+  INSERT INTO t3(rowid, x, y) VALUES(16, 'V E C F P', 'L U T V K');
+  INSERT INTO t3(rowid, x, y) VALUES(17, 'T N O Z N', 'T P Q X N');
+  INSERT INTO t3(rowid, x, y) VALUES(18, 'V W U W R', 'H O A A V');
+  INSERT INTO t3(rowid, x, y) VALUES(19, 'A H N L F', 'I G H B O');
+  DELETE FROM ft3;
+----
+stmt 0 err 1 -1 68 no such table: t3
+stmt 68 err 1 -1 136 no such table: t3
+stmt 136 err 1 -1 204 no such table: t3
+stmt 204 err 1 -1 272 no such table: t3
+stmt 272 err 1 -1 340 no such table: t3
+stmt 340 err 1 -1 359 no such table: ft3
+==== 4.0
+
+  CREATE TABLE t4(x);
+  CREATE VIRTUAL TABLE ft4 USING fts4(content=t4);
+  CREATE VIRTUAL TABLE ft4x USING fts4(x);
+----
+stmt 0 ok
+stmt 22 ok
+stmt 73 ok
+==== 4.1.1
+
+  INSERT INTO ft4x(ft4x) VALUES('rebuild');
+  INSERT INTO ft4(ft4) VALUES('rebuild');
+----
+stmt 0 err 1 -1 44 no such table: ft4x
+stmt 44 err 1 -1 86 no such table: ft4
+==== 4.1.2
+
+  SELECT id, quote(value) FROM ft4_stat
+----
+stmt 0 err 1 -1 41 no such table: ft4_stat
+==== 4.1.3
+
+  SELECT id, quote(value) FROM ft4x_stat
+----
+stmt 0 err 1 -1 42 no such table: ft4x_stat
+==== 4.2.1
+
+  INSERT INTO ft4x VALUES('M G M F T');
+  INSERT INTO ft4x VALUES('Z Q C A U');
+  INSERT INTO ft4x VALUES('N L L V');
+  INSERT INTO ft4x VALUES('T F D X D');
+  INSERT INTO ft4x VALUES('Z H I S D');
+
+  SELECT id, quote(value) FROM ft4x_stat
+----
+stmt 0 err 1 -1 40 no such table: ft4x
+stmt 40 err 1 -1 80 no such table: ft4x
+stmt 80 err 1 -1 118 no such table: ft4x
+stmt 118 err 1 -1 158 no such table: ft4x
+stmt 158 err 1 -1 198 no such table: ft4x
+stmt 198 err 1 -1 241 no such table: ft4x_stat
+==== 4.2.2
+
+  INSERT INTO ft4(rowid, x) SELECT rowid, * FROM ft4x;
+  SELECT id, quote(value) FROM ft4_stat
+----
+stmt 0 err 1 -1 55 no such table: ft4
+stmt 55 err 1 -1 96 no such table: ft4_stat
+==== 4.2.3
+
+  SELECT docid, quote(size) FROM ft4_docsize
+----
+stmt 0 err 1 -1 46 no such table: ft4_docsize
+==== 4.2.4
+
+  INSERT INTO ft4x(ft4x) VALUES('rebuild');
+  SELECT id, quote(value) FROM ft4x_stat;
+  SELECT docid, quote(size) FROM ft4x_docsize
+----
+stmt 0 err 1 -1 44 no such table: ft4x
+stmt 44 err 1 -1 86 no such table: ft4x_stat
+stmt 86 err 1 -1 133 no such table: ft4x_docsize
+==== 4.2.5
+
+  INSERT INTO ft4(ft4) VALUES('rebuild');
+  SELECT id, quote(value) FROM ft4_stat;
+  SELECT docid, quote(size) FROM ft4_docsize
+----
+stmt 0 err 1 -1 42 no such table: ft4
+stmt 42 err 1 -1 83 no such table: ft4_stat
+stmt 83 err 1 -1 129 no such table: ft4_docsize
+==== 4.2.6
+
+  INSERT INTO t4(rowid, x) SELECT rowid, x FROM ft4x;
+  INSERT INTO ft4(ft4) VALUES('rebuild');
+  SELECT id, quote(value) FROM ft4_stat;
+  SELECT docid, quote(size) FROM ft4_docsize
+----
+stmt 0 err 1 -1 54 no such table: t4
+stmt 54 err 1 -1 96 no such table: ft4
+stmt 96 err 1 -1 137 no such table: ft4_stat
+stmt 137 err 1 -1 183 no such table: ft4_docsize
+==== 5.1.1
+
+  CREATE TABLE t5(a, b, c, d);
+  CREATE VIRTUAL TABLE ft5 USING fts4(content=t5);
+  SELECT name FROM sqlite_master WHERE name LIKE '%t5%';
+----
+stmt 0 ok
+stmt 31 ok
+stmt 82 ok
+==== 5.1.2
+
+  ALTER TABLE ft5 RENAME TO ft6;
+  SELECT name FROM sqlite_master WHERE name LIKE '%t5%';
+----
+stmt 0 err 1 -1 33 no such table: ft5
+stmt 33 ok
+==== 5.1.3
+
+  SELECT name FROM sqlite_master WHERE name LIKE '%t6%';
+----
+stmt 0 ok
+==== 5.1.4
+
+  INSERT INTO t5 VALUES('a', 'b', 'c', 'd');
+  INSERT INTO ft6(ft6) VALUES('rebuild');
+  SELECT rowid FROM ft6 WHERE ft6 MATCH 'b';
+----
+stmt 0 err 1 -1 45 no such table: t5
+stmt 45 err 1 -1 87 no such table: ft6
+stmt 87 err 1 -1 132 no such table: ft6
+==== 5.1.5
+
+  DROP TABLE ft6;
+  SELECT * FROM t5;
+----
+stmt 0 err 1 -1 18 no such table: ft6
+stmt 18 err 1 -1 38 no such table: t5
+==== 5.1.6
+
+  SELECT name FROM sqlite_master WHERE name LIKE '%t6%';
+----
+stmt 0 ok
+==== 5.1.7
+
+  CREATE VIRTUAL TABLE ft5 USING fts4(content=t5);
+  CREATE TABLE t5_content(a, b);
+  DROP TABLE ft5;
+  SELECT name FROM sqlite_master WHERE name LIKE '%t5%';
+----
+stmt 0 ok
+stmt 51 ok
+stmt 84 err 1 -1 102 no such table: ft5
+stmt 102 ok
+==== 6.1.1
+
+  CREATE VIRTUAL TABLE ft7 USING fts4(content=t7);
+----
+stmt 0 ok
+==== 6.2.1
+
+  CREATE TABLE t7(one, two);
+  CREATE VIRTUAL TABLE ft7 USING fts4(content=t7);
+  INSERT INTO t7 VALUES('A B', 'B A');
+  INSERT INTO t7 VALUES('C D', 'A A');
+  SELECT * FROM ft7;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 80 err 1 -1 119 no such table: t7
+stmt 119 err 1 -1 158 no such table: t7
+stmt 158 err 1 -1 179 no such table: ft7
+==== 6.2.2
+
+  DROP TABLE t7;
+  SELECT * FROM ft7;
+----
+stmt 0 err 1 -1 17 no such table: t7
+stmt 17 err 1 -1 38 no such table: ft7
+==== 6.2.3
+
+  SELECT name FROM sqlite_master WHERE name LIKE '%t7%'
+----
+stmt 0 ok
+==== 6.2.4
+
+  SELECT * FROM ft7;
+----
+stmt 0 err 1 -1 21 no such table: ft7
+==== 6.2.5
+
+  CREATE TABLE t7(x, y);
+  INSERT INTO t7 VALUES('A B', 'B A');
+  INSERT INTO t7 VALUES('C D', 'A A');
+  SELECT * FROM ft7;
+----
+stmt 0 ok
+stmt 25 err 1 -1 64 no such table: t7
+stmt 64 err 1 -1 103 no such table: t7
+stmt 103 err 1 -1 124 no such table: ft7
+==== 6.2.6
+
+  INSERT INTO ft7(ft7) VALUES('rebuild');
+  SELECT rowid FROM ft7 WHERE ft7 MATCH '"A A"';
+----
+stmt 0 err 1 -1 42 no such table: ft7
+stmt 42 err 1 -1 91 no such table: ft7
+==== 6.2.7
+
+  DROP TABLE t7;
+  CREATE TABLE t7(x);
+----
+stmt 0 err 1 -1 17 no such table: t7
+stmt 17 ok
+==== 6.2.8
+
+  SELECT * FROM ft7 WHERE ft7 MATCH '"A A"';
+----
+stmt 0 err 1 -1 45 no such table: ft7
+==== 6.2.9
+
+  SELECT * FROM ft7 WHERE ft7 MATCH '"A A"';
+----
+stmt 0 err 1 -1 45 no such table: ft7
+==== 6.2.10
+
+  SELECT rowid FROM ft7 WHERE ft7 MATCH '"A A"';
+----
+stmt 0 err 1 -1 49 no such table: ft7
+==== 6.2.11
+
+  SELECT rowid, * FROM ft7 WHERE ft7 MATCH '"A A"';
+----
+stmt 0 err 1 -1 52 no such table: ft7
+==== 7.1.1
+
+  CREATE VIRTUAL TABLE ft8 USING fts4(content=nosuchtable, x);
+  INSERT INTO ft8(docid, x) VALUES(13, 'U O N X G');
+  INSERT INTO ft8(docid, x) VALUES(14, 'C J J U B');
+  INSERT INTO ft8(docid, x) VALUES(15, 'N J Y G X');
+  INSERT INTO ft8(docid, x) VALUES(16, 'R Y D O R');
+  INSERT INTO ft8(docid, x) VALUES(17, 'I Y T Q O');
+----
+stmt 0 ok
+stmt 63 err 1 -1 116 no such table: ft8
+stmt 116 err 1 -1 169 no such table: ft8
+stmt 169 err 1 -1 222 no such table: ft8
+stmt 222 err 1 -1 275 no such table: ft8
+stmt 275 err 1 -1 328 no such table: ft8
+==== 7.1.2
+
+  SELECT docid FROM ft8 WHERE ft8 MATCH 'N';
+----
+stmt 0 err 1 -1 45 no such table: ft8
+==== 7.2.1
+
+  CREATE VIRTUAL TABLE ft9 USING fts4(content=, x);
+  INSERT INTO ft9(docid, x) VALUES(13, 'U O N X G');
+  INSERT INTO ft9(docid, x) VALUES(14, 'C J J U B');
+  INSERT INTO ft9(docid, x) VALUES(15, 'N J Y G X');
+  INSERT INTO ft9(docid, x) VALUES(16, 'R Y D O R');
+  INSERT INTO ft9(docid, x) VALUES(17, 'I Y T Q O');
+----
+stmt 0 ok
+stmt 52 err 1 -1 105 no such table: ft9
+stmt 105 err 1 -1 158 no such table: ft9
+stmt 158 err 1 -1 211 no such table: ft9
+stmt 211 err 1 -1 264 no such table: ft9
+stmt 264 err 1 -1 317 no such table: ft9
+==== 7.2.2
+
+  SELECT docid FROM ft9 WHERE ft9 MATCH 'N';
+----
+stmt 0 err 1 -1 45 no such table: ft9
+==== 7.2.3
+
+  SELECT name FROM sqlite_master WHERE name LIKE 'ft9_%';
+----
+stmt 0 ok
+==== 7.2.4
+
+  SELECT * FROM ft9 WHERE ft9 MATCH 'N';
+----
+stmt 0 err 1 -1 41 no such table: ft9
+==== 8.1
+
+  CREATE TABLE t10(a, b);
+  INSERT INTO t10 VALUES(
+      'abasia abasic abask', 'Abassin abastardize abatable');
+  INSERT INTO t10 VALUES(
+      'abate abatement abater', 'abatis abatised abaton');
+  INSERT INTO t10 VALUES(
+      'abator abattoir Abatua', 'abature abave abaxial');
+
+  CREATE VIRTUAL TABLE ft10 USING fts4(content=t10, prefix="2,4", a, b);
+----
+stmt 0 ok
+stmt 26 err 1 -1 114 no such table: t10
+stmt 114 err 1 -1 199 no such table: t10
+stmt 199 err 1 -1 283 no such table: t10
+stmt 283 ok
+==== 8.2
+ SELECT * FROM ft10 WHERE a MATCH 'ab*';
+----
+stmt 0 err 1 -1 40 no such table: ft10
+==== 8.3
+ INSERT INTO ft10(ft10) VALUES('rebuild');
+----
+stmt 0 err 1 -1 42 no such table: ft10
+==== 8.4
+ SELECT rowid FROM ft10 WHERE a MATCH 'ab*';
+----
+stmt 0 err 1 -1 44 no such table: ft10
+==== 8.5
+ SELECT rowid FROM ft10 WHERE b MATCH 'abav*';
+----
+stmt 0 err 1 -1 46 no such table: ft10
+==== 8.6
+ SELECT rowid FROM ft10 WHERE ft10 MATCH 'abas*';
+----
+stmt 0 err 1 -1 49 no such table: ft10
+==== 9.1
+
+  CREATE TABLE tbl1(a, b);
+  INSERT INTO tbl1 VALUES('a b', 'c d');
+  INSERT INTO tbl1 VALUES('e f', 'a b');
+  CREATE VIRTUAL TABLE e1 USING echo(tbl1);
+  CREATE VIRTUAL TABLE ft1 USING fts4(content=e1);
+  INSERT INTO ft1(ft1) VALUES('rebuild');
+----
+stmt 0 ok
+stmt 27 err 1 -1 68 no such table: tbl1
+stmt 68 err 1 -1 109 no such table: tbl1
+stmt 109 ok
+stmt 153 ok
+stmt 204 err 1 -1 246 no such table: ft1
+==== 9.2
+
+  SELECT rowid, * FROM ft1 WHERE ft1 MATCH 'e'
+----
+stmt 0 err 1 -1 48 no such table: ft1
+==== 9.3
+
+  SELECT rowid, * FROM ft1 WHERE ft1 MATCH 'a'
+----
+stmt 0 err 1 -1 48 no such table: ft1
+==== 9.4
+ 
+  DELETE FROM ft1 WHERE docid=1;
+----
+stmt 0 err 1 -1 34 no such table: ft1
+==== 9.5
+
+  SELECT rowid, * FROM ft1 WHERE ft1 MATCH 'a'
+----
+stmt 0 err 1 -1 48 no such table: ft1
+==== 9.6
+
+  INSERT INTO ft1(ft1) VALUES('rebuild');
+  SELECT rowid, * FROM ft1 WHERE ft1 MATCH 'a'
+----
+stmt 0 err 1 -1 42 no such table: ft1
+stmt 42 err 1 -1 90 no such table: ft1
+==== 10.1
+
+  CREATE TABLE idx(id INTEGER PRIMARY KEY, path TEXT);
+  INSERT INTO idx VALUES (1, 't1.txt');
+  INSERT INTO idx VALUES (2, 't2.txt');
+  INSERT INTO idx VALUES (3, 't3.txt');
+
+  CREATE VIRTUAL TABLE vt USING fs(idx);
+  SELECT path, data FROM vt;
+----
+stmt 0 ok
+stmt 55 err 1 -1 95 no such table: idx
+stmt 95 err 1 -1 135 no such table: idx
+stmt 135 err 1 -1 175 no such table: idx
+stmt 175 ok
+stmt 217 err 1 -1 246 no such table: vt
+==== 10.2
+
+  SELECT path, data FROM vt WHERE rowid = 2;
+----
+stmt 0 err 1 -1 45 no such table: vt
+==== 10.3
+
+  CREATE VIRTUAL TABLE ft USING fts4(content=vt);
+  INSERT INTO ft(ft) VALUES('rebuild');
+----
+stmt 0 ok
+stmt 50 err 1 -1 90 no such table: ft
+==== 10.6
+ DELETE FROM ft WHERE docid=2
+----
+stmt 0 err 1 -1 30 no such table: ft
+==== 11.1
+
+  CREATE VIRTUAL TABLE x1 USING fts4(content=x1);
+----
+stmt 0 ok
+==== 12.1.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4(a, content=t1 );
+  INSERT INTO t1(rowid, a) VALUES(1, 'abc');
+----
+stmt 0 ok
+stmt 54 err 1 -1 99 no such table: t1
+==== 12.1.2
+ 
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 21 no such table: t1
+==== 12.1.3
+ 
+  SELECT * FROM t1('abc');
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== 12.1.4
+ 
+  SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== 12.2.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4(a, content=t2 );
+  CREATE VIRTUAL TABLE t2 USING fts4(a, content=t1 );
+  INSERT INTO t1(rowid, a) VALUES(1, 'abc');
+----
+stmt 0 ok
+stmt 54 ok
+stmt 108 err 1 -1 153 no such table: t1
+==== 12.2.2
+ 
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 21 no such table: t1
+==== 12.2.3
+ 
+  SELECT * FROM t1('abc');
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== 12.2.4
+ 
+  SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== 13.0
+
+  PRAGMA trusted_schema = off;
+  CREATE VIRTUAL TABLE t1 USING fts4(data, content=sqlite_dbpage);
+----
+stmt 0 ok
+stmt 31 ok
+==== 13.1
+
+  INSERT INTO t1(t1) VALUES('rebuild');
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== 13.2.0
+
+  CREATE VIRTUAL TABLE aa USING tcl(vtab_command);
+----
+stmt 0 ok
+==== 13.2.1
+
+  INSERT INTO aa VALUES('one two three');
+----
+stmt 0 err 1 -1 42 no such table: aa

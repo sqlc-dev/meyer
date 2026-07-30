@@ -1,0 +1,13 @@
+==== fallocate-1.6
+ PRAGMA freelist_count
+----
+stmt 0 ok
+==== fallocate-1.8
+ COMMIT
+----
+stmt 0 ok
+==== fallocate-1.9
+
+  PRAGMA max_page_count = 100;
+----
+stmt 0 ok

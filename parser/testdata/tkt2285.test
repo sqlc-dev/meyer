@@ -1,0 +1,19 @@
+==== tkt2285-1.2
+
+    SELECT * FROM sqlite_master;
+----
+stmt 0 ok
+==== tkt2285-2.1
+
+      BEGIN;
+      CREATE TEMP TABLE abc(a, b, c);
+      ROLLBACK;
+----
+stmt 0 ok
+stmt 13 ok
+stmt 51 ok
+==== tkt2285-2.2
+
+      SELECT * FROM sqlite_temp_master;
+----
+stmt 0 ok

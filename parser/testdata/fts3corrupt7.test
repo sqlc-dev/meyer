@@ -1,0 +1,73 @@
+==== 1.1
+
+  SELECT offsets(t1) FROM t1 WHERE t1 MATCH 'rtree NEAR rtree NEAR "json1 enable"';
+----
+stmt 0 err 1 -1 84 no such table: t1
+==== 2.1
+
+  SELECT 0 FROM t1 WHERE t1 MATCH 'rtree NEAR rtree"json1 enable"';
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== 3.2
+
+  SELECT * FROM fts WHERE fts MATCH 'x';
+----
+stmt 0 err 1 -1 41 no such table: fts
+==== 4.1
+
+  CREATE VIRTUAL TABLE t1 USING fts4(content);
+  DELETE FROM t1_segments;
+  DELETE FROM t1_segdir;
+----
+stmt 0 ok
+stmt 47 err 1 -1 74 no such table: t1_segments
+stmt 74 err 1 -1 99 no such table: t1_segdir
+==== 4.2
+
+  INSERT INTO t1_segdir
+  (level, idx, start_block, leaves_end_block, end_block, root)
+  VALUES(0, 0, 0, 0, 0, X'000568656C6C6F08010201FFFFFF7F00');
+----
+stmt 0 err 1 -1 149 no such table: t1_segdir
+==== 4.3
+
+  CREATE VIRTUAL TABLE t1_terms USING fts4aux(t1);
+----
+stmt 0 ok
+==== 4.4
+
+  SELECT * FROM t1_terms;
+----
+stmt 0 err 1 -1 26 no such table: t1_terms
+==== 7.0
+
+  CREATE VIRTUAL TABLE t USING fts3(x);
+  INSERT INTO t_segdir(level,idx,start_block,leaves_end_block,end_block,root)
+    VALUES(1,0,0,0,'0 -9223372036854775808',x'00');
+----
+stmt 0 ok
+stmt 40 err 1 -1 170 no such table: t_segdir
+==== 7.1
+
+  INSERT INTO t(x) VALUES('alpha');
+----
+stmt 0 err 1 -1 36 no such table: t
+==== 8.0
+
+  CREATE VIRTUAL TABLE t USING fts4(x);
+  INSERT INTO t_content(docid,c0x) VALUES(1,'a b');
+  DELETE FROM t_segments;
+  DELETE FROM t_segdir;
+  INSERT INTO t_segdir(level,idx,start_block,leaves_end_block,end_block,root)
+    VALUES(0,0,0,0,0,x'000161110150028001500a818080800103038101000001622c010281008101ffffffffffffffffff010204ffffffffffffffffff01ffffffffffffffffff01c80109323200');
+----
+stmt 0 ok
+stmt 40 err 1 -1 92 no such table: t_content
+stmt 92 err 1 -1 118 no such table: t_segments
+stmt 118 err 1 -1 142 no such table: t_segdir
+stmt 142 err 1 -1 385 no such table: t_segdir
+==== 8.1
+
+  SELECT count(*) FROM t WHERE t MATCH 'a NEAR/100 b';
+----
+stmt 0 err 1 -1 55 no such table: t

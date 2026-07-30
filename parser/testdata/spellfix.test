@@ -1,0 +1,277 @@
+==== 1.11
+
+  SELECT next_char('re','vocab','w');
+----
+stmt 0 err 1 10 38 no such function: next_char
+==== 1.11sub
+
+  SELECT next_char('re','(SELECT w AS x FROM vocab)','x');
+----
+stmt 0 err 1 10 59 no such function: next_char
+==== 1.12
+
+  SELECT next_char('r','vocab','w');
+----
+stmt 0 err 1 10 37 no such function: next_char
+==== 1.13
+
+  SELECT next_char('','vocab','w');
+----
+stmt 0 err 1 10 36 no such function: next_char
+==== 1.14
+SELECT next_char('','xyzzy','a')
+----
+stmt 0 err 1 7 33 no such function: next_char
+==== 1.20
+
+  CREATE TABLE vocab2(w TEXT);
+  CREATE INDEX vocab2w ON vocab2(w COLLATE nocase);
+  INSERT INTO vocab2 VALUES('abc'), ('ABD'), ('aBe'), ('AbF');
+  SELECT next_char('ab', 'vocab2', 'w', null, 'nocase');
+----
+stmt 0 ok
+stmt 31 err 1 -1 83 no such table: main.vocab2
+stmt 83 err 1 -1 146 no such table: vocab2
+stmt 146 err 1 156 203 no such function: next_char
+==== 1.21
+
+  SELECT next_char('ab','vocab2','w',null,null);
+----
+stmt 0 err 1 10 49 no such function: next_char
+==== 1.22
+
+  SELECT next_char('AB','vocab2','w',null,'NOCASE');
+----
+stmt 0 err 1 10 53 no such function: next_char
+==== 1.23
+
+  SELECT next_char('ab','vocab2','w',null,'binary');
+----
+stmt 0 err 1 10 53 no such function: next_char
+==== 1.30
+
+  SELECT rowid FROM t1 WHERE word='rabbit';
+----
+stmt 0 err 1 -1 44 no such table: t1
+==== 1.31
+
+  UPDATE t1 SET rowid=2000 WHERE word='rabbit';
+  SELECT rowid FROM t1 WHERE word='rabbit';
+----
+stmt 0 err 1 -1 48 no such table: t1
+stmt 48 err 1 -1 92 no such table: t1
+==== 1.32
+
+  INSERT INTO t1(rowid, word) VALUES(3000,'melody');
+  SELECT rowid, word, matchlen FROM t1 WHERE word MATCH 'melotti'
+   ORDER BY score LIMIT 3;
+----
+stmt 0 err 1 -1 53 no such table: t1
+stmt 53 err 1 -1 146 no such table: t1
+==== 1.33
+INSERT INTO t1(rowid, word) VALUES(3000,'garden');
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== 2.1
+
+  CREATE VIRTUAL TABLE t2 USING spellfix1;
+  INSERT INTO t2 (word, soundslike) VALUES('school', 'skuul');
+  INSERT INTO t2 (word, soundslike) VALUES('psalm', 'sarm');
+  SELECT word, matchlen FROM t2 WHERE word MATCH 'sar*' LIMIT 5;
+----
+stmt 0 ok
+stmt 43 err 1 -1 106 no such table: t2
+stmt 106 err 1 -1 167 no such table: t2
+stmt 167 err 1 -1 232 no such table: t2
+==== 2.2
+
+  SELECT word, matchlen FROM t2 WHERE word MATCH 'skol*' LIMIT 5;
+----
+stmt 0 err 1 -1 66 no such table: t2
+==== 3.1
+
+  CREATE TABLE costs(iLang, cFrom, cTo, iCost);
+  INSERT INTO costs VALUES(0, 'a', 'e', 1);
+  INSERT INTO costs VALUES(0, 'e', 'i', 1);
+  INSERT INTO costs VALUES(0, 'i', 'o', 1);
+  INSERT INTO costs VALUES(0, 'o', 'u', 1);
+  INSERT INTO costs VALUES(0, 'u', 'a', 1);
+  CREATE VIRTUAL TABLE t3 USING spellfix1(edit_cost_table=costs);
+----
+stmt 0 ok
+stmt 48 err 1 -1 92 no such table: costs
+stmt 92 err 1 -1 136 no such table: costs
+stmt 136 err 1 -1 180 no such table: costs
+stmt 180 err 1 -1 224 no such table: costs
+stmt 224 err 1 -1 268 no such table: costs
+stmt 268 ok
+==== 4.0
+
+  INSERT INTO t3(command) VALUES('edit_cost_table=NULL');
+----
+stmt 0 err 1 -1 58 no such table: t3
+==== 5.0
+
+  CREATE TABLE costs2(iLang, cFrom, cTo, iCost);
+  INSERT INTO costs2 VALUES(0, 'a', 'o', 1);
+  INSERT INTO costs2 VALUES(0, 'e', 'o', 4);
+  INSERT INTO costs2 VALUES(0, 'i', 'o', 8);
+  INSERT INTO costs2 VALUES(0, 'u', 'o', 16);
+  INSERT INTO t3(command) VALUES('edit_cost_table="costs2"');
+----
+stmt 0 ok
+stmt 49 err 1 -1 94 no such table: costs2
+stmt 94 err 1 -1 139 no such table: costs2
+stmt 139 err 1 -1 184 no such table: costs2
+stmt 184 err 1 -1 230 no such table: costs2
+stmt 230 err 1 -1 292 no such table: t3
+==== 6.1.1
+
+  SELECT word FROM t3 WHERE rowid = 10;
+----
+stmt 0 err 1 -1 40 no such table: t3
+==== 6.1.2
+
+  SELECT word, distance FROM t3 WHERE rowid = 10;
+----
+stmt 0 err 1 -1 50 no such table: t3
+==== 6.1.3
+
+  SELECT word, distance FROM t3 WHERE rowid = 10 AND word MATCH 'kiiner';
+----
+stmt 0 err 1 -1 74 no such table: t3
+==== 7.1
+
+  CREATE VIRTUAL TABLE t4 USING spellfix1;
+  PRAGMA table_info = t4;
+----
+stmt 0 ok
+stmt 43 ok
+==== 7.2.1
+
+  INSERT INTO t4(rowid, word) VALUES(1, 'Archilles');
+  INSERT INTO t4(rowid, word) VALUES(2, 'Pluto');
+  INSERT INTO t4(rowid, word) VALUES(3, 'Atrides');
+  INSERT OR REPLACE INTO t4(rowid, word) VALUES(2, 'Apollo');
+  SELECT rowid, word FROM t4;
+----
+stmt 0 err 1 -1 54 no such table: t4
+stmt 54 err 1 -1 104 no such table: t4
+stmt 104 err 1 -1 156 no such table: t4
+stmt 156 err 1 -1 218 no such table: t4
+stmt 218 err 1 -1 248 no such table: t4
+==== 7.2.2
+
+  INSERT OR ABORT INTO t4(rowid, word) VALUES(1, 'Leto');
+----
+stmt 0 err 1 -1 58 no such table: t4
+==== 7.2.3
+
+  INSERT OR ROLLBACK INTO t4(rowid, word) VALUES(3, 'Zeus');
+----
+stmt 0 err 1 -1 61 no such table: t4
+==== 7.2.4
+
+  INSERT OR FAIL INTO t4(rowid, word) VALUES(3, 'Zeus');
+----
+stmt 0 err 1 -1 57 no such table: t4
+==== 7.2.5
+
+  INSERT OR IGNORE INTO t4(rowid, word) VALUES(3, 'Zeus');
+  SELECT rowid, word FROM t4;
+----
+stmt 0 err 1 -1 59 no such table: t4
+stmt 59 err 1 -1 89 no such table: t4
+==== 7.3.1
+
+  UPDATE OR REPLACE t4 SET rowid=3 WHERE rowid=1;
+  SELECT rowid, word FROM t4;
+----
+stmt 0 err 1 -1 50 no such table: t4
+stmt 50 err 1 -1 80 no such table: t4
+==== 7.3.2
+
+  UPDATE OR ABORT t4 SET rowid=3 WHERE rowid=2;
+----
+stmt 0 err 1 -1 48 no such table: t4
+==== 7.3.3
+
+  UPDATE OR ROLLBACK t4 SET rowid=3 WHERE rowid=2;
+----
+stmt 0 err 1 -1 51 no such table: t4
+==== 7.3.4
+
+  UPDATE OR FAIL t4 SET rowid=3 WHERE rowid=2;
+----
+stmt 0 err 1 -1 47 no such table: t4
+==== 7.3.5
+
+  UPDATE OR IGNORE t4 SET rowid=3 WHERE rowid=2;
+  SELECT rowid, word FROM t4;
+----
+stmt 0 err 1 -1 49 no such table: t4
+stmt 49 err 1 -1 79 no such table: t4
+==== 7.4.1
+
+  DELETE FROM t4;
+  INSERT INTO t4(rowid, word) VALUES(10, 'Agamemnon');
+  INSERT INTO t4(rowid, word) VALUES(20, 'Patroclus');
+  INSERT INTO t4(rowid, word) VALUES(30, 'Chryses');
+
+  CREATE TABLE t5(i, w);
+  INSERT INTO t5 VALUES(5,  'Poseidon');
+  INSERT INTO t5 VALUES(20, 'Chronos');
+  INSERT INTO t5 VALUES(30, 'Hera');
+----
+stmt 0 err 1 -1 18 no such table: t4
+stmt 18 err 1 -1 73 no such table: t4
+stmt 73 err 1 -1 128 no such table: t4
+stmt 128 err 1 -1 181 no such table: t4
+stmt 181 ok
+stmt 207 err 1 -1 248 no such table: t5
+stmt 248 err 1 -1 288 no such table: t5
+stmt 288 err 1 -1 325 no such table: t5
+==== spellfix-generated
+ SELECT rowid, word FROM t4
+----
+stmt 0 err 1 -1 28 no such table: t4
+==== spellfix-generated.dup1
+ SELECT rowid, word FROM t4
+----
+stmt 0 err 1 -1 28 no such table: t4
+==== 8.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE d(w);
+  INSERT INTO d VALUES(1);
+  WITH RECURSIVE cnt(n) AS (VALUES(1) UNION ALL SELECT n+1 FROM cnt WHERE n<100)
+  SELECT sum(length(next_char(
+    printf('%.*c',1000000,'A'),
+    'd',
+    'substr(printf(''%.*c'',2000000,''A''),1,if(abs(random())%2=0,1000001,1))')))>0
+    FROM cnt;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 48 err 1 -1 75 no such table: d
+stmt 75 err 1 177 326 no such function: next_char
+==== 8.2
+
+  DROP TABLE IF EXISTS t1;
+  CREATE VIRTUAL TABLE t1 USING spellfix1;
+  INSERT INTO t1(word) VALUES('hello'),('world');
+  SELECT word FROM t1 WHERE word MATCH '';
+----
+stmt 0 ok
+stmt 27 ok
+stmt 70 err 1 -1 120 no such table: t1
+stmt 120 err 1 -1 163 no such table: t1
+==== 8.3
+
+  DROP TABLE t1;
+  CREATE VIRTUAL TABLE t1 USING spellfix1;
+  INSERT INTO t1(command) VALUES('edit_cost_table=''xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+----
+stmt 0 err 1 -1 17 no such table: t1
+stmt 17 ok
+stmt 60 err 1 -1 217 no such table: t1

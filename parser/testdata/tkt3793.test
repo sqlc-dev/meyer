@@ -1,0 +1,7 @@
+==== tkt3793-1.2
+
+    BEGIN;
+    SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 11 err 1 -1 40 no such table: t1

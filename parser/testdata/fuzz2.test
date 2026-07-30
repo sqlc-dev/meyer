@@ -1,0 +1,20 @@
+==== fuzz2-6.1
+SELECT n()AND+#0;
+----
+stmt 0 err 1 -1 17 near "#0": syntax error
+==== fuzz2-6.2
+SELECT strftime()
+----
+stmt 0 ok
+==== fuzz2-6.3
+DETACH(SELECT group_concat(q));
+----
+stmt 0 err 1 27 31 no such column: q
+==== fuzz2-7.1
+select e.*,0 from(s,(L))e;
+----
+stmt 0 err 1 -1 26 no such table: s
+==== fuzz2-7.2
+SELECT c.* FROM (a,b) AS c
+----
+stmt 0 err 1 -1 27 no such table: a

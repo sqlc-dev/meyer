@@ -1,0 +1,25 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a);
+  INSERT INTO t1 VALUES(1, 'xxx');
+  INSERT INTO t1 SELECT a+1, b FROM t1;
+  INSERT INTO t1 SELECT a+2, b FROM t1;
+  INSERT INTO t1 SELECT a+4, b FROM t1;
+  INSERT INTO t1 SELECT a+8, b FROM t1;
+  INSERT INTO t1 SELECT a+16, b FROM t1;
+  INSERT INTO t1 SELECT a+32, b FROM t1;
+  INSERT INTO t1 SELECT a+64, b FROM t1;
+  ANALYZE;
+----
+stmt 0 ok
+stmt 25 err 1 -1 53 no such table: main.t1
+stmt 53 err 1 -1 88 no such table: t1
+stmt 88 err 1 -1 128 no such table: t1
+stmt 128 err 1 -1 168 no such table: t1
+stmt 168 err 1 -1 208 no such table: t1
+stmt 208 err 1 -1 248 no such table: t1
+stmt 248 err 1 -1 289 no such table: t1
+stmt 289 err 1 -1 330 no such table: t1
+stmt 330 err 1 -1 371 no such table: t1
+stmt 371 ok

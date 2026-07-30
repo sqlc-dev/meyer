@@ -33,42 +33,42 @@
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 73 err 1 -1 no such table: t3
+stmt 73 err 1 -1 1751 no such table: t3
 ==== 1.1.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.1.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.1.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.1.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.1.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.1.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.1.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.1.8
 
   SELECT a, b, 
@@ -78,42 +78,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.2.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.2.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.2.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.2.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.2.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.2.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.2.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.2.8
 
   SELECT a, b, 
@@ -123,42 +123,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.3.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.3.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.3.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.3.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.3.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.3.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.3.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.3.8
 
   SELECT a, b, 
@@ -168,42 +168,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.4.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 127 no such table: t3
 ==== 1.4.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.4.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 127 no such table: t3
 ==== 1.4.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.4.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.4.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 147 no such table: t3
 ==== 1.4.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 149 no such table: t3
 ==== 1.4.8
 
   SELECT a, b, 
@@ -213,42 +213,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 461 no such table: t3
 ==== 1.5.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 1 PRECEDING         AND 2 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.5.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 PRECEDING         AND 2 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.5.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 1 PRECEDING         AND 2 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.5.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 PRECEDING         AND 2 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.5.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 PRECEDING         AND 2 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.5.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 1 PRECEDING         AND 2 PRECEDING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.5.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 PRECEDING         AND 2 PRECEDING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.5.8
 
   SELECT a, b, 
@@ -258,42 +258,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 PRECEDING         AND 2 PRECEDING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.6.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 2 PRECEDING         AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.6.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.6.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 2 PRECEDING         AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.6.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.6.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.6.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 2 PRECEDING         AND 1 PRECEDING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.6.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND 1 PRECEDING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.6.8
 
   SELECT a, b, 
@@ -303,42 +303,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND 1 PRECEDING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.7.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 3 PRECEDING         AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.7.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.7.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 3 PRECEDING         AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.7.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.7.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 1 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.7.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 3 PRECEDING         AND 1 PRECEDING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.7.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 1 PRECEDING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.7.8
 
   SELECT a, b, 
@@ -348,42 +348,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 1 PRECEDING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.8.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 3 PRECEDING         AND 0 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.8.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 0 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.8.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 3 PRECEDING         AND 0 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.8.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 0 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.8.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 0 PRECEDING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.8.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 3 PRECEDING         AND 0 PRECEDING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.8.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 0 PRECEDING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.8.8
 
   SELECT a, b, 
@@ -393,42 +393,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 0 PRECEDING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.9.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 2 PRECEDING         AND CURRENT ROW ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.9.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND CURRENT ROW ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.9.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 2 PRECEDING         AND CURRENT ROW ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.9.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND CURRENT ROW ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.9.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND CURRENT ROW ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.9.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 2 PRECEDING         AND CURRENT ROW  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.9.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND CURRENT ROW  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.9.8
 
   SELECT a, b, 
@@ -438,42 +438,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND CURRENT ROW )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.10.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 3 PRECEDING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.10.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.10.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 3 PRECEDING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.10.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.10.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.10.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 3 PRECEDING         AND 0 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.10.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 0 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.10.8
 
   SELECT a, b, 
@@ -483,42 +483,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 3 PRECEDING         AND 0 FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.11.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 2 PRECEDING         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 127 no such table: t3
 ==== 1.11.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.11.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 2 PRECEDING         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 127 no such table: t3
 ==== 1.11.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.11.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.11.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 2 PRECEDING         AND UNBOUNDED FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 147 no such table: t3
 ==== 1.11.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND UNBOUNDED FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 149 no such table: t3
 ==== 1.11.8
 
   SELECT a, b, 
@@ -528,42 +528,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 2 PRECEDING         AND UNBOUNDED FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 461 no such table: t3
 ==== 1.12.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.12.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.12.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.12.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.12.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.12.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND 0 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.12.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 0 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.12.8
 
   SELECT a, b, 
@@ -573,42 +573,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 0 FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.13.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND 1 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.13.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 1 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.13.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND 1 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.13.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 1 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.13.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 1 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.13.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND 1 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.13.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 1 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.13.8
 
   SELECT a, b, 
@@ -618,42 +618,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 1 FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.14.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND 100 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.14.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 100 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 123 no such table: t3
 ==== 1.14.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND 100 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.14.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 100 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 123 no such table: t3
 ==== 1.14.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 100 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 123 no such table: t3
 ==== 1.14.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND 100 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.14.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 100 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 143 no such table: t3
 ==== 1.14.8
 
   SELECT a, b, 
@@ -663,42 +663,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND 100 FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 437 no such table: t3
 ==== 1.15.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 127 no such table: t3
 ==== 1.15.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.15.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 127 no such table: t3
 ==== 1.15.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.15.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.15.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN CURRENT ROW         AND UNBOUNDED FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 147 no such table: t3
 ==== 1.15.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND UNBOUNDED FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 149 no such table: t3
 ==== 1.15.8
 
   SELECT a, b, 
@@ -708,42 +708,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN CURRENT ROW         AND UNBOUNDED FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 461 no such table: t3
 ==== 1.16.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 0 FOLLOWING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.16.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 0 FOLLOWING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.16.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 0 FOLLOWING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.16.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 0 FOLLOWING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.16.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 0 FOLLOWING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.16.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 0 FOLLOWING         AND 0 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.16.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 0 FOLLOWING         AND 0 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.16.8
 
   SELECT a, b, 
@@ -753,42 +753,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 0 FOLLOWING         AND 0 FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.17.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 1 FOLLOWING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.17.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.17.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 1 FOLLOWING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.17.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.17.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND 0 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.17.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 1 FOLLOWING         AND 0 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.17.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND 0 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.17.8
 
   SELECT a, b, 
@@ -798,42 +798,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND 0 FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.18.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 1 FOLLOWING         AND 5 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.18.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND 5 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.18.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 1 FOLLOWING         AND 5 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 119 no such table: t3
 ==== 1.18.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND 5 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.18.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND 5 FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 121 no such table: t3
 ==== 1.18.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 1 FOLLOWING         AND 5 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 139 no such table: t3
 ==== 1.18.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND 5 FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 141 no such table: t3
 ==== 1.18.8
 
   SELECT a, b, 
@@ -843,42 +843,42 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND 5 FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 429 no such table: t3
 ==== 1.19.1
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 1 FOLLOWING         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 127 no such table: t3
 ==== 1.19.2
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.19.3
 
   SELECT a, b, rank() OVER (ORDER BY a  GROUPS BETWEEN 1 FOLLOWING         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 127 no such table: t3
 ==== 1.19.4
 
   SELECT a, b, max(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.19.5
 
   SELECT a, b, min(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND UNBOUNDED FOLLOWING ) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 129 no such table: t3
 ==== 1.19.6
 
   SELECT a, b, sum(c) OVER (ORDER BY a  GROUPS BETWEEN 1 FOLLOWING         AND UNBOUNDED FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 147 no such table: t3
 ==== 1.19.7
 
   SELECT a, b, sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND UNBOUNDED FOLLOWING  EXCLUDE CURRENT ROW) FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 149 no such table: t3
 ==== 1.19.8
 
   SELECT a, b, 
@@ -888,7 +888,7 @@ stmt 0 err 1 -1 no such table: t3
       sum(c) OVER (ORDER BY a,b  GROUPS BETWEEN 1 FOLLOWING         AND UNBOUNDED FOLLOWING )
     FROM t3 ORDER BY 1, 2, 3;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 461 no such table: t3
 ==== 2.1.1
 
   SELECT row_number() OVER win 
@@ -898,7 +898,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING  EXCLUDE NO OTHERS 
     )
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 177 no such table: t3
 ==== 2.1.2
 
   SELECT nth_value(c, 14) OVER win 
@@ -908,7 +908,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING  EXCLUDE NO OTHERS 
     )
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 181 no such table: t3
 ==== 2.1.3
 
   SELECT min(c) OVER win, max(c) OVER win, sum(c) OVER win FROM t3
@@ -917,7 +917,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW  EXCLUDE NO OTHERS 
     ) ORDER BY a, b, c;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 209 no such table: t3
 ==== 2.2.1
 
   SELECT row_number() OVER win 
@@ -927,7 +927,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING  EXCLUDE CURRENT ROW 
     )
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 179 no such table: t3
 ==== 2.2.2
 
   SELECT nth_value(c, 14) OVER win 
@@ -937,7 +937,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING  EXCLUDE CURRENT ROW 
     )
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 183 no such table: t3
 ==== 2.2.3
 
   SELECT min(c) OVER win, max(c) OVER win, sum(c) OVER win FROM t3
@@ -946,7 +946,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW  EXCLUDE CURRENT ROW 
     ) ORDER BY a, b, c;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 211 no such table: t3
 ==== 2.3.1
 
   SELECT row_number() OVER win 
@@ -956,7 +956,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING  EXCLUDE GROUP 
     )
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 173 no such table: t3
 ==== 2.3.2
 
   SELECT nth_value(c, 14) OVER win 
@@ -966,7 +966,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING  EXCLUDE GROUP 
     )
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 177 no such table: t3
 ==== 2.3.3
 
   SELECT min(c) OVER win, max(c) OVER win, sum(c) OVER win FROM t3
@@ -975,7 +975,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW  EXCLUDE GROUP 
     ) ORDER BY a, b, c;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 205 no such table: t3
 ==== 2.4.1
 
   SELECT row_number() OVER win 
@@ -985,7 +985,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING  EXCLUDE TIES 
     )
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 172 no such table: t3
 ==== 2.4.2
 
   SELECT nth_value(c, 14) OVER win 
@@ -995,7 +995,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING  EXCLUDE TIES 
     )
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 176 no such table: t3
 ==== 2.4.3
 
   SELECT min(c) OVER win, max(c) OVER win, sum(c) OVER win FROM t3
@@ -1004,7 +1004,7 @@ stmt 0 err 1 -1 no such table: t3
       ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW  EXCLUDE TIES 
     ) ORDER BY a, b, c;
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 204 no such table: t3
 ==== 3.0
 
   DROP TABLE IF EXISTS t1;
@@ -1015,72 +1015,72 @@ stmt 0 err 1 -1 no such table: t3
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 65 err 1 -1 no such table: t1
+stmt 65 err 1 -1 180 no such table: t1
 ==== 3.1
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a RANGE BETWEEN 5 PRECEDING AND 5 FOLLOWING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 125 no such table: t1
 ==== 3.2
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a RANGE BETWEEN 10 PRECEDING AND 5 PRECEDING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 126 no such table: t1
 ==== 3.3
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a RANGE BETWEEN 2 FOLLOWING AND 3 FOLLOWING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 125 no such table: t1
 ==== 3.4
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a DESC RANGE BETWEEN 5 PRECEDING AND 5 FOLLOWING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 130 no such table: t1
 ==== 3.5
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a DESC RANGE BETWEEN 10 PRECEDING AND 5 PRECEDING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 131 no such table: t1
 ==== 3.6
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a DESC RANGE BETWEEN 2 FOLLOWING AND 3 FOLLOWING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 130 no such table: t1
 ==== 3.7
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a RANGE BETWEEN 5.1 PRECEDING AND 5.3 FOLLOWING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 129 no such table: t1
 ==== 3.8
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a RANGE BETWEEN 10.2 PRECEDING AND 5.4 PRECEDING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 130 no such table: t1
 ==== 3.9
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a RANGE BETWEEN 2.6 FOLLOWING AND 3.5 FOLLOWING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 129 no such table: t1
 ==== 3.10
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a DESC RANGE BETWEEN 5.7 PRECEDING AND 5.8 FOLLOWING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 134 no such table: t1
 ==== 3.11
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a DESC RANGE BETWEEN UNBOUNDED PRECEDING AND 5.9 PRECEDING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 140 no such table: t1
 ==== 3.12
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a DESC RANGE BETWEEN 2.1 FOLLOWING AND UNBOUNDED FOLLOWING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 140 no such table: t1
 ==== 3.13
 
   SELECT CAST(a AS INTEGER), sum(b) OVER win FROM t1 WINDOW win AS ( ORDER BY a RANGE 5.1 PRECEDING )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 103 no such table: t1
 ==== 4.0
 
   DROP TABLE IF EXISTS t1;
@@ -1090,98 +1090,98 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 68 err 1 -1 no such table: t1
+stmt 68 err 1 -1 147 no such table: t1
 ==== 4.1.1
 
   SELECT sum(b) OVER (
     ORDER BY a RANGE BETWEEN 5 PRECEDING AND 10 FOLLOWING
   ) FROM t1 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 105 no such table: t1
 ==== 4.1.2
 
   SELECT sum(b) OVER (
     ORDER BY a DESC RANGE BETWEEN 5 PRECEDING AND 10 FOLLOWING
   ) FROM t1 ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 110 no such table: t1
 ==== 4.2.1
 
   SELECT sum(b) OVER (
     ORDER BY a RANGE BETWEEN 5 FOLLOWING AND 10 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS FIRST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 117 no such table: t1
 ==== 4.2.2
 
   SELECT sum(b) OVER (
     ORDER BY a RANGE BETWEEN 5 FOLLOWING AND 10 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS LAST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 116 no such table: t1
 ==== 4.2.3
 
   SELECT sum(b) OVER (
     ORDER BY a DESC RANGE BETWEEN 5 FOLLOWING AND 10 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS FIRST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 122 no such table: t1
 ==== 4.2.4
 
   SELECT sum(b) OVER (
     ORDER BY a DESC RANGE BETWEEN 5 FOLLOWING AND 10 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS LAST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 121 no such table: t1
 ==== 4.3.1
 
   SELECT sum(b) OVER (
     ORDER BY a NULLS FIRST RANGE BETWEEN UNBOUNDED PRECEDING AND 10 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS FIRST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 137 no such table: t1
 ==== 4.3.2
 
   SELECT sum(b) OVER (
     ORDER BY a NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND 10 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS LAST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 135 no such table: t1
 ==== 4.4.1
 
   SELECT sum(b) OVER (
     ORDER BY a NULLS FIRST ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS FIRST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 127 no such table: t1
 ==== 4.4.2
 
   SELECT sum(b) OVER (
     ORDER BY a NULLS LAST ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS LAST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 125 no such table: t1
 ==== 4.4.3
 
   SELECT sum(b) OVER (
     ORDER BY a DESC NULLS LAST ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS FIRST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 131 no such table: t1
 ==== 4.4.4
 
   SELECT sum(b) OVER (
     ORDER BY a DESC NULLS LAST ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS LAST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 130 no such table: t1
 ==== 4.5.1
 
   SELECT sum(b) OVER (
     ORDER BY a ASC  NULLS LAST RANGE BETWEEN UNBOUNDED PRECEDING AND 10 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS LAST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 140 no such table: t1
 ==== 4.5.2
 
   SELECT sum(b) OVER (
@@ -1189,7 +1189,7 @@ stmt 0 err 1 -1 no such table: t1
     BETWEEN UNBOUNDED PRECEDING AND 10 FOLLOWING
   ) FROM t1 ORDER BY 1 NULLS LAST;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 146 no such table: t1
 ==== 5.0
 
   INSERT INTO t3 VALUES
@@ -1197,7 +1197,7 @@ stmt 0 err 1 -1 no such table: t1
     ('JJ', NULL, 839), ('FF', NULL, 618), ('BB', NULL, 393), 
     (NULL, 'bb', 629), (NULL, NULL, 667), (NULL, NULL, 870);
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 209 no such table: t3
 ==== 5.1.1.1
 
   SELECT max(c) OVER win,
@@ -1207,7 +1207,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 257 no such table: t3
 ==== 5.1.1.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1217,7 +1217,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 285 no such table: t3
 ==== 5.1.2.1
 
   SELECT max(c) OVER win,
@@ -1228,7 +1228,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 289 no such table: t3
 ==== 5.1.2.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1239,7 +1239,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 317 no such table: t3
 ==== 5.1.3.1
 
   SELECT max(c) OVER win,
@@ -1250,7 +1250,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 295 no such table: t3
 ==== 5.1.3.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1261,7 +1261,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 323 no such table: t3
 ==== 5.1.4.1
 
   SELECT max(c) OVER win,
@@ -1271,7 +1271,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS FIRST GROUPS 6 PRECEDING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 249 no such table: t3
 ==== 5.1.4.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1281,7 +1281,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS FIRST GROUPS 6 PRECEDING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 277 no such table: t3
 ==== 5.1.5.1
 
   SELECT max(c) OVER win,
@@ -1291,7 +1291,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 272 no such table: t3
 ==== 5.1.5.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1301,7 +1301,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 300 no such table: t3
 ==== 5.1.6.1
 
   SELECT max(c) OVER win,
@@ -1311,7 +1311,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 272 no such table: t3
 ==== 5.1.6.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1321,7 +1321,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 300 no such table: t3
 ==== 5.1.7.1
 
   SELECT max(c) OVER win,
@@ -1332,7 +1332,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 317 no such table: t3
 ==== 5.1.7.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1343,7 +1343,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 345 no such table: t3
 ==== 5.1.8.1
 
   SELECT max(c) OVER win,
@@ -1353,7 +1353,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 257 no such table: t3
 ==== 5.1.8.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1363,7 +1363,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 285 no such table: t3
 ==== 5.1.9.1
 
   SELECT max(c) OVER win,
@@ -1374,7 +1374,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 288 no such table: t3
 ==== 5.1.9.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1385,7 +1385,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 316 no such table: t3
 ==== 5.1.10.1
 
   SELECT max(c) OVER win,
@@ -1396,7 +1396,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 295 no such table: t3
 ==== 5.1.10.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1407,7 +1407,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 323 no such table: t3
 ==== 5.1.11.1
 
   SELECT max(c) OVER win,
@@ -1417,7 +1417,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS LAST GROUPS 6 PRECEDING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 248 no such table: t3
 ==== 5.1.11.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1427,7 +1427,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS LAST GROUPS 6 PRECEDING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 276 no such table: t3
 ==== 5.1.12.1
 
   SELECT max(c) OVER win,
@@ -1437,7 +1437,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 271 no such table: t3
 ==== 5.1.12.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1447,7 +1447,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 299 no such table: t3
 ==== 5.1.13.1
 
   SELECT max(c) OVER win,
@@ -1457,7 +1457,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 271 no such table: t3
 ==== 5.1.13.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1467,7 +1467,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 299 no such table: t3
 ==== 5.1.14.1
 
   SELECT max(c) OVER win,
@@ -1478,7 +1478,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 314 no such table: t3
 ==== 5.1.14.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1489,7 +1489,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE NO OTHERS  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 342 no such table: t3
 ==== 5.2.1.1
 
   SELECT max(c) OVER win,
@@ -1499,7 +1499,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 259 no such table: t3
 ==== 5.2.1.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1509,7 +1509,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 287 no such table: t3
 ==== 5.2.2.1
 
   SELECT max(c) OVER win,
@@ -1520,7 +1520,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 291 no such table: t3
 ==== 5.2.2.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1531,7 +1531,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 319 no such table: t3
 ==== 5.2.3.1
 
   SELECT max(c) OVER win,
@@ -1542,7 +1542,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 297 no such table: t3
 ==== 5.2.3.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1553,7 +1553,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 325 no such table: t3
 ==== 5.2.4.1
 
   SELECT max(c) OVER win,
@@ -1563,7 +1563,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS FIRST GROUPS 6 PRECEDING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 251 no such table: t3
 ==== 5.2.4.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1573,7 +1573,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS FIRST GROUPS 6 PRECEDING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 279 no such table: t3
 ==== 5.2.5.1
 
   SELECT max(c) OVER win,
@@ -1583,7 +1583,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 274 no such table: t3
 ==== 5.2.5.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1593,7 +1593,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 302 no such table: t3
 ==== 5.2.6.1
 
   SELECT max(c) OVER win,
@@ -1603,7 +1603,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 274 no such table: t3
 ==== 5.2.6.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1613,7 +1613,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 302 no such table: t3
 ==== 5.2.7.1
 
   SELECT max(c) OVER win,
@@ -1624,7 +1624,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 319 no such table: t3
 ==== 5.2.7.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1635,7 +1635,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 347 no such table: t3
 ==== 5.2.8.1
 
   SELECT max(c) OVER win,
@@ -1645,7 +1645,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 259 no such table: t3
 ==== 5.2.8.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1655,7 +1655,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 287 no such table: t3
 ==== 5.2.9.1
 
   SELECT max(c) OVER win,
@@ -1666,7 +1666,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 290 no such table: t3
 ==== 5.2.9.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1677,7 +1677,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 318 no such table: t3
 ==== 5.2.10.1
 
   SELECT max(c) OVER win,
@@ -1688,7 +1688,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 297 no such table: t3
 ==== 5.2.10.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1699,7 +1699,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 325 no such table: t3
 ==== 5.2.11.1
 
   SELECT max(c) OVER win,
@@ -1709,7 +1709,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS LAST GROUPS 6 PRECEDING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 250 no such table: t3
 ==== 5.2.11.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1719,7 +1719,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS LAST GROUPS 6 PRECEDING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 278 no such table: t3
 ==== 5.2.12.1
 
   SELECT max(c) OVER win,
@@ -1729,7 +1729,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 273 no such table: t3
 ==== 5.2.12.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1739,7 +1739,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 301 no such table: t3
 ==== 5.2.13.1
 
   SELECT max(c) OVER win,
@@ -1749,7 +1749,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 273 no such table: t3
 ==== 5.2.13.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1759,7 +1759,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 301 no such table: t3
 ==== 5.2.14.1
 
   SELECT max(c) OVER win,
@@ -1770,7 +1770,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 316 no such table: t3
 ==== 5.2.14.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1781,7 +1781,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE CURRENT ROW  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 344 no such table: t3
 ==== 5.3.1.1
 
   SELECT max(c) OVER win,
@@ -1791,7 +1791,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 253 no such table: t3
 ==== 5.3.1.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1801,7 +1801,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 281 no such table: t3
 ==== 5.3.2.1
 
   SELECT max(c) OVER win,
@@ -1812,7 +1812,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 285 no such table: t3
 ==== 5.3.2.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1823,7 +1823,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 313 no such table: t3
 ==== 5.3.3.1
 
   SELECT max(c) OVER win,
@@ -1834,7 +1834,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 291 no such table: t3
 ==== 5.3.3.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1845,7 +1845,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 319 no such table: t3
 ==== 5.3.4.1
 
   SELECT max(c) OVER win,
@@ -1855,7 +1855,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS FIRST GROUPS 6 PRECEDING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 245 no such table: t3
 ==== 5.3.4.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1865,7 +1865,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS FIRST GROUPS 6 PRECEDING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 273 no such table: t3
 ==== 5.3.5.1
 
   SELECT max(c) OVER win,
@@ -1875,7 +1875,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 268 no such table: t3
 ==== 5.3.5.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1885,7 +1885,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 296 no such table: t3
 ==== 5.3.6.1
 
   SELECT max(c) OVER win,
@@ -1895,7 +1895,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 268 no such table: t3
 ==== 5.3.6.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1905,7 +1905,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 296 no such table: t3
 ==== 5.3.7.1
 
   SELECT max(c) OVER win,
@@ -1916,7 +1916,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 313 no such table: t3
 ==== 5.3.7.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1927,7 +1927,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 341 no such table: t3
 ==== 5.3.8.1
 
   SELECT max(c) OVER win,
@@ -1937,7 +1937,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 253 no such table: t3
 ==== 5.3.8.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1947,7 +1947,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 281 no such table: t3
 ==== 5.3.9.1
 
   SELECT max(c) OVER win,
@@ -1958,7 +1958,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 284 no such table: t3
 ==== 5.3.9.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1969,7 +1969,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 312 no such table: t3
 ==== 5.3.10.1
 
   SELECT max(c) OVER win,
@@ -1980,7 +1980,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 291 no such table: t3
 ==== 5.3.10.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -1991,7 +1991,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 319 no such table: t3
 ==== 5.3.11.1
 
   SELECT max(c) OVER win,
@@ -2001,7 +2001,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS LAST GROUPS 6 PRECEDING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 244 no such table: t3
 ==== 5.3.11.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2011,7 +2011,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS LAST GROUPS 6 PRECEDING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 272 no such table: t3
 ==== 5.3.12.1
 
   SELECT max(c) OVER win,
@@ -2021,7 +2021,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 267 no such table: t3
 ==== 5.3.12.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2031,7 +2031,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 295 no such table: t3
 ==== 5.3.13.1
 
   SELECT max(c) OVER win,
@@ -2041,7 +2041,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 267 no such table: t3
 ==== 5.3.13.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2051,7 +2051,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 295 no such table: t3
 ==== 5.3.14.1
 
   SELECT max(c) OVER win,
@@ -2062,7 +2062,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 310 no such table: t3
 ==== 5.3.14.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2073,7 +2073,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE GROUP  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 338 no such table: t3
 ==== 5.4.1.1
 
   SELECT max(c) OVER win,
@@ -2083,7 +2083,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 252 no such table: t3
 ==== 5.4.1.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2093,7 +2093,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 280 no such table: t3
 ==== 5.4.2.1
 
   SELECT max(c) OVER win,
@@ -2104,7 +2104,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 284 no such table: t3
 ==== 5.4.2.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2115,7 +2115,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 312 no such table: t3
 ==== 5.4.3.1
 
   SELECT max(c) OVER win,
@@ -2126,7 +2126,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 290 no such table: t3
 ==== 5.4.3.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2137,7 +2137,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 318 no such table: t3
 ==== 5.4.4.1
 
   SELECT max(c) OVER win,
@@ -2147,7 +2147,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS FIRST GROUPS 6 PRECEDING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 244 no such table: t3
 ==== 5.4.4.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2157,7 +2157,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS FIRST GROUPS 6 PRECEDING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 272 no such table: t3
 ==== 5.4.5.1
 
   SELECT max(c) OVER win,
@@ -2167,7 +2167,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 267 no such table: t3
 ==== 5.4.5.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2177,7 +2177,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 295 no such table: t3
 ==== 5.4.6.1
 
   SELECT max(c) OVER win,
@@ -2187,7 +2187,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 267 no such table: t3
 ==== 5.4.6.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2197,7 +2197,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS FIRST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 295 no such table: t3
 ==== 5.4.7.1
 
   SELECT max(c) OVER win,
@@ -2208,7 +2208,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 312 no such table: t3
 ==== 5.4.7.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2219,7 +2219,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 340 no such table: t3
 ==== 5.4.8.1
 
   SELECT max(c) OVER win,
@@ -2229,7 +2229,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 252 no such table: t3
 ==== 5.4.8.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2239,7 +2239,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 280 no such table: t3
 ==== 5.4.9.1
 
   SELECT max(c) OVER win,
@@ -2250,7 +2250,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 283 no such table: t3
 ==== 5.4.9.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2261,7 +2261,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 311 no such table: t3
 ==== 5.4.10.1
 
   SELECT max(c) OVER win,
@@ -2272,7 +2272,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 290 no such table: t3
 ==== 5.4.10.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2283,7 +2283,7 @@ stmt 0 err 1 -1 no such table: t3
         RANGE BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 318 no such table: t3
 ==== 5.4.11.1
 
   SELECT max(c) OVER win,
@@ -2293,7 +2293,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS LAST GROUPS 6 PRECEDING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 243 no such table: t3
 ==== 5.4.11.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2303,7 +2303,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY a NULLS LAST GROUPS 6 PRECEDING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 271 no such table: t3
 ==== 5.4.12.1
 
   SELECT max(c) OVER win,
@@ -2313,7 +2313,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 266 no such table: t3
 ==== 5.4.12.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2323,7 +2323,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 6 PRECEDING AND 7 FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 294 no such table: t3
 ==== 5.4.13.1
 
   SELECT max(c) OVER win,
@@ -2333,7 +2333,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 266 no such table: t3
 ==== 5.4.13.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2343,7 +2343,7 @@ stmt 0 err 1 -1 no such table: t3
       WINDOW win AS (  ORDER BY c NULLS LAST RANGE BETWEEN 0 PRECEDING AND 0 FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 294 no such table: t3
 ==== 5.4.14.1
 
   SELECT max(c) OVER win,
@@ -2354,7 +2354,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 309 no such table: t3
 ==== 5.4.14.2
 
   SELECT sum(c) FILTER (WHERE (c%2)!=0) OVER win,
@@ -2365,7 +2365,7 @@ stmt 0 err 1 -1 no such table: t3
         ROWS BETWEEN 6 PRECEDING AND UNBOUNDED FOLLOWING   EXCLUDE TIES  )
       ORDER BY 1 NULLS FIRST, 2 NULLS FIRST, 3 NULLS FIRST
 ----
-stmt 0 err 1 -1 no such table: t3
+stmt 0 err 1 -1 337 no such table: t3
 ==== 6.0
 
   DROP TABLE IF EXISTS t2;
@@ -2376,9 +2376,9 @@ stmt 0 err 1 -1 no such table: t3
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 65 err 1 -1 no such table: t2
-stmt 101 err 1 -1 no such table: t2
-stmt 137 err 1 -1 no such table: t2
+stmt 65 err 1 -1 101 no such table: t2
+stmt 101 err 1 -1 137 no such table: t2
+stmt 137 err 1 -1 170 no such table: t2
 ==== 6.1
 
   SELECT group_concat(a, '.') OVER (
@@ -2386,7 +2386,7 @@ stmt 137 err 1 -1 no such table: t2
   )
   FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 121 no such table: t2
 ==== 6.2
 
   SELECT group_concat(a, '.') OVER (
@@ -2394,7 +2394,7 @@ stmt 0 err 1 -1 no such table: t2
   )
   FROM t2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 125 no such table: t2
 ==== 7.0
 
   DROP TABLE IF EXISTS t2;
@@ -2409,12 +2409,12 @@ stmt 0 err 1 -1 no such table: t2
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 68 err 1 -1 no such table: t2
-stmt 101 err 1 -1 no such table: t2
-stmt 135 err 1 -1 no such table: t2
-stmt 169 err 1 -1 no such table: t2
-stmt 203 err 1 -1 no such table: t2
-stmt 235 err 1 -1 no such table: t2
+stmt 68 err 1 -1 101 no such table: t2
+stmt 101 err 1 -1 135 no such table: t2
+stmt 135 err 1 -1 169 no such table: t2
+stmt 169 err 1 -1 203 no such table: t2
+stmt 203 err 1 -1 235 no such table: t2
+stmt 235 err 1 -1 267 no such table: t2
 ==== 7.1.1
 
   SELECT sum (a) OVER win FROM t2
@@ -2422,7 +2422,7 @@ stmt 235 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 6 FOLLOWING AND UNBOUNDED FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 135 no such table: t2
 ==== 7.1.2
 
   SELECT sum (a) OVER win FROM t2
@@ -2430,7 +2430,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 1 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 127 no such table: t2
 ==== 7.1.3
 
   SELECT sum (a) OVER win FROM t2
@@ -2438,7 +2438,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 2 FOLLOWING AND 1 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 127 no such table: t2
 ==== 7.1.4
 
   SELECT sum (a) OVER win FROM t2
@@ -2446,7 +2446,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 1 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 128 no such table: t2
 ==== 7.1.5
 
   SELECT sum (a) OVER win FROM t2
@@ -2454,7 +2454,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 2 FOLLOWING AND 1 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 128 no such table: t2
 ==== 7.1.6
 
   SELECT sum (a) OVER win FROM t2
@@ -2462,7 +2462,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 1000 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 130 no such table: t2
 ==== 7.1.7
 
   SELECT sum (a) OVER win FROM t2
@@ -2470,7 +2470,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 2000 FOLLOWING AND 1000 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 133 no such table: t2
 ==== 7.1.8
 
   SELECT sum (a) OVER win FROM t2
@@ -2478,7 +2478,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 1000 PRECEDING AND 2000 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 134 no such table: t2
 ==== 7.1.9
 
   SELECT sum (a) OVER win FROM t2
@@ -2486,7 +2486,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 2000 FOLLOWING AND 1000 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 134 no such table: t2
 ==== 7.2.1
 
   SELECT min (a) OVER win FROM t2
@@ -2494,7 +2494,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 6 FOLLOWING AND UNBOUNDED FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 135 no such table: t2
 ==== 7.2.2
 
   SELECT min (a) OVER win FROM t2
@@ -2502,7 +2502,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 1 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 127 no such table: t2
 ==== 7.2.3
 
   SELECT min (a) OVER win FROM t2
@@ -2510,7 +2510,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 2 FOLLOWING AND 1 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 127 no such table: t2
 ==== 7.2.4
 
   SELECT min (a) OVER win FROM t2
@@ -2518,7 +2518,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 1 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 128 no such table: t2
 ==== 7.2.5
 
   SELECT min (a) OVER win FROM t2
@@ -2526,7 +2526,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 2 FOLLOWING AND 1 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 128 no such table: t2
 ==== 7.2.6
 
   SELECT min (a) OVER win FROM t2
@@ -2534,7 +2534,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 1000 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 130 no such table: t2
 ==== 7.2.7
 
   SELECT min (a) OVER win FROM t2
@@ -2542,7 +2542,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 2000 FOLLOWING AND 1000 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 133 no such table: t2
 ==== 7.2.8
 
   SELECT min (a) OVER win FROM t2
@@ -2550,7 +2550,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 1000 PRECEDING AND 2000 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 134 no such table: t2
 ==== 7.2.9
 
   SELECT min (a) OVER win FROM t2
@@ -2558,7 +2558,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 2000 FOLLOWING AND 1000 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 134 no such table: t2
 ==== 7.3.1
 
   SELECT sum (a) OVER win FROM t2
@@ -2566,7 +2566,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 6 FOLLOWING AND UNBOUNDED FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 135 no such table: t2
 ==== 7.3.2
 
   SELECT sum (a) OVER win FROM t2
@@ -2574,7 +2574,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 1 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 127 no such table: t2
 ==== 7.3.3
 
   SELECT sum (a) OVER win FROM t2
@@ -2582,7 +2582,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 2 FOLLOWING AND 1 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 127 no such table: t2
 ==== 7.3.4
 
   SELECT sum (a) OVER win FROM t2
@@ -2590,7 +2590,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 1 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 128 no such table: t2
 ==== 7.3.5
 
   SELECT sum (a) OVER win FROM t2
@@ -2598,7 +2598,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 2 FOLLOWING AND 1 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 128 no such table: t2
 ==== 7.3.6
 
   SELECT sum (a) OVER win FROM t2
@@ -2606,7 +2606,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 1000 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 130 no such table: t2
 ==== 7.3.7
 
   SELECT sum (a) OVER win FROM t2
@@ -2614,7 +2614,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 2000 FOLLOWING AND 1000 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 133 no such table: t2
 ==== 7.3.8
 
   SELECT sum (a) OVER win FROM t2
@@ -2622,7 +2622,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 1000 PRECEDING AND 2000 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 134 no such table: t2
 ==== 7.3.9
 
   SELECT sum (a) OVER win FROM t2
@@ -2630,7 +2630,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 2000 FOLLOWING AND 1000 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 134 no such table: t2
 ==== 7.4.1
 
   SELECT max (a) OVER win FROM t2
@@ -2638,7 +2638,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 6 FOLLOWING AND UNBOUNDED FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 135 no such table: t2
 ==== 7.4.2
 
   SELECT max (a) OVER win FROM t2
@@ -2646,7 +2646,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 1 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 127 no such table: t2
 ==== 7.4.3
 
   SELECT max (a) OVER win FROM t2
@@ -2654,7 +2654,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 2 FOLLOWING AND 1 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 127 no such table: t2
 ==== 7.4.4
 
   SELECT max (a) OVER win FROM t2
@@ -2662,7 +2662,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 1 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 128 no such table: t2
 ==== 7.4.5
 
   SELECT max (a) OVER win FROM t2
@@ -2670,7 +2670,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 2 FOLLOWING AND 1 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 128 no such table: t2
 ==== 7.4.6
 
   SELECT max (a) OVER win FROM t2
@@ -2678,7 +2678,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 1000 PRECEDING AND 2 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 130 no such table: t2
 ==== 7.4.7
 
   SELECT max (a) OVER win FROM t2
@@ -2686,7 +2686,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS LAST RANGE BETWEEN 2000 FOLLOWING AND 1000 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 133 no such table: t2
 ==== 7.4.8
 
   SELECT max (a) OVER win FROM t2
@@ -2694,7 +2694,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 1000 PRECEDING AND 2000 PRECEDING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 134 no such table: t2
 ==== 7.4.9
 
   SELECT max (a) OVER win FROM t2
@@ -2702,7 +2702,7 @@ stmt 0 err 1 -1 no such table: t2
       ORDER BY b NULLS FIRST RANGE BETWEEN 2000 FOLLOWING AND 1000 FOLLOWING
   );
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 134 no such table: t2
 ==== 8.0
 
   DROP TABLE IF EXISTS tx;
@@ -2717,10 +2717,10 @@ stmt 0 err 1 -1 no such table: t2
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 69 err 1 -1 no such table: tx
+stmt 69 err 1 -1 122 no such table: tx
 stmt 122 ok
 stmt 151 ok
-stmt 202 err 1 -1 no such table: map
+stmt 202 err 1 -1 311 no such table: map
 ==== 8.1
 
   SELECT sum(a) OVER (
@@ -2729,7 +2729,7 @@ stmt 202 err 1 -1 no such table: map
     ) ORDER BY a
   ) FROM tx;
 ----
-stmt 0 err 1 -1 no such table: tx
+stmt 0 err 1 -1 106 no such table: tx
 ==== 8.2
 
   SELECT sum(a) OVER win FROM tx
@@ -2739,7 +2739,7 @@ stmt 0 err 1 -1 no such table: tx
     ) ORDER BY a
   );
 ----
-stmt 0 err 1 -1 no such table: tx
+stmt 0 err 1 -1 126 no such table: tx
 ==== 8.3
 
   WITH map2 AS (
@@ -2751,7 +2751,7 @@ stmt 0 err 1 -1 no such table: tx
     ) ORDER BY a
   ) FROM tx;
 ----
-stmt 0 err 1 -1 no such table: tx
+stmt 0 err 1 -1 150 no such table: tx
 ==== 8.4
 
   WITH map2 AS (
@@ -2764,7 +2764,7 @@ stmt 0 err 1 -1 no such table: tx
     ) ORDER BY a
   );
 ----
-stmt 0 err 1 -1 no such table: tx
+stmt 0 err 1 -1 170 no such table: tx
 ==== 9.1
 
   DROP TABLE IF EXISTS t1;
@@ -2784,7 +2784,7 @@ stmt 84 ok
   )
   FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 112 no such table: t1
 ==== 10.0
 
   DROP TABLE IF EXISTS t1;
@@ -2797,7 +2797,7 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 68 err 1 -1 no such table: t1
+stmt 68 err 1 -1 237 no such table: t1
 ==== 10.1
 
   SELECT 
@@ -2805,7 +2805,7 @@ stmt 68 err 1 -1 no such table: t1
     FROM t1
     WINDOW win AS (ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 142 no such table: t1
 ==== 10.2
 
   SELECT 
@@ -2813,7 +2813,7 @@ stmt 0 err 1 -1 no such table: t1
     FROM t1
     WINDOW win AS ();
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 91 no such table: t1
 ==== 10.3
 
   SELECT 
@@ -2821,7 +2821,7 @@ stmt 0 err 1 -1 no such table: t1
     FROM t1
     WINDOW win AS (ORDER BY a);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 101 no such table: t1
 ==== 10.4
 
   SELECT 
@@ -2829,7 +2829,7 @@ stmt 0 err 1 -1 no such table: t1
     FROM t1
     WINDOW win AS (ORDER BY a ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 122 no such table: t1
 ==== 11.0
 
   DROP TABLE IF EXISTS t2;
@@ -2847,20 +2847,20 @@ stmt 0 err 1 -1 no such table: t1
 ----
 stmt 0 ok
 stmt 27 ok
-stmt 68 err 1 -1 no such table: t2
-stmt 100 err 1 -1 no such table: t2
-stmt 132 err 1 -1 no such table: t2
-stmt 164 err 1 -1 no such table: t2
-stmt 196 err 1 -1 no such table: t2
-stmt 228 err 1 -1 no such table: t2
-stmt 260 err 1 -1 no such table: t2
-stmt 292 err 1 -1 no such table: t2
-stmt 324 err 1 -1 no such table: t2
-stmt 356 err 1 -1 no such table: t2
+stmt 68 err 1 -1 100 no such table: t2
+stmt 100 err 1 -1 132 no such table: t2
+stmt 132 err 1 -1 164 no such table: t2
+stmt 164 err 1 -1 196 no such table: t2
+stmt 196 err 1 -1 228 no such table: t2
+stmt 228 err 1 -1 260 no such table: t2
+stmt 260 err 1 -1 292 no such table: t2
+stmt 292 err 1 -1 324 no such table: t2
+stmt 324 err 1 -1 356 no such table: t2
+stmt 356 err 1 -1 388 no such table: t2
 ==== 11.1
 
   SELECT a, min(b) FILTER (WHERE a%2 != 0) OVER win
   FROM t2
   WINDOW win AS (ORDER BY a ROWS BETWEEN 2 PRECEDING AND 2 FOLLOWING);
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 133 no such table: t2

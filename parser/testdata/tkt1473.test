@@ -1,0 +1,693 @@
+==== tkt1473-1.1
+
+    CREATE TABLE t1(a,b);
+    INSERT INTO t1 VALUES(1,2);
+    INSERT INTO t1 VALUES(3,4);
+    SELECT * FROM t1
+----
+stmt 0 ok
+stmt 26 err 1 -1 58 no such table: t1
+stmt 58 err 1 -1 90 no such table: t1
+stmt 90 err 1 -1 112 no such table: t1
+==== tkt1473-1.2
+
+    SELECT 1 FROM t1 WHERE a=1 UNION ALL SELECT 2 FROM t1 WHERE b=0
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== tkt1473-1.3
+
+    SELECT 1 FROM t1 WHERE a=1 UNION SELECT 2 FROM t1 WHERE b=0
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== tkt1473-1.4
+
+    SELECT 1 FROM t1 WHERE a=1 UNION ALL SELECT 2 FROM t1 WHERE b=4
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== tkt1473-1.5
+
+    SELECT 1 FROM t1 WHERE a=1 UNION SELECT 2 FROM t1 WHERE b=4
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== tkt1473-1.6
+
+    SELECT 1 FROM t1 WHERE a=0 UNION ALL SELECT 2 FROM t1 WHERE b=4
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== tkt1473-1.7
+
+    SELECT 1 FROM t1 WHERE a=0 UNION SELECT 2 FROM t1 WHERE b=4
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== tkt1473-1.8
+
+    SELECT 1 FROM t1 WHERE a=0 UNION ALL SELECT 2 FROM t1 WHERE b=0
+----
+stmt 0 err 1 -1 69 no such table: t1
+==== tkt1473-1.9
+
+    SELECT 1 FROM t1 WHERE a=0 UNION SELECT 2 FROM t1 WHERE b=0
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== tkt1473-2.2
+
+    SELECT (SELECT 1 FROM t1 WHERE a=1 UNION ALL SELECT 2 FROM t1 WHERE b=0)
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== tkt1473-2.3
+
+    SELECT (SELECT 1 FROM t1 WHERE a=1 UNION SELECT 2 FROM t1 WHERE b=0)
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== tkt1473-2.4
+
+    SELECT (SELECT 1 FROM t1 WHERE a=1 UNION ALL SELECT 2 FROM t1 WHERE b=4)
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== tkt1473-2.5
+
+    SELECT (SELECT 1 FROM t1 WHERE a=1 UNION SELECT 2 FROM t1 WHERE b=4)
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== tkt1473-2.6
+
+    SELECT (SELECT 1 FROM t1 WHERE a=0 UNION ALL SELECT 2 FROM t1 WHERE b=4)
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== tkt1473-2.7
+
+    SELECT (SELECT 1 FROM t1 WHERE a=0 UNION SELECT 2 FROM t1 WHERE b=4)
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== tkt1473-2.8
+
+    SELECT (SELECT 1 FROM t1 WHERE a=0 UNION ALL SELECT 2 FROM t1 WHERE b=0)
+----
+stmt 0 err 1 -1 78 no such table: t1
+==== tkt1473-2.9
+
+    SELECT (SELECT 1 FROM t1 WHERE a=0 UNION SELECT 2 FROM t1 WHERE b=0)
+----
+stmt 0 err 1 -1 74 no such table: t1
+==== tkt1473-3.2
+
+    SELECT EXISTS
+      (SELECT 1 FROM t1 WHERE a=1 UNION ALL SELECT 2 FROM t1 WHERE b=0)
+----
+stmt 0 err 1 -1 91 no such table: t1
+==== tkt1473-3.3
+
+    SELECT EXISTS
+      (SELECT 1 FROM t1 WHERE a=1 UNION SELECT 2 FROM t1 WHERE b=0)
+----
+stmt 0 err 1 -1 87 no such table: t1
+==== tkt1473-3.4
+
+    SELECT EXISTS
+      (SELECT 1 FROM t1 WHERE a=1 UNION ALL SELECT 2 FROM t1 WHERE b=4)
+----
+stmt 0 err 1 -1 91 no such table: t1
+==== tkt1473-3.5
+
+    SELECT EXISTS
+      (SELECT 1 FROM t1 WHERE a=1 UNION SELECT 2 FROM t1 WHERE b=4)
+----
+stmt 0 err 1 -1 87 no such table: t1
+==== tkt1473-3.6
+
+    SELECT EXISTS
+      (SELECT 1 FROM t1 WHERE a=0 UNION ALL SELECT 2 FROM t1 WHERE b=4)
+----
+stmt 0 err 1 -1 91 no such table: t1
+==== tkt1473-3.7
+
+    SELECT EXISTS
+      (SELECT 1 FROM t1 WHERE a=0 UNION SELECT 2 FROM t1 WHERE b=4)
+----
+stmt 0 err 1 -1 87 no such table: t1
+==== tkt1473-3.8
+
+    SELECT EXISTS
+      (SELECT 1 FROM t1 WHERE a=0 UNION ALL SELECT 2 FROM t1 WHERE b=0)
+----
+stmt 0 err 1 -1 91 no such table: t1
+==== tkt1473-3.9
+
+    SELECT EXISTS
+      (SELECT 1 FROM t1 WHERE a=0 UNION SELECT 2 FROM t1 WHERE b=0)
+----
+stmt 0 err 1 -1 87 no such table: t1
+==== tkt1473-4.1
+
+    CREATE TABLE t2(x,y);
+    INSERT INTO t2 VALUES(1,2);
+    INSERT INTO t2 SELECT x+2, y+2 FROM t2;
+    INSERT INTO t2 SELECT x+4, y+4 FROM t2;
+    INSERT INTO t2 SELECT x+8, y+8 FROM t2;
+    INSERT INTO t2 SELECT x+16, y+16 FROM t2;
+    INSERT INTO t2 SELECT x+32, y+32 FROM t2;
+    INSERT INTO t2 SELECT x+64, y+64 FROM t2;
+    SELECT count(*), sum(x), sum(y) FROM t2;
+----
+stmt 0 ok
+stmt 26 err 1 -1 58 no such table: t2
+stmt 58 err 1 -1 102 no such table: t2
+stmt 102 err 1 -1 146 no such table: t2
+stmt 146 err 1 -1 190 no such table: t2
+stmt 190 err 1 -1 236 no such table: t2
+stmt 236 err 1 -1 282 no such table: t2
+stmt 282 err 1 -1 328 no such table: t2
+stmt 328 err 1 -1 373 no such table: t2
+==== tkt1473-4.2
+
+    SELECT 1 FROM t2 WHERE x=0
+    UNION ALL
+    SELECT 2 FROM t2 WHERE x=1
+    UNION ALL
+    SELECT 3 FROM t2 WHERE x=2
+    UNION ALL
+    SELECT 4 FROM t2 WHERE x=3
+    UNION ALL
+    SELECT 5 FROM t2 WHERE x=4
+    UNION ALL
+    SELECT 6 FROM t2 WHERE y=0
+    UNION ALL
+    SELECT 7 FROM t2 WHERE y=1
+    UNION ALL
+    SELECT 8 FROM t2 WHERE y=2
+    UNION ALL
+    SELECT 9 FROM t2 WHERE y=3
+    UNION ALL
+    SELECT 10 FROM t2 WHERE y=4
+----
+stmt 0 err 1 -1 438 no such table: t2
+==== tkt1473-4.3
+
+    SELECT (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION ALL
+      SELECT 2 FROM t2 WHERE x=1
+      UNION ALL
+      SELECT 3 FROM t2 WHERE x=2
+      UNION ALL
+      SELECT 4 FROM t2 WHERE x=3
+      UNION ALL
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION ALL
+      SELECT 7 FROM t2 WHERE y=1
+      UNION ALL
+      SELECT 8 FROM t2 WHERE y=2
+      UNION ALL
+      SELECT 9 FROM t2 WHERE y=3
+      UNION ALL
+      SELECT 10 FROM t2 WHERE y=4
+    )
+----
+stmt 0 err 1 -1 495 no such table: t2
+==== tkt1473-4.4
+
+    SELECT (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION ALL
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION ALL
+      SELECT 3 FROM t2 WHERE x=2
+      UNION ALL
+      SELECT 4 FROM t2 WHERE x=3
+      UNION ALL
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION ALL
+      SELECT 7 FROM t2 WHERE y=1
+      UNION ALL
+      SELECT 8 FROM t2 WHERE y=2
+      UNION ALL
+      SELECT 9 FROM t2 WHERE y=3
+      UNION ALL
+      SELECT 10 FROM t2 WHERE y=4
+    )
+----
+stmt 0 err 1 -1 496 no such table: t2
+==== tkt1473-4.5
+
+    SELECT (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION ALL
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION ALL
+      SELECT 3 FROM t2 WHERE x=2
+      UNION ALL
+      SELECT 4 FROM t2 WHERE x=-1
+      UNION ALL
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION ALL
+      SELECT 7 FROM t2 WHERE y=1
+      UNION ALL
+      SELECT 8 FROM t2 WHERE y=2
+      UNION ALL
+      SELECT 9 FROM t2 WHERE y=3
+      UNION ALL
+      SELECT 10 FROM t2 WHERE y=-4
+    )
+----
+stmt 0 err 1 -1 498 no such table: t2
+==== tkt1473-4.6
+
+    SELECT (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION ALL
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION ALL
+      SELECT 3 FROM t2 WHERE x=2
+      UNION ALL
+      SELECT 4 FROM t2 WHERE x=-2
+      UNION ALL
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION ALL
+      SELECT 7 FROM t2 WHERE y=1
+      UNION ALL
+      SELECT 8 FROM t2 WHERE y=-3
+      UNION ALL
+      SELECT 9 FROM t2 WHERE y=3
+      UNION ALL
+      SELECT 10 FROM t2 WHERE y=4
+    )
+----
+stmt 0 err 1 -1 498 no such table: t2
+==== tkt1473-4.7
+
+    SELECT (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION ALL
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION ALL
+      SELECT 3 FROM t2 WHERE x=2
+      UNION ALL
+      SELECT 4 FROM t2 WHERE x=-2
+      UNION ALL
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION ALL
+      SELECT 7 FROM t2 WHERE y=1
+      UNION ALL
+      SELECT 8 FROM t2 WHERE y=-3
+      UNION ALL
+      SELECT 9 FROM t2 WHERE y=3
+      UNION ALL
+      SELECT 10 FROM t2 WHERE y=-4
+    )
+----
+stmt 0 err 1 -1 499 no such table: t2
+==== tkt1473-5.3
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION ALL
+      SELECT 2 FROM t2 WHERE x=1
+      UNION ALL
+      SELECT 3 FROM t2 WHERE x=2
+      UNION ALL
+      SELECT 4 FROM t2 WHERE x=3
+      UNION ALL
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION ALL
+      SELECT 7 FROM t2 WHERE y=1
+      UNION ALL
+      SELECT 8 FROM t2 WHERE y=2
+      UNION ALL
+      SELECT 9 FROM t2 WHERE y=3
+      UNION ALL
+      SELECT 10 FROM t2 WHERE y=4
+    )
+----
+stmt 0 err 1 -1 502 no such table: t2
+==== tkt1473-5.4
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION ALL
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION ALL
+      SELECT 3 FROM t2 WHERE x=2
+      UNION ALL
+      SELECT 4 FROM t2 WHERE x=3
+      UNION ALL
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION ALL
+      SELECT 7 FROM t2 WHERE y=1
+      UNION ALL
+      SELECT 8 FROM t2 WHERE y=2
+      UNION ALL
+      SELECT 9 FROM t2 WHERE y=3
+      UNION ALL
+      SELECT 10 FROM t2 WHERE y=4
+    )
+----
+stmt 0 err 1 -1 503 no such table: t2
+==== tkt1473-5.5
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION ALL
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION ALL
+      SELECT 3 FROM t2 WHERE x=2
+      UNION ALL
+      SELECT 4 FROM t2 WHERE x=-1
+      UNION ALL
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION ALL
+      SELECT 7 FROM t2 WHERE y=1
+      UNION ALL
+      SELECT 8 FROM t2 WHERE y=2
+      UNION ALL
+      SELECT 9 FROM t2 WHERE y=3
+      UNION ALL
+      SELECT 10 FROM t2 WHERE y=-4
+    )
+----
+stmt 0 err 1 -1 505 no such table: t2
+==== tkt1473-5.6
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION ALL
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION ALL
+      SELECT 3 FROM t2 WHERE x=2
+      UNION ALL
+      SELECT 4 FROM t2 WHERE x=-2
+      UNION ALL
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION ALL
+      SELECT 7 FROM t2 WHERE y=1
+      UNION ALL
+      SELECT 8 FROM t2 WHERE y=-3
+      UNION ALL
+      SELECT 9 FROM t2 WHERE y=3
+      UNION ALL
+      SELECT 10 FROM t2 WHERE y=4
+    )
+----
+stmt 0 err 1 -1 505 no such table: t2
+==== tkt1473-5.7
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION ALL
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION ALL
+      SELECT 3 FROM t2 WHERE x=2
+      UNION ALL
+      SELECT 4 FROM t2 WHERE x=-2
+      UNION ALL
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION ALL
+      SELECT 7 FROM t2 WHERE y=1
+      UNION ALL
+      SELECT 8 FROM t2 WHERE y=-3
+      UNION ALL
+      SELECT 9 FROM t2 WHERE y=3
+      UNION ALL
+      SELECT 10 FROM t2 WHERE y=-4
+    )
+----
+stmt 0 err 1 -1 506 no such table: t2
+==== tkt1473-6.3
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION
+      SELECT 2 FROM t2 WHERE x=1
+      UNION
+      SELECT 3 FROM t2 WHERE x=2
+      UNION
+      SELECT 4 FROM t2 WHERE x=3
+      UNION
+      SELECT 5 FROM t2 WHERE x=4
+      UNION
+      SELECT 6 FROM t2 WHERE y=0
+      UNION
+      SELECT 7 FROM t2 WHERE y=1
+      UNION
+      SELECT 8 FROM t2 WHERE y=2
+      UNION
+      SELECT 9 FROM t2 WHERE y=3
+      UNION
+      SELECT 10 FROM t2 WHERE y=4
+    )
+----
+stmt 0 err 1 -1 466 no such table: t2
+==== tkt1473-6.4
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION
+      SELECT 3 FROM t2 WHERE x=2
+      UNION
+      SELECT 4 FROM t2 WHERE x=3
+      UNION
+      SELECT 5 FROM t2 WHERE x=4
+      UNION
+      SELECT 6 FROM t2 WHERE y=0
+      UNION
+      SELECT 7 FROM t2 WHERE y=1
+      UNION
+      SELECT 8 FROM t2 WHERE y=2
+      UNION
+      SELECT 9 FROM t2 WHERE y=3
+      UNION
+      SELECT 10 FROM t2 WHERE y=4
+    )
+----
+stmt 0 err 1 -1 467 no such table: t2
+==== tkt1473-6.5
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION
+      SELECT 3 FROM t2 WHERE x=2
+      UNION
+      SELECT 4 FROM t2 WHERE x=-1
+      UNION
+      SELECT 5 FROM t2 WHERE x=4
+      UNION
+      SELECT 6 FROM t2 WHERE y=0
+      UNION
+      SELECT 7 FROM t2 WHERE y=1
+      UNION
+      SELECT 8 FROM t2 WHERE y=2
+      UNION
+      SELECT 9 FROM t2 WHERE y=3
+      UNION
+      SELECT 10 FROM t2 WHERE y=-4
+    )
+----
+stmt 0 err 1 -1 469 no such table: t2
+==== tkt1473-6.6
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION
+      SELECT 3 FROM t2 WHERE x=2
+      UNION
+      SELECT 4 FROM t2 WHERE x=-2
+      UNION
+      SELECT 5 FROM t2 WHERE x=4
+      UNION
+      SELECT 6 FROM t2 WHERE y=0
+      UNION
+      SELECT 7 FROM t2 WHERE y=1
+      UNION
+      SELECT 8 FROM t2 WHERE y=-3
+      UNION
+      SELECT 9 FROM t2 WHERE y=3
+      UNION
+      SELECT 10 FROM t2 WHERE y=4
+    )
+----
+stmt 0 err 1 -1 469 no such table: t2
+==== tkt1473-6.7
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION
+      SELECT 3 FROM t2 WHERE x=2
+      UNION
+      SELECT 4 FROM t2 WHERE x=-2
+      UNION
+      SELECT 5 FROM t2 WHERE x=4
+      UNION
+      SELECT 6 FROM t2 WHERE y=0
+      UNION
+      SELECT 7 FROM t2 WHERE y=1
+      UNION
+      SELECT 8 FROM t2 WHERE y=-3
+      UNION
+      SELECT 9 FROM t2 WHERE y=3
+      UNION
+      SELECT 10 FROM t2 WHERE y=-4
+    )
+----
+stmt 0 err 1 -1 470 no such table: t2
+==== tkt1473-6.8
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION
+      SELECT 3 FROM t2 WHERE x=2
+      UNION
+      SELECT 4 FROM t2 WHERE x=-2
+      UNION
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION
+      SELECT 7 FROM t2 WHERE y=1
+      UNION
+      SELECT 8 FROM t2 WHERE y=-3
+      UNION
+      SELECT 9 FROM t2 WHERE y=3
+      UNION
+      SELECT 10 FROM t2 WHERE y=4
+    )
+----
+stmt 0 err 1 -1 473 no such table: t2
+==== tkt1473-6.9
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0
+      UNION
+      SELECT 2 FROM t2 WHERE x=-1
+      UNION
+      SELECT 3 FROM t2 WHERE x=2
+      UNION
+      SELECT 4 FROM t2 WHERE x=-2
+      UNION
+      SELECT 5 FROM t2 WHERE x=4
+      UNION ALL
+      SELECT 6 FROM t2 WHERE y=0
+      UNION
+      SELECT 7 FROM t2 WHERE y=1
+      UNION
+      SELECT 8 FROM t2 WHERE y=-3
+      UNION
+      SELECT 9 FROM t2 WHERE y=3
+      UNION
+      SELECT 10 FROM t2 WHERE y=-4
+    )
+----
+stmt 0 err 1 -1 474 no such table: t2
+==== tkt1473-7.1
+
+    SELECT 1 FROM t2 WHERE x=1 EXCEPT SELECT 2 FROM t2 WHERE y=2
+----
+stmt 0 err 1 -1 66 no such table: t2
+==== tkt1473-7.2
+
+    SELECT (
+      SELECT 1 FROM t2 WHERE x=1 EXCEPT SELECT 2 FROM t2 WHERE y=2
+    )
+----
+stmt 0 err 1 -1 87 no such table: t2
+==== tkt1473-7.3
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=1 EXCEPT SELECT 2 FROM t2 WHERE y=2
+    )
+----
+stmt 0 err 1 -1 94 no such table: t2
+==== tkt1473-7.4
+
+    SELECT (
+      SELECT 1 FROM t2 WHERE x=0 EXCEPT SELECT 2 FROM t2 WHERE y=2
+    )
+----
+stmt 0 err 1 -1 87 no such table: t2
+==== tkt1473-7.5
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=0 EXCEPT SELECT 2 FROM t2 WHERE y=2
+    )
+----
+stmt 0 err 1 -1 94 no such table: t2
+==== tkt1473-8.1
+
+    SELECT 1 FROM t2 WHERE x=1 INTERSECT SELECT 2 FROM t2 WHERE y=2
+----
+stmt 0 err 1 -1 69 no such table: t2
+==== tkt1473-8.1.dup1
+
+    SELECT 1 FROM t2 WHERE x=1 INTERSECT SELECT 1 FROM t2 WHERE y=2
+----
+stmt 0 err 1 -1 69 no such table: t2
+==== tkt1473-8.3
+
+    SELECT (
+      SELECT 1 FROM t2 WHERE x=1 INTERSECT SELECT 2 FROM t2 WHERE y=2
+    )
+----
+stmt 0 err 1 -1 90 no such table: t2
+==== tkt1473-8.4
+
+    SELECT (
+      SELECT 1 FROM t2 WHERE x=1 INTERSECT SELECT 1 FROM t2 WHERE y=2
+    )
+----
+stmt 0 err 1 -1 90 no such table: t2
+==== tkt1473-8.5
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=1 INTERSECT SELECT 2 FROM t2 WHERE y=2
+    )
+----
+stmt 0 err 1 -1 97 no such table: t2
+==== tkt1473-8.6
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=1 INTERSECT SELECT 1 FROM t2 WHERE y=2
+    )
+----
+stmt 0 err 1 -1 97 no such table: t2
+==== tkt1473-8.7
+
+    SELECT (
+      SELECT 1 FROM t2 WHERE x=0 INTERSECT SELECT 1 FROM t2 WHERE y=2
+    )
+----
+stmt 0 err 1 -1 90 no such table: t2
+==== tkt1473-8.8
+
+    SELECT EXISTS (
+      SELECT 1 FROM t2 WHERE x=1 INTERSECT SELECT 1 FROM t2 WHERE y=0
+    )
+----
+stmt 0 err 1 -1 97 no such table: t2

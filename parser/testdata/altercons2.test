@@ -1,0 +1,249 @@
+==== altercons2-generated
+
+    CREATE TABLE t1(a, b, c NOT NULL, CONSTRAINT xyz CHECK( a!=0 ));
+----
+stmt 0 ok
+==== altercons2-generated.dup1
+
+    SELECT sql FROM sqlite_schema WHERE name='t1'
+----
+stmt 0 ok
+==== 2.0
+
+  CREATE TABLE x1(a PRIMARY KEY, b CHECK(a!=b) NOT NULL, c);
+----
+stmt 0 ok
+==== 2.1.1
+
+  ALTER TABLE x1 ADD CONSTRAINT ccc CHECK (a!='a')
+----
+stmt 0 err 1 -1 52 no such table: x1
+==== 2.1.2
+
+  SELECT sql FROM sqlite_schema WHERE name='x1'
+----
+stmt 0 ok
+==== 2.2.1
+
+  ALTER TABLE x1 ALTER c SET NOT NULL
+----
+stmt 0 err 1 -1 39 no such table: x1
+==== 2.2.2
+
+  SELECT sql FROM sqlite_schema WHERE name='x1'
+----
+stmt 0 ok
+==== 3.0
+
+  CREATE TABLE t1(x);
+----
+stmt 0 ok
+==== 3.1
+
+  ALTER TABLE t1 ALTER x SET NOT NULL;
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== 4.0
+
+  CREATE TABLE abc(a, b, c, CONSTRAINT one CONSTRAINT two CHECK (b!=c));
+----
+stmt 0 ok
+==== 4.1
+
+  ALTER TABLE abc DROP CONSTRAINT one
+----
+stmt 0 err 1 -1 39 no such table: abc
+==== 4.2
+
+  SELECT sql FROM sqlite_schema
+----
+stmt 0 ok
+==== 5.0
+
+  CREATE TABLE abc(a, b, c, CONSTRAINT two CHECK (b!=c), d)
+----
+stmt 0 err 1 58 59 near "d": syntax error
+==== 5.1
+
+  CREATE TABLE def(CONSTRAINT abc CHECK( b!=c ), a, b, c);
+----
+stmt 0 err 1 20 30 near "CONSTRAINT": syntax error
+==== 6.0
+
+  CREATE TABLE abc(a, b CONSTRAINT two COLLATE nocase CHECK (a!=b), c CONSTRAINT one DEFAULT 'abc');
+----
+stmt 0 ok
+==== 6.1
+
+  ALTER TABLE abc DROP CONSTRAINT one;
+  ALTER TABLE abc DROP CONSTRAINT two;
+----
+stmt 0 err 1 -1 39 no such table: abc
+stmt 39 err 1 -1 78 no such table: abc
+==== 6.2
+
+  SELECT sql FROM sqlite_schema
+----
+stmt 0 ok
+==== 7.0
+
+  CREATE TABLE abc(a, b, c, CONSTRAINT one CHECK (a>b) FOREIGN KEY(a) REFERENCES abc);
+----
+stmt 0 ok
+==== 7.1
+
+  ALTER TABLE abc DROP CONSTRAINT one
+----
+stmt 0 err 1 -1 39 no such table: abc
+==== 7.2
+
+  SELECT sql FROM sqlite_schema
+----
+stmt 0 ok
+==== 8.0
+
+  CREATE TABLE abc(a, b, c, CONSTRAINT one FOREIGN KEY(a) REFERENCES abc);
+----
+stmt 0 ok
+==== 8.1
+
+  ALTER TABLE abc DROP CONSTRAINT one
+----
+stmt 0 err 1 -1 39 no such table: abc
+==== 9.0
+
+  CREATE TABLE abc(a, b NOT NULL AS (a+1))
+----
+stmt 0 ok
+==== 9.1
+
+  ALTER TABLE abc ALTER b DROP NOT NULL;
+  SELECT sql FROM sqlite_schema;
+----
+stmt 0 err 1 -1 41 no such table: abc
+stmt 41 ok
+==== 10.0
+
+  CREATE TABLE abc(a, b GENERATED ALWAYS AS (a+1));
+  INSERT INTO abc VALUES(1), (2);
+  SELECT * FROM abc;
+----
+stmt 0 ok
+stmt 52 err 1 -1 86 no such table: abc
+stmt 86 err 1 -1 107 no such table: abc
+==== 10.1
+
+  ALTER TABLE abc ALTER b SET NOT NULL;
+----
+stmt 0 err 1 -1 40 no such table: abc
+==== 10.2
+
+  INSERT INTO abc VALUES(NULL);
+----
+stmt 0 err 1 -1 32 no such table: abc
+==== 10.3
+
+  INSERT INTO abc VALUES(3);
+  ALTER TABLE abc ALTER COLUMN b DROP NOT NULL;
+----
+stmt 0 err 1 -1 29 no such table: abc
+stmt 29 err 1 -1 77 no such table: abc
+==== 10.4
+
+  INSERT INTO abc VALUES(NULL);
+----
+stmt 0 err 1 -1 32 no such table: abc
+==== 11.0
+
+  CREATE TABLE t1(a, b, c);
+----
+stmt 0 ok
+==== 11.1.1
+
+  ALTER TABLE t1 ADD CONSTRAINT c1 CHECK(a=b) --comment
+  ;
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== 11.1.2
+ALTER TABLE t1 ADD CONSTRAINT c2 CHECK(a=b) --comment
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== 11.1.3
+
+  SELECT sql FROM sqlite_schema;
+----
+stmt 0 ok
+==== 11.2.1
+
+  CREATE TABLE t2(a, b);
+----
+stmt 0 ok
+==== 11.2.2
+ALTER TABLE t2 ALTER b SET NOT NULL --new cons
+----
+stmt 0 err 1 -1 47 no such table: t2
+==== 11.2.3
+
+  SELECT sql FROM sqlite_schema WHERE name='t2';
+----
+stmt 0 ok
+==== 11.2.3.dup1
+
+  ALTER TABLE t2 ALTER b DROP NOT NULL;
+  SELECT sql FROM sqlite_schema WHERE name='t2';
+----
+stmt 0 err 1 -1 40 no such table: t2
+stmt 40 ok
+==== 11.2.2.dup1
+ALTER TABLE t2 ALTER b SET NOT NULL --new cons
+;
+----
+stmt 0 err 1 -1 48 no such table: t2
+==== 12.0
+
+  CREATE TABLE "Test" ( 
+      "IsActive" INTEGER, 
+      CONSTRAINT "BooleanZeroOrOne" CHECK ("IsActive" IN (0, 1)) 
+  );
+----
+stmt 0 ok
+==== 12.1
+
+  ALTER TABLE Test DROP CONSTRAINT BooleanZeroOrOne
+----
+stmt 0 err 1 -1 53 no such table: Test
+==== 12.2
+
+  SELECT sql FROM sqlite_schema
+----
+stmt 0 ok
+==== 12.3
+
+  DROP TABLE Test;
+  CREATE TABLE "Test" ( 
+      "IsActive" INTEGER, 
+      CONSTRAINT "BooleanZeroOrOne" CHECK ("IsActive" IN (0, 1)) 
+  );
+----
+stmt 0 err 1 -1 19 no such table: Test
+stmt 19 ok
+==== 12.4
+
+  ALTER TABLE Test DROP CONSTRAINT "BooleanZeroOrOne"
+----
+stmt 0 err 1 -1 55 no such table: Test
+==== 12.5
+
+  SELECT sql FROM sqlite_schema
+----
+stmt 0 ok
+==== 12.6
+
+  CREATE TABLE t1(a, b CONSTRAINT "a""b" CHECK (b IS NOT NULL));
+----
+stmt 0 ok
+==== 12.7
+
+  ALTER TABLE t1 DROP CONSTRAINT "a""b"
+----
+stmt 0 err 1 -1 41 no such table: t1

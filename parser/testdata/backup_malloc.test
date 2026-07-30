@@ -1,0 +1,13 @@
+==== 3.0
+
+  PRAGMA page_size = 16384;
+  BEGIN;
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES(1, 2);
+  COMMIT;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 37 ok
+stmt 62 err 1 -1 93 no such table: t1
+stmt 93 ok

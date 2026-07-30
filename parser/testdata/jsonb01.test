@@ -1,0 +1,5 @@
+==== jsonb01-3.0
+
+  SELECT json(x'6B37616263162d');
+----
+stmt 0 ok

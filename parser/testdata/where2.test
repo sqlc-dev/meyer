@@ -1,0 +1,306 @@
+==== where2-2.5
+
+  -- random() is not optimized out
+  EXPLAIN SELECT * FROM x1, x2 WHERE x=1 ORDER BY random();
+----
+stmt 0 err 1 -1 95 no such table: x1
+==== where2-2.5b
+
+  -- random() is not optimized out
+  EXPLAIN SELECT * FROM x1, x2 WHERE x=1 ORDER BY random();
+----
+stmt 0 err 1 -1 95 no such table: x1
+==== where2-2.6
+
+  -- other constant functions are optimized out
+  EXPLAIN SELECT * FROM x1, x2 WHERE x=1 ORDER BY abs(5);
+----
+stmt 0 err 1 -1 106 no such table: x1
+==== where2-2.6b
+
+  -- other constant functions are optimized out
+  EXPLAIN SELECT * FROM x1, x2 WHERE x=1 ORDER BY abs(5);
+----
+stmt 0 err 1 -1 106 no such table: x1
+==== where2-8.1
+
+      SELECT * FROM t1 WHERE x IN (20,21) AND y IN (1,2)
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== where2-8.2
+
+      SELECT * FROM t1 WHERE x IN (1,2) AND y IN (-5,-6)
+----
+stmt 0 err 1 -1 58 no such table: t1
+==== where2-8.3
+
+      SELECT w FROM t1
+       WHERE x IN (SELECT x FROM tx WHERE rowid<0)
+         AND +y IN (SELECT y FROM tx WHERE rowid=1)
+----
+stmt 0 err 1 -1 127 no such table: t1
+==== where2-8.4
+
+      SELECT w FROM t1
+       WHERE x IN (SELECT x FROM tx WHERE rowid=1)
+         AND y IN (SELECT y FROM tx WHERE rowid<0)
+----
+stmt 0 err 1 -1 126 no such table: t1
+==== where2-8.5
+
+      CREATE INDEX tx_xyz ON tx(x, y, z, w);
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 12 AND 14)
+----
+stmt 0 err 1 -1 45 no such table: main.tx
+stmt 45 err 1 -1 258 no such table: tx
+==== where2-8.6
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 12 AND 14)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 213 no such table: tx
+==== where2-8.7
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 12 AND 14)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 213 no such table: tx
+==== where2-8.8
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 213 no such table: tx
+==== where2-8.9
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 2 AND 4)
+----
+stmt 0 err 1 -1 211 no such table: tx
+==== where2-8.10
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 2 AND 4)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 211 no such table: tx
+==== where2-8.11
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 2 AND 4)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 211 no such table: tx
+==== where2-8.12
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN -4 AND -2)
+----
+stmt 0 err 1 -1 213 no such table: tx
+==== where2-8.13
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN -4 AND -2)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 213 no such table: tx
+==== where2-8.14
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN -4 AND -2)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 213 no such table: tx
+==== where2-8.15
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 200 AND 300)
+----
+stmt 0 err 1 -1 215 no such table: tx
+==== where2-8.16
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 200 AND 300)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 215 no such table: tx
+==== where2-8.17
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE w BETWEEN 200 AND 300)
+         AND y IN (SELECT y FROM t1 WHERE w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 215 no such table: tx
+==== where2-8.18
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE +w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE +w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE +w BETWEEN 200 AND 300)
+----
+stmt 0 err 1 -1 218 no such table: tx
+==== where2-8.19
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE +w BETWEEN 10 AND 20)
+         AND y IN (SELECT y FROM t1 WHERE +w BETWEEN 200 AND 300)
+         AND z IN (SELECT z FROM t1 WHERE +w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 218 no such table: tx
+==== where2-8.20
+
+      SELECT w FROM tx
+       WHERE x IN (SELECT x FROM t1 WHERE +w BETWEEN 200 AND 300)
+         AND y IN (SELECT y FROM t1 WHERE +w BETWEEN 10 AND 20)
+         AND z IN (SELECT z FROM t1 WHERE +w BETWEEN 10 AND 20)
+----
+stmt 0 err 1 -1 218 no such table: tx
+==== where2-11.1
+
+    CREATE TABLE t11(a,b,c,d);
+    CREATE INDEX i11aba ON t11(a,b,a,c); -- column A occurs twice.
+    INSERT INTO t11 VALUES(1,2,3,4);
+    INSERT INTO t11 VALUES(5,6,7,8);
+    INSERT INTO t11 VALUES(1,2,9,10);
+    INSERT INTO t11 VALUES(5,11,12,13);
+    SELECT c FROM t11 WHERE a=1 AND b=2 ORDER BY c;
+----
+stmt 0 ok
+stmt 31 err 1 -1 72 no such table: main.t11
+stmt 72 err 1 -1 135 no such table: t11
+stmt 135 err 1 -1 172 no such table: t11
+stmt 172 err 1 -1 210 no such table: t11
+stmt 210 err 1 -1 250 no such table: t11
+stmt 250 err 1 -1 302 no such table: t11
+==== where2-11.2
+
+    CREATE INDEX i11cccccccc ON t11(c,c,c,c,c,c,c,c); -- repeated column
+    SELECT d FROM t11 WHERE c=9;
+----
+stmt 0 err 1 -1 54 no such table: main.t11
+stmt 54 err 1 -1 106 no such table: t11
+==== where2-11.3
+
+    SELECT d FROM t11 WHERE c IN (1,2,3,4,5);
+----
+stmt 0 err 1 -1 46 no such table: t11
+==== where2-11.4
+
+    SELECT d FROM t11 WHERE c=7 OR (a=1 AND b=2) ORDER BY d;
+----
+stmt 0 err 1 -1 61 no such table: t11
+==== where2-13.1
+
+  CREATE TABLE t13(a,b);
+  CREATE INDEX t13a ON t13(a);
+  INSERT INTO t13 VALUES(4,5);
+  SELECT * FROM t13 WHERE (1=2 AND a=3) OR a=4;
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: main.t13
+stmt 56 err 1 -1 87 no such table: t13
+stmt 87 err 1 -1 135 no such table: t13
+==== where2-14.1
+
+  CREATE TABLE t14a(x INTEGER PRIMARY KEY);
+  INSERT INTO t14a(x) VALUES(1),(2),(3),(4);
+  CREATE TABLE t14b(y INTEGER PRIMARY KEY);
+  INSERT INTO t14b(y) VALUES(1);
+  SELECT x FROM t14a WHERE x NOT IN (SELECT x FROM t14b);
+----
+stmt 0 ok
+stmt 44 err 1 -1 89 no such table: t14a
+stmt 89 ok
+stmt 133 err 1 -1 166 no such table: t14b
+stmt 166 err 1 -1 224 no such table: t14a
+==== where2-15.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY,b INT);
+  INSERT INTO t1 VALUES(12,34),(56,78),(90,12);
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t2(x INT UNIQUE);
+  INSERT INTO t2 VALUES(78),(12);
+  SELECT a,b,quote(x),'|'
+    FROM t1 LEFT JOIN (SELECT x FROM t2) AS s1 ON t1.b=s1.x
+   ORDER BY a,EXISTS(SELECT 1 FROM t1 LEFT JOIN (SELECT x AS y FROM t2) AS s2 ON t1.b=s2.y),x;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 75 err 1 -1 123 no such table: t1
+stmt 123 ok
+stmt 150 ok
+stmt 183 err 1 -1 217 no such table: t2
+stmt 217 err 1 -1 398 no such table: t1
+==== where2-16.1
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b INT);
+  CREATE TABLE t2(c INTEGER PRIMARY KEY, d INT);
+  CREATE TABLE t3(e INTEGER PRIMARY KEY, f INT);
+  CREATE TABLE t4(g INTEGER PRIMARY KEY, h INT);
+----
+stmt 0 ok
+stmt 49 ok
+stmt 98 ok
+stmt 147 ok
+==== where2-16.2
+
+  EXPLAIN QUERY PLAN
+  SELECT *
+    FROM t1, t2 CROSS JOIN t3, t4
+   WHERE t4.g=1
+     AND t1.a=t4.h
+     AND t2.c=t1.b
+     AND t3.e=t2.d;
+----
+stmt 0 err 1 -1 140 no such table: t1
+==== where2-16.2.dup1
+
+  EXPLAIN QUERY PLAN
+  SELECT *
+    FROM t1, t2 CROSS JOIN t3, t4
+   WHERE t2.c=1
+     AND t3.e=t2.d
+     AND t4.g=t3.f
+     AND t1.a=t4.h;
+----
+stmt 0 err 1 -1 140 no such table: t1
+==== where2-17.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a TEXT);
+  INSERT INTO t1 VALUES('A'),('b');
+  SELECT * FROM t1 WHERE (a='a' COLLATE nocase) OR a='b' ORDER BY +a;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 err 1 -1 90 no such table: t1
+stmt 90 err 1 -1 160 no such table: t1
+==== where2-17.1
+
+  CREATE INDEX t1_a ON t1(a);
+  SELECT * FROM t1 WHERE (a='a' COLLATE nocase) OR a='b' ORDER BY +a;
+----
+stmt 0 err 1 -1 30 no such table: main.t1
+stmt 30 err 1 -1 100 no such table: t1

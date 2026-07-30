@@ -1,0 +1,35 @@
+==== types3-3.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x TEXT PRIMARY KEY);
+  INSERT INTO t1 VALUES('1');
+  SELECT * FROM t1 WHERE NOT x=upper(1);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 66 err 1 -1 96 no such table: t1
+stmt 96 err 1 -1 137 no such table: t1
+==== types3-3.2
+
+  SELECT * FROM t1 WHERE NOT x=add_text_type(1);
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== types3-3.3
+
+  SELECT * FROM t1 WHERE NOT x=add_int_type('1');
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== types3-3.4
+
+  DELETE FROM t1;
+  INSERT INTO t1 VALUES(1.25);
+  SELECT * FROM t1 WHERE NOT x=add_real_type('1.25');
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 err 1 -1 49 no such table: t1
+stmt 49 err 1 -1 103 no such table: t1
+==== types3-3.5
+
+  SELECT * FROM t1 WHERE NOT x=add_text_type(1.25);
+----
+stmt 0 err 1 -1 52 no such table: t1

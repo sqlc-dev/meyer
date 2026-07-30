@@ -1,0 +1,5 @@
+==== 1.0
+
+  CREATE TABLE t1(a INT NOT NULL);
+----
+stmt 0 ok

@@ -1,0 +1,359 @@
+==== temptrigger-1.1
+
+    CREATE TABLE t1(a, b);
+    CREATE TEMP TABLE tt1(a, b);
+    CREATE TEMP TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+      INSERT INTO tt1 VALUES(new.a, new.b);
+    END;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 60 err 1 -1 113 no such table: t1
+==== temptrigger-1.2.2
+ SELECT * FROM tt1
+----
+stmt 0 err 1 -1 19 no such table: tt1
+==== temptrigger-1.2.4
+ SELECT * FROM tt1
+----
+stmt 0 err 1 -1 19 no such table: tt1
+==== temptrigger-2.2
+
+    INSERT INTO t1 VALUES(10, 20);
+    SELECT * FROM tt1;
+----
+stmt 0 err 1 -1 35 no such table: t1
+stmt 35 err 1 -1 58 no such table: tt1
+==== temptrigger-2.4
+
+    INSERT INTO t1 VALUES(30, 40);
+    SELECT * FROM tt1;
+----
+stmt 0 err 1 -1 35 no such table: t1
+stmt 35 err 1 -1 58 no such table: tt1
+==== temptrigger-3.2.1
+ 
+    INSERT INTO aux.t2 VALUES(1, 2);
+    SELECT * FROM aux.t2;
+----
+stmt 0 err 1 -1 38 no such table: aux.t2
+stmt 38 err 1 -1 64 no such table: aux.t2
+==== temptrigger-3.2.2
+ SELECT * FROM tt2
+----
+stmt 0 err 1 -1 19 no such table: tt2
+==== temptrigger-3.3.2
+ SELECT * FROM tt2
+----
+stmt 0 err 1 -1 19 no such table: tt2
+==== 4.0
+
+  CREATE TABLE t1(x);
+  CREATE TEMP TRIGGER tr1 BEFORE INSERT ON t1 BEGIN
+    SELECT 1,2,3;
+  END;
+----
+stmt 0 ok
+stmt 22 err 1 -1 74 no such table: t1
+==== 4.1
+
+  CREATE TEMP TABLE t1(x);
+----
+stmt 0 ok
+==== 5.0
+
+  CREATE TABLE t1(x);
+  CREATE TEMP TRIGGER tr1 BEFORE INSERT ON t1 BEGIN SELECT 1,2,3; END;
+----
+stmt 0 ok
+stmt 22 err 1 -1 74 no such table: t1
+==== 5.2
+
+  SELECT * FROM sqlite_master;
+  SELECT * FROM temp.sqlite_master;
+----
+stmt 0 ok
+stmt 31 ok
+==== 6.0
+
+  CREATE TABLE t1(x);
+  CREATE TEMP TRIGGER tr1 BEFORE INSERT ON t1 BEGIN 
+    SELECT raise(ABORT, 'error'); 
+  END;
+  ATTACH 'test.db2' AS aux;
+----
+stmt 0 ok
+stmt 22 err 1 -1 74 no such table: t1
+stmt 117 ok
+==== 6.2
+
+  SELECT type,name,tbl_name,sql FROM aux.sqlite_master;
+  INSERT INTO aux.t1 VALUES(1,2,3);
+----
+stmt 0 err 1 -1 56 no such table: aux.sqlite_master
+stmt 56 err 1 -1 92 no such table: aux.t1
+==== 6.3
+
+  INSERT INTO main.t1 VALUES(1);
+----
+stmt 0 err 1 -1 33 no such table: main.t1
+==== 7.0
+
+  CREATE TABLE m1(a, b);
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE aux.a1(c, d);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 53 err 1 69 76 unknown database aux
+==== 7.1
+
+  CREATE TEMP TRIGGER tr1 AFTER INSERT ON m1 BEGIN
+    INSERT INTO a1 VALUES(new.a, new.b);
+  END;
+
+  INSERT INTO m1 VALUES(5, 6);
+  SELECT * FROM aux.a1;
+----
+stmt 0 err 1 -1 51 no such table: m1
+stmt 99 err 1 -1 131 no such table: m1
+stmt 131 err 1 -1 155 no such table: aux.a1
+==== 7.2
+
+  CREATE TABLE a1(e, f);
+  INSERT INTO m1 VALUES(7, 8);
+----
+stmt 0 ok
+stmt 25 err 1 -1 56 no such table: m1
+==== 7.3.1
+ SELECT * FROM main.a1
+----
+stmt 0 err 1 -1 23 no such table: main.a1
+==== 7.3.2
+ SELECT * FROM  aux.a1
+----
+stmt 0 err 1 -1 23 no such table: aux.a1
+==== 7.4
+
+  DROP TRIGGER tr1;
+  CREATE TEMP TRIGGER tr1 AFTER INSERT ON m1 BEGIN
+    INSERT INTO a1 SELECT d, c FROM aux.a1;
+  END;
+
+  DELETE FROM aux.a1;
+  DELETE FROM main.a1;
+  INSERT INTO aux.a1 VALUES('hello', 'world');
+----
+stmt 0 err 1 -1 20 no such trigger: tr1
+stmt 20 err 1 -1 71 no such table: m1
+stmt 122 err 1 -1 145 no such table: aux.a1
+stmt 145 err 1 -1 168 no such table: main.a1
+stmt 168 err 1 -1 215 no such table: aux.a1
+==== 7.5
+
+  INSERT INTO m1 VALUES(9, 10);
+  SELECT * FROM main.a1;
+----
+stmt 0 err 1 -1 32 no such table: m1
+stmt 32 err 1 -1 57 no such table: main.a1
+==== 7.6
+
+  DROP TRIGGER tr1;
+  CREATE TRIGGER tr1 AFTER INSERT ON m1 BEGIN
+    INSERT INTO a1 SELECT d, c FROM aux.a1;
+  END;
+----
+stmt 0 err 1 -1 20 no such trigger: tr1
+stmt 20 err 1 -1 66 no such table: main.m1
+==== 8.0
+
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(c, d);
+  CREATE TABLE aux.t1(e, f);
+  CREATE TABLE aux.t2(g, h);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 53 ok
+stmt 78 err 1 94 101 unknown database aux
+stmt 107 err 1 123 130 unknown database aux
+==== 8.1.1
+
+  CREATE TRIGGER tr1 AFTER INSERT ON t2 BEGIN
+    INSERT INTO aux.t1 VALUES(new.c, new.d);
+  END;
+----
+stmt 0 err 1 -1 46 no such table: main.t2
+==== 8.1.2
+
+  CREATE TEMP TRIGGER tr1 AFTER INSERT ON t2 BEGIN
+    INSERT INTO aux.t1 VALUES(new.c, new.d);
+  END;
+
+  INSERT INTO main.t2 VALUES('x', 'y');
+  SELECT * FROM aux.t1;
+----
+stmt 0 err 1 -1 51 no such table: t2
+stmt 103 err 1 -1 144 no such table: main.t2
+stmt 144 err 1 -1 168 no such table: aux.t1
+==== 8.1.3
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== 8.2.1
+
+  CREATE TRIGGER aux.tr2 AFTER UPDATE ON aux.t1 BEGIN
+    UPDATE main.t2 SET c=new.e, d=new.f;
+  END;
+----
+stmt 0 err 1 18 54 unknown database aux
+==== 8.2.2
+
+  CREATE TEMP TRIGGER tr2 AFTER UPDATE ON aux.t1 BEGIN
+    UPDATE main.t2 SET c=new.e, d=new.f;
+  END;
+
+  UPDATE aux.t1 SET e=1, f=2;
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 55 no such table: aux.t1
+stmt 103 err 1 -1 134 no such table: aux.t1
+stmt 134 err 1 -1 154 no such table: t2
+==== 8.2.3
+ SELECT * FROM aux.t2
+----
+stmt 0 err 1 -1 22 no such table: aux.t2
+==== 8.3.1
+
+  CREATE TRIGGER tr3 AFTER DELETE ON t2 BEGIN
+    DELETE FROM aux.t1;
+  END;
+----
+stmt 0 err 1 -1 46 no such table: main.t2
+==== 8.3.2
+
+  INSERT INTO main.t1 VALUES('a', 'b');
+  CREATE TEMP TRIGGER tr3 AFTER DELETE ON t2 BEGIN
+    DELETE FROM aux.t1;
+  END;
+
+  DELETE FROM main.t2;
+  SELECT * FROM aux.t1;
+----
+stmt 0 err 1 -1 40 no such table: main.t1
+stmt 40 err 1 -1 91 no such table: t2
+stmt 122 err 1 -1 146 no such table: main.t2
+stmt 146 err 1 -1 170 no such table: aux.t1
+==== 8.3.3
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== 9.1
+ INSERT INTO db0.tbl VALUES('a', 'b', 'c');
+----
+stmt 0 err 1 -1 43 no such table: db0.tbl
+==== 9.1.1
+ SELECT * FROM db0.tbl
+----
+stmt 0 err 1 -1 23 no such table: db0.tbl
+==== 9.1.2
+ SELECT * FROM db1.tbl
+----
+stmt 0 err 1 -1 23 no such table: db1.tbl
+==== 9.1.3
+ SELECT * FROM db2.tbl
+----
+stmt 0 err 1 -1 23 no such table: db2.tbl
+==== 9.1.1.dup1
+ SELECT * FROM db3.tbl
+----
+stmt 0 err 1 -1 23 no such table: db3.tbl
+==== 9.1.2.dup1
+ SELECT * FROM db4.tbl
+----
+stmt 0 err 1 -1 23 no such table: db4.tbl
+==== 9.1.3.dup1
+ SELECT * FROM db5.tbl
+----
+stmt 0 err 1 -1 23 no such table: db5.tbl
+==== 9.1.1.dup2
+ SELECT * FROM db6.tbl
+----
+stmt 0 err 1 -1 23 no such table: db6.tbl
+==== 9.1.2.dup2
+ SELECT * FROM db7.tbl
+----
+stmt 0 err 1 -1 23 no such table: db7.tbl
+==== 9.3
+ UPDATE db0.tbl SET a=1, b=2, c=3
+----
+stmt 0 err 1 -1 34 no such table: db0.tbl
+==== 9.3.1
+ SELECT * FROM db0.tbl
+----
+stmt 0 err 1 -1 23 no such table: db0.tbl
+==== 9.3.2
+ SELECT * FROM db1.tbl
+----
+stmt 0 err 1 -1 23 no such table: db1.tbl
+==== 9.3.3
+ SELECT * FROM db2.tbl
+----
+stmt 0 err 1 -1 23 no such table: db2.tbl
+==== 9.3.1.dup1
+ SELECT * FROM db3.tbl
+----
+stmt 0 err 1 -1 23 no such table: db3.tbl
+==== 9.3.2.dup1
+ SELECT * FROM db4.tbl
+----
+stmt 0 err 1 -1 23 no such table: db4.tbl
+==== 9.3.3.dup1
+ SELECT * FROM db5.tbl
+----
+stmt 0 err 1 -1 23 no such table: db5.tbl
+==== 9.3.1.dup2
+ SELECT * FROM db6.tbl
+----
+stmt 0 err 1 -1 23 no such table: db6.tbl
+==== 9.3.2.dup2
+ SELECT * FROM db7.tbl
+----
+stmt 0 err 1 -1 23 no such table: db7.tbl
+==== 9.5
+ DELETE FROM db0.tbl
+----
+stmt 0 err 1 -1 21 no such table: db0.tbl
+==== 9.5.1
+ SELECT * FROM db0.tbl
+----
+stmt 0 err 1 -1 23 no such table: db0.tbl
+==== 9.5.2
+ SELECT * FROM db1.tbl
+----
+stmt 0 err 1 -1 23 no such table: db1.tbl
+==== 9.5.3
+ SELECT * FROM db2.tbl
+----
+stmt 0 err 1 -1 23 no such table: db2.tbl
+==== 9.5.1.dup1
+ SELECT * FROM db3.tbl
+----
+stmt 0 err 1 -1 23 no such table: db3.tbl
+==== 9.5.2.dup1
+ SELECT * FROM db4.tbl
+----
+stmt 0 err 1 -1 23 no such table: db4.tbl
+==== 9.5.3.dup1
+ SELECT * FROM db5.tbl
+----
+stmt 0 err 1 -1 23 no such table: db5.tbl
+==== 9.5.1.dup2
+ SELECT * FROM db6.tbl
+----
+stmt 0 err 1 -1 23 no such table: db6.tbl
+==== 9.5.2.dup2
+ SELECT * FROM db7.tbl
+----
+stmt 0 err 1 -1 23 no such table: db7.tbl

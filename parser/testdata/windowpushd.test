@@ -1,0 +1,207 @@
+==== 1.0
+
+  CREATE TABLE t1(id INTEGER PRIMARY KEY, grp_id);
+  CREATE INDEX i1 ON t1(grp_id);
+  CREATE VIEW lll AS SELECT
+    row_number() OVER (PARTITION BY grp_id), 
+    grp_id, id 
+  FROM t1
+----
+stmt 0 ok
+stmt 51 err 1 -1 84 no such table: main.t1
+stmt 84 ok
+==== 1.1
+
+  INSERT INTO t1 VALUES
+    (1, 2), (2, 3), (3, 3), (4, 1), (5, 1),
+    (6, 1), (7, 1), (8, 1), (9, 3), (10, 3), 
+    (11, 2), (12, 3), (13, 3), (14, 2), (15, 1),
+    (16, 2), (17, 1), (18, 2), (19, 3), (20, 2)
+----
+stmt 0 err 1 -1 212 no such table: t1
+==== 1.2
+
+  SELECT * FROM lll
+----
+stmt 0 err 1 -1 21 no such table: lll
+==== 1.3
+
+  SELECT * FROM lll WHERE grp_id=2
+----
+stmt 0 err 1 -1 36 no such table: lll
+==== 1.4
+
+  SELECT * FROM lll WHERE grp_id=2
+----
+stmt 0 err 1 -1 36 no such table: lll
+==== 2.0
+
+  CREATE TABLE t1(a, b, c, d);
+  INSERT INTO t1 VALUES('A', 'C', 1,  0.1);
+  INSERT INTO t1 VALUES('A', 'D', 2,  0.2);
+  INSERT INTO t1 VALUES('A', 'E', 3,  0.3);
+  INSERT INTO t1 VALUES('A', 'C', 4,  0.4);
+  INSERT INTO t1 VALUES('B', 'D', 5,  0.5);
+  INSERT INTO t1 VALUES('B', 'E', 6,  0.6);
+  INSERT INTO t1 VALUES('B', 'C', 7,  0.7);
+  INSERT INTO t1 VALUES('B', 'D', 8,  0.8);
+  INSERT INTO t1 VALUES('C', 'E', 9,  0.9);
+  INSERT INTO t1 VALUES('C', 'C', 10, 1.0);
+  INSERT INTO t1 VALUES('C', 'D', 11, 1.1);
+  INSERT INTO t1 VALUES('C', 'E', 12, 1.2);
+
+  CREATE INDEX i1 ON t1(a);
+  CREATE INDEX i2 ON t1(b);
+
+  CREATE VIEW v1 AS SELECT a, c, max(c) OVER (PARTITION BY a) FROM t1;
+
+  CREATE VIEW v2 AS SELECT a, c, 
+      max(c) OVER (PARTITION BY a),
+      row_number() OVER ()
+  FROM t1;
+
+  CREATE VIEW v3 AS SELECT b, d, 
+      max(d) OVER (PARTITION BY b),
+      row_number() OVER (PARTITION BY b)
+  FROM t1;
+
+  CREATE TABLE t2(x, y, z);
+  INSERT INTO t2 VALUES('W', 3, 1);
+  INSERT INTO t2 VALUES('W', 2, 2);
+  INSERT INTO t2 VALUES('X', 1, 4);
+  INSERT INTO t2 VALUES('X', 5, 7);
+  INSERT INTO t2 VALUES('Y', 1, 9);
+  INSERT INTO t2 VALUES('Y', 4, 2);
+  INSERT INTO t2 VALUES('Z', 3, 3);
+  INSERT INTO t2 VALUES('Z', 3, 4);
+----
+stmt 0 ok
+stmt 31 err 1 -1 75 no such table: t1
+stmt 75 err 1 -1 119 no such table: t1
+stmt 119 err 1 -1 163 no such table: t1
+stmt 163 err 1 -1 207 no such table: t1
+stmt 207 err 1 -1 251 no such table: t1
+stmt 251 err 1 -1 295 no such table: t1
+stmt 295 err 1 -1 339 no such table: t1
+stmt 339 err 1 -1 383 no such table: t1
+stmt 383 err 1 -1 427 no such table: t1
+stmt 427 err 1 -1 471 no such table: t1
+stmt 471 err 1 -1 515 no such table: t1
+stmt 515 err 1 -1 559 no such table: t1
+stmt 559 err 1 -1 588 no such table: main.t1
+stmt 588 err 1 -1 616 no such table: main.t1
+stmt 616 ok
+stmt 688 ok
+stmt 797 ok
+stmt 920 ok
+stmt 949 err 1 -1 985 no such table: t2
+stmt 985 err 1 -1 1021 no such table: t2
+stmt 1021 err 1 -1 1057 no such table: t2
+stmt 1057 err 1 -1 1093 no such table: t2
+stmt 1093 err 1 -1 1129 no such table: t2
+stmt 1129 err 1 -1 1165 no such table: t2
+stmt 1165 err 1 -1 1201 no such table: t2
+stmt 1201 err 1 -1 1237 no such table: t2
+==== windowpushd-generated
+
+    SELECT * FROM v1;
+----
+stmt 0 err 1 -1 22 no such table: v1
+==== windowpushd-generated.dup1
+
+    SELECT * FROM v1 WHERE a IN ('A', 'B');
+----
+stmt 0 err 1 -1 44 no such table: v1
+==== windowpushd-generated.dup2
+
+    SELECT * FROM v1 WHERE a IS 'C'
+----
+stmt 0 err 1 -1 37 no such table: v1
+==== windowpushd-generated.dup3
+
+      SELECT * FROM v1 WHERE a IN ('A', 'B');
+----
+stmt 0 err 1 -1 46 no such table: v1
+==== windowpushd-generated.dup4
+
+      SELECT * FROM v1 WHERE a = 'c' COLLATE nocase
+----
+stmt 0 err 1 -1 53 no such table: v1
+==== windowpushd-generated.dup5
+
+    SELECT * FROM v2;
+----
+stmt 0 err 1 -1 22 no such table: v2
+==== windowpushd-generated.dup6
+
+    SELECT * FROM v2 WHERE a = 'C';
+----
+stmt 0 err 1 -1 36 no such table: v2
+==== windowpushd-generated.dup7
+ SELECT * FROM v3;
+----
+stmt 0 err 1 -1 18 no such table: v3
+==== windowpushd-generated.dup8
+ SELECT * FROM v3 WHERE b<'E'
+----
+stmt 0 err 1 -1 30 no such table: v3
+==== windowpushd-generated.dup9
+
+      SELECT * FROM v3 WHERE b='E'
+----
+stmt 0 err 1 -1 36 no such table: v3
+==== windowpushd-generated.dup10
+
+      SELECT * FROM v3 WHERE b>'C'
+----
+stmt 0 err 1 -1 36 no such table: v3
+==== windowpushd-generated.dup11
+ SELECT * FROM v3 WHERE d<0.55;
+----
+stmt 0 err 1 -1 31 no such table: v3
+==== windowpushd-generated.dup12
+
+      SELECT * FROM v3 WHERE d<0.55
+----
+stmt 0 err 1 -1 37 no such table: v3
+==== windowpushd-generated.dup13
+
+    SELECT * FROM (
+      SELECT x, sum(y) AS s, max(z) AS m 
+      FROM t2 GROUP BY x
+    )
+----
+stmt 0 err 1 -1 94 no such table: t2
+==== windowpushd-generated.dup14
+
+    SELECT * FROM (
+      SELECT x, sum(y) AS s, max(z) AS m,
+        max( max(z) ) OVER (PARTITION BY sum(y) 
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        )
+      FROM t2 GROUP BY x
+    )
+----
+stmt 0 err 1 -1 222 no such table: t2
+==== windowpushd-generated.dup15
+
+    SELECT * FROM (
+      SELECT x, sum(y) AS s, max(z) AS m,
+        max( max(z) ) OVER (PARTITION BY sum(y) 
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        )
+      FROM t2 GROUP BY x
+    ) WHERE s=6
+----
+stmt 0 err 1 -1 232 no such table: t2
+==== windowpushd-generated.dup16
+
+    SELECT * FROM (
+      SELECT x, sum(y) AS s, max(z) AS m,
+        max( max(z) ) OVER (PARTITION BY sum(y) 
+            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+        )
+      FROM t2 GROUP BY x
+    ) WHERE s<6
+----
+stmt 0 err 1 -1 232 no such table: t2

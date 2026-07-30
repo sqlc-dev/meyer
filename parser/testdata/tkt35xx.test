@@ -1,0 +1,26 @@
+==== tkt35xx-1.1
+
+    PRAGMA auto_vacuum = 0;
+    PRAGMA page_size = 1024;
+----
+stmt 0 ok
+stmt 28 ok
+==== tkt35xx-1.2.2
+
+    BEGIN;
+    CREATE TABLE t5(e PRIMARY KEY, f);
+    DROP TABLE t5;
+    INSERT INTO t3(a, b) SELECT c, d FROM t4;
+----
+stmt 0 ok
+stmt 11 ok
+stmt 50 err 1 -1 69 no such table: t5
+stmt 69 err 1 -1 115 no such table: t3
+==== tkt35xx-1.2.4
+ SELECT count(*) FROM t3
+----
+stmt 0 err 1 -1 25 no such table: t3
+==== tkt35xx-1.2.6
+ SELECT count(*) FROM t3
+----
+stmt 0 err 1 -1 25 no such table: t3

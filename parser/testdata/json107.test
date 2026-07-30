@@ -1,0 +1,51 @@
+==== 1.1
+
+  SELECT json_valid( CAST('{"a":1}' AS BLOB) );
+----
+stmt 0 ok
+==== 1.1.1
+
+  SELECT json_valid( CAST('{"a":1}' AS BLOB), 1);
+----
+stmt 0 ok
+==== 1.1.2
+
+  SELECT json_valid( CAST('{"a":1}' AS BLOB), 2);
+----
+stmt 0 ok
+==== 1.1.4
+
+  SELECT json_valid( CAST('{"a":1}' AS BLOB), 4);
+----
+stmt 0 ok
+==== 1.1.8
+
+  SELECT json_valid( CAST('{"a":1}' AS BLOB), 8);
+----
+stmt 0 ok
+==== 1.2.1
+
+  SELECT CAST('{"a":123}' AS blob) -> 'a';
+----
+stmt 0 ok
+==== 1.2.2
+
+  SELECT CAST('{"a":123}' AS blob) ->> 'a';
+----
+stmt 0 ok
+==== 1.7
+
+  SELECT json_type(CAST('{"a":123,"b":456}' AS blob));
+----
+stmt 0 ok
+==== 1.8
+
+  SELECT json(CAST('{"a":123,"b":456}' AS blob));
+----
+stmt 0 ok
+==== 2.1
+
+    SELECT key, value FROM json_tree( CAST('{"a":123,"b":456}' AS blob) )
+      WHERE atom;
+----
+stmt 0 ok

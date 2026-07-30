@@ -1,0 +1,174 @@
+==== 1.1
+
+  VACUUM;
+----
+stmt 0 ok
+==== 3.0
+
+    CREATE TABLE t1(x INTEGER PRIMARY KEY AUTOINCREMENT, y);
+    PRAGMA writable_schema = 1;
+    UPDATE sqlite_schema 
+      SET sql = 'CREATE TABLE sqlite_sequence(name-seq)' 
+      WHERE name = 'sqlite_sequence';
+----
+stmt 0 ok
+stmt 61 ok
+stmt 93 ok
+==== 3.1
+
+    PRAGMA writable_schema = 1;
+    INSERT INTO t1(y) VALUES('abc');
+----
+stmt 0 ok
+stmt 32 err 1 -1 69 no such table: t1
+==== 4.1
+
+    CREATE TABLE x1(a INTEGER PRIMARY KEY, b UNIQUE, c UNIQUE);
+    INSERT INTO x1 VALUES(1, 1, 2);
+    INSERT INTO x1 VALUES(2, 2, 3);
+    INSERT INTO x1 VALUES(3, 3, 4);
+    INSERT INTO x1 VALUES(4, 5, 6);
+    PRAGMA writable_schema = 1;
+
+    UPDATE sqlite_schema SET rootpage = (
+      SELECT rootpage FROM sqlite_schema WHERE name = 'sqlite_autoindex_x1_2'
+    ) WHERE name = 'sqlite_autoindex_x1_1';
+----
+stmt 0 ok
+stmt 64 err 1 -1 100 no such table: x1
+stmt 100 err 1 -1 136 no such table: x1
+stmt 136 err 1 -1 172 no such table: x1
+stmt 172 err 1 -1 208 no such table: x1
+stmt 208 ok
+stmt 240 ok
+==== 4.2
+
+    PRAGMA writable_schema = 1;
+    REPLACE INTO x1 VALUES(5, 2, 3);
+----
+stmt 0 ok
+stmt 32 err 1 -1 69 no such table: x1
+==== 5.0
+
+    CREATE TABLE t1(a, b);
+    CREATE INDEX t1a ON t1(a);
+    CREATE INDEX t1b ON t1(b);
+
+    PRAGMA writable_schema = 1;
+    UPDATE sqlite_schema 
+      SET sql = strreplace(sql, 't1', 'json_each') 
+      WHERE type='index';
+----
+stmt 0 ok
+stmt 27 err 1 -1 58 no such table: main.t1
+stmt 58 err 1 -1 89 no such table: main.t1
+stmt 89 ok
+stmt 122 err 1 165 226 no such function: strreplace
+==== 5.1
+
+      PRAGMA writable_schema = 1;
+      SELECT * FROM t1
+----
+stmt 0 ok
+stmt 34 err 1 -1 58 no such table: t1
+==== 6.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA page_size=1024;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  INSERT INTO t1(b) VALUES(zeroblob(300)),(zeroblob(300)),(zeroblob(300)),(zeroblob(300));
+  CREATE TABLE t2(a);
+  CREATE TRIGGER t1tr BEFORE UPDATE ON t1 BEGIN DELETE FROM t2; END;
+  PRAGMA writable_schema=ON;
+  UPDATE sqlite_schema SET rootpage=3 WHERE rowid=2;
+  PRAGMA writable_schema=RESET;
+  INSERT INTO t2 VALUES('active'),('boomer'),('atom'),('atomic'),
+         ('alpha channel backup abandon test aback boomer atom alpha active');
+----
+stmt 0 ok
+stmt 26 ok
+stmt 51 ok
+stmt 96 err 1 -1 187 no such table: t1
+stmt 187 ok
+stmt 209 err 1 -1 257 no such table: main.t1
+stmt 278 ok
+stmt 307 ok
+stmt 360 ok
+stmt 392 err 1 -1 537 no such table: t2
+==== 6.1
+
+  UPDATE t1 SET b=zeroblob(299);
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== 6.2
+
+  -- Make "t1" a large table. Large enough that the children of the root
+  -- node are interior nodes.
+  PRAGMA page_size = 1024;
+  PRAGMA auto_vacuum = 0;
+  CREATE TABLE t1(x);
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<500
+  )
+  INSERT INTO t1 SELECT zeroblob(300) FROM s;
+  
+  CREATE TABLE t2(y);
+  CREATE TRIGGER tr BEFORE UPDATE ON t1 BEGIN
+    DELETE FROM t2;
+  END;
+  
+  -- Set the root of table t2 to 137 - the leftmost child of the root of t1.
+  PRAGMA writable_schema = ON;
+  UPDATE sqlite_schema SET rootpage = 137 WHERE name='t2';
+  PRAGMA writable_schema = RESET;
+----
+stmt 0 ok
+stmt 130 ok
+stmt 156 ok
+stmt 178 err 1 -1 298 no such table: t1
+stmt 298 ok
+stmt 323 err 1 -1 369 no such table: main.t1
+stmt 396 ok
+stmt 507 ok
+stmt 566 ok
+==== 6.3
+
+  -- Run an UPDATE on t1 that will hit a child of page 136. Have the trigger
+  -- clear page 136 and its children. Assert fails.
+  UPDATE t1 SET x='hello world' WHERE rowid=1;
+----
+stmt 0 err 1 -1 176 no such table: t1
+==== 7.0
+
+  BEGIN;
+  CREATE TABLE p1(x PRIMARY KEY);
+  CREATE TABLE c1(y);
+
+  PRAGMA schema_version = 0;
+  PRAGMA writable_schema = RESET;
+
+  INSERT INTO c1 VALUES(1000);
+  ROLLBACK;
+----
+stmt 0 ok
+stmt 9 ok
+stmt 43 ok
+stmt 65 ok
+stmt 95 ok
+stmt 129 err 1 -1 161 no such table: c1
+stmt 161 ok
+==== 7.1
+
+  PRAGMA table_info = p1;
+----
+stmt 0 ok
+==== 7.2
+
+  SELECT * FROM p1;
+----
+stmt 0 err 1 -1 20 no such table: p1
+==== 7.3
+
+  PRAGMA integrity_check
+----
+stmt 0 ok

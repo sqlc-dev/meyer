@@ -1,0 +1,19 @@
+==== 1.0
+
+  PRAGMA cache_size = 5;
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a, b);
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<10
+  )
+  INSERT INTO t1 SELECT hex(randomblob(100)), hex(randomblob(100)) FROM s;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 81 no such table: main.t1
+stmt 81 err 1 -1 229 no such table: t1
+==== 1.3
+
+  PRAGMA integrity_check
+----
+stmt 0 ok

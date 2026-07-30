@@ -1,0 +1,8 @@
+==== walhook-2.2
+ PRAGMA wal_autocheckpoint = 10
+----
+stmt 0 ok
+==== walhook-2.3
+ PRAGMA wal_autocheckpoint
+----
+stmt 0 ok

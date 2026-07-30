@@ -1,0 +1,28 @@
+==== fts3af-1.1
+SELECT COUNT(*) FROM t1
+----
+stmt 0 err 1 -1 24 no such table: t1
+==== fts3af-2.0
+SELECT rowid FROM t1 WHERE content MATCH 'update'
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== fts3af-2.1
+SELECT rowid FROM t1 WHERE content MATCH 'one'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== fts3af-2.2
+SELECT rowid FROM t1 WHERE content MATCH 'two'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== fts3af-2.3
+SELECT rowid FROM t1 WHERE content MATCH 'three'
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== fts3af-2.4
+SELECT rowid FROM t1 WHERE content MATCH 'four'
+----
+stmt 0 err 1 -1 48 no such table: t1
+==== fts3af-2.5
+SELECT rowid FROM t1 WHERE content MATCH 'five'
+----
+stmt 0 err 1 -1 48 no such table: t1

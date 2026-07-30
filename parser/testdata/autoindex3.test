@@ -1,0 +1,99 @@
+==== autoindex3-100
+
+  CREATE TABLE t1(a,b,x);
+  CREATE TABLE t2(c,d,y);
+  CREATE INDEX t1b ON t1(b);
+  CREATE INDEX t2d ON t2(d);
+  ANALYZE sqlite_master;
+  INSERT INTO sqlite_stat1 VALUES('t1','t1b','10000 500');
+  INSERT INTO sqlite_stat1 VALUES('t2','t2d','10000 500');
+  ANALYZE sqlite_master;
+  EXPLAIN QUERY PLAN SELECT * FROM t1, t2 WHERE d=b;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 52 err 1 -1 81 no such table: main.t1
+stmt 81 err 1 -1 110 no such table: main.t2
+stmt 110 ok
+stmt 135 err 1 -1 194 no such table: sqlite_stat1
+stmt 194 err 1 -1 253 no such table: sqlite_stat1
+stmt 253 ok
+stmt 278 err 1 -1 331 no such table: t1
+==== autoindex3-110
+
+  EXPLAIN QUERY PLAN SELECT * FROM t1, t2 WHERE d>b AND x=y;
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== autoindex3-120
+
+  EXPLAIN QUERY PLAN SELECT * FROM t1, t2 WHERE d<b AND x=y;
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== autoindex3-130
+
+  EXPLAIN QUERY PLAN SELECT * FROM t1, t2 WHERE d IS NULL AND x=y;
+----
+stmt 0 err 1 -1 67 no such table: t1
+==== autoindex3-140
+
+  EXPLAIN QUERY PLAN SELECT * FROM t1, t2 WHERE d IN (5,b) AND x=y;
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== 210
+
+  CREATE TABLE v(b, d, e);
+  CREATE TABLE u(a, b, c);
+  ANALYZE sqlite_master;
+  INSERT INTO "sqlite_stat1" VALUES('u','uab','40000 400 1');
+  INSERT INTO "sqlite_stat1" VALUES('v','vbde','40000 400 1 1');
+  INSERT INTO "sqlite_stat1" VALUES('v','ve','40000 21');
+
+  CREATE INDEX uab on u(a, b);
+  CREATE INDEX ve on v(e);
+  CREATE INDEX vbde on v(b,d,e);
+
+  DROP TABLE IF EXISTS sqlite_stat4;
+  ANALYZE sqlite_master;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 79 err 1 -1 141 no such table: sqlite_stat1
+stmt 141 err 1 -1 206 no such table: sqlite_stat1
+stmt 206 err 1 -1 264 no such table: sqlite_stat1
+stmt 264 err 1 -1 296 no such table: main.u
+stmt 296 err 1 -1 323 no such table: main.v
+stmt 323 err 1 -1 356 no such table: main.v
+stmt 356 ok
+stmt 394 ok
+==== 220
+
+  select count(*) from u, v where u.b = v.b and v.e > 34;
+----
+stmt 0 err 1 -1 58 no such table: u
+==== 300
+
+  CREATE TABLE t1(id INTEGER PRIMARY KEY);
+  CREATE TABLE t2(cid INT, pid INT, rx INT, PRIMARY KEY(cid, pid, rx));
+  CREATE INDEX x1 ON t2(pid, rx);
+  ANALYZE sqlite_schema;
+  REPLACE INTO sqlite_stat1(tbl, idx, stat) VALUES
+    ('t2', 'x1', '500000 250 250'),
+    ('t2','sqlite_autoindex_t2_1','500000 1 1 1');
+  ANALYZE sqlite_schema;
+----
+stmt 0 ok
+stmt 43 ok
+stmt 115 err 1 -1 149 no such table: main.t2
+stmt 149 ok
+stmt 174 err 1 -1 312 no such table: sqlite_stat1
+stmt 312 ok
+==== 310
+
+  WITH RECURSIVE children(id) AS (
+    SELECT cid FROM t2 WHERE pid = ?1 AND rx = ?2
+    UNION 
+    SELECT cid FROM t2 JOIN children ON t2.pid = children.id AND rx = ?2
+  ) SELECT count(id) FROM children;
+----
+stmt 0 err 1 -1 205 no such table: t2

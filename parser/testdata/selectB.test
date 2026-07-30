@@ -13,26 +13,26 @@
 ----
 stmt 0 ok
 stmt 30 ok
-stmt 60 err 1 -1 no such table: t1
-stmt 100 err 1 -1 no such table: t1
-stmt 139 err 1 -1 no such table: t1
-stmt 178 err 1 -1 no such table: t2
-stmt 218 err 1 -1 no such table: t2
-stmt 257 err 1 -1 no such table: t2
+stmt 60 err 1 -1 100 no such table: t1
+stmt 100 err 1 -1 139 no such table: t1
+stmt 139 err 1 -1 178 no such table: t1
+stmt 178 err 1 -1 218 no such table: t2
+stmt 218 err 1 -1 257 no such table: t2
+stmt 257 err 1 -1 296 no such table: t2
 ==== selectB-2.1
 
         CREATE INDEX i1 ON t1(a);
         CREATE INDEX i2 ON t2(d);
 ----
-stmt 0 err 1 -1 no such table: main.t1
-stmt 34 err 1 -1 no such table: main.t2
+stmt 0 err 1 -1 34 no such table: main.t1
+stmt 34 err 1 -1 68 no such table: main.t2
 ==== selectB-3.0
 
     DROP INDEX i1;
     DROP INDEX i2;
 ----
-stmt 0 err 1 -1 no such index: i1
-stmt 19 err 1 -1 no such index: i2
+stmt 0 err 1 -1 19 no such index: i1
+stmt 19 err 1 -1 38 no such index: i2
 ==== selectB-5.0
 
           CREATE INDEX i1 ON t1(a);
@@ -42,33 +42,33 @@ stmt 19 err 1 -1 no such index: i2
           CREATE INDEX i5 ON t2(e);
           CREATE INDEX i6 ON t2(f);
 ----
-stmt 0 err 1 -1 no such table: main.t1
-stmt 36 err 1 -1 no such table: main.t1
-stmt 72 err 1 -1 no such table: main.t1
-stmt 108 err 1 -1 no such table: main.t2
-stmt 144 err 1 -1 no such table: main.t2
-stmt 180 err 1 -1 no such table: main.t2
+stmt 0 err 1 -1 36 no such table: main.t1
+stmt 36 err 1 -1 72 no such table: main.t1
+stmt 72 err 1 -1 108 no such table: main.t1
+stmt 108 err 1 -1 144 no such table: main.t2
+stmt 144 err 1 -1 180 no such table: main.t2
+stmt 180 err 1 -1 216 no such table: main.t2
 ==== selectB-generated
 
       SELECT DISTINCT * FROM 
         (SELECT c FROM t1 UNION ALL SELECT e FROM t2) 
       ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 103 no such table: t2
 ==== selectB-generated.dup1
 
       SELECT c, count(*) FROM 
         (SELECT c FROM t1 UNION ALL SELECT e FROM t2) 
       GROUP BY c ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 115 no such table: t2
 ==== selectB-generated.dup2
 
       SELECT c, count(*) FROM 
         (SELECT c FROM t1 UNION ALL SELECT e FROM t2) 
       GROUP BY c HAVING count(*)>1;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 122 no such table: t2
 ==== selectB-generated.dup3
 
       SELECT t4.c, t3.a FROM 
@@ -76,35 +76,35 @@ stmt 0 err 1 -1 no such table: t2
       WHERE t3.a=14
       ORDER BY 1
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 138 no such table: t2
 ==== selectB-generated.dup4
 
       SELECT d FROM t2 
       EXCEPT 
       SELECT a FROM (SELECT a FROM t1 UNION ALL SELECT d FROM t2)
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 105 no such table: t2
 ==== selectB-generated.dup5
 
       SELECT * FROM (SELECT a FROM t1 UNION ALL SELECT d FROM t2)
       EXCEPT 
       SELECT * FROM (SELECT a FROM t1 UNION ALL SELECT d FROM t2)
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 147 no such table: t2
 ==== selectB-generated.dup6
 
       SELECT c FROM t1
       EXCEPT 
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 104 no such table: t2
 ==== selectB-generated.dup7
 
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
       EXCEPT 
       SELECT c FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 104 no such table: t1
 ==== selectB-generated.dup8
 
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
@@ -112,7 +112,7 @@ stmt 0 err 1 -1 no such table: t1
       SELECT c FROM t1
       ORDER BY c DESC
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 126 no such table: t1
 ==== selectB-generated.dup9
 
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
@@ -120,7 +120,7 @@ stmt 0 err 1 -1 no such table: t1
       SELECT c FROM t1
       ORDER BY c DESC
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 125 no such table: t1
 ==== selectB-generated.dup10
 
       SELECT c FROM t1
@@ -128,13 +128,13 @@ stmt 0 err 1 -1 no such table: t1
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
       ORDER BY c
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 120 no such table: t2
 ==== selectB-generated.dup11
 
       SELECT c FROM t1 UNION SELECT e FROM t2 UNION ALL SELECT f FROM t2
       ORDER BY c
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 91 no such table: t2
 ==== selectB-generated.dup12
 
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
@@ -142,7 +142,7 @@ stmt 0 err 1 -1 no such table: t2
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
       ORDER BY 1
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 163 no such table: t2
 ==== selectB-generated.dup13
 
       SELECT c FROM t1
@@ -150,7 +150,7 @@ stmt 0 err 1 -1 no such table: t2
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
       ORDER BY 1
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 124 no such table: t2
 ==== selectB-generated.dup14
 
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
@@ -158,7 +158,7 @@ stmt 0 err 1 -1 no such table: t2
       SELECT c FROM t1
       ORDER BY 1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 124 no such table: t1
 ==== selectB-generated.dup15
 
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
@@ -166,45 +166,45 @@ stmt 0 err 1 -1 no such table: t1
       SELECT * FROM (SELECT e FROM t2 UNION ALL SELECT f FROM t2)
       ORDER BY 1
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 167 no such table: t2
 ==== selectB-generated.dup16
 
       SELECT * FROM (
         SELECT a FROM t1 UNION ALL SELECT d FROM t2 LIMIT 4
       ) LIMIT 2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 99 no such table: t2
 ==== selectB-generated.dup17
 
       SELECT * FROM (
         SELECT a FROM t1 UNION ALL SELECT d FROM t2 LIMIT 4 OFFSET 2
       ) LIMIT 2
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 108 no such table: t2
 ==== selectB-generated.dup18
 
       SELECT * FROM (
         SELECT DISTINCT (a/10) FROM t1 UNION ALL SELECT DISTINCT(d%2) FROM t2
       )
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 109 no such table: t2
 ==== selectB-generated.dup19
 
       SELECT DISTINCT * FROM (
         SELECT DISTINCT (a/10) FROM t1 UNION ALL SELECT DISTINCT(d%2) FROM t2
       )
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 118 no such table: t2
 ==== selectB-generated.dup20
 
       SELECT * FROM (SELECT * FROM t1 UNION ALL SELECT * FROM t2) ORDER BY a+b
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 80 no such table: t2
 ==== selectB-generated.dup21
 
       SELECT * FROM (SELECT 345 UNION ALL SELECT d FROM t2) ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 72 no such table: t2
 ==== selectB-generated.dup22
 
       SELECT x, y FROM (
@@ -215,7 +215,7 @@ stmt 0 err 1 -1 no such table: t2
         SELECT a*100, b*100 FROM t1
       ) ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 218 no such table: t1
 ==== selectB-generated.dup23
 
       SELECT x, y FROM (
@@ -226,7 +226,7 @@ stmt 0 err 1 -1 no such table: t1
         SELECT a*100, b*100 FROM t1
       ) ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 223 no such table: t1
 ==== selectB-generated.dup24
 
       SELECT x+y FROM (
@@ -237,4 +237,4 @@ stmt 0 err 1 -1 no such table: t1
         SELECT a*100, b*100 FROM t1
       ) WHERE y+x NOT NULL ORDER BY 1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 241 no such table: t1

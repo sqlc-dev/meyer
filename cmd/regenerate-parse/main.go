@@ -14,70 +14,50 @@
 //     and merge parser/testdata/<name>.metadata.json (new cases start as
 //     todo; existing entries are preserved).
 //
-// The SQLite release is pinned by version and SHA-256 below. Artifacts are
-// downloaded from sqlite.org into the cache directory (default .sqlite/,
-// gitignored) and reused on later runs.
+// The SQLite release is pinned in internal/sqlitesrc, which downloads the
+// artifacts into the cache directory (default .sqlite/, gitignored) and
+// reuses them on later runs.
 //
 // Usage:
 //
 //	go run ./cmd/regenerate-parse [-files select1,expr,...] [flags]
 //
-// With no -files, the starter set below is regenerated.
+// With no -files, every test script in the pinned source tree is
+// regenerated. Scripts that yield no literal-SQL cases (the tokenizer
+// tests written in C, the VFS and WAL harnesses, and so on) produce no
+// corpus file, and a stale one left over from an earlier run is removed.
 package main
 
 import (
-	"archive/zip"
-	"bytes"
-	"crypto/sha256"
 	"flag"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
-	"strconv"
+	"sort"
 	"strings"
 	"sync"
 
-	_ "embed"
-
+	"github.com/sqlc-dev/meyer/internal/sqlitesrc"
 	"github.com/sqlc-dev/meyer/internal/tclextract"
 	"github.com/sqlc-dev/meyer/internal/testfile"
 )
 
-//go:embed oracle/oracle.c
-var oracleSource []byte
-
-// The pinned SQLite release. When advancing the pin, update all four
-// constants and parser/testdata/README.md, rerun with no -files, and review
-// the corpus diff.
-const (
-	sqliteVersion   = "3530400" // 3.53.4
-	sqliteYear      = "2026"
-	amalgamationSHA = "1e71ddf93849c6a6ecf58b827c0692073d2dd7ee40196158068f7b29f422e87d"
-	srcSHA          = "d18fa15aec74d8c17e1463f861095adc01b5ad190256acb4f91d22f0368d232b"
-)
-
-// starterSet is the corpus from PLAN.md milestone 2: the dedicated
-// parser/tokenizer tests, the grammar-heavy statement suites, and the
-// evidence files that map 1:1 to the documented grammar.
-var starterSet = []string{
-	"parser1", "tokenize", "keyword1",
-	"select1", "select2", "select3", "select4", "select5", "select6",
-	"select7", "select8", "select9", "selectA", "selectB", "selectC",
-	"selectD", "selectE", "selectF", "selectG", "selectH",
-	"expr", "expr2", "in", "in2", "in3", "in4", "in5", "between",
-	"with1", "with2", "with3", "withM",
-	"window1", "window2", "window3", "window4", "window5",
-	"window6", "window7", "window8", "window9", "windowA",
-	"windowB", "windowC", "windowD", "windowE", "windowerr",
-	"alter", "alter2", "alter3", "alter4", "altertab", "altertab2", "altertab3",
-	"alterdropcol", "alterdropcol2",
-	"trigger1", "upsert1", "upsert2", "upsert3", "upsert4", "upsert5",
-	"returning1",
-	"e_select", "e_expr", "e_createtable", "e_insert", "e_update", "e_delete",
+// allScripts lists every test/*.test script of the pinned source tree, in
+// sorted order. PLAN.md milestone 2 named a hand-picked starter set; taking
+// the whole suite instead costs a few megabytes and quadruples the case
+// count, and needs no curation when the pin advances.
+func allScripts(testDir string) ([]string, error) {
+	paths, err := filepath.Glob(filepath.Join(testDir, "*.test"))
+	if err != nil {
+		return nil, err
+	}
+	names := make([]string, len(paths))
+	for i, path := range paths {
+		names[i] = strings.TrimSuffix(filepath.Base(path), ".test")
+	}
+	sort.Strings(names)
+	return names, nil
 }
 
 func main() {
@@ -89,24 +69,35 @@ func main() {
 	)
 	flag.Parse()
 
-	names := starterSet
-	if *files != "" {
-		names = strings.Split(*files, ",")
+	// Workers each own an oracle process; the pinned build is compiled once
+	// here, before any of them start.
+	if _, err := sqlitesrc.Oracle(*cacheDir); err != nil {
+		fatal(err)
 	}
-
-	oracle, err := ensureOracle(*cacheDir)
+	testDir, err := sqlitesrc.TestScripts(*cacheDir)
 	if err != nil {
 		fatal(err)
 	}
-	testDir, err := ensureSourceTests(*cacheDir)
-	if err != nil {
+
+	var names []string
+	if *files != "" {
+		names = strings.Split(*files, ",")
+	} else if names, err = allScripts(testDir); err != nil {
 		fatal(err)
 	}
 	if err := os.MkdirAll(*testdata, 0o755); err != nil {
 		fatal(err)
 	}
 
-	var totalCases, totalTodo int
+	// One pool of oracle processes for the whole run: a Runner is reusable,
+	// and starting one per script would fork a few thousand times.
+	pool, err := newPool(*cacheDir, *jobs)
+	if err != nil {
+		fatal(err)
+	}
+	defer pool.close()
+
+	var totalCases, totalTodo, usedScripts, emptyScripts int
 	var totals tclextract.Stats
 	for _, name := range names {
 		// Snapshot the previous corpus state before regenerating, so the
@@ -123,9 +114,20 @@ func main() {
 			fatal(fmt.Errorf("%s: %w", name, err))
 		}
 
-		cases, stats, err := regenerateFile(oracle, testDir, *testdata, name, *jobs)
+		cases, stats, err := regenerateFile(pool, testDir, *testdata, name)
 		if err != nil {
 			fatal(fmt.Errorf("%s: %w", name, err))
+		}
+		totals.Found += stats.Found
+		totals.SkippedSubst += stats.SkippedSubst
+		totals.SkippedForm += stats.SkippedForm
+		if len(cases) == 0 {
+			// Nothing extractable: leave no corpus file behind, and clear
+			// away one from an earlier run of a differently pinned tree.
+			os.Remove(testPath)
+			os.Remove(testfile.MetadataPath(testPath))
+			emptyScripts++
+			continue
 		}
 		todo, err := mergeMetadata(testPath, prevCases, prevMeta.Todo, cases)
 		if err != nil {
@@ -135,12 +137,11 @@ func main() {
 			name, len(cases), todo, stats.SkippedSubst, stats.SkippedForm)
 		totalCases += len(cases)
 		totalTodo += todo
-		totals.Found += stats.Found
-		totals.SkippedSubst += stats.SkippedSubst
-		totals.SkippedForm += stats.SkippedForm
+		usedScripts++
 	}
-	fmt.Printf("\ntotal: %d cases (%d todo) from %d files; %d of %d found blocks skipped (%d substitution, %d malformed/non-literal)\n",
-		totalCases, totalTodo, len(names),
+	fmt.Printf("\ntotal: %d cases (%d todo) from %d of %d scripts (%d yielded nothing); "+
+		"%d of %d found blocks skipped (%d substitution, %d malformed/non-literal)\n",
+		totalCases, totalTodo, usedScripts, len(names), emptyScripts,
 		totals.SkippedSubst+totals.SkippedForm, totals.Found,
 		totals.SkippedSubst, totals.SkippedForm)
 }
@@ -150,7 +151,34 @@ func fatal(err error) {
 	os.Exit(1)
 }
 
-func regenerateFile(oracle, testDir, outDir, name string, jobs int) ([]testfile.Case, tclextract.Stats, error) {
+// pool hands out oracle processes. Runners are not safe for concurrent use,
+// so a worker takes one for the duration of a batch and puts it back.
+type pool struct {
+	runners chan *sqlitesrc.Runner
+	all     []*sqlitesrc.Runner
+}
+
+func newPool(cacheDir string, n int) (*pool, error) {
+	p := &pool{runners: make(chan *sqlitesrc.Runner, n)}
+	for i := 0; i < n; i++ {
+		r, err := sqlitesrc.NewRunner(cacheDir)
+		if err != nil {
+			p.close()
+			return nil, err
+		}
+		p.all = append(p.all, r)
+		p.runners <- r
+	}
+	return p, nil
+}
+
+func (p *pool) close() {
+	for _, r := range p.all {
+		r.Close()
+	}
+}
+
+func regenerateFile(pool *pool, testDir, outDir, name string) ([]testfile.Case, tclextract.Stats, error) {
 	src, err := os.ReadFile(filepath.Join(testDir, name+".test"))
 	if err != nil {
 		return nil, tclextract.Stats{}, err
@@ -158,28 +186,36 @@ func regenerateFile(oracle, testDir, outDir, name string, jobs int) ([]testfile.
 	extracted, stats := tclextract.File(name, src)
 
 	cases := make([]testfile.Case, len(extracted))
-	sem := make(chan struct{}, jobs)
+	work := make(chan int)
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var firstErr error
-	for i, ex := range extracted {
+	for w := 0; w < cap(pool.runners); w++ {
 		wg.Add(1)
-		go func(i int, ex tclextract.Case) {
+		go func() {
 			defer wg.Done()
-			sem <- struct{}{}
-			defer func() { <-sem }()
-			results, err := runOracle(oracle, ex.SQL)
-			if err != nil {
-				mu.Lock()
-				if firstErr == nil {
-					firstErr = fmt.Errorf("case %s: %w", ex.Name, err)
+			r := <-pool.runners
+			defer func() { pool.runners <- r }()
+			for i := range work {
+				results, err := r.Run(extracted[i].SQL)
+				if err != nil {
+					mu.Lock()
+					if firstErr == nil {
+						firstErr = fmt.Errorf("case %s: %w", extracted[i].Name, err)
+					}
+					mu.Unlock()
+					continue
 				}
-				mu.Unlock()
-				return
+				cases[i] = testfile.Case{
+					Name: extracted[i].Name, SQL: extracted[i].SQL, Results: results,
+				}
 			}
-			cases[i] = testfile.Case{Name: ex.Name, SQL: ex.SQL, Results: results}
-		}(i, ex)
+		}()
 	}
+	for i := range extracted {
+		work <- i
+	}
+	close(work)
 	wg.Wait()
 	if firstErr != nil {
 		return nil, stats, firstErr
@@ -196,58 +232,13 @@ func regenerateFile(oracle, testDir, outDir, name string, jobs int) ([]testfile.
 		}
 		kept = append(kept, c)
 	}
+	if len(kept) == 0 {
+		return nil, stats, nil
+	}
 	if err := testfile.Write(filepath.Join(outDir, name+".test"), kept); err != nil {
 		return nil, stats, err
 	}
 	return kept, stats, nil
-}
-
-// runOracle feeds one case's SQL to the oracle binary and parses its output.
-func runOracle(oracle, sql string) ([]testfile.StmtResult, error) {
-	cmd := exec.Command(oracle)
-	cmd.Stdin = strings.NewReader(sql)
-	var out, errb bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &errb
-	if err := cmd.Run(); err != nil {
-		return nil, fmt.Errorf("oracle: %w: %s", err, errb.String())
-	}
-	var results []testfile.StmtResult
-	for _, line := range strings.Split(strings.TrimRight(out.String(), "\n"), "\n") {
-		if line == "" {
-			continue
-		}
-		r, err := parseOracleLine(line)
-		if err != nil {
-			return nil, err
-		}
-		results = append(results, r)
-	}
-	return results, nil
-}
-
-func parseOracleLine(line string) (testfile.StmtResult, error) {
-	fields := strings.SplitN(line, " ", 3)
-	if len(fields) != 3 || fields[0] != "stmt" {
-		return testfile.StmtResult{}, fmt.Errorf("malformed oracle line %q", line)
-	}
-	off, err := strconv.Atoi(fields[1])
-	if err != nil {
-		return testfile.StmtResult{}, fmt.Errorf("malformed oracle line %q", line)
-	}
-	if fields[2] == "ok" {
-		return testfile.StmtResult{Offset: off, OK: true}, nil
-	}
-	rest := strings.SplitN(strings.TrimPrefix(fields[2], "err "), " ", 3)
-	if !strings.HasPrefix(fields[2], "err ") || len(rest) != 3 {
-		return testfile.StmtResult{}, fmt.Errorf("malformed oracle line %q", line)
-	}
-	rc, err1 := strconv.Atoi(rest[0])
-	erroff, err2 := strconv.Atoi(rest[1])
-	if err1 != nil || err2 != nil {
-		return testfile.StmtResult{}, fmt.Errorf("malformed oracle line %q", line)
-	}
-	return testfile.StmtResult{Offset: off, RC: rc, ErrOffset: erroff, Message: rest[2]}, nil
 }
 
 // mergeMetadata reconciles the sidecar with the regenerated case list:
@@ -266,129 +257,4 @@ func mergeMetadata(testPath string, prevCases, prevMeta map[string]bool, cases [
 		return 0, err
 	}
 	return len(todo), nil
-}
-
-// ensureOracle downloads the pinned amalgamation and compiles the oracle
-// binary into the cache directory, reusing existing artifacts.
-func ensureOracle(cacheDir string) (string, error) {
-	oracle := filepath.Join(cacheDir, "oracle-"+sqliteVersion)
-	if _, err := os.Stat(oracle); err == nil {
-		return oracle, nil
-	}
-	amalgDir := filepath.Join(cacheDir, "sqlite-amalgamation-"+sqliteVersion)
-	if _, err := os.Stat(filepath.Join(amalgDir, "sqlite3.c")); err != nil {
-		zipPath, err := download(cacheDir, "sqlite-amalgamation-"+sqliteVersion+".zip", amalgamationSHA)
-		if err != nil {
-			return "", err
-		}
-		if err := unzip(zipPath, cacheDir, nil); err != nil {
-			return "", err
-		}
-	}
-	srcPath := filepath.Join(cacheDir, "oracle.c")
-	if err := os.WriteFile(srcPath, oracleSource, 0o644); err != nil {
-		return "", err
-	}
-	cc := os.Getenv("CC")
-	if cc == "" {
-		cc = "cc"
-	}
-	fmt.Printf("compiling oracle (%s, SQLite %s)...\n", cc, sqliteVersion)
-	cmd := exec.Command(cc, "-O1", "-o", oracle, srcPath,
-		filepath.Join(amalgDir, "sqlite3.c"), "-I", amalgDir,
-		"-lpthread", "-ldl", "-lm")
-	if out, err := cmd.CombinedOutput(); err != nil {
-		return "", fmt.Errorf("compiling oracle: %w\n%s", err, out)
-	}
-	return oracle, nil
-}
-
-// ensureSourceTests downloads the pinned source zip and extracts test/*.test,
-// returning the directory holding them.
-func ensureSourceTests(cacheDir string) (string, error) {
-	testDir := filepath.Join(cacheDir, "sqlite-src-"+sqliteVersion, "test")
-	if _, err := os.Stat(filepath.Join(testDir, "select1.test")); err == nil {
-		return testDir, nil
-	}
-	zipPath, err := download(cacheDir, "sqlite-src-"+sqliteVersion+".zip", srcSHA)
-	if err != nil {
-		return "", err
-	}
-	only := func(name string) bool {
-		return strings.Contains(name, "/test/") && strings.HasSuffix(name, ".test")
-	}
-	if err := unzip(zipPath, cacheDir, only); err != nil {
-		return "", err
-	}
-	return testDir, nil
-}
-
-// download fetches https://sqlite.org/<year>/<name> into cacheDir (reusing an
-// existing file) and verifies its SHA-256.
-func download(cacheDir, name, wantSHA string) (string, error) {
-	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
-		return "", err
-	}
-	dest := filepath.Join(cacheDir, name)
-	if data, err := os.ReadFile(dest); err == nil {
-		if fmt.Sprintf("%x", sha256.Sum256(data)) == wantSHA {
-			return dest, nil
-		}
-		fmt.Printf("cached %s has wrong checksum; re-downloading\n", name)
-	}
-	url := "https://sqlite.org/" + sqliteYear + "/" + name
-	fmt.Printf("downloading %s...\n", url)
-	resp, err := http.Get(url)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("GET %s: %s", url, resp.Status)
-	}
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	if got := fmt.Sprintf("%x", sha256.Sum256(data)); got != wantSHA {
-		return "", fmt.Errorf("%s: checksum mismatch: got %s, want %s", name, got, wantSHA)
-	}
-	if err := os.WriteFile(dest, data, 0o644); err != nil {
-		return "", err
-	}
-	return dest, nil
-}
-
-func unzip(zipPath, destDir string, keep func(string) bool) error {
-	zr, err := zip.OpenReader(zipPath)
-	if err != nil {
-		return err
-	}
-	defer zr.Close()
-	for _, f := range zr.File {
-		if f.FileInfo().IsDir() || (keep != nil && !keep(f.Name)) {
-			continue
-		}
-		clean := filepath.Clean(f.Name)
-		if strings.HasPrefix(clean, "..") || filepath.IsAbs(clean) {
-			return fmt.Errorf("unsafe path in zip: %q", f.Name)
-		}
-		dest := filepath.Join(destDir, clean)
-		if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
-			return err
-		}
-		rc, err := f.Open()
-		if err != nil {
-			return err
-		}
-		data, err := io.ReadAll(rc)
-		rc.Close()
-		if err != nil {
-			return err
-		}
-		if err := os.WriteFile(dest, data, 0o644); err != nil {
-			return err
-		}
-	}
-	return nil
 }

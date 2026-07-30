@@ -1,0 +1,16 @@
+==== 1.0
+
+  CREATE TABLE x1(a, b);
+  INSERT INTO x1 VALUES(1, 2), (3, 4), (5, 6);
+  CREATE UNIQUE INDEX x1a ON x1(a);
+  CREATE INDEX x1b ON x1(b);
+
+  CREATE TABLE x2(x, y);
+  INSERT INTO x2 VALUES(1, 2), (3, 4), (5, 6);
+----
+stmt 0 ok
+stmt 25 err 1 -1 72 no such table: x1
+stmt 72 err 1 -1 108 no such table: main.x1
+stmt 108 err 1 -1 137 no such table: main.x1
+stmt 137 ok
+stmt 163 err 1 -1 210 no such table: x2

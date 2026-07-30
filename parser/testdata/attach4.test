@@ -1,0 +1,28 @@
+==== 1.2.2
+
+  ATTACH 'x.db' AS next;
+----
+stmt 0 ok
+==== 2.0
+
+  ATTACH DATABASE '' AS aux;
+  CREATE TABLE IF NOT EXISTS aux.t1(a, b);
+  CREATE TEMPORARY TRIGGER tr1 DELETE ON t1 BEGIN 
+    DELETE FROM t1; 
+  END;
+  CREATE TABLE temp.t1(a, b);
+----
+stmt 0 ok
+stmt 29 err 1 59 66 unknown database aux
+stmt 72 err 1 -1 122 no such table: t1
+stmt 151 ok
+==== 2.1
+
+  DETACH DATABASE aux;
+----
+stmt 0 ok
+==== 2.2
+
+  DROP TRIGGER tr1;
+----
+stmt 0 err 1 -1 20 no such trigger: tr1

@@ -1,0 +1,20 @@
+==== 1.0
+
+    CREATE TABLE t1(id1 INTEGER PRIMARY KEY);
+    INSERT INTO t1 VALUES(9999);
+    CREATE TABLE t2(id2 INTEGER PRIMARY KEY);
+    INSERT INTO t2 VALUES(12345);
+    INSERT INTO t2 VALUES(54321);
+    SELECT DISTINCT id1 AS x, id1 AS y FROM t1, t2;
+----
+stmt 0 ok
+stmt 46 err 1 -1 79 no such table: t1
+stmt 79 ok
+stmt 125 err 1 -1 159 no such table: t2
+stmt 159 err 1 -1 193 no such table: t2
+stmt 193 err 1 -1 245 no such table: t1
+==== 1.1
+
+    SELECT count(*) FROM t1, t2 GROUP BY id1, id1;
+----
+stmt 0 err 1 -1 51 no such table: t1

@@ -1,0 +1,7 @@
+==== speed3-0.4
+
+    PRAGMA main.auto_vacuum;
+    PRAGMA aux.auto_vacuum;
+----
+stmt 0 ok
+stmt 29 err 1 41 57 unknown database aux

@@ -1,0 +1,220 @@
+BeginStmt{
+  Span: 58:64
+  Type: TransactionType(DEFERRED)
+}
+BeginStmt{
+  Span: 65:98
+  Type: TransactionType(IMMEDIATE)
+  HasType: true
+  HasTransaction: true
+  Name: Ident{
+    Span: 93:97
+    Name: "name"
+    Raw: "name"
+  }
+}
+CommitStmt{
+  Span: 99:118
+  Keyword: "COMMIT"
+  HasTransaction: true
+}
+CommitStmt{
+  Span: 119:123
+  Keyword: "END"
+}
+RollbackStmt{
+  Span: 124:133
+}
+RollbackStmt{
+  Span: 134:170
+  HasTransaction: true
+  Savepoint: Ident{
+    Span: 168:169
+    Name: "s"
+    Raw: "s"
+  }
+  SavepointKeyword: true
+}
+SavepointStmt{
+  Span: 171:183
+  Name: Ident{
+    Span: 181:182
+    Name: "s"
+    Raw: "s"
+  }
+}
+ReleaseStmt{
+  Span: 184:204
+  SavepointKeyword: true
+  Name: Ident{
+    Span: 202:203
+    Name: "s"
+    Raw: "s"
+  }
+}
+AttachStmt{
+  Span: 205:242
+  HasDatabase: true
+  File: Literal{
+    Span: 221:227
+    Kind: LiteralKind(STRING)
+    Value: "file"
+    Raw: "'file'"
+  }
+  Name: Ident{
+    Span: 231:233
+    Name: "db"
+    Raw: "db"
+  }
+  Key: Literal{
+    Span: 238:241
+    Kind: LiteralKind(STRING)
+    Value: "k"
+    Raw: "'k'"
+  }
+}
+DetachStmt{
+  Span: 243:253
+  Name: Ident{
+    Span: 250:252
+    Name: "db"
+    Raw: "db"
+  }
+}
+PragmaStmt{
+  Span: 254:275
+  Name: QualifiedName{
+    Span: 261:274
+    Schema: Ident{
+      Span: 261:264
+      Name: "sch"
+      Raw: "sch"
+    }
+    Name: Ident{
+      Span: 265:274
+      Name: "page_size"
+      Raw: "page_size"
+    }
+  }
+}
+PragmaStmt{
+  Span: 276:300
+  Name: QualifiedName{
+    Span: 283:292
+    Name: Ident{
+      Span: 283:292
+      Name: "page_size"
+      Raw: "page_size"
+    }
+  }
+  Value: "4096"
+  HasValue: true
+}
+PragmaStmt{
+  Span: 301:323
+  Name: QualifiedName{
+    Span: 308:317
+    Name: Ident{
+      Span: 308:317
+      Name: "page_size"
+      Raw: "page_size"
+    }
+  }
+  Value: "-1"
+  HasValue: true
+}
+PragmaStmt{
+  Span: 324:352
+  Name: QualifiedName{
+    Span: 331:343
+    Name: Ident{
+      Span: 331:343
+      Name: "journal_mode"
+      Raw: "journal_mode"
+    }
+  }
+  Value: "delete"
+  Paren: true
+  HasValue: true
+}
+VacuumStmt{
+  Span: 353:360
+}
+VacuumStmt{
+  Span: 361:384
+  Schema: Ident{
+    Span: 368:371
+    Name: "sch"
+    Raw: "sch"
+  }
+  Into: Literal{
+    Span: 377:383
+    Kind: LiteralKind(STRING)
+    Value: "file"
+    Raw: "'file'"
+  }
+}
+AnalyzeStmt{
+  Span: 385:399
+  Name: QualifiedName{
+    Span: 393:398
+    Schema: Ident{
+      Span: 393:396
+      Name: "sch"
+      Raw: "sch"
+    }
+    Name: Ident{
+      Span: 397:398
+      Name: "t"
+      Raw: "t"
+    }
+  }
+}
+ReindexStmt{
+  Span: 400:408
+}
+ExplainStmt{
+  Span: 409:426
+  Stmt: SelectStmt{
+    Span: 417:425
+    Cores: [
+      SelectQuery{
+        Span: 417:425
+        Columns: [
+          ResultColumn{
+            Span: 424:425
+            Expr: Literal{
+              Span: 424:425
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+ExplainStmt{
+  Span: 427:455
+  QueryPlan: true
+  Stmt: SelectStmt{
+    Span: 446:454
+    Cores: [
+      SelectQuery{
+        Span: 446:454
+        Columns: [
+          ResultColumn{
+            Span: 453:454
+            Expr: Literal{
+              Span: 453:454
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

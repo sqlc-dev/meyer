@@ -1,0 +1,58 @@
+==== delete3-1.1
+
+    CREATE TABLE t1(x integer primary key);
+    BEGIN;
+    INSERT INTO t1 VALUES(1);
+    INSERT INTO t1 VALUES(2);
+    INSERT INTO t1 SELECT x+2 FROM t1;
+    INSERT INTO t1 SELECT x+4 FROM t1;
+    INSERT INTO t1 SELECT x+8 FROM t1;
+    INSERT INTO t1 SELECT x+16 FROM t1;
+    INSERT INTO t1 SELECT x+32 FROM t1;
+    INSERT INTO t1 SELECT x+64 FROM t1;
+    INSERT INTO t1 SELECT x+128 FROM t1;
+    INSERT INTO t1 SELECT x+256 FROM t1;
+    INSERT INTO t1 SELECT x+512 FROM t1;
+    INSERT INTO t1 SELECT x+1024 FROM t1;
+    INSERT INTO t1 SELECT x+2048 FROM t1;
+    INSERT INTO t1 SELECT x+4096 FROM t1;
+    INSERT INTO t1 SELECT x+8192 FROM t1;
+    INSERT INTO t1 SELECT x+16384 FROM t1;
+    INSERT INTO t1 SELECT x+32768 FROM t1;
+    INSERT INTO t1 SELECT x+65536 FROM t1;
+    INSERT INTO t1 SELECT x+131072 FROM t1;
+    INSERT INTO t1 SELECT x+262144 FROM t1;
+    COMMIT;
+    SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 44 ok
+stmt 55 err 1 -1 85 no such table: t1
+stmt 85 err 1 -1 115 no such table: t1
+stmt 115 err 1 -1 154 no such table: t1
+stmt 154 err 1 -1 193 no such table: t1
+stmt 193 err 1 -1 232 no such table: t1
+stmt 232 err 1 -1 272 no such table: t1
+stmt 272 err 1 -1 312 no such table: t1
+stmt 312 err 1 -1 352 no such table: t1
+stmt 352 err 1 -1 393 no such table: t1
+stmt 393 err 1 -1 434 no such table: t1
+stmt 434 err 1 -1 475 no such table: t1
+stmt 475 err 1 -1 517 no such table: t1
+stmt 517 err 1 -1 559 no such table: t1
+stmt 559 err 1 -1 601 no such table: t1
+stmt 601 err 1 -1 643 no such table: t1
+stmt 643 err 1 -1 686 no such table: t1
+stmt 686 err 1 -1 729 no such table: t1
+stmt 729 err 1 -1 772 no such table: t1
+stmt 772 err 1 -1 816 no such table: t1
+stmt 816 err 1 -1 860 no such table: t1
+stmt 860 ok
+stmt 872 err 1 -1 901 no such table: t1
+==== delete3-1.2
+
+    DELETE FROM t1 WHERE x%2==0;
+    SELECT count(*) FROM t1;
+----
+stmt 0 err 1 -1 33 no such table: t1
+stmt 33 err 1 -1 62 no such table: t1

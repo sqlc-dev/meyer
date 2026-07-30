@@ -9,19 +9,19 @@
   INSERT INTO t1 VALUES(6, 'six');
   CREATE INDEX t1b ON t1(b);
 ----
-stmt 0 err 1 -1 no such collation sequence: custom
-stmt 65 err 1 -1 no such table: t1
-stmt 100 err 1 -1 no such table: t1
-stmt 135 err 1 -1 no such table: t1
-stmt 172 err 1 -1 no such table: t1
-stmt 208 err 1 -1 no such table: t1
-stmt 244 err 1 -1 no such table: t1
-stmt 279 err 1 -1 no such table: main.t1
+stmt 0 err 1 -1 64 no such collation sequence: custom
+stmt 65 err 1 -1 100 no such table: t1
+stmt 100 err 1 -1 135 no such table: t1
+stmt 135 err 1 -1 172 no such table: t1
+stmt 172 err 1 -1 208 no such table: t1
+stmt 208 err 1 -1 244 no such table: t1
+stmt 244 err 1 -1 279 no such table: t1
+stmt 279 err 1 -1 308 no such table: main.t1
 ==== 1.1
 
   SELECT * FROM t1
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 20 no such table: t1
 ==== 1.2
 
   SELECT group_concat(a,',') OVER win FROM t1 
@@ -29,7 +29,7 @@ stmt 0 err 1 -1 no such table: t1
     ORDER BY b RANGE BETWEEN 1 PRECEDING AND 2 PRECEDING
   )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 127 no such table: t1
 ==== 1.3
 
   SELECT group_concat(a,',') OVER win FROM t1 
@@ -37,7 +37,7 @@ stmt 0 err 1 -1 no such table: t1
     ORDER BY b RANGE BETWEEN 1 PRECEDING AND 2 PRECEDING
   )
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 127 no such table: t1
 ==== 2.0
 
   CREATE TABLE t1(x);
@@ -48,13 +48,13 @@ stmt 0 ok
   SELECT min(x) OVER w1 FROM t1
     WINDOW w1 AS (PARTITION BY x_count(x) OVER w1);
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 84 no such table: t1
 ==== 2.2
 
   SELECT min(x) FILTER (WHERE x_count(x) OVER w1) OVER w1 FROM t1
     WINDOW w1 AS (PARTITION BY x OVER w1);
 ----
-stmt 0 err 1 100 near "OVER": syntax error
+stmt 0 err 1 100 104 near "OVER": syntax error
 ==== 3.0
 
   BEGIN TRANSACTION;
@@ -74,13 +74,13 @@ stmt 0 err 1 100 near "OVER": syntax error
 ----
 stmt 0 ok
 stmt 21 ok
-stmt 59 err 1 -1 no such table: t2
+stmt 59 err 1 -1 884 no such table: t2
 stmt 884 ok
 ==== 3.1
 
   select c1, max(c2) over (order by c1 range 366.0 preceding) from t2;
 ----
-stmt 0 err 1 -1 no such table: t2
+stmt 0 err 1 -1 71 no such table: t2
 ==== 4.0
 
   CREATE TABLE t1(a, b);
@@ -90,24 +90,24 @@ stmt 0 err 1 -1 no such table: t2
   INSERT INTO t1 VALUES(4, 4);
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: t1
-stmt 56 err 1 -1 no such table: t1
-stmt 105 err 1 -1 no such table: t1
-stmt 136 err 1 -1 no such table: t1
+stmt 25 err 1 -1 56 no such table: t1
+stmt 56 err 1 -1 105 no such table: t1
+stmt 105 err 1 -1 136 no such table: t1
+stmt 136 err 1 -1 167 no such table: t1
 ==== 4.1
 
   SELECT a, 
     total(b) OVER (ORDER BY a ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
   FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 104 no such table: t1
 ==== 4.2
 
   SELECT a, 
     total(b) OVER (ORDER BY a ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING)
   FROM t1;
 ----
-stmt 0 err 1 -1 no such table: t1
+stmt 0 err 1 -1 96 no such table: t1
 ==== 5.0
 
   CREATE TABLE t(id, x);
@@ -117,21 +117,21 @@ stmt 0 err 1 -1 no such table: t1
   INSERT INTO t VALUES(4, 0.5);
 ----
 stmt 0 ok
-stmt 25 err 1 -1 no such table: t
-stmt 56 err 1 -1 no such table: t
-stmt 104 err 1 -1 no such table: t
-stmt 134 err 1 -1 no such table: t
+stmt 25 err 1 -1 56 no such table: t
+stmt 56 err 1 -1 104 no such table: t
+stmt 104 err 1 -1 134 no such table: t
+stmt 134 err 1 -1 166 no such table: t
 ==== 5.1
 
   SELECT id,
     sum(id) OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING) 
   FROM t t1
 ----
-stmt 0 err 1 -1 no such table: t
+stmt 0 err 1 -1 99 no such table: t
 ==== 5.2
 
   SELECT id,
     sum(x) OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND 2 FOLLOWING) 
   FROM t t1
 ----
-stmt 0 err 1 -1 no such table: t
+stmt 0 err 1 -1 98 no such table: t

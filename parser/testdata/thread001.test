@@ -1,0 +1,44 @@
+==== thread001-generated
+
+      CREATE TABLE ab(a INTEGER PRIMARY KEY, b);
+      CREATE INDEX ab_i ON ab(b);
+      INSERT INTO ab SELECT NULL, md5sum(a, b) FROM ab;
+      SELECT count(*) FROM ab;
+----
+stmt 0 ok
+stmt 49 err 1 -1 83 no such table: main.ab
+stmt 83 err 1 -1 139 no such table: ab
+stmt 139 err 1 -1 170 no such table: ab
+==== thread001-generated.dup1
+
+      SELECT 
+        (SELECT md5sum(a, b) FROM ab WHERE a < (SELECT max(a) FROM ab)) ==
+        (SELECT b FROM ab WHERE a = (SELECT max(a) FROM ab))
+----
+stmt 0 err 1 -1 151 no such table: ab
+==== thread001-generated.dup2
+ PRAGMA integrity_check
+----
+stmt 0 ok
+==== t1
+
+          SELECT 
+            (SELECT md5sum(a, b) FROM ab WHERE +a < (SELECT max(a) FROM ab)) ==
+            (SELECT b FROM ab WHERE a = (SELECT max(a) FROM ab))
+----
+stmt 0 err 1 -1 164 no such table: ab
+==== thread001-generated.dup3
+ SELECT count(*) FROM ab;
+----
+stmt 0 err 1 -1 25 no such table: ab
+==== thread001-generated.dup4
+
+      SELECT 
+        (SELECT md5sum(a, b) FROM ab WHERE +a < (SELECT max(a) FROM ab)) ==
+        (SELECT b FROM ab WHERE a = (SELECT max(a) FROM ab))
+----
+stmt 0 err 1 -1 152 no such table: ab
+==== thread001-generated.dup5
+ PRAGMA integrity_check
+----
+stmt 0 ok

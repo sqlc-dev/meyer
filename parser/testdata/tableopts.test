@@ -1,0 +1,55 @@
+==== tableopt-1.1
+
+    CREATE TABLE t1(a,b) WITHOUT rowid;
+----
+stmt 0 err 1 -1 40 PRIMARY KEY missing on table t1
+==== tableopt-1.1b
+
+    CREATE TABLE t1(a INTEGER PRIMARY KEY AUTOINCREMENT,b) WITHOUT rowid;
+----
+stmt 0 err 1 -1 74 AUTOINCREMENT not allowed on WITHOUT ROWID tables
+==== tableopt-1.2
+
+    CREATE TABLE t1(a,b) WITHOUT unknown2;
+----
+stmt 0 err 1 -1 43 unknown table option: unknown2
+==== tableopt-2.1
+
+  CREATE TABLE t1(a, b, c, PRIMARY KEY(a,b)) WITHOUT rowid;
+  INSERT INTO t1 VALUES(1,2,3),(2,3,4);
+  SELECT c FROM t1 WHERE a IN (1,2) ORDER BY b;
+----
+stmt 0 ok
+stmt 60 err 1 -1 100 no such table: t1
+stmt 100 err 1 -1 148 no such table: t1
+==== tableopt-2.1.1
+
+    SELECT rowid, * FROM t1;
+----
+stmt 0 err 1 -1 29 no such table: t1
+==== tableopt-2.1.2
+
+    SELECT _rowid_, * FROM t1;
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== tableopt-2.1.3
+
+    SELECT oid, * FROM t1;
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== tableopt-2.2
+
+  VACUUM;
+  SELECT c FROM t1 WHERE a IN (1,2) ORDER BY b;
+----
+stmt 0 ok
+stmt 10 err 1 -1 58 no such table: t1
+==== tableopt-3.1
+
+  CREATE TABLE without(x INTEGER PRIMARY KEY, without TEXT);
+  INSERT INTO without VALUES(1, 'xyzzy'), (2, 'fizzle');
+  SELECT * FROM without WHERE without='xyzzy';
+----
+stmt 0 ok
+stmt 61 err 1 -1 118 no such table: without
+stmt 118 err 1 -1 165 no such table: without

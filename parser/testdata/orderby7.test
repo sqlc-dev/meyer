@@ -1,0 +1,98 @@
+==== 1.0
+
+  CREATE VIRTUAL TABLE fts USING fts3(content TEXT);
+  INSERT INTO fts(rowid,content)
+     VALUES(1,'this is a test of the fts3 virtual'),
+           (2,'table used as part of a join together'),
+           (3,'with the DISTINCT keyword.  There was'),
+           (4,'a bug at one time (2013-06 through 2014-04)'),
+           (5,'that prevented this from working correctly.'),
+           (11,'a row that occurs twice'),
+           (12,'a row that occurs twice');
+ 
+  CREATE TABLE t1(x TEXT PRIMARY KEY, y);
+  INSERT OR IGNORE INTO t1 SELECT content, rowid+100 FROM fts;
+----
+stmt 0 ok
+stmt 53 err 1 -1 461 no such table: fts
+stmt 461 ok
+stmt 505 err 1 -1 568 no such table: t1
+==== 1.1
+
+  SELECT DISTINCT fts.rowid, t1.y
+    FROM fts, t1
+   WHERE fts MATCH 'that twice'
+     AND content=x
+   ORDER BY y;
+----
+stmt 0 err 1 -1 117 no such table: fts
+==== 1.2
+
+  SELECT DISTINCT fts.rowid, t1.x
+    FROM fts, t1
+   WHERE fts MATCH 'that twice'
+     AND content=x
+   ORDER BY 1;
+----
+stmt 0 err 1 -1 117 no such table: fts
+==== 1.3
+
+  SELECT DISTINCT t1.x
+    FROM fts, t1
+   WHERE fts MATCH 'that twice'
+     AND content=x
+   ORDER BY 1;
+----
+stmt 0 err 1 -1 106 no such table: fts
+==== 1.4
+
+  SELECT t1.x
+    FROM fts, t1
+   WHERE fts MATCH 'that twice'
+     AND content=x
+   ORDER BY 1;
+----
+stmt 0 err 1 -1 97 no such table: fts
+==== 1.5
+
+  SELECT DISTINCT t1.x
+    FROM fts, t1
+   WHERE fts MATCH 'that twice'
+     AND content=x;
+----
+stmt 0 err 1 -1 92 no such table: fts
+==== 1.6
+
+  SELECT t1.x
+    FROM fts, t1
+   WHERE fts MATCH 'that twice'
+     AND content=x;
+----
+stmt 0 err 1 -1 83 no such table: fts
+==== 2.1
+
+  SELECT DISTINCT t1.x
+    FROM fts, t1
+   WHERE fts.rowid=11
+     AND content=x
+   ORDER BY fts.rowid;
+----
+stmt 0 err 1 -1 104 no such table: fts
+==== 2.2
+
+  SELECT DISTINCT t1.*
+    FROM fts, t1
+   WHERE fts.rowid=11
+     AND content=x
+   ORDER BY fts.rowid;
+----
+stmt 0 err 1 -1 104 no such table: fts
+==== 2.3
+
+  SELECT DISTINCT t1.*
+    FROM fts, t1
+   WHERE fts.rowid=11
+     AND content=x
+   ORDER BY t1.y
+----
+stmt 0 err 1 -1 99 no such table: fts

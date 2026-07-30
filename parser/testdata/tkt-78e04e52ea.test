@@ -1,0 +1,49 @@
+==== tkt-78e04-1.0
+
+    CREATE TABLE ""("" UNIQUE, x CHAR(100));
+    CREATE TABLE t2(x);
+    INSERT INTO ""("") VALUES(1);
+    INSERT INTO t2 VALUES(2);
+    SELECT * FROM "", t2;
+----
+stmt 0 ok
+stmt 45 ok
+stmt 69 err 1 -1 103 no such table: 
+stmt 103 err 1 -1 133 no such table: t2
+stmt 133 err 1 -1 159 no such table: 
+==== tkt-78e04-1.1
+
+    INSERT INTO ""("") VALUES(1);
+----
+stmt 0 err 1 -1 34 no such table: 
+==== tkt-78e04-1.2
+
+    PRAGMA table_info("");
+----
+stmt 0 ok
+==== tkt-78e04-1.3
+
+    CREATE INDEX i1 ON ""("" COLLATE nocase);
+----
+stmt 0 err 1 -1 46 no such table: main.
+==== tkt-78e04-1.5
+
+    DROP TABLE "";
+    SELECT name FROM sqlite_master;
+----
+stmt 0 err 1 -1 19 no such table: 
+stmt 19 ok
+==== tkt-78e04-2.1
+
+    CREATE INDEX "" ON t2(x);
+    EXPLAIN QUERY PLAN SELECT * FROM t2 WHERE x=5;
+----
+stmt 0 err 1 -1 30 no such table: main.t2
+stmt 30 err 1 -1 81 no such table: t2
+==== tkt-78e04-2.2
+
+    DROP INDEX "";
+    EXPLAIN QUERY PLAN SELECT * FROM t2 WHERE x=2;
+----
+stmt 0 err 1 -1 19 no such index: 
+stmt 19 err 1 -1 70 no such table: t2

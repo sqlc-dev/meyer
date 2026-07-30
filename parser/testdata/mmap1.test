@@ -1,0 +1,71 @@
+==== 2.1
+
+    PRAGMA auto_vacuum = 1;
+    PRAGMA mmap_size = 67108864;
+    PRAGMA journal_mode = wal;
+    CREATE TABLE t1(a, b, UNIQUE(a, b));
+    INSERT INTO t1 VALUES(rblob(500), rblob(500));
+    INSERT INTO t1 SELECT rblob(500), rblob(500) FROM t1; --    2
+    INSERT INTO t1 SELECT rblob(500), rblob(500) FROM t1; --    4
+    INSERT INTO t1 SELECT rblob(500), rblob(500) FROM t1; --    8
+    INSERT INTO t1 SELECT rblob(500), rblob(500) FROM t1; --   16
+    INSERT INTO t1 SELECT rblob(500), rblob(500) FROM t1; --   32
+    PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 61 ok
+stmt 92 ok
+stmt 133 err 1 -1 184 no such table: t1
+stmt 184 err 1 -1 242 no such table: t1
+stmt 242 err 1 -1 308 no such table: t1
+stmt 308 err 1 -1 374 no such table: t1
+stmt 374 err 1 -1 440 no such table: t1
+stmt 440 err 1 -1 506 no such table: t1
+stmt 506 ok
+==== 2.2
+
+    PRAGMA auto_vacuum;
+    SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 24 err 1 -1 53 no such table: t1
+==== 2.4
+
+      PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+==== 3.1
+
+  PRAGMA auto_vacuum = 1;
+
+  CREATE TABLE t1(a, b, UNIQUE(a, b));
+  INSERT INTO t1 VALUES(rblob(500), rblob(500));
+  INSERT INTO t1 SELECT rblob(500), rblob(500) FROM t1; --    2
+  INSERT INTO t1 SELECT rblob(500), rblob(500) FROM t1; --    4
+  INSERT INTO t1 SELECT rblob(500), rblob(500) FROM t1; --    8
+
+  CREATE TABLE t2(a, b, UNIQUE(a, b));
+  INSERT INTO t2 SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 66 err 1 -1 115 no such table: t1
+stmt 115 err 1 -1 171 no such table: t1
+stmt 171 err 1 -1 235 no such table: t1
+stmt 235 err 1 -1 299 no such table: t1
+stmt 299 ok
+stmt 347 err 1 -1 382 no such table: t2
+==== 4.5
+ COMMIT
+----
+stmt 0 ok
+==== 5.3
+
+  CREATE TABLE t2(x);
+  INSERT INTO t2 VALUES('tricked you!');
+  INSERT INTO t2 VALUES('tricked you!');
+----
+stmt 0 ok
+stmt 22 err 1 -1 63 no such table: t2
+stmt 63 err 1 -1 104 no such table: t2

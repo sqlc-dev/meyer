@@ -1,0 +1,28 @@
+==== rowallock-generated
+
+    PRAGMA page_size = 4096;
+    CREATE TABLE t1(a, b);
+    CREATE TABLE t2(a, b);
+    INSERT INTO t1 VALUES(1, 2), (3, 4);
+    PRAGMA journal_mode = wal;
+----
+stmt 0 ok
+stmt 29 ok
+stmt 56 ok
+stmt 83 err 1 -1 124 no such table: t1
+stmt 124 ok
+==== rowallock-generated.dup1
+
+    PRAGMA mmap_size = 1000000;
+----
+stmt 0 ok
+==== rowallock-generated.dup2
+
+    SELECT * FROM t1;
+----
+stmt 0 err 1 -1 22 no such table: t1
+==== rowallock-generated.dup3
+
+    INSERT INTO t1 VALUES(5, 6);
+----
+stmt 0 err 1 -1 33 no such table: t1

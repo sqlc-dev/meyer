@@ -1,0 +1,39 @@
+==== 1
+
+  CREATE TABLE t1 (x, y);
+  INSERT INTO t1 VALUES (3, 'a');
+  INSERT INTO t1 VALUES (1, 'a'); 
+  INSERT INTO t1 VALUES (2, 'b');
+  INSERT INTO t1 VALUES (2, 'a');
+  INSERT INTO t1 VALUES (3, 'b');
+  INSERT INTO t1 VALUES (1, 'b');
+----
+stmt 0 ok
+stmt 26 err 1 -1 60 no such table: t1
+stmt 60 err 1 -1 94 no such table: t1
+stmt 94 err 1 -1 129 no such table: t1
+stmt 129 err 1 -1 163 no such table: t1
+stmt 163 err 1 -1 197 no such table: t1
+stmt 197 err 1 -1 231 no such table: t1
+==== 1.1
+
+  CREATE INDEX i1 ON t1(x, y);
+----
+stmt 0 err 1 -1 31 no such table: main.t1
+==== 2.0
+
+  drop table if exists t1;
+  create table t1(id int);
+  insert into t1(id) values(1),(2),(3),(4),(5);
+  create index t1_idx_id on t1(id asc);
+  select * from t1 group by id order by id;
+  select * from t1 group by id order by id asc;
+  select * from t1 group by id order by id desc;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 err 1 -1 102 no such table: t1
+stmt 102 err 1 -1 142 no such table: main.t1
+stmt 142 err 1 -1 186 no such table: t1
+stmt 186 err 1 -1 234 no such table: t1
+stmt 234 err 1 -1 283 no such table: t1

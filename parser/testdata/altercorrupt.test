@@ -1,0 +1,12 @@
+==== 1.1
+
+  ALTER TABLE t2 DROP COLUMN e;
+  ALTER TABLE t1 DROP COLUMN f;
+----
+stmt 0 err 1 -1 32 no such table: t2
+stmt 32 err 1 -1 64 no such table: t1
+==== 2.1
+
+  ALTER TABLE t1 DROP COLUMN a;
+----
+stmt 0 err 1 -1 32 no such table: t1

@@ -1,0 +1,27 @@
+==== emptytable-100
+
+  CREATE TABLE t1(a);
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<100)
+    INSERT INTO t1(a) SELECT x FROM c;
+  CREATE TABLE empty(x);
+  SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 22 err 1 -1 138 no such table: t1
+stmt 138 ok
+stmt 163 err 1 -1 190 no such table: t1
+==== emptytable-110
+
+  SELECT count(*) FROM t1, t1, t1, t1, t1, t1, empty;
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== emptytable-120
+
+  SELECT count(*) FROM t1, t1 LEFT JOIN empty;
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== emptytable-121
+
+  SELECT count(*) FROM t1, t1 LEFT JOIN t1, empty;
+----
+stmt 0 err 1 -1 51 no such table: t1

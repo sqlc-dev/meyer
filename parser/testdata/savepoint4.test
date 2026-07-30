@@ -1,0 +1,84 @@
+==== savepoint4-1
+
+    PRAGMA cache_size=10;
+    BEGIN;
+    CREATE TABLE t1(x TEXT);
+    INSERT INTO t1 VALUES(randstr(10,400));
+    INSERT INTO t1 VALUES(randstr(10,400));
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    COMMIT;
+    SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 37 ok
+stmt 66 err 1 -1 110 no such table: t1
+stmt 110 err 1 -1 154 no such table: t1
+stmt 154 err 1 -1 205 no such table: t1
+stmt 205 err 1 -1 256 no such table: t1
+stmt 256 err 1 -1 307 no such table: t1
+stmt 307 err 1 -1 358 no such table: t1
+stmt 358 err 1 -1 409 no such table: t1
+stmt 409 err 1 -1 460 no such table: t1
+stmt 460 err 1 -1 511 no such table: t1
+stmt 511 err 1 -1 562 no such table: t1
+stmt 562 err 1 -1 613 no such table: t1
+stmt 613 ok
+stmt 625 err 1 -1 654 no such table: t1
+==== savepoint4-generated
+
+      DELETE FROM t1 WHERE random()%10==0;
+      INSERT INTO t1 SELECT randstr(10,10)||x FROM t1 WHERE random()%9==0;
+----
+stmt 0 err 1 -1 43 no such table: t1
+stmt 43 err 1 -1 118 no such table: t1
+==== savepoint4-2
+
+    PRAGMA cache_size=10;
+    DROP TABLE IF EXISTS t1;
+    BEGIN;
+    CREATE TABLE t1(x TEXT);
+    CREATE INDEX i1 ON t1(x);
+    INSERT INTO t1 VALUES(randstr(10,400));
+    INSERT INTO t1 VALUES(randstr(10,400));
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    INSERT INTO t1 SELECT randstr(10,400) FROM t1;
+    COMMIT;
+    SELECT count(*) FROM t1;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 55 ok
+stmt 66 ok
+stmt 95 err 1 -1 125 no such table: main.t1
+stmt 125 err 1 -1 169 no such table: t1
+stmt 169 err 1 -1 213 no such table: t1
+stmt 213 err 1 -1 264 no such table: t1
+stmt 264 err 1 -1 315 no such table: t1
+stmt 315 err 1 -1 366 no such table: t1
+stmt 366 err 1 -1 417 no such table: t1
+stmt 417 err 1 -1 468 no such table: t1
+stmt 468 err 1 -1 519 no such table: t1
+stmt 519 err 1 -1 570 no such table: t1
+stmt 570 ok
+stmt 582 err 1 -1 611 no such table: t1
+==== savepoint4-generated.dup1
+
+      DELETE FROM t1 WHERE random()%10==0;
+      INSERT INTO t1 SELECT randstr(10,10)||x FROM t1 WHERE random()%9==0;
+----
+stmt 0 err 1 -1 43 no such table: t1
+stmt 43 err 1 -1 118 no such table: t1

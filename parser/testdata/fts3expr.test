@@ -1,0 +1,81 @@
+==== fts3expr-4.1
+ CREATE VIRTUAL TABLE t1 USING fts3(a, b, c)
+----
+stmt 0 ok
+==== fts3expr-4.2.1
+ SELECT * FROM t1 WHERE t1 MATCH 'example AND (hello OR world))'
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== fts3expr-4.2.2
+ SELECT * FROM t1 WHERE t1 MATCH 'example AND (hello OR world'
+----
+stmt 0 err 1 -1 63 no such table: t1
+==== fts3expr-4.2.3
+ SELECT * FROM t1 WHERE t1 MATCH '(hello'
+----
+stmt 0 err 1 -1 42 no such table: t1
+==== fts3expr-4.2.4
+ SELECT * FROM t1 WHERE t1 MATCH '('
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== fts3expr-4.2.5
+ SELECT * FROM t1 WHERE t1 MATCH ')'
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== fts3expr-4.2.6
+ SELECT * FROM t1 WHERE t1 MATCH 'example (hello world'
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== fts3expr-4.3.1
+ SELECT * FROM t1 WHERE t1 MATCH 'example OR "hello world'
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== fts3expr-4.3.2
+ SELECT * FROM t1 WHERE t1 MATCH 'example OR hello world"'
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== fts3expr-4.4.1
+ SELECT * FROM t1 WHERE t1 MATCH 'OR hello world'
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== fts3expr-4.4.2
+ SELECT * FROM t1 WHERE t1 MATCH 'hello world OR'
+----
+stmt 0 err 1 -1 50 no such table: t1
+==== fts3expr-4.4.3
+ SELECT * FROM t1 WHERE t1 MATCH 'one (hello world OR) two'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== fts3expr-4.4.4
+ SELECT * FROM t1 WHERE t1 MATCH 'one (OR hello world) two'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== fts3expr-4.5.1
+ SELECT * FROM t1 WHERE t1 MATCH '(hello OR world) NEAR one'
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== fts3expr-4.5.2
+ SELECT * FROM t1 WHERE t1 MATCH 'one NEAR (hello OR world)'
+----
+stmt 0 err 1 -1 61 no such table: t1
+==== fts3expr-5.1
+ SELECT fts3_exprtest('simple', 'a b')
+----
+stmt 0 err 1 8 39 no such function: fts3_exprtest
+==== fts3expr-5.2
+ SELECT fts3_exprtest('doesnotexist', 'a b', 'c')
+----
+stmt 0 err 1 8 50 no such function: fts3_exprtest
+==== fts3expr-5.3
+ SELECT fts3_exprtest('simple', 'a b OR', 'c')
+----
+stmt 0 err 1 8 47 no such function: fts3_exprtest
+==== fts3expr-7.1
+
+    CREATE VIRTUAL TABLE test USING fts3 (keyword);
+    INSERT INTO test VALUES ('abc');
+    SELECT * FROM test WHERE keyword MATCH '""';
+----
+stmt 0 ok
+stmt 52 err 1 -1 89 no such table: test
+stmt 89 err 1 -1 138 no such table: test

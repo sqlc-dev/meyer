@@ -1,0 +1,226 @@
+==== 1.0.1
+
+  CREATE VIRTUAL TABLE t1 USING fts3(x);
+  INSERT INTO t1(rowid, x) VALUES(1, 'a b c d');
+  INSERT INTO t1(rowid, x) VALUES(2, 'e f g h');
+
+  CREATE TABLE source(a, b);
+  INSERT INTO source VALUES(4, 'z');
+  INSERT INTO source VALUES(2, 'y');
+----
+stmt 0 ok
+stmt 41 err 1 -1 90 no such table: t1
+stmt 90 err 1 -1 139 no such table: t1
+stmt 139 ok
+stmt 169 err 1 -1 206 no such table: source
+stmt 206 err 1 -1 243 no such table: source
+==== fts3conf-generated
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== 2.1.1
+
+  DELETE FROM t1;
+  BEGIN;
+    INSERT INTO t1 VALUES('a b c');
+    SAVEPOINT a;
+      INSERT INTO t1 VALUES('x y z');
+    ROLLBACK TO a;
+  COMMIT;
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 ok
+stmt 27 err 1 -1 63 no such table: t1
+stmt 63 ok
+stmt 80 err 1 -1 118 no such table: t1
+stmt 118 ok
+stmt 137 ok
+==== 2.2.1
+
+  DELETE FROM t1;
+  BEGIN;
+    INSERT INTO t1(docid, x) VALUES(0, 'a b c');
+    INSERT INTO t1(docid, x) VALUES(1, 'a b c');
+    REPLACE INTO t1(docid, x) VALUES('zero', 'd e f');
+----
+stmt 0 err 1 -1 18 no such table: t1
+stmt 18 ok
+stmt 27 err 1 -1 76 no such table: t1
+stmt 76 err 1 -1 125 no such table: t1
+stmt 125 err 1 -1 180 no such table: t1
+==== 2.2.2
+ COMMIT
+----
+stmt 0 ok
+==== 2.2.3
+ SELECT * FROM t1
+----
+stmt 0 err 1 -1 18 no such table: t1
+==== 3.1
+
+    CREATE VIRTUAL TABLE t3 USING fts4;
+    REPLACE INTO t3(docid, content) VALUES (1, 'one two');
+    SELECT quote(matchinfo(t3, 'na')) FROM t3 WHERE t3 MATCH 'one'
+----
+stmt 0 ok
+stmt 40 err 1 -1 99 no such table: t3
+stmt 99 err 1 -1 167 no such table: t3
+==== 3.2
+
+    REPLACE INTO t3(docid, content) VALUES (2, 'one two three four');
+    SELECT quote(matchinfo(t3, 'na')) FROM t3 WHERE t3 MATCH 'four'
+----
+stmt 0 err 1 -1 70 no such table: t3
+stmt 70 err 1 -1 139 no such table: t3
+==== 3.3
+
+    REPLACE INTO t3(docid, content) VALUES (1, 'one two three four five six');
+    SELECT quote(matchinfo(t3, 'na')) FROM t3 WHERE t3 MATCH 'six'
+----
+stmt 0 err 1 -1 79 no such table: t3
+stmt 79 err 1 -1 147 no such table: t3
+==== 3.4
+
+    UPDATE OR REPLACE t3 SET docid = 2 WHERE docid=1;
+    SELECT quote(matchinfo(t3, 'na')) FROM t3 WHERE t3 MATCH 'six'
+----
+stmt 0 err 1 -1 54 no such table: t3
+stmt 54 err 1 -1 122 no such table: t3
+==== 3.5
+
+    UPDATE OR REPLACE t3 SET docid = 3 WHERE docid=2;
+    SELECT quote(matchinfo(t3, 'na')) FROM t3 WHERE t3 MATCH 'six'
+----
+stmt 0 err 1 -1 54 no such table: t3
+stmt 54 err 1 -1 122 no such table: t3
+==== 3.6
+
+    REPLACE INTO t3(docid, content) VALUES (3, 'one two');
+    SELECT quote(matchinfo(t3, 'na')) FROM t3 WHERE t3 MATCH 'one'
+----
+stmt 0 err 1 -1 59 no such table: t3
+stmt 59 err 1 -1 127 no such table: t3
+==== 3.7
+
+    REPLACE INTO t3(docid, content) VALUES(NULL,'one two three four');
+    REPLACE INTO t3(docid, content) VALUES(NULL,'one two three four five six');
+    SELECT docid FROM t3;
+----
+stmt 0 err 1 -1 71 no such table: t3
+stmt 71 err 1 -1 151 no such table: t3
+stmt 151 err 1 -1 177 no such table: t3
+==== 3.8
+
+    UPDATE OR REPLACE t3 SET docid = 5, content='three four' WHERE docid = 4;
+    SELECT quote(matchinfo(t3, 'na')) FROM t3 WHERE t3 MATCH 'one'
+----
+stmt 0 err 1 -1 78 no such table: t3
+stmt 78 err 1 -1 146 no such table: t3
+==== 4.1.1
+
+  CREATE VIRTUAL TABLE t0 USING fts4;
+  BEGIN;
+    INSERT INTO t0(rowid, content) SELECT
+      1, 'abc' UNION ALL SELECT
+      2, 'def' UNION ALL SELECT
+      1, 'ghi';
+----
+stmt 0 ok
+stmt 38 ok
+stmt 47 err 1 -1 169 no such table: t0
+==== 4.1.2
+
+  COMMIT;
+----
+stmt 0 ok
+==== 4.1.3
+
+  SELECT * FROM t0 WHERE t0 MATCH 'abc';
+  INSERT INTO t0(t0) VALUES('integrity-check');
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 41 no such table: t0
+stmt 41 err 1 -1 89 no such table: t0
+stmt 89 ok
+==== 4.2.1
+
+  CREATE VIRTUAL TABLE t01 USING fts4;
+  BEGIN;
+    SAVEPOINT abc;
+      INSERT INTO t01 VALUES('a b c');
+    ROLLBACK TO abc;
+  COMMIT;
+----
+stmt 0 ok
+stmt 39 ok
+stmt 48 ok
+stmt 67 err 1 -1 106 no such table: t01
+stmt 106 ok
+stmt 127 ok
+==== 4.2.2
+
+  SELECT * FROM t01 WHERE t01 MATCH 'b';
+  INSERT INTO t01(t01) VALUES('integrity-check');
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 41 no such table: t01
+stmt 41 err 1 -1 91 no such table: t01
+stmt 91 ok
+==== 4.3.1
+
+  CREATE VIRTUAL TABLE t02 USING fts4;
+  INSERT INTO t01 VALUES('1 1 1');
+  INSERT INTO t02 VALUES('2 2 2');
+  BEGIN;
+    SAVEPOINT abc;
+      INSERT INTO t01 VALUES('a b c');
+      INSERT INTO t02 VALUES('a b c');
+    ROLLBACK TO abc;
+  COMMIT;
+----
+stmt 0 ok
+stmt 39 err 1 -1 74 no such table: t01
+stmt 74 err 1 -1 109 no such table: t02
+stmt 109 ok
+stmt 118 ok
+stmt 137 err 1 -1 176 no such table: t01
+stmt 176 err 1 -1 215 no such table: t02
+stmt 215 ok
+stmt 236 ok
+==== 4.3.2
+
+  SELECT * FROM t01 WHERE t01 MATCH 'b';
+  INSERT INTO t01(t01) VALUES('integrity-check');
+----
+stmt 0 err 1 -1 41 no such table: t01
+stmt 41 err 1 -1 91 no such table: t01
+==== 4.4.1
+
+  CREATE TABLE A(ID INTEGER PRIMARY KEY, AnotherID INTEGER, Notes TEXT);
+  CREATE VIRTUAL TABLE AFTS USING FTS4 (Notes);
+  CREATE TRIGGER A_DeleteTrigger AFTER DELETE ON A FOR EACH ROW BEGIN 
+    DELETE FROM AFTS WHERE rowid=OLD.ID; 
+  END;
+  CREATE TABLE B(ID INTEGER PRIMARY KEY,Notes TEXT);
+  CREATE VIRTUAL TABLE BFTS USING FTS3 (Notes);
+  CREATE TRIGGER B_DeleteTrigger AFTER DELETE ON B FOR EACH ROW BEGIN 
+    DELETE FROM BFTS WHERE rowid=OLD.ID; 
+  END;
+----
+stmt 0 ok
+stmt 73 ok
+stmt 121 err 1 -1 191 no such table: main.A
+stmt 241 ok
+stmt 294 ok
+stmt 342 err 1 -1 412 no such table: main.B
+==== 4.4.2
+
+  BEGIN TRANSACTION;
+    DELETE FROM A WHERE AnotherID=1;
+    DELETE FROM B WHERE ID=1;
+  COMMIT;
+----
+stmt 0 ok
+stmt 21 err 1 -1 58 no such table: A
+stmt 58 err 1 -1 88 no such table: B
+stmt 88 ok

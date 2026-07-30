@@ -1,0 +1,226 @@
+==== istrue-100
+
+  CREATE TABLE t1(x INTEGER PRIMARY KEY, y BOOLEAN);
+  INSERT INTO t1 VALUES(1, true),(2, false),(3, null);
+  SELECT x FROM t1 WHERE y IS TRUE;
+----
+stmt 0 ok
+stmt 53 err 1 -1 108 no such table: t1
+stmt 108 err 1 -1 144 no such table: t1
+==== istrue-110
+
+  SELECT x FROM t1 WHERE y IS FALSE;
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== istrue-120
+
+  SELECT x FROM t1 WHERE y IS NULL;
+----
+stmt 0 err 1 -1 36 no such table: t1
+==== istrue-130
+
+  SELECT x FROM t1 WHERE y IS NOT TRUE;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== istrue-140
+
+  SELECT x FROM t1 WHERE y IS NOT FALSE;
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== istrue-150
+
+  SELECT x FROM t1 WHERE y IS NOT NULL;
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== istrue-300
+
+  SELECT x,
+         y IS TRUE, y IS FALSE, y is NULL,
+         y IS NOT TRUE, y IS NOT FALSE, y IS NOT NULL, '|'
+    FROM t1 ORDER BY x;
+----
+stmt 0 err 1 -1 138 no such table: t1
+==== istrue-400
+
+  SELECT x FROM t1 WHERE true;
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== istrue-410
+
+  SELECT x FROM t1 WHERE false;
+----
+stmt 0 err 1 -1 32 no such table: t1
+==== istrue-500
+
+  CREATE TABLE t2(
+     a INTEGER PRIMARY KEY,
+     b BOOLEAN DEFAULT true,
+     c BOOLEAN DEFAULT(true),
+     d BOOLEAN DEFAULT false,
+     e BOOLEAN DEFAULT(false)
+  );
+  INSERT INTO t2 DEFAULT VALUES;
+  SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 171 err 1 -1 204 no such table: t2
+stmt 204 err 1 -1 224 no such table: t2
+==== istrue-510
+
+  DROP TABLE t2;
+  CREATE TABLE t2(
+     a INTEGER PRIMARY KEY,
+     b BOOLEAN DEFAULT(not true),
+     c BOOLEAN DEFAULT(not false)
+  );
+  INSERT INTO t2(a) VALUES(99);
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 17 no such table: t2
+stmt 17 ok
+stmt 137 err 1 -1 169 no such table: t2
+stmt 169 err 1 -1 189 no such table: t2
+==== istrue-520
+
+  DROP TABLE t2;
+  CREATE TABLE t2(
+     a INTEGER PRIMARY KEY,
+     b BOOLEAN CHECK(b IS TRUE),
+     c BOOLEAN CHECK(c IS FALSE),
+     d BOOLEAN CHECK(d IS NOT TRUE),
+     e BOOLEAN CHECK(e IS NOT FALSE)
+  );
+  INSERT INTO t2 VALUES(1,true,false,null,null);
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 17 no such table: t2
+stmt 17 ok
+stmt 210 err 1 -1 259 no such table: t2
+stmt 259 err 1 -1 279 no such table: t2
+==== istrue-521
+
+  INSERT INTO t2 VALUES(2,false,false,null,null);
+----
+stmt 0 err 1 -1 50 no such table: t2
+==== istrue-522
+
+  INSERT INTO t2 VALUES(2,true,true,null,null);
+----
+stmt 0 err 1 -1 48 no such table: t2
+==== istrue-523
+
+  INSERT INTO t2 VALUES(2,true,false,true,null);
+----
+stmt 0 err 1 -1 49 no such table: t2
+==== istrue-524
+
+  INSERT INTO t2 VALUES(2,true,false,null,false);
+----
+stmt 0 err 1 -1 50 no such table: t2
+==== istrue-generated
+
+    DROP TABLE IF EXISTS t1;
+    CREATE TABLE t1(x);
+----
+stmt 0 ok
+stmt 29 ok
+==== istrue-generated.dup1
+
+    SELECT x IS TRUE FROM t1;
+----
+stmt 0 err 1 -1 30 no such table: t1
+==== istrue-generated.dup2
+
+    SELECT x IS FALSE FROM t1;
+----
+stmt 0 err 1 -1 31 no such table: t1
+==== istrue-700
+
+    CREATE TABLE t7(
+      a INTEGER PRIMARY KEY,
+      b BOOLEAN DEFAULT false,
+      c BOOLEAN DEFAULT true
+    );
+    INSERT INTO t7(a) VALUES(1);
+    INSERT INTO t7(a,b,c) VALUES(2,true,false);
+    ALTER TABLE t7 ADD COLUMN d BOOLEAN DEFAULT false;
+    ALTER TABLE t7 ADD COLUMN e BOOLEAN DEFAULT true;
+    INSERT INTO t7(a,b,c) VALUES(3,true,false);
+    INSERT INTO t7 VALUES(4,false,true,true,false);
+    SELECT *,'x' FROM t7 ORDER BY a;
+----
+stmt 0 ok
+stmt 117 err 1 -1 150 no such table: t7
+stmt 150 err 1 -1 198 no such table: t7
+stmt 198 err 1 -1 246 no such table: t7
+stmt 253 err 1 -1 301 no such table: t7
+stmt 307 err 1 -1 355 no such table: t7
+stmt 355 err 1 -1 407 no such table: t7
+stmt 407 err 1 -1 444 no such table: t7
+==== istrue-710
+
+  SELECT 0.5 IS TRUE COLLATE NOCASE;
+  SELECT 0.5 IS TRUE COLLATE RTRIM;
+  SELECT 0.5 IS TRUE COLLATE BINARY;
+
+  SELECT 0.5 IS TRUE;
+  SELECT 0.5 COLLATE NOCASE IS TRUE;
+  SELECT 0.0 IS FALSE;
+
+  SELECT 0.0 IS FALSE COLLATE NOCASE;
+  SELECT 0.0 IS FALSE COLLATE RTRIM;
+  SELECT 0.0 IS FALSE COLLATE BINARY;
+----
+stmt 0 ok
+stmt 37 ok
+stmt 73 ok
+stmt 110 ok
+stmt 133 ok
+stmt 170 ok
+stmt 193 ok
+stmt 232 ok
+stmt 269 ok
+==== istrue-800
+
+  SELECT 9 IN (false.false);
+----
+stmt 0 err 1 16 29 no such column: false.false
+==== istrue-810
+
+  CREATE TABLE t8(a INT, true INT, false INT, d INT);
+  INSERT INTO t8(a,true,false,d) VALUES(5,6,7,8),(4,3,2,1),('a','b','c','d');
+  SELECT * FROM t8 ORDER BY false;
+----
+stmt 0 ok
+stmt 54 err 1 -1 132 no such table: t8
+stmt 132 err 1 -1 167 no such table: t8
+==== istrue-820
+
+  SELECT 9 IN (false.false) FROM t8;
+----
+stmt 0 err 1 -1 37 no such table: t8
+==== istrue-830
+
+  CREATE TABLE false(true INT, false INT, x INT CHECK (5 IN (false.false)));
+----
+stmt 0 ok
+==== istrue-840
+
+  INSERT INTO False VALUES(4,5,6);
+----
+stmt 0 err 1 -1 35 no such table: False
+==== istrue-841
+
+  INSERT INTO False VALUES(5,6,7);
+----
+stmt 0 err 1 -1 35 no such table: False
+==== istrue-850
+
+  SELECT 9 IN (false.false) FROM false;
+----
+stmt 0 err 1 -1 40 no such table: false
+==== istrue-851
+
+  SELECT 5 IN (false.false) FROM false;
+----
+stmt 0 err 1 -1 40 no such table: false

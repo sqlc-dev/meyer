@@ -1,0 +1,163 @@
+==== 1.1
+
+  CREATE TABLE t1(__hidden__a, b);
+  INSERT INTO t1 VALUES('1');
+  INSERT INTO t1(__hidden__a, b) VALUES('x', 'y');
+----
+stmt 0 ok
+stmt 35 err 1 -1 65 no such table: t1
+stmt 65 err 1 -1 116 no such table: t1
+==== 1.2
+
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 20 no such table: t1
+==== 1.3
+
+  SELECT __hidden__a, * FROM t1;
+----
+stmt 0 err 1 -1 33 no such table: t1
+==== hidden-generated
+
+    DROP TABLE IF EXISTS x1;
+    CREATE TABLE x1(a, b, c);
+    INSERT INTO x1 VALUES(1, 2, 3);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 59 err 1 -1 95 no such table: x1
+==== hidden-generated.dup1
+
+    SELECT a, b, __hidden__c FROM v1;
+----
+stmt 0 err 1 -1 38 no such table: v1
+==== hidden-generated.dup2
+
+    SELECT * FROM v1;
+----
+stmt 0 err 1 -1 22 no such table: v1
+==== hidden-generated.dup3
+
+    CREATE TRIGGER tr1 INSTEAD OF INSERT ON v1 BEGIN
+      INSERT INTO x1 VALUES(new.a, new.b, new.__hidden__c);
+    END;
+  
+    INSERT INTO v1 VALUES(4, 5);
+    SELECT * FROM x1;
+----
+stmt 0 err 1 -1 53 no such table: main.v1
+stmt 122 err 1 -1 158 no such table: v1
+stmt 158 err 1 -1 180 no such table: x1
+==== hidden-generated.dup4
+
+    INSERT INTO v1(a, b, __hidden__c) VALUES(7, 8, 9);
+    SELECT * FROM x1;
+----
+stmt 0 err 1 -1 55 no such table: v1
+stmt 55 err 1 -1 77 no such table: x1
+==== 3.1
+
+  CREATE TABLE t4(a, __hidden__b, c);
+  INSERT INTO t4 SELECT 1, 2;
+  SELECT a, __hidden__b, c FROM t4;
+----
+stmt 0 ok
+stmt 38 err 1 -1 68 no such table: t4
+stmt 68 err 1 -1 104 no such table: t4
+==== 3.2.1
+
+  CREATE TABLE t5(__hidden__a, b, c);
+  CREATE TABLE t6(__hidden__a, b, c);
+  INSERT INTO t6(__hidden__a, b, c) VALUES(1, 2, 3);
+  INSERT INTO t6(__hidden__a, b, c) VALUES(4, 5, 6);
+  INSERT INTO t6(__hidden__a, b, c) VALUES(7, 8, 9);
+----
+stmt 0 ok
+stmt 38 ok
+stmt 76 err 1 -1 129 no such table: t6
+stmt 129 err 1 -1 182 no such table: t6
+stmt 182 err 1 -1 235 no such table: t6
+==== 3.2.2
+
+  INSERT INTO t5 SELECT * FROM t6;
+  SELECT * FROM t5;
+----
+stmt 0 err 1 -1 35 no such table: t5
+stmt 35 err 1 -1 55 no such table: t5
+==== 3.2.3
+
+  SELECT __hidden__a FROM t5;
+----
+stmt 0 err 1 -1 30 no such table: t5
+==== 3.3.1
+
+  CREATE TABLE t5a(a, b, __hidden__c);
+  CREATE TABLE t6a(a, b, __hidden__c);
+  INSERT INTO t6a(a, b, __hidden__c) VALUES(1, 2, 3);
+  INSERT INTO t6a(a, b, __hidden__c) VALUES(4, 5, 6);
+  INSERT INTO t6a(a, b, __hidden__c) VALUES(7, 8, 9);
+----
+stmt 0 ok
+stmt 39 ok
+stmt 78 err 1 -1 132 no such table: t6a
+stmt 132 err 1 -1 186 no such table: t6a
+stmt 186 err 1 -1 240 no such table: t6a
+==== 3.3.2
+
+  INSERT INTO t5a SELECT * FROM t6a;
+  SELECT * FROM t5a;
+----
+stmt 0 err 1 -1 37 no such table: t5a
+stmt 37 err 1 -1 58 no such table: t5a
+==== 3.3.3
+
+  SELECT __hidden__c FROM t5a;
+----
+stmt 0 err 1 -1 31 no such table: t5a
+==== 3.4.1
+
+  CREATE TABLE t5b(a, __hidden__b, c);
+  CREATE TABLE t6b(a, b, __hidden__c);
+  INSERT INTO t6b(a, b, __hidden__c) VALUES(1, 2, 3);
+  INSERT INTO t6b(a, b, __hidden__c) VALUES(4, 5, 6);
+  INSERT INTO t6b(a, b, __hidden__c) VALUES(7, 8, 9);
+----
+stmt 0 ok
+stmt 39 ok
+stmt 78 err 1 -1 132 no such table: t6b
+stmt 132 err 1 -1 186 no such table: t6b
+stmt 186 err 1 -1 240 no such table: t6b
+==== 3.4.2
+
+  INSERT INTO t5b SELECT * FROM t6b;
+  SELECT * FROM t5b;
+----
+stmt 0 err 1 -1 37 no such table: t5b
+stmt 37 err 1 -1 58 no such table: t5b
+==== 3.4.3
+
+  SELECT __hidden__b FROM t5b;
+----
+stmt 0 err 1 -1 31 no such table: t5b
+==== 4.1
+
+  CREATE TABLE t1(a, __hidden__b, c UNIQUE);
+  INSERT INTO t1(a, __hidden__b, c) VALUES(1, 2, 3);
+  INSERT INTO t1(a, __hidden__b, c) VALUES(4, 5, 6);
+  INSERT INTO t1(a, __hidden__b, c) VALUES(7, 8, 9);
+  DELETE FROM t1 WHERE __hidden__b = 5;
+  SELECT rowid, a, __hidden__b, c FROM t1;
+----
+stmt 0 ok
+stmt 45 err 1 -1 98 no such table: t1
+stmt 98 err 1 -1 151 no such table: t1
+stmt 151 err 1 -1 204 no such table: t1
+stmt 204 err 1 -1 244 no such table: t1
+stmt 244 err 1 -1 287 no such table: t1
+==== 4.2
+
+  VACUUM;
+  SELECT rowid, a, __hidden__b, c FROM t1;
+----
+stmt 0 ok
+stmt 10 err 1 -1 53 no such table: t1

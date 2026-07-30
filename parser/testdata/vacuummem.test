@@ -1,0 +1,25 @@
+==== 1.0
+
+  PRAGMA cache_size = -2000;
+  CREATE TABLE t1(a, b, c);
+
+  WITH r(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM r WHERE i<100000
+  )
+  INSERT INTO t1 SELECT randomblob(100),randomblob(100),randomblob(100) FROM r;
+
+  CREATE INDEX t1a ON t1(a);
+  CREATE INDEX t1b ON t1(b);
+  CREATE INDEX t1c ON t1(c);
+----
+stmt 0 ok
+stmt 29 ok
+stmt 57 err 1 -1 215 no such table: t1
+stmt 215 err 1 -1 245 no such table: main.t1
+stmt 245 err 1 -1 274 no such table: main.t1
+stmt 274 err 1 -1 303 no such table: main.t1
+==== 1.4
+
+  SELECT count(*) FROM t1 WHERE +a IS NOT NULL
+----
+stmt 0 err 1 -1 48 no such table: t1

@@ -1,0 +1,124 @@
+==== fts3comp1-generated
+
+    INSERT INTO t1 VALUES('one two three', 'two four six');
+    SELECT a, b FROM t1;
+----
+stmt 0 err 1 -1 60 no such table: t1
+stmt 60 err 1 -1 85 no such table: t1
+==== fts3comp1-generated.dup1
+
+    SELECT c0a, c1b FROM t1_content;
+----
+stmt 0 err 1 -1 37 no such table: t1_content
+==== fts3comp1-generated.dup2
+
+    INSERT INTO t1 VALUES('three six nine', 'four eight twelve');
+    SELECT a, b FROM t1;
+----
+stmt 0 err 1 -1 66 no such table: t1
+stmt 66 err 1 -1 91 no such table: t1
+==== fts3comp1-generated.dup3
+
+    SELECT c0a, c1b FROM t1_content;
+----
+stmt 0 err 1 -1 37 no such table: t1_content
+==== fts3comp1-generated.dup4
+
+    SELECT a, b FROM t1 WHERE docid = 2
+----
+stmt 0 err 1 -1 41 no such table: t1
+==== fts3comp1-generated.dup5
+
+    SELECT a, b FROM t1 WHERE t1 MATCH 'two'
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== fts3comp1-generated.dup6
+
+    CREATE VIRTUAL TABLE terms USING fts4aux(t1);
+    SELECT term, documents, occurrences FROM terms WHERE col = '*';
+----
+stmt 0 ok
+stmt 50 err 1 -1 118 no such table: terms
+==== fts3comp1-generated.dup7
+
+    DELETE FROM t1 WHERE docid = 1;
+    SELECT term, documents, occurrences FROM terms WHERE col = '*';
+----
+stmt 0 err 1 -1 36 no such table: t1
+stmt 36 err 1 -1 104 no such table: terms
+==== fts3comp1-generated.dup8
+ SELECT c0a, c1b FROM t1_content
+----
+stmt 0 err 1 -1 33 no such table: t1_content
+==== 2.1
+
+  CREATE VIRTUAL TABLE t2 USING fts4(x, compress=zip)
+----
+stmt 0 ok
+==== 2.2
+
+  CREATE VIRTUAL TABLE t2 USING fts4(x, uncompress=unzip)
+----
+stmt 0 ok
+==== 3.0
+
+  PRAGMA trusted_schema = OFF;
+----
+stmt 0 ok
+==== 3.1
+
+  CREATE VIEW v1 AS SELECT myfunc('xyz');
+----
+stmt 0 ok
+==== 3.2
+
+  SELECT * FROM v1
+----
+stmt 0 err 1 -1 20 no such table: v1
+==== 3.3
+
+  CREATE VIRTUAL TABLE f1 USING fts4(x, compress=myfunc, uncompress=myfunc);
+----
+stmt 0 ok
+==== 3.4
+
+  INSERT INTO f1(rowid, x) VALUES(123, 'one two three');
+----
+stmt 0 err 1 -1 57 no such table: f1
+==== 3.6.1
+
+  CREATE TABLE t1(x);
+  CREATE TABLE t2(y);
+
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t2 VALUES( myfunc(new.x) );
+  END;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 91 no such table: main.t1
+==== 3.6.2
+
+  INSERT INTO t1 VALUES('hello world');
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== 4.0
+
+  CREATE VIRTUAL TABLE v1 USING fts4(x, compress=comp, uncompress=uncomp);
+----
+stmt 0 ok
+==== 4.1
+
+  INSERT INTO v1 VALUES('one two three');
+----
+stmt 0 err 1 -1 42 no such table: v1
+==== 4.2
+
+  INSERT INTO v1 VALUES('one two three');
+----
+stmt 0 err 1 -1 42 no such table: v1
+==== 4.3
+
+  SELECT * FROM v1
+----
+stmt 0 err 1 -1 20 no such table: v1

@@ -1,0 +1,256 @@
+==== fts3aa-1.1
+SELECT rowid FROM t1 WHERE content MATCH 'one'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== fts3aa-1.2
+SELECT rowid FROM t1 WHERE content MATCH 'one two'
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== fts3aa-1.3
+SELECT rowid FROM t1 WHERE content MATCH 'two one'
+----
+stmt 0 err 1 -1 51 no such table: t1
+==== fts3aa-1.4
+SELECT rowid FROM t1 WHERE content MATCH 'one two three'
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== fts3aa-1.5
+SELECT rowid FROM t1 WHERE content MATCH 'one three two'
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== fts3aa-1.6
+SELECT rowid FROM t1 WHERE content MATCH 'two three one'
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== fts3aa-1.7
+SELECT rowid FROM t1 WHERE content MATCH 'two one three'
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== fts3aa-1.8
+SELECT rowid FROM t1 WHERE content MATCH 'three one two'
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== fts3aa-1.9
+SELECT rowid FROM t1 WHERE content MATCH 'three two one'
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== fts3aa-1.10
+SELECT rowid FROM t1 WHERE content MATCH 'one two THREE'
+----
+stmt 0 err 1 -1 57 no such table: t1
+==== fts3aa-1.11
+SELECT rowid FROM t1 WHERE content MATCH '  ONE    Two   three  '
+----
+stmt 0 err 1 -1 66 no such table: t1
+==== fts3aa-2.1
+SELECT rowid FROM t1 WHERE content MATCH '"one"'
+----
+stmt 0 err 1 -1 49 no such table: t1
+==== fts3aa-2.2
+SELECT rowid FROM t1 WHERE content MATCH '"one two"'
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== fts3aa-2.3
+SELECT rowid FROM t1 WHERE content MATCH '"two one"'
+----
+stmt 0 err 1 -1 53 no such table: t1
+==== fts3aa-2.4
+SELECT rowid FROM t1 WHERE content MATCH '"one two three"'
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== fts3aa-2.5
+SELECT rowid FROM t1 WHERE content MATCH '"one three two"'
+----
+stmt 0 err 1 -1 59 no such table: t1
+==== fts3aa-2.6
+SELECT rowid FROM t1 WHERE content MATCH '"one two three four"'
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== fts3aa-2.7
+SELECT rowid FROM t1 WHERE content MATCH '"one three two four"'
+----
+stmt 0 err 1 -1 64 no such table: t1
+==== fts3aa-2.8
+SELECT rowid FROM t1 WHERE content MATCH '"one three five"'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== fts3aa-2.9
+SELECT rowid FROM t1 WHERE content MATCH '"one three" five'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== fts3aa-2.10
+SELECT rowid FROM t1 WHERE content MATCH 'five "one three"'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== fts3aa-2.11
+SELECT rowid FROM t1 WHERE content MATCH 'five "one three" four'
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== fts3aa-2.12
+SELECT rowid FROM t1 WHERE content MATCH 'five four "one three"'
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== fts3aa-2.13
+SELECT rowid FROM t1 WHERE content MATCH '"one three" four five'
+----
+stmt 0 err 1 -1 65 no such table: t1
+==== fts3aa-3.1
+SELECT rowid FROM t1 WHERE content MATCH 'one'
+----
+stmt 0 err 1 -1 47 no such table: t1
+==== fts3aa-3.2
+SELECT rowid FROM t1 WHERE content MATCH 'one -two'
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== fts3aa-3.3
+SELECT rowid FROM t1 WHERE content MATCH '-two one'
+----
+stmt 0 err 1 -1 52 no such table: t1
+==== fts3aa-4.1
+SELECT rowid FROM t1 WHERE content MATCH 'one OR two'
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== fts3aa-4.2
+SELECT rowid FROM t1 WHERE content MATCH '"one two" OR three'
+----
+stmt 0 err 1 -1 62 no such table: t1
+==== fts3aa-4.3
+SELECT rowid FROM t1 WHERE content MATCH 'three OR "one two"'
+----
+stmt 0 err 1 -1 62 no such table: t1
+==== fts3aa-4.4
+SELECT rowid FROM t1 WHERE content MATCH 'one two OR three'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== fts3aa-4.5
+SELECT rowid FROM t1 WHERE content MATCH 'three OR two one'
+----
+stmt 0 err 1 -1 60 no such table: t1
+==== fts3aa-4.6
+SELECT rowid FROM t1 WHERE content MATCH 'one two OR three OR four'
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== fts3aa-4.7
+SELECT rowid FROM t1 WHERE content MATCH 'two OR three OR four one'
+----
+stmt 0 err 1 -1 68 no such table: t1
+==== fts3aa-5.1
+INSERT INTO t1(content) VALUES(NULL)
+----
+stmt 0 err 1 -1 37 no such table: t1
+==== fts3aa-5.3
+SELECT rowid FROM t1 WHERE content MATCH NULL
+----
+stmt 0 err 1 -1 46 no such table: t1
+==== fts3aa-6.0
+INSERT INTO t1(rowid, content) VALUES(0, 'four five')
+----
+stmt 0 err 1 -1 54 no such table: t1
+==== fts3aa-6.1
+SELECT content FROM t1 WHERE rowid = 0
+----
+stmt 0 err 1 -1 39 no such table: t1
+==== fts3aa-6.2
+INSERT INTO t1(rowid, content) VALUES(-1, 'three four')
+----
+stmt 0 err 1 -1 56 no such table: t1
+==== fts3aa-6.3
+SELECT content FROM t1 WHERE rowid = -1
+----
+stmt 0 err 1 -1 40 no such table: t1
+==== fts3aa-6.4
+SELECT rowid FROM t1 WHERE t1 MATCH 'four'
+----
+stmt 0 err 1 -1 43 no such table: t1
+==== fts3aa-7.1
+
+  CREATE VIRTUAL TABLE t2 USING fts3(xyz=abc);
+  SELECT xyz FROM t2;
+----
+stmt 0 ok
+stmt 47 err 1 -1 69 no such table: t2
+==== fts3aa-7.2
+
+  CREATE VIRTUAL TABLE t3 USING fts4(xyz=abc);
+----
+stmt 0 ok
+==== fts3aa-7.3
+
+  CREATE VIRTUAL TABLE t3 USING fts4(xyz = abc);
+----
+stmt 0 ok
+==== fts3aa-7.4
+
+  CREATE VIRTUAL TABLE t3 USING fts3(tokenize=simple, tokenize=simple);
+  SELECT tokenize FROM t3;
+----
+stmt 0 ok
+stmt 72 err 1 -1 99 no such table: t3
+==== fts3aa-7.5
+
+  CREATE VIRTUAL TABLE t4 USING fts4(tokenize=simple, tokenize=simple);
+----
+stmt 0 ok
+==== 8.0
+
+  CREATE VIRTUAL TABLE t0 USING fts4(order=desc);
+  BEGIN;
+  INSERT INTO t0(rowid, content) VALUES(1, 'abc');
+  UPDATE t0 SET docid=5 WHERE docid=1;
+  INSERT INTO t0(rowid, content) VALUES(6, 'abc');
+----
+stmt 0 ok
+stmt 50 ok
+stmt 59 err 1 -1 110 no such table: t0
+stmt 110 err 1 -1 149 no such table: t0
+stmt 149 err 1 -1 200 no such table: t0
+==== 8.1
+
+  SELECT docid FROM t0 WHERE t0 MATCH 'abc';
+----
+stmt 0 err 1 -1 45 no such table: t0
+==== 8.2
+
+  SELECT docid FROM t0 WHERE t0 MATCH '"abc abc"';
+----
+stmt 0 err 1 -1 51 no such table: t0
+==== 8.3
+ COMMIT
+----
+stmt 0 ok
+==== 8.4
+
+  SELECT docid FROM t0 WHERE t0 MATCH 'abc';
+----
+stmt 0 err 1 -1 45 no such table: t0
+==== 8.5
+
+  SELECT docid FROM t0 WHERE t0 MATCH '"abc abc"';
+----
+stmt 0 err 1 -1 51 no such table: t0
+==== 9.1
+
+  CREATE VIRTUAL TABLE t9 USING fts4(a, "", '---');
+----
+stmt 0 ok
+==== 9.2
+
+  CREATE VIRTUAL TABLE t10 USING fts3(<, b, c);
+----
+stmt 0 ok
+==== 10.0
+
+  CREATE VIRTUAL TABLE z1 USING fts3;
+  INSERT INTO z1 VALUES('one two three'),('four one five'),('six two five');
+  CREATE TRIGGER z1r1 AFTER DELETE ON z1_content BEGIN
+    DELETE FROM z1;
+  END;
+----
+stmt 0 ok
+stmt 38 err 1 -1 115 no such table: z1
+stmt 115 err 1 -1 170 no such table: main.z1_content
+==== 10.1
+
+  DELETE FROM z1;
+----
+stmt 0 err 1 -1 18 no such table: z1

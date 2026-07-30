@@ -1,0 +1,27 @@
+==== vtab4-1.1
+
+    CREATE TABLE treal(a PRIMARY KEY, b, c);
+    CREATE VIRTUAL TABLE techo USING echo(treal);
+----
+stmt 0 ok
+stmt 45 ok
+==== vtab4-2.3
+
+    SELECT * FROM secho;
+----
+stmt 0 err 1 -1 25 no such table: secho
+==== vtab4-2.4
+
+    SELECT * FROM techo;
+----
+stmt 0 err 1 -1 25 no such table: techo
+==== vtab4-2.6
+
+    SELECT * FROM secho;
+----
+stmt 0 err 1 -1 25 no such table: secho
+==== vtab4-2.7
+
+    SELECT * FROM techo;
+----
+stmt 0 err 1 -1 25 no such table: techo

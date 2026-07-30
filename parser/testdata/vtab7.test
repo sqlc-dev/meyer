@@ -1,0 +1,21 @@
+==== vtab7-1.1
+
+    CREATE TABLE abc(a, b, c);
+    CREATE VIRTUAL TABLE abc2 USING echo(abc);
+----
+stmt 0 ok
+stmt 31 ok
+==== vtab7-2.3
+
+    INSERT INTO abc2 VALUES(4, 5, 6);
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 38 no such table: abc2
+stmt 38 err 1 -1 61 no such table: log
+==== vtab7-2.4
+
+    INSERT INTO abc2 VALUES(4, 5, 6);
+    SELECT * FROM log;
+----
+stmt 0 err 1 -1 38 no such table: abc2
+stmt 38 err 1 -1 61 no such table: log

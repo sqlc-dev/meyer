@@ -1,0 +1,183 @@
+==== 1.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA journal_mode = wal;
+  PRAGMA synchronous = normal;
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES(1, 2, 3);
+  INSERT INTO t1 VALUES(4, 5, 6);
+  INSERT INTO t1 VALUES(7, 8, 9);
+  PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 55 ok
+stmt 86 ok
+stmt 114 err 1 -1 148 no such table: t1
+stmt 148 err 1 -1 182 no such table: t1
+stmt 182 err 1 -1 216 no such table: t1
+stmt 216 ok
+==== 1.2
+
+  PRAGMA synchronous = normal;
+  INSERT INTO t1 VALUES(13, 14, 15);
+  INSERT INTO t1 VALUES(16, 17, 18);
+  PRAGMA wal_checkpoint;
+----
+stmt 0 ok
+stmt 31 err 1 -1 68 no such table: t1
+stmt 68 err 1 -1 105 no such table: t1
+stmt 105 ok
+==== 2.0
+
+  PRAGMA journal_size_limit = 10000;
+  CREATE TABLE t1(x);
+  PRAGMA journal_mode = wal;
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s LIMIT 20
+  )
+  INSERT INTO t1 SELECT randomblob(750) FROM s;
+----
+stmt 0 ok
+stmt 37 ok
+stmt 59 ok
+stmt 88 err 1 -1 207 no such table: t1
+==== 3.0
+
+  CREATE TABLE t1(x);
+  PRAGMA journal_mode = wal;
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s LIMIT 20
+  )
+  INSERT INTO t1 SELECT randomblob(750) FROM s;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 51 err 1 -1 170 no such table: t1
+==== 3.1
+
+  PRAGMA wal_checkpoint
+----
+stmt 0 ok
+==== 3.2
+
+  PRAGMA wal_checkpoint
+----
+stmt 0 ok
+==== 4.1
+
+  SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== 4.2
+
+  SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== 5.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA page_size = 1024;
+  CREATE TABLE t1(x);
+  PRAGMA journal_mode = wal;
+  WITH s(i) AS (
+      SELECT 1 UNION ALL SELECT i+1 FROM s LIMIT 20
+  )
+  INSERT INTO t1 SELECT randomblob(750) FROM s;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 53 ok
+stmt 75 ok
+stmt 104 err 1 -1 225 no such table: t1
+==== 5.1
+
+  SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== 5.3
+
+  SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 27 no such table: t1
+==== 6.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA page_size = 1024;
+  CREATE TABLE t1(x);
+  PRAGMA journal_mode = wal;
+  WITH s(i) AS (
+      SELECT 1 UNION ALL SELECT i+1 FROM s LIMIT 20
+  )
+  INSERT INTO t1 SELECT randomblob(750) FROM s;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 53 ok
+stmt 75 ok
+stmt 104 err 1 -1 225 no such table: t1
+==== 6.2
+
+  INSERT INTO t1 VALUES(1);
+----
+stmt 0 err 1 -1 28 no such table: t1
+==== 7.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA page_size = 1024;
+  CREATE TABLE t1(x);
+  PRAGMA journal_mode = wal;
+  WITH s(i) AS (
+      SELECT 1 UNION ALL SELECT i+1 FROM s LIMIT 20
+  )
+  INSERT INTO t1 SELECT randomblob(750) FROM s;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 53 ok
+stmt 75 ok
+stmt 104 err 1 -1 225 no such table: t1
+==== 7.1
+
+  PRAGMA wal_checkpoint
+----
+stmt 0 ok
+==== 8.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA page_size = 1024;
+  CREATE TABLE t1(x);
+  PRAGMA journal_mode = wal;
+  WITH s(i) AS ( SELECT 1 UNION ALL SELECT i+1 FROM s LIMIT 20 )
+  INSERT INTO t1 SELECT randomblob(75) FROM s;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 53 ok
+stmt 75 ok
+stmt 104 err 1 -1 216 no such table: t1
+==== 8.1
+ SELECT count(*) FROM t1
+----
+stmt 0 err 1 -1 25 no such table: t1
+==== 8.3
+ 
+  PRAGMA wal_checkpoint;
+  SELECT count(*) FROM t1
+----
+stmt 0 ok
+stmt 26 err 1 -1 53 no such table: t1
+==== 9.0
+
+  PRAGMA auto_vacuum = 0;
+  PRAGMA page_size = 1024;
+  CREATE TABLE t1(x);
+  PRAGMA journal_mode = wal;
+  WITH s(i) AS ( SELECT 1 UNION ALL SELECT i+1 FROM s LIMIT 20 )
+  INSERT INTO t1 SELECT randomblob(75) FROM s;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 53 ok
+stmt 75 ok
+stmt 104 err 1 -1 216 no such table: t1

@@ -1,0 +1,1447 @@
+SelectStmt{
+  Span: 141:165
+  Cores: [
+    SelectQuery{
+      Span: 141:164
+      Columns: [
+        ResultColumn{
+          Span: 148:164
+          Expr: BinaryExpr{
+            Span: 148:164
+            Op: Operator(OR)
+            X: Ident{
+              Span: 148:149
+              Name: "a"
+              Raw: "a"
+            }
+            Y: BinaryExpr{
+              Span: 153:164
+              Op: Operator(AND)
+              X: Ident{
+                Span: 153:154
+                Name: "b"
+                Raw: "b"
+              }
+              Y: UnaryExpr{
+                Span: 159:164
+                Op: Operator(NOT)
+                X: Ident{
+                  Span: 163:164
+                  Name: "c"
+                  Raw: "c"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 166:195
+  Cores: [
+    SelectQuery{
+      Span: 166:194
+      Columns: [
+        ResultColumn{
+          Span: 173:194
+          Expr: BinaryExpr{
+            Span: 173:194
+            Op: Operator(-)
+            X: BinaryExpr{
+              Span: 173:182
+              Op: Operator(+)
+              X: Literal{
+                Span: 173:174
+                Kind: LiteralKind(INTEGER)
+                Value: "1"
+                Raw: "1"
+              }
+              Y: BinaryExpr{
+                Span: 177:182
+                Op: Operator(*)
+                X: Literal{
+                  Span: 177:178
+                  Kind: LiteralKind(INTEGER)
+                  Value: "2"
+                  Raw: "2"
+                }
+                Y: Literal{
+                  Span: 181:182
+                  Kind: LiteralKind(INTEGER)
+                  Value: "3"
+                  Raw: "3"
+                }
+              }
+            }
+            Y: BinaryExpr{
+              Span: 185:194
+              Op: Operator(%)
+              X: BinaryExpr{
+                Span: 185:190
+                Op: Operator(/)
+                X: Literal{
+                  Span: 185:186
+                  Kind: LiteralKind(INTEGER)
+                  Value: "4"
+                  Raw: "4"
+                }
+                Y: Literal{
+                  Span: 189:190
+                  Kind: LiteralKind(INTEGER)
+                  Value: "5"
+                  Raw: "5"
+                }
+              }
+              Y: Literal{
+                Span: 193:194
+                Kind: LiteralKind(INTEGER)
+                Value: "6"
+                Raw: "6"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 196:215
+  Cores: [
+    SelectQuery{
+      Span: 196:214
+      Columns: [
+        ResultColumn{
+          Span: 203:214
+          Expr: BinaryExpr{
+            Span: 203:214
+            Op: Operator(*)
+            X: ParenExpr{
+              Span: 203:210
+              X: BinaryExpr{
+                Span: 204:209
+                Op: Operator(+)
+                X: Literal{
+                  Span: 204:205
+                  Kind: LiteralKind(INTEGER)
+                  Value: "1"
+                  Raw: "1"
+                }
+                Y: Literal{
+                  Span: 208:209
+                  Kind: LiteralKind(INTEGER)
+                  Value: "2"
+                  Raw: "2"
+                }
+              }
+            }
+            Y: Literal{
+              Span: 213:214
+              Kind: LiteralKind(INTEGER)
+              Value: "3"
+              Raw: "3"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 216:254
+  Cores: [
+    SelectQuery{
+      Span: 216:253
+      Columns: [
+        ResultColumn{
+          Span: 223:232
+          Expr: BinaryExpr{
+            Span: 223:232
+            Op: Operator(=)
+            X: BinaryExpr{
+              Span: 223:228
+              Op: Operator(<)
+              X: Literal{
+                Span: 223:224
+                Kind: LiteralKind(INTEGER)
+                Value: "1"
+                Raw: "1"
+              }
+              Y: Literal{
+                Span: 227:228
+                Kind: LiteralKind(INTEGER)
+                Value: "2"
+                Raw: "2"
+              }
+            }
+            Y: Literal{
+              Span: 231:232
+              Kind: LiteralKind(INTEGER)
+              Value: "3"
+              Raw: "3"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 234:253
+          Expr: BinaryExpr{
+            Span: 234:253
+            Op: Operator(>>)
+            X: BinaryExpr{
+              Span: 234:248
+              Op: Operator(<<)
+              X: BinaryExpr{
+                Span: 234:243
+                Op: Operator(|)
+                X: BinaryExpr{
+                  Span: 234:239
+                  Op: Operator(&)
+                  X: Literal{
+                    Span: 234:235
+                    Kind: LiteralKind(INTEGER)
+                    Value: "1"
+                    Raw: "1"
+                  }
+                  Y: Literal{
+                    Span: 238:239
+                    Kind: LiteralKind(INTEGER)
+                    Value: "2"
+                    Raw: "2"
+                  }
+                }
+                Y: Literal{
+                  Span: 242:243
+                  Kind: LiteralKind(INTEGER)
+                  Value: "3"
+                  Raw: "3"
+                }
+              }
+              Y: Literal{
+                Span: 247:248
+                Kind: LiteralKind(INTEGER)
+                Value: "4"
+                Raw: "4"
+              }
+            }
+            Y: Literal{
+              Span: 252:253
+              Kind: LiteralKind(INTEGER)
+              Value: "5"
+              Raw: "5"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 255:288
+  Cores: [
+    SelectQuery{
+      Span: 255:287
+      Columns: [
+        ResultColumn{
+          Span: 262:287
+          Expr: BinaryExpr{
+            Span: 262:287
+            Op: Operator(->>)
+            X: BinaryExpr{
+              Span: 262:279
+              Op: Operator(->)
+              X: BinaryExpr{
+                Span: 262:272
+                Op: Operator(||)
+                X: Literal{
+                  Span: 262:265
+                  Kind: LiteralKind(STRING)
+                  Value: "a"
+                  Raw: "'a'"
+                }
+                Y: Literal{
+                  Span: 269:272
+                  Kind: LiteralKind(STRING)
+                  Value: "b"
+                  Raw: "'b'"
+                }
+              }
+              Y: Literal{
+                Span: 276:279
+                Kind: LiteralKind(STRING)
+                Value: "c"
+                Raw: "'c'"
+              }
+            }
+            Y: Literal{
+              Span: 284:287
+              Kind: LiteralKind(STRING)
+              Value: "d"
+              Raw: "'d'"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 289:314
+  Cores: [
+    SelectQuery{
+      Span: 289:313
+      Columns: [
+        ResultColumn{
+          Span: 296:298
+          Expr: UnaryExpr{
+            Span: 296:298
+            Op: Operator(-)
+            X: Ident{
+              Span: 297:298
+              Name: "x"
+              Raw: "x"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 300:302
+          Expr: UnaryExpr{
+            Span: 300:302
+            Op: Operator(+)
+            X: Ident{
+              Span: 301:302
+              Name: "x"
+              Raw: "x"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 304:306
+          Expr: UnaryExpr{
+            Span: 304:306
+            Op: Operator(~)
+            X: Ident{
+              Span: 305:306
+              Name: "x"
+              Raw: "x"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 308:313
+          Expr: UnaryExpr{
+            Span: 308:313
+            Op: Operator(NOT)
+            X: Ident{
+              Span: 312:313
+              Name: "x"
+              Raw: "x"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 315:335
+  Cores: [
+    SelectQuery{
+      Span: 315:334
+      Columns: [
+        ResultColumn{
+          Span: 322:326
+          Expr: UnaryExpr{
+            Span: 322:326
+            Op: Operator(-)
+            X: UnaryExpr{
+              Span: 324:326
+              Op: Operator(-)
+              X: Ident{
+                Span: 325:326
+                Name: "x"
+                Raw: "x"
+              }
+            }
+          }
+        }
+        ResultColumn{
+          Span: 328:334
+          Expr: BinaryExpr{
+            Span: 328:334
+            Op: Operator(-)
+            X: Literal{
+              Span: 328:329
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+            Y: UnaryExpr{
+              Span: 332:334
+              Op: Operator(-)
+              X: Literal{
+                Span: 333:334
+                Kind: LiteralKind(INTEGER)
+                Value: "2"
+                Raw: "2"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 336:379
+  Cores: [
+    SelectQuery{
+      Span: 336:378
+      Columns: [
+        ResultColumn{
+          Span: 343:359
+          Expr: CollateExpr{
+            Span: 343:359
+            X: Ident{
+              Span: 343:344
+              Name: "x"
+              Raw: "x"
+            }
+            Name: Ident{
+              Span: 353:359
+              Name: "nocase"
+              Raw: "nocase"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 361:378
+          Expr: CollateExpr{
+            Span: 361:378
+            X: UnaryExpr{
+              Span: 361:363
+              Op: Operator(-)
+              X: Ident{
+                Span: 362:363
+                Name: "x"
+                Raw: "x"
+              }
+            }
+            Name: Ident{
+              Span: 372:378
+              Name: "binary"
+              Raw: "binary"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 380:454
+  Cores: [
+    SelectQuery{
+      Span: 380:453
+      Columns: [
+        ResultColumn{
+          Span: 387:393
+          Expr: IsExpr{
+            Span: 387:393
+            X: Ident{
+              Span: 387:388
+              Name: "x"
+              Raw: "x"
+            }
+            Y: Ident{
+              Span: 392:393
+              Name: "y"
+              Raw: "y"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 395:405
+          Expr: IsExpr{
+            Span: 395:405
+            Not: true
+            X: Ident{
+              Span: 395:396
+              Name: "x"
+              Raw: "x"
+            }
+            Y: Ident{
+              Span: 404:405
+              Name: "y"
+              Raw: "y"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 407:427
+          Expr: IsExpr{
+            Span: 407:427
+            Distinct: true
+            X: Ident{
+              Span: 407:408
+              Name: "x"
+              Raw: "x"
+            }
+            Y: Ident{
+              Span: 426:427
+              Name: "y"
+              Raw: "y"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 429:453
+          Expr: IsExpr{
+            Span: 429:453
+            Not: true
+            Distinct: true
+            X: Ident{
+              Span: 429:430
+              Name: "x"
+              Raw: "x"
+            }
+            Y: Ident{
+              Span: 452:453
+              Name: "y"
+              Raw: "y"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 455:494
+  Cores: [
+    SelectQuery{
+      Span: 455:493
+      Columns: [
+        ResultColumn{
+          Span: 462:470
+          Expr: NullCheckExpr{
+            Span: 462:470
+            Test: NullTest(ISNULL)
+            X: Ident{
+              Span: 462:463
+              Name: "x"
+              Raw: "x"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 472:481
+          Expr: NullCheckExpr{
+            Span: 472:481
+            Test: NullTest(NOTNULL)
+            X: Ident{
+              Span: 472:473
+              Name: "x"
+              Raw: "x"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 483:493
+          Expr: NullCheckExpr{
+            Span: 483:493
+            Test: NullTest(NOT NULL)
+            X: Ident{
+              Span: 483:484
+              Name: "x"
+              Raw: "x"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 495:569
+  Cores: [
+    SelectQuery{
+      Span: 495:568
+      Columns: [
+        ResultColumn{
+          Span: 502:510
+          Expr: LikeExpr{
+            Span: 502:510
+            Op: Ident{
+              Span: 504:508
+              Name: "LIKE"
+              Raw: "LIKE"
+            }
+            X: Ident{
+              Span: 502:503
+              Name: "x"
+              Raw: "x"
+            }
+            Y: Ident{
+              Span: 509:510
+              Name: "y"
+              Raw: "y"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 512:535
+          Expr: LikeExpr{
+            Span: 512:535
+            Op: Ident{
+              Span: 518:522
+              Name: "LIKE"
+              Raw: "LIKE"
+            }
+            Not: true
+            X: Ident{
+              Span: 512:513
+              Name: "x"
+              Raw: "x"
+            }
+            Y: Ident{
+              Span: 523:524
+              Name: "y"
+              Raw: "y"
+            }
+            Escape: Literal{
+              Span: 532:535
+              Kind: LiteralKind(STRING)
+              Value: "\\"
+              Raw: "'\\'"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 537:545
+          Expr: LikeExpr{
+            Span: 537:545
+            Op: Ident{
+              Span: 539:543
+              Name: "GLOB"
+              Raw: "GLOB"
+            }
+            X: Ident{
+              Span: 537:538
+              Name: "x"
+              Raw: "x"
+            }
+            Y: Ident{
+              Span: 544:545
+              Name: "y"
+              Raw: "y"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 547:557
+          Expr: LikeExpr{
+            Span: 547:557
+            Op: Ident{
+              Span: 549:555
+              Name: "REGEXP"
+              Raw: "REGEXP"
+            }
+            X: Ident{
+              Span: 547:548
+              Name: "x"
+              Raw: "x"
+            }
+            Y: Ident{
+              Span: 556:557
+              Name: "y"
+              Raw: "y"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 559:568
+          Expr: LikeExpr{
+            Span: 559:568
+            Op: Ident{
+              Span: 561:566
+              Name: "MATCH"
+              Raw: "MATCH"
+            }
+            X: Ident{
+              Span: 559:560
+              Name: "x"
+              Raw: "x"
+            }
+            Y: Ident{
+              Span: 567:568
+              Name: "y"
+              Raw: "y"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 570:624
+  Cores: [
+    SelectQuery{
+      Span: 570:623
+      Columns: [
+        ResultColumn{
+          Span: 577:594
+          Expr: BetweenExpr{
+            Span: 577:594
+            X: Ident{
+              Span: 577:578
+              Name: "x"
+              Raw: "x"
+            }
+            Lo: Literal{
+              Span: 587:588
+              Kind: LiteralKind(INTEGER)
+              Value: "1"
+              Raw: "1"
+            }
+            Hi: Literal{
+              Span: 593:594
+              Kind: LiteralKind(INTEGER)
+              Value: "2"
+              Raw: "2"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 596:623
+          Expr: BinaryExpr{
+            Span: 596:623
+            Op: Operator(AND)
+            X: BetweenExpr{
+              Span: 596:617
+              Not: true
+              X: Ident{
+                Span: 596:597
+                Name: "x"
+                Raw: "x"
+              }
+              Lo: Literal{
+                Span: 610:611
+                Kind: LiteralKind(INTEGER)
+                Value: "1"
+                Raw: "1"
+              }
+              Hi: Literal{
+                Span: 616:617
+                Kind: LiteralKind(INTEGER)
+                Value: "2"
+                Raw: "2"
+              }
+            }
+            Y: Ident{
+              Span: 622:623
+              Name: "z"
+              Raw: "z"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 625:701
+  Cores: [
+    SelectQuery{
+      Span: 625:700
+      Columns: [
+        ResultColumn{
+          Span: 632:639
+          Expr: InExpr{
+            Span: 632:639
+            X: Ident{
+              Span: 632:633
+              Name: "x"
+              Raw: "x"
+            }
+            Parens: true
+          }
+        }
+        ResultColumn{
+          Span: 641:652
+          Expr: InExpr{
+            Span: 641:652
+            X: Ident{
+              Span: 641:642
+              Name: "x"
+              Raw: "x"
+            }
+            Parens: true
+            List: [
+              Literal{
+                Span: 647:648
+                Kind: LiteralKind(INTEGER)
+                Value: "1"
+                Raw: "1"
+              }
+              Literal{
+                Span: 650:651
+                Kind: LiteralKind(INTEGER)
+                Value: "2"
+                Raw: "2"
+              }
+            ]
+          }
+        }
+        ResultColumn{
+          Span: 654:669
+          Expr: InExpr{
+            Span: 654:669
+            X: Ident{
+              Span: 654:655
+              Name: "x"
+              Raw: "x"
+            }
+            Parens: true
+            Select: SelectStmt{
+              Span: 660:668
+              Cores: [
+                SelectQuery{
+                  Span: 660:668
+                  Columns: [
+                    ResultColumn{
+                      Span: 667:668
+                      Expr: Literal{
+                        Span: 667:668
+                        Kind: LiteralKind(INTEGER)
+                        Value: "1"
+                        Raw: "1"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+        ResultColumn{
+          Span: 671:683
+          Expr: InExpr{
+            Span: 671:683
+            Not: true
+            X: Ident{
+              Span: 671:672
+              Name: "x"
+              Raw: "x"
+            }
+            Table: QualifiedName{
+              Span: 680:683
+              Name: Ident{
+                Span: 680:683
+                Name: "tbl"
+                Raw: "tbl"
+              }
+            }
+          }
+        }
+        ResultColumn{
+          Span: 685:700
+          Expr: InExpr{
+            Span: 685:700
+            X: Ident{
+              Span: 685:686
+              Name: "x"
+              Raw: "x"
+            }
+            Table: QualifiedName{
+              Span: 690:697
+              Schema: Ident{
+                Span: 690:693
+                Name: "sch"
+                Raw: "sch"
+              }
+              Name: Ident{
+                Span: 694:697
+                Name: "tbl"
+                Raw: "tbl"
+              }
+            }
+            Args: [
+              Literal{
+                Span: 698:699
+                Kind: LiteralKind(INTEGER)
+                Value: "1"
+                Raw: "1"
+              }
+            ]
+            HasArgs: true
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 702:765
+  Cores: [
+    SelectQuery{
+      Span: 702:764
+      Columns: [
+        ResultColumn{
+          Span: 709:731
+          Expr: CaseExpr{
+            Span: 709:731
+            Whens: [
+              CaseWhen{
+                Span: 714:727
+                When: Ident{
+                  Span: 719:720
+                  Name: "a"
+                  Raw: "a"
+                }
+                Then: Ident{
+                  Span: 726:727
+                  Name: "b"
+                  Raw: "b"
+                }
+              }
+            ]
+          }
+        }
+        ResultColumn{
+          Span: 733:764
+          Expr: CaseExpr{
+            Span: 733:764
+            Operand: Ident{
+              Span: 738:739
+              Name: "a"
+              Raw: "a"
+            }
+            Whens: [
+              CaseWhen{
+                Span: 740:753
+                When: Ident{
+                  Span: 745:746
+                  Name: "b"
+                  Raw: "b"
+                }
+                Then: Ident{
+                  Span: 752:753
+                  Name: "c"
+                  Raw: "c"
+                }
+              }
+            ]
+            Else: Ident{
+              Span: 759:760
+              Name: "d"
+              Raw: "d"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 766:841
+  Cores: [
+    SelectQuery{
+      Span: 766:840
+      Columns: [
+        ResultColumn{
+          Span: 773:800
+          Expr: CastExpr{
+            Span: 773:800
+            X: Ident{
+              Span: 778:779
+              Name: "x"
+              Raw: "x"
+            }
+            Type: TypeName{
+              Span: 783:799
+              Name: "UNSIGNED BIG INT"
+              Raw: "UNSIGNED BIG INT"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 802:828
+          Expr: CastExpr{
+            Span: 802:828
+            X: Ident{
+              Span: 807:808
+              Name: "x"
+              Raw: "x"
+            }
+            Type: TypeName{
+              Span: 812:827
+              Name: "decimal"
+              Args: [
+                "10"
+                "-2"
+              ]
+              Raw: "decimal(10, -2)"
+            }
+          }
+        }
+        ResultColumn{
+          Span: 830:840
+          Expr: CastExpr{
+            Span: 830:840
+            X: Ident{
+              Span: 835:836
+              Name: "x"
+              Raw: "x"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 842:922
+  Cores: [
+    SelectQuery{
+      Span: 842:921
+      Columns: [
+        ResultColumn{
+          Span: 849:857
+          Expr: FuncCall{
+            Span: 849:857
+            Name: Ident{
+              Span: 849:854
+              Name: "count"
+              Raw: "count"
+            }
+            Star: true
+          }
+        }
+        ResultColumn{
+          Span: 859:876
+          Expr: FuncCall{
+            Span: 859:876
+            Name: Ident{
+              Span: 859:864
+              Name: "count"
+              Raw: "count"
+            }
+            Distinct: true
+            Args: [
+              Ident{
+                Span: 874:875
+                Name: "a"
+                Raw: "a"
+              }
+            ]
+          }
+        }
+        ResultColumn{
+          Span: 878:909
+          Expr: FuncCall{
+            Span: 878:909
+            Name: Ident{
+              Span: 878:890
+              Name: "group_concat"
+              Raw: "group_concat"
+            }
+            Args: [
+              Ident{
+                Span: 891:892
+                Name: "a"
+                Raw: "a"
+              }
+            ]
+            OrderBy: [
+              OrderingTerm{
+                Span: 902:908
+                Expr: Ident{
+                  Span: 902:903
+                  Name: "b"
+                  Raw: "b"
+                }
+                Order: SortOrder(DESC)
+              }
+            ]
+          }
+        }
+        ResultColumn{
+          Span: 911:921
+          Expr: FuncCall{
+            Span: 911:921
+            Name: Ident{
+              Span: 911:914
+              Name: "max"
+              Raw: "max"
+            }
+            All: true
+            Args: [
+              Ident{
+                Span: 919:920
+                Name: "a"
+                Raw: "a"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 923:977
+  Cores: [
+    SelectQuery{
+      Span: 923:976
+      Columns: [
+        ResultColumn{
+          Span: 930:947
+          Expr: ExistsExpr{
+            Span: 930:947
+            Select: SelectStmt{
+              Span: 938:946
+              Cores: [
+                SelectQuery{
+                  Span: 938:946
+                  Columns: [
+                    ResultColumn{
+                      Span: 945:946
+                      Expr: Literal{
+                        Span: 945:946
+                        Kind: LiteralKind(INTEGER)
+                        Value: "1"
+                        Raw: "1"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+        ResultColumn{
+          Span: 949:959
+          Expr: SubqueryExpr{
+            Span: 949:959
+            Select: SelectStmt{
+              Span: 950:958
+              Cores: [
+                SelectQuery{
+                  Span: 950:958
+                  Columns: [
+                    ResultColumn{
+                      Span: 957:958
+                      Expr: Literal{
+                        Span: 957:958
+                        Kind: LiteralKind(INTEGER)
+                        Value: "1"
+                        Raw: "1"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+        ResultColumn{
+          Span: 961:976
+          Expr: BinaryExpr{
+            Span: 961:976
+            Op: Operator(=)
+            X: VectorExpr{
+              Span: 961:967
+              List: [
+                Ident{
+                  Span: 962:963
+                  Name: "a"
+                  Raw: "a"
+                }
+                Ident{
+                  Span: 965:966
+                  Name: "b"
+                  Raw: "b"
+                }
+              ]
+            }
+            Y: VectorExpr{
+              Span: 970:976
+              List: [
+                Literal{
+                  Span: 971:972
+                  Kind: LiteralKind(INTEGER)
+                  Value: "1"
+                  Raw: "1"
+                }
+                Literal{
+                  Span: 974:975
+                  Kind: LiteralKind(INTEGER)
+                  Value: "2"
+                  Raw: "2"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 978:1049
+  Cores: [
+    SelectQuery{
+      Span: 978:1048
+      Columns: [
+        ResultColumn{
+          Span: 985:989
+          Expr: Literal{
+            Span: 985:989
+            Kind: LiteralKind(NULL)
+            Value: "NULL"
+            Raw: "NULL"
+          }
+        }
+        ResultColumn{
+          Span: 991:992
+          Expr: Literal{
+            Span: 991:992
+            Kind: LiteralKind(INTEGER)
+            Value: "1"
+            Raw: "1"
+          }
+        }
+        ResultColumn{
+          Span: 994:997
+          Expr: Literal{
+            Span: 994:997
+            Kind: LiteralKind(FLOAT)
+            Value: "1.5"
+            Raw: "1.5"
+          }
+        }
+        ResultColumn{
+          Span: 999:1002
+          Expr: Literal{
+            Span: 999:1002
+            Kind: LiteralKind(FLOAT)
+            Value: "1e3"
+            Raw: "1e3"
+          }
+        }
+        ResultColumn{
+          Span: 1004:1008
+          Expr: Literal{
+            Span: 1004:1008
+            Kind: LiteralKind(INTEGER)
+            Value: "0xff"
+            Raw: "0xff"
+          }
+        }
+        ResultColumn{
+          Span: 1010:1015
+          Expr: Literal{
+            Span: 1010:1015
+            Kind: LiteralKind(INTEGER)
+            Value: "1000"
+            Raw: "1_000"
+          }
+        }
+        ResultColumn{
+          Span: 1017:1022
+          Expr: Literal{
+            Span: 1017:1022
+            Kind: LiteralKind(STRING)
+            Value: "str"
+            Raw: "'str'"
+          }
+        }
+        ResultColumn{
+          Span: 1024:1029
+          Expr: Literal{
+            Span: 1024:1029
+            Kind: LiteralKind(BLOB)
+            Value: "x'ab'"
+            Raw: "x'ab'"
+          }
+        }
+        ResultColumn{
+          Span: 1031:1048
+          Expr: Literal{
+            Span: 1031:1048
+            Kind: LiteralKind(CURRENT_TIMESTAMP)
+            Value: "CURRENT_TIMESTAMP"
+            Raw: "CURRENT_TIMESTAMP"
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 1050:1094
+  Cores: [
+    SelectQuery{
+      Span: 1050:1093
+      Columns: [
+        ResultColumn{
+          Span: 1057:1058
+          Expr: BindParam{
+            Span: 1057:1058
+            Kind: ParamKind(?)
+            Number: 1
+            Raw: "?"
+          }
+        }
+        ResultColumn{
+          Span: 1060:1063
+          Expr: BindParam{
+            Span: 1060:1063
+            Kind: ParamKind(?NNN)
+            Number: 12
+            Raw: "?12"
+          }
+        }
+        ResultColumn{
+          Span: 1065:1070
+          Expr: BindParam{
+            Span: 1065:1070
+            Kind: ParamKind(:name)
+            Number: 13
+            Name: "name"
+            Raw: ":name"
+          }
+        }
+        ResultColumn{
+          Span: 1072:1077
+          Expr: BindParam{
+            Span: 1072:1077
+            Kind: ParamKind(@name)
+            Number: 14
+            Name: "name"
+            Raw: "@name"
+          }
+        }
+        ResultColumn{
+          Span: 1079:1093
+          Expr: BindParam{
+            Span: 1079:1093
+            Kind: ParamKind($name)
+            Number: 15
+            Name: "foo::bar(baz)"
+            Raw: "$foo::bar(baz)"
+          }
+        }
+      ]
+    }
+  ]
+}
+SelectStmt{
+  Span: 1095:1155
+  Cores: [
+    SelectQuery{
+      Span: 1095:1154
+      Columns: [
+        ResultColumn{
+          Span: 1102:1103
+          Expr: Ident{
+            Span: 1102:1103
+            Name: "a"
+            Raw: "a"
+          }
+        }
+        ResultColumn{
+          Span: 1105:1108
+          Expr: QualifiedRef{
+            Span: 1105:1108
+            Parts: [
+              Ident{
+                Span: 1105:1106
+                Name: "t"
+                Raw: "t"
+              }
+              Ident{
+                Span: 1107:1108
+                Name: "a"
+                Raw: "a"
+              }
+            ]
+          }
+        }
+        ResultColumn{
+          Span: 1110:1117
+          Expr: QualifiedRef{
+            Span: 1110:1117
+            Parts: [
+              Ident{
+                Span: 1110:1113
+                Name: "sch"
+                Raw: "sch"
+              }
+              Ident{
+                Span: 1114:1115
+                Name: "t"
+                Raw: "t"
+              }
+              Ident{
+                Span: 1116:1117
+                Name: "a"
+                Raw: "a"
+              }
+            ]
+          }
+        }
+        ResultColumn{
+          Span: 1119:1127
+          Expr: Ident{
+            Span: 1119:1127
+            Name: "quoted"
+            Raw: "\"quoted\""
+            Quote: QuoteStyle(")
+          }
+        }
+        ResultColumn{
+          Span: 1129:1135
+          Expr: Ident{
+            Span: 1129:1135
+            Name: "back"
+            Raw: "`back`"
+            Quote: QuoteStyle(`)
+          }
+        }
+        ResultColumn{
+          Span: 1137:1145
+          Expr: Ident{
+            Span: 1137:1145
+            Name: "square"
+            Raw: "[square]"
+            Quote: QuoteStyle([)
+          }
+        }
+        ResultColumn{
+          Span: 1147:1154
+          Expr: QualifiedRef{
+            Span: 1147:1154
+            Parts: [
+              Ident{
+                Span: 1147:1150
+                Name: "a"
+                Raw: "'a'"
+                Quote: QuoteStyle(')
+              }
+              Ident{
+                Span: 1151:1154
+                Name: "b"
+                Raw: "'b'"
+                Quote: QuoteStyle(')
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
