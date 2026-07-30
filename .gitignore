@@ -1,3 +1,4 @@
 # Local cache used by cmd/regenerate-parse: downloaded SQLite release
 # artifacts and the compiled oracle binary.
 .sqlite/
+/oq
