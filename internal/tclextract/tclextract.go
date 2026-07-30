@@ -63,17 +63,14 @@ func File(base string, src []byte) ([]Case, Stats) {
 		if strings.HasPrefix(trimmed, "#") {
 			continue
 		}
+		// The command must begin the (possibly indented) line, so that
+		// occurrences inside strings or inside longer words are skipped.
+		col := len(line) - len(trimmed)
 		for _, cmd := range commands {
-			col := strings.Index(line, cmd)
-			if col < 0 {
+			if !strings.HasPrefix(trimmed, cmd) {
 				continue
 			}
-			// Require the command at the start of the (possibly indented)
-			// line so occurrences inside strings or longer words are skipped.
-			if strings.TrimLeft(line[:col], " \t") != "" {
-				continue
-			}
-			if rest := line[col+len(cmd):]; rest != "" && rest[0] != ' ' && rest[0] != '\t' {
+			if rest := trimmed[len(cmd):]; rest != "" && rest[0] != ' ' && rest[0] != '\t' {
 				continue // longer word, e.g. do_execsql_test_if_vdbe
 			}
 			stats.Found++

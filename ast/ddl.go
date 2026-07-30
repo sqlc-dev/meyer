@@ -14,23 +14,28 @@ type CreateTableStmt struct {
 	Name        *QualifiedName     `json:"name"`
 	Columns     []*ColumnDef       `json:"columns,omitempty"`
 	Constraints []*TableConstraint `json:"constraints,omitempty"`
-	Options     []*Ident           `json:"options,omitempty"` // WITHOUT ROWID, STRICT
-	WithoutOpt  []bool             `json:"withoutOpt,omitempty"`
+	Options     []*TableOption     `json:"options,omitempty"` // WITHOUT ROWID, STRICT
 	Select      *SelectStmt        `json:"select,omitempty"`
 }
+
+// TableOption is one entry of a table_option_set. SQLite rejects an unknown
+// one from a grammar action rather than the grammar, so any name parses.
+//
+//	table_option ::= WITHOUT nm. / table_option ::= nm.
+type TableOption struct {
+	Span
+	Without bool   `json:"without,omitempty"`
+	Name    *Ident `json:"name"`
+}
+
+func (n *TableOption) Children() []Node { return nodes(n.Name) }
 
 func (*CreateTableStmt) stmtNode() {}
 func (n *CreateTableStmt) Children() []Node {
 	out := nodes(n.Name)
-	for _, c := range n.Columns {
-		out = append(out, c)
-	}
-	for _, c := range n.Constraints {
-		out = append(out, c)
-	}
-	for _, o := range n.Options {
-		out = append(out, o)
-	}
+	out = appendNodes(out, n.Columns)
+	out = appendNodes(out, n.Constraints)
+	out = appendNodes(out, n.Options)
 	return append(out, nodes(n.Select)...)
 }
 
@@ -46,9 +51,7 @@ type ColumnDef struct {
 
 func (n *ColumnDef) Children() []Node {
 	out := nodes(n.Name, n.Type)
-	for _, c := range n.Constraints {
-		out = append(out, c)
-	}
+	out = appendNodes(out, n.Constraints)
 	return out
 }
 
@@ -132,13 +135,9 @@ type TableConstraint struct {
 
 func (n *TableConstraint) Children() []Node {
 	out := nodes(n.Name)
-	for _, c := range n.Columns {
-		out = append(out, c)
-	}
+	out = appendNodes(out, n.Columns)
 	out = append(out, nodes(n.Expr)...)
-	for _, c := range n.FKColumns {
-		out = append(out, c)
-	}
+	out = appendNodes(out, n.FKColumns)
 	return append(out, nodes(n.References, n.Deferrable)...)
 }
 
@@ -179,12 +178,8 @@ type ForeignKeyClause struct {
 
 func (n *ForeignKeyClause) Children() []Node {
 	out := nodes(n.Table)
-	for _, c := range n.Columns {
-		out = append(out, c)
-	}
-	for _, a := range n.Args {
-		out = append(out, a)
-	}
+	out = appendNodes(out, n.Columns)
+	out = appendNodes(out, n.Args)
 	return out
 }
 
@@ -228,9 +223,7 @@ type CreateIndexStmt struct {
 func (*CreateIndexStmt) stmtNode() {}
 func (n *CreateIndexStmt) Children() []Node {
 	out := nodes(n.Name, n.Table)
-	for _, c := range n.Columns {
-		out = append(out, c)
-	}
+	out = appendNodes(out, n.Columns)
 	return append(out, nodes(n.Where)...)
 }
 
@@ -249,9 +242,7 @@ type CreateViewStmt struct {
 func (*CreateViewStmt) stmtNode() {}
 func (n *CreateViewStmt) Children() []Node {
 	out := nodes(n.Name)
-	for _, c := range n.Columns {
-		out = append(out, c)
-	}
+	out = appendNodes(out, n.Columns)
 	return append(out, nodes(n.Select)...)
 }
 
@@ -287,13 +278,9 @@ type CreateTriggerStmt struct {
 func (*CreateTriggerStmt) stmtNode() {}
 func (n *CreateTriggerStmt) Children() []Node {
 	out := nodes(n.Name)
-	for _, u := range n.UpdateOf {
-		out = append(out, u)
-	}
+	out = appendNodes(out, n.UpdateOf)
 	out = append(out, nodes(n.Table, n.When)...)
-	for _, s := range n.Body {
-		out = append(out, s)
-	}
+	out = appendNodes(out, n.Body)
 	return out
 }
 

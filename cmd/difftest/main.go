@@ -95,7 +95,7 @@ func main() {
 		fatal(err)
 	}
 
-	rep := &report{examples: *examples}
+	rep := &report{examples: *examples, buckets: map[string]*bucket{}}
 	work := make(chan string)
 	var wg sync.WaitGroup
 	for w := 0; w < *jobs; w++ {
@@ -217,8 +217,9 @@ func mutations(src string, n int, rng *rand.Rand) []string {
 			out = append(out, s)
 		}
 	}
-	for len(out) < n {
-		before := len(out)
+	// Bounded by attempts as well as results: with few tokens the edit
+	// space is small and most draws repeat one already made.
+	for attempts := 0; attempts < 8*n && len(out) < n; attempts++ {
 		i := rng.Intn(len(toks))
 		t := toks[i]
 		switch rng.Intn(5) {
@@ -232,13 +233,6 @@ func mutations(src string, n int, rng *rand.Rand) []string {
 			add(src[:t.Pos] + injections[rng.Intn(len(injections))] + src[t.End:])
 		case 4: // insert a token
 			add(src[:t.Pos] + injections[rng.Intn(len(injections))] + " " + src[t.Pos:])
-		}
-		if len(out) == before {
-			// Every edit at this position was a duplicate; with few tokens
-			// the space is small, so stop rather than spin.
-			if len(seen) > 4*len(toks) {
-				break
-			}
 		}
 	}
 	return out
@@ -318,9 +312,6 @@ func (r *report) add(kind, sql, got, want string) {
 	r.disagreements.Add(1)
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	if r.buckets == nil {
-		r.buckets = map[string]*bucket{}
-	}
 	b := r.buckets[kind]
 	if b == nil {
 		b = &bucket{}

@@ -70,9 +70,10 @@ func (p *parser) parseCreateTrigger(start int, temp bool) ast.Stmt {
 }
 
 // parseTriggerCmd implements the restricted statement forms of a trigger
-// body. They differ from the top-level statements: no WITH prefix, no
-// RETURNING, and INDEXED BY is diagnosed by a grammar action rather than
-// being rejected outright.
+// body. They differ from the top-level statements in three ways: no WITH
+// prefix; UPDATE and DELETE take where_opt rather than where_opt_ret, so
+// they have no RETURNING, while INSERT still does because "upsert" carries
+// one; and INSERT has no DEFAULT VALUES form.
 //
 //	trigger_cmd ::= UPDATE orconf xfullname tridxby SET setlist from where_opt.
 //	trigger_cmd ::= insert_cmd INTO xfullname idlist_opt select upsert.
@@ -86,47 +87,24 @@ func (p *parser) parseTriggerCmd() ast.Stmt {
 	start := p.cur().Pos
 	switch p.cur().Kind {
 	case token.UPDATE:
-		p.advance()
 		n := &ast.UpdateStmt{}
-		n.OrConflict = p.parseOrConflict()
-		n.Table, n.Alias = p.xfullname()
-		n.IndexedBy, n.NotIndexed = p.parseIndexedOpt() // tridxby
-		p.expect(token.SET)
-		n.Set = p.parseSetList()
-		if p.accept(token.FROM) {
-			n.From = p.parseFromList()
-		}
-		if p.accept(token.WHERE) {
+		p.updateCore(n)
+		if p.accept(token.WHERE) { // where_opt, not where_opt_ret
 			n.Where = p.parseExpr(precLowest)
 		}
 		n.Span = p.span(start)
 		return n
 	case token.INSERT, token.REPLACE:
 		n := &ast.InsertStmt{}
-		if p.accept(token.REPLACE) {
-			n.Replace = true
-		} else {
-			p.advance()
-			n.OrConflict = p.parseOrConflict()
-		}
-		p.expect(token.INTO)
-		n.Table, n.Alias = p.xfullname()
-		if p.at(token.LP) {
-			p.advance()
-			n.Columns = p.parseIDList()
-			p.expect(token.RP)
-		}
+		p.insertTarget(n) // no DEFAULT VALUES form here
 		n.Select = p.parseSelect()
 		p.parseUpsert(n)
 		n.Span = p.span(start)
 		return n
 	case token.DELETE:
-		p.advance()
-		p.expect(token.FROM)
 		n := &ast.DeleteStmt{}
-		n.Table, n.Alias = p.xfullname()
-		n.IndexedBy, n.NotIndexed = p.parseIndexedOpt() // tridxby
-		if p.accept(token.WHERE) {
+		p.deleteCore(n)
+		if p.accept(token.WHERE) { // where_opt, not where_opt_ret
 			n.Where = p.parseExpr(precLowest)
 		}
 		n.Span = p.span(start)

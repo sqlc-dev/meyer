@@ -18,6 +18,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/sqlc-dev/meyer/ast"
 )
@@ -117,15 +118,22 @@ func (d *dumper) value(v reflect.Value, depth int) {
 		d.indent(depth)
 		d.b.WriteString("]")
 	case reflect.String:
-		fmt.Fprintf(d.b, "%q", v.String())
+		d.b.WriteString(strconv.Quote(v.String()))
 	case reflect.Bool:
-		fmt.Fprintf(d.b, "%v", v.Bool())
+		if v.Bool() {
+			d.b.WriteString("true")
+		} else {
+			d.b.WriteString("false")
+		}
 	default:
 		// Enum-typed fields (SortOrder, ConflictAction, ...) all implement
 		// Stringer, so a snapshot diff names what changed rather than
 		// showing a number that has to be looked up.
 		if s, ok := v.Interface().(fmt.Stringer); ok {
-			fmt.Fprintf(d.b, "%s(%s)", v.Type().Name(), s)
+			d.b.WriteString(v.Type().Name())
+			d.b.WriteByte('(')
+			d.b.WriteString(s.String())
+			d.b.WriteByte(')')
 			return
 		}
 		fmt.Fprintf(d.b, "%v", v.Interface())
@@ -135,28 +143,37 @@ func (d *dumper) value(v reflect.Value, depth int) {
 func (d *dumper) strct(v reflect.Value, name string, depth int) {
 	if v.Type() == spanType {
 		s := v.Interface().(ast.Span)
-		fmt.Fprintf(d.b, "%d:%d", s.Start, s.Stop)
+		d.b.WriteString(strconv.Itoa(s.Start))
+		d.b.WriteByte(':')
+		d.b.WriteString(strconv.Itoa(s.Stop))
 		return
 	}
-	fields := d.fields(v)
-	if len(fields) == 0 {
-		d.b.WriteString(name + "{}")
-		return
-	}
-	d.b.WriteString(name + "{\n")
-	for _, f := range fields {
+	d.b.WriteString(name)
+	d.b.WriteByte('{')
+	written := false
+	for _, f := range layoutOf(v.Type()) {
+		fv := v.Field(f.index)
+		if f.span {
+			if !d.opts.Positions {
+				continue
+			}
+		} else if f.raw && !d.opts.Raw {
+			continue
+		} else if fv.IsZero() && !meaningfulZero(fv) {
+			continue
+		}
+		written = true
+		d.b.WriteByte('\n')
 		d.indent(depth + 1)
-		d.b.WriteString(f.name + ": ")
-		d.value(f.value, depth+1)
-		d.b.WriteString("\n")
+		d.b.WriteString(f.name)
+		d.b.WriteString(": ")
+		d.value(fv, depth+1)
 	}
-	d.indent(depth)
-	d.b.WriteString("}")
-}
-
-type field struct {
-	name  string
-	value reflect.Value
+	if written {
+		d.b.WriteByte('\n')
+		d.indent(depth)
+	}
+	d.b.WriteByte('}')
 }
 
 // meaningfulZero reports whether a zero value still says something. Several
@@ -184,32 +201,34 @@ func meaningfulZero(v reflect.Value) bool {
 	return true
 }
 
-// fields selects the fields worth printing: zero values are omitted so that
-// a dump shows what a statement said rather than what it did not, except
-// where the zero value is itself the statement (see meaningfulZero).
-func (d *dumper) fields(v reflect.Value) []field {
-	t := v.Type()
-	var out []field
+// fieldInfo is one printable field of a node type. The layout depends only
+// on the type, so it is computed once rather than per node visited -- the
+// corpus tests dump tens of thousands of trees.
+type fieldInfo struct {
+	index int
+	name  string
+	span  bool
+	raw   bool
+}
+
+var layouts sync.Map // reflect.Type -> []fieldInfo
+
+func layoutOf(t reflect.Type) []fieldInfo {
+	if v, ok := layouts.Load(t); ok {
+		return v.([]fieldInfo)
+	}
+	out := make([]fieldInfo, 0, t.NumField())
 	for i := 0; i < t.NumField(); i++ {
 		sf := t.Field(i)
 		if !sf.IsExported() {
 			continue
 		}
-		fv := v.Field(i)
+		f := fieldInfo{index: i, name: sf.Name, raw: sf.Name == "Raw"}
 		if sf.Type == spanType {
-			if !d.opts.Positions {
-				continue
-			}
-			out = append(out, field{"Span", fv})
-			continue
+			f.span, f.name = true, "Span"
 		}
-		if sf.Name == "Raw" && !d.opts.Raw {
-			continue
-		}
-		if fv.IsZero() && !meaningfulZero(fv) {
-			continue
-		}
-		out = append(out, field{sf.Name, fv})
+		out = append(out, f)
 	}
+	layouts.Store(t, out)
 	return out
 }

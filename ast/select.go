@@ -21,9 +21,7 @@ type SelectStmt struct {
 func (*SelectStmt) stmtNode() {}
 func (n *SelectStmt) Children() []Node {
 	out := nodes(n.With)
-	for _, c := range n.Cores {
-		out = append(out, c)
-	}
+	out = appendNodes(out, n.Cores)
 	return out
 }
 
@@ -73,23 +71,13 @@ type SelectQuery struct {
 func (*SelectQuery) selectCoreNode() {}
 func (n *SelectQuery) Children() []Node {
 	var out []Node
-	for _, c := range n.Columns {
-		out = append(out, c)
-	}
-	for _, t := range n.From {
-		out = append(out, t)
-	}
+	out = appendNodes(out, n.Columns)
+	out = appendNodes(out, n.From)
 	out = append(out, nodes(n.Where)...)
-	for _, g := range n.GroupBy {
-		out = append(out, g)
-	}
+	out = appendNodes(out, n.GroupBy)
 	out = append(out, nodes(n.Having)...)
-	for _, w := range n.Windows {
-		out = append(out, w)
-	}
-	for _, o := range n.OrderBy {
-		out = append(out, o)
-	}
+	out = appendNodes(out, n.Windows)
+	out = appendNodes(out, n.OrderBy)
 	return append(out, nodes(n.Limit)...)
 }
 
@@ -177,17 +165,11 @@ type TableRef struct {
 
 func (n *TableRef) Children() []Node {
 	out := nodes(n.Join, n.Name)
-	for _, a := range n.Args {
-		out = append(out, a)
-	}
+	out = appendNodes(out, n.Args)
 	out = append(out, nodes(n.Select)...)
-	for _, t := range n.List {
-		out = append(out, t)
-	}
+	out = appendNodes(out, n.List)
 	out = append(out, nodes(n.Alias, n.IndexedBy, n.On)...)
-	for _, u := range n.Using {
-		out = append(out, u)
-	}
+	out = appendNodes(out, n.Using)
 	return out
 }
 
@@ -273,9 +255,7 @@ type CTE struct {
 
 func (n *CTE) Children() []Node {
 	out := nodes(n.Name)
-	for _, c := range n.Columns {
-		out = append(out, c)
-	}
+	out = appendNodes(out, n.Columns)
 	return append(out, nodes(n.Select)...)
 }
 
@@ -343,11 +323,7 @@ type WindowDef struct {
 
 func (n *WindowDef) Children() []Node {
 	out := nodes(n.Name, n.Base)
-	for _, p := range n.Partition {
-		out = append(out, p)
-	}
-	for _, o := range n.OrderBy {
-		out = append(out, o)
-	}
+	out = appendNodes(out, n.Partition)
+	out = appendNodes(out, n.OrderBy)
 	return append(out, nodes(n.StartBound, n.EndBound)...)
 }

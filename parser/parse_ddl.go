@@ -489,9 +489,11 @@ func (p *parser) parseTableConstraint(start int) *ast.TableConstraint {
 //	table_option ::= WITHOUT nm. / table_option ::= nm.
 func (p *parser) parseTableOptions(n *ast.CreateTableStmt) {
 	option := func() {
-		without := p.accept(token.WITHOUT)
-		n.Options = append(n.Options, p.expectName())
-		n.WithoutOpt = append(n.WithoutOpt, without)
+		start := p.cur().Pos
+		o := &ast.TableOption{Without: p.accept(token.WITHOUT)}
+		o.Name = p.expectName()
+		o.Span = p.span(start)
+		n.Options = append(n.Options, o)
 	}
 	switch {
 	case p.at(token.WITHOUT) || token.IsName(p.cur().Kind):

@@ -292,12 +292,8 @@ type InExpr struct {
 func (*InExpr) exprNode() {}
 func (n *InExpr) Children() []Node {
 	out := nodes(n.X, n.Select, n.Table)
-	for _, e := range n.List {
-		out = append(out, e)
-	}
-	for _, e := range n.Args {
-		out = append(out, e)
-	}
+	out = appendNodes(out, n.List)
+	out = appendNodes(out, n.Args)
 	return out
 }
 
@@ -314,9 +310,7 @@ type CaseExpr struct {
 func (*CaseExpr) exprNode() {}
 func (n *CaseExpr) Children() []Node {
 	out := nodes(n.Operand)
-	for _, w := range n.Whens {
-		out = append(out, w)
-	}
+	out = appendNodes(out, n.Whens)
 	return append(out, nodes(n.Else)...)
 }
 
@@ -375,12 +369,8 @@ type FuncCall struct {
 func (*FuncCall) exprNode() {}
 func (n *FuncCall) Children() []Node {
 	out := nodes(n.Name)
-	for _, a := range n.Args {
-		out = append(out, a)
-	}
-	for _, o := range n.OrderBy {
-		out = append(out, o)
-	}
+	out = appendNodes(out, n.Args)
+	out = appendNodes(out, n.OrderBy)
 	return append(out, nodes(n.Filter, n.Over)...)
 }
 
@@ -448,13 +438,25 @@ type TypeName struct {
 
 func (n *TypeName) Children() []Node { return nil }
 
-// nodes builds a Children() slice, dropping nil interfaces and nil pointers.
+// nodes builds a Children() slice, dropping nil interfaces and nil
+// pointers. Optional fields are common, so a node whose children are all
+// absent allocates nothing.
 func nodes(list ...Node) []Node {
-	out := make([]Node, 0, len(list))
+	var out []Node
 	for _, n := range list {
 		if !isNil(n) {
 			out = append(out, n)
 		}
+	}
+	return out
+}
+
+// appendNodes appends a slice of concrete node pointers to a Children()
+// result. It exists because every node with a repeated field would
+// otherwise spell the same three-line loop out again.
+func appendNodes[T Node](out []Node, list []T) []Node {
+	for _, n := range list {
+		out = append(out, n)
 	}
 	return out
 }

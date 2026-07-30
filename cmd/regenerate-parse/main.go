@@ -89,6 +89,14 @@ func main() {
 		fatal(err)
 	}
 
+	// One pool of oracle processes for the whole run: a Runner is reusable,
+	// and starting one per script would fork a few thousand times.
+	pool, err := newPool(*cacheDir, *jobs)
+	if err != nil {
+		fatal(err)
+	}
+	defer pool.close()
+
 	var totalCases, totalTodo, usedScripts, emptyScripts int
 	var totals tclextract.Stats
 	for _, name := range names {
@@ -106,7 +114,7 @@ func main() {
 			fatal(fmt.Errorf("%s: %w", name, err))
 		}
 
-		cases, stats, err := regenerateFile(*cacheDir, testDir, *testdata, name, *jobs)
+		cases, stats, err := regenerateFile(pool, testDir, *testdata, name)
 		if err != nil {
 			fatal(fmt.Errorf("%s: %w", name, err))
 		}
@@ -143,7 +151,34 @@ func fatal(err error) {
 	os.Exit(1)
 }
 
-func regenerateFile(cacheDir, testDir, outDir, name string, jobs int) ([]testfile.Case, tclextract.Stats, error) {
+// pool hands out oracle processes. Runners are not safe for concurrent use,
+// so a worker takes one for the duration of a batch and puts it back.
+type pool struct {
+	runners chan *sqlitesrc.Runner
+	all     []*sqlitesrc.Runner
+}
+
+func newPool(cacheDir string, n int) (*pool, error) {
+	p := &pool{runners: make(chan *sqlitesrc.Runner, n)}
+	for i := 0; i < n; i++ {
+		r, err := sqlitesrc.NewRunner(cacheDir)
+		if err != nil {
+			p.close()
+			return nil, err
+		}
+		p.all = append(p.all, r)
+		p.runners <- r
+	}
+	return p, nil
+}
+
+func (p *pool) close() {
+	for _, r := range p.all {
+		r.Close()
+	}
+}
+
+func regenerateFile(pool *pool, testDir, outDir, name string) ([]testfile.Case, tclextract.Stats, error) {
 	src, err := os.ReadFile(filepath.Join(testDir, name+".test"))
 	if err != nil {
 		return nil, tclextract.Stats{}, err
@@ -155,29 +190,20 @@ func regenerateFile(cacheDir, testDir, outDir, name string, jobs int) ([]testfil
 	var wg sync.WaitGroup
 	var mu sync.Mutex
 	var firstErr error
-	fail := func(err error) {
-		mu.Lock()
-		if firstErr == nil {
-			firstErr = err
-		}
-		mu.Unlock()
-	}
-	for w := 0; w < jobs; w++ {
+	for w := 0; w < cap(pool.runners); w++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			r, err := sqlitesrc.NewRunner(cacheDir)
-			if err != nil {
-				fail(err)
-				for range work { // drain so producers are not blocked
-				}
-				return
-			}
-			defer r.Close()
+			r := <-pool.runners
+			defer func() { pool.runners <- r }()
 			for i := range work {
 				results, err := r.Run(extracted[i].SQL)
 				if err != nil {
-					fail(fmt.Errorf("case %s: %w", extracted[i].Name, err))
+					mu.Lock()
+					if firstErr == nil {
+						firstErr = fmt.Errorf("case %s: %w", extracted[i].Name, err)
+					}
+					mu.Unlock()
 					continue
 				}
 				cases[i] = testfile.Case{

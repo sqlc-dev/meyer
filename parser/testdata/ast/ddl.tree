@@ -386,20 +386,23 @@ CreateTableStmt{
     }
   ]
   Options: [
-    Ident{
-      Span: 604:609
-      Name: "ROWID"
-      Raw: "ROWID"
+    TableOption{
+      Span: 596:609
+      Without: true
+      Name: Ident{
+        Span: 604:609
+        Name: "ROWID"
+        Raw: "ROWID"
+      }
     }
-    Ident{
+    TableOption{
       Span: 611:617
-      Name: "STRICT"
-      Raw: "STRICT"
+      Name: Ident{
+        Span: 611:617
+        Name: "STRICT"
+        Raw: "STRICT"
+      }
     }
-  ]
-  WithoutOpt: [
-    true
-    false
   ]
 }
 CreateTableStmt{

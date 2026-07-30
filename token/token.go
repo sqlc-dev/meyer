@@ -191,6 +191,10 @@ const (
 	WINDOW
 	WITH
 	WITHOUT
+
+	// KindCount is one past the last kind, so a table indexed by Kind can
+	// be sized without a map.
+	KindCount
 )
 
 var kindNames = map[Kind]string{

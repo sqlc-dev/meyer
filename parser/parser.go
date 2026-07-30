@@ -16,6 +16,14 @@
 //
 // Parsing is fail-fast: the first error aborts, as it does in SQLite, which
 // reports exactly one parse error per statement.
+//
+// One habit recurs throughout and is worth stating once. SQLite's LALR
+// parser shifts a token as soon as some rule can begin with it, and only
+// discovers that the rule does not continue on the token after. So where a
+// keyword can only introduce one thing -- NOT before INDEXED, DEFERRABLE or
+// MATERIALIZED, say -- meyer consumes it before checking what follows,
+// rather than peeking. Peeking would put the error on the keyword; SQLite
+// puts it on what came next.
 package parser
 
 import (
@@ -139,7 +147,7 @@ type parser struct {
 	i    int
 
 	nVar    int            // bind parameters seen so far
-	varNums map[string]int // named parameters already assigned a number
+	varNums map[string]int // named parameters already assigned a number, if any
 
 	depth int // current nesting depth, guarded by enter/leave
 
@@ -175,7 +183,7 @@ func (p *parser) enter() {
 func (p *parser) leave() { p.depth-- }
 
 func newParser(src string) *parser {
-	p := &parser{src: src, toks: lexer.Lex(src), varNums: map[string]int{}}
+	p := &parser{src: src, toks: lexer.Lex(src)}
 	p.checkIllegal()
 	return p
 }

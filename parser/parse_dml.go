@@ -12,21 +12,7 @@ import (
 //	insert_cmd ::= INSERT orconf. / insert_cmd ::= REPLACE.
 func (p *parser) parseInsert(with *ast.With, start int) ast.Stmt {
 	n := &ast.InsertStmt{With: with}
-	if p.accept(token.REPLACE) {
-		n.Replace = true
-	} else {
-		p.expect(token.INSERT)
-		n.OrConflict = p.parseOrConflict()
-	}
-	p.expect(token.INTO)
-	n.Table, n.Alias = p.xfullname()
-	// idlist_opt ::= . / idlist_opt ::= LP idlist RP. A "select" never
-	// starts with "(", so a leading "(" is always the column list.
-	if p.at(token.LP) {
-		p.advance()
-		n.Columns = p.parseIDList()
-		p.expect(token.RP)
-	}
+	p.insertTarget(n)
 	if p.at(token.DEFAULT) {
 		p.advance()
 		p.expect(token.VALUES)
@@ -39,6 +25,28 @@ func (p *parser) parseInsert(with *ast.With, start int) ast.Stmt {
 	p.parseUpsert(n)
 	n.Span = p.span(start)
 	return n
+}
+
+// insertTarget reads "insert_cmd INTO xfullname idlist_opt", the part an
+// INSERT shares with a trigger body's insert.
+//
+//	insert_cmd ::= INSERT orconf. / insert_cmd ::= REPLACE.
+//	idlist_opt ::= . / idlist_opt ::= LP idlist RP.
+func (p *parser) insertTarget(n *ast.InsertStmt) {
+	if p.accept(token.REPLACE) {
+		n.Replace = true
+	} else {
+		p.expect(token.INSERT)
+		n.OrConflict = p.parseOrConflict()
+	}
+	p.expect(token.INTO)
+	n.Table, n.Alias = p.xfullname()
+	// A "select" never starts with "(", so a leading "(" is the column list.
+	if p.at(token.LP) {
+		p.advance()
+		n.Columns = p.parseIDList()
+		p.expect(token.RP)
+	}
 }
 
 // parseOrConflict implements "orconf".
@@ -163,8 +171,18 @@ func (p *parser) parseSetList() []*ast.SetPair {
 //	cmd ::= with UPDATE orconf xfullname indexed_opt SET setlist from
 //	        where_opt_ret.
 func (p *parser) parseUpdate(with *ast.With, start int) ast.Stmt {
-	p.expect(token.UPDATE)
 	n := &ast.UpdateStmt{With: with}
+	p.updateCore(n)
+	n.Where, n.Returning = p.parseWhereOptRet()
+	n.Span = p.span(start)
+	return n
+}
+
+// updateCore reads "UPDATE orconf xfullname indexed_opt SET setlist from",
+// everything an UPDATE shares with a trigger body's update. Only the WHERE
+// clause differs: the trigger form takes where_opt, with no RETURNING.
+func (p *parser) updateCore(n *ast.UpdateStmt) {
+	p.expect(token.UPDATE)
 	n.OrConflict = p.parseOrConflict()
 	n.Table, n.Alias = p.xfullname()
 	n.IndexedBy, n.NotIndexed = p.parseIndexedOpt()
@@ -173,23 +191,26 @@ func (p *parser) parseUpdate(with *ast.With, start int) ast.Stmt {
 	if p.accept(token.FROM) {
 		n.From = p.parseFromList()
 	}
-	n.Where, n.Returning = p.parseWhereOptRet()
-	n.Span = p.span(start)
-	return n
 }
 
 // parseDelete implements the DELETE command.
 //
 //	cmd ::= with DELETE FROM xfullname indexed_opt where_opt_ret.
 func (p *parser) parseDelete(with *ast.With, start int) ast.Stmt {
-	p.expect(token.DELETE)
-	p.expect(token.FROM)
 	n := &ast.DeleteStmt{With: with}
-	n.Table, n.Alias = p.xfullname()
-	n.IndexedBy, n.NotIndexed = p.parseIndexedOpt()
+	p.deleteCore(n)
 	n.Where, n.Returning = p.parseWhereOptRet()
 	n.Span = p.span(start)
 	return n
+}
+
+// deleteCore reads "DELETE FROM xfullname indexed_opt", everything a DELETE
+// shares with a trigger body's delete.
+func (p *parser) deleteCore(n *ast.DeleteStmt) {
+	p.expect(token.DELETE)
+	p.expect(token.FROM)
+	n.Table, n.Alias = p.xfullname()
+	n.IndexedBy, n.NotIndexed = p.parseIndexedOpt()
 }
 
 // parseIndexedOpt implements "indexed_opt".

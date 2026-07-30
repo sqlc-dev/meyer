@@ -37,14 +37,40 @@ const (
 	precUnary      = 12 // BITNOT, and the [BITNOT] mark on unary PLUS/MINUS
 )
 
-// binaryOps maps the operator tokens that need no special handling to their
-// AST operator.
-var binaryOps = map[token.Kind]ast.Operator{
-	token.LT: ast.OpLt, token.LE: ast.OpLe, token.GT: ast.OpGt, token.GE: ast.OpGe,
-	token.BITAND: ast.OpBitAnd, token.BITOR: ast.OpBitOr,
-	token.LSHIFT: ast.OpLShift, token.RSHIFT: ast.OpRShift,
-	token.STAR: ast.OpMul, token.SLASH: ast.OpDiv, token.REM: ast.OpMod,
-}
+// infix tables the operators that need nothing but their precedence and an
+// AST operator, so the climbing loop states the guard once instead of once
+// per level. The operators with syntax of their own -- IS, LIKE, BETWEEN,
+// IN, COLLATE, the null tests and NOT -- keep their own cases below.
+var infix = func() [token.KindCount]struct {
+	prec int
+	op   ast.Operator
+} {
+	var t [token.KindCount]struct {
+		prec int
+		op   ast.Operator
+	}
+	set := func(k token.Kind, prec int, op ast.Operator) { t[k].prec, t[k].op = prec, op }
+	set(token.OR, precOr, ast.OpOr)
+	set(token.AND, precAnd, ast.OpAnd)
+	set(token.EQ, precCompare, ast.OpEq)
+	set(token.NE, precCompare, ast.OpNe)
+	set(token.LT, precRelational, ast.OpLt)
+	set(token.LE, precRelational, ast.OpLe)
+	set(token.GT, precRelational, ast.OpGt)
+	set(token.GE, precRelational, ast.OpGe)
+	set(token.BITAND, precBitwise, ast.OpBitAnd)
+	set(token.BITOR, precBitwise, ast.OpBitOr)
+	set(token.LSHIFT, precBitwise, ast.OpLShift)
+	set(token.RSHIFT, precBitwise, ast.OpRShift)
+	set(token.PLUS, precAdd, ast.OpAdd)
+	set(token.MINUS, precAdd, ast.OpSub)
+	set(token.STAR, precMul, ast.OpMul)
+	set(token.SLASH, precMul, ast.OpDiv)
+	set(token.REM, precMul, ast.OpMod)
+	set(token.CONCAT, precConcat, ast.OpConcat)
+	set(token.PTR, precConcat, ast.OpPtr) // "->>" is corrected below
+	return t
+}()
 
 // parseExpr parses an expression, consuming operators of precedence min and
 // above.
@@ -97,67 +123,19 @@ func (p *parser) parsePrefix() ast.Expr {
 func (p *parser) parseOperators(x ast.Expr, min int, stopAtAnd bool) ast.Expr {
 	for {
 		t := p.cur()
-		switch t.Kind {
-		case token.OR:
-			if precOr < min {
+		if e := infix[t.Kind]; e.prec > 0 {
+			if e.prec < min || (t.Kind == token.AND && stopAtAnd) {
 				return x
 			}
-			x = p.binary(x, ast.OpOr, precOr)
-		case token.AND:
-			if stopAtAnd || precAnd < min {
-				return x
-			}
-			x = p.binary(x, ast.OpAnd, precAnd)
-		case token.EQ:
-			if precCompare < min {
-				return x
-			}
-			x = p.binary(x, ast.OpEq, precCompare)
-		case token.NE:
-			if precCompare < min {
-				return x
-			}
-			x = p.binary(x, ast.OpNe, precCompare)
-		case token.LT, token.LE, token.GT, token.GE:
-			if precRelational < min {
-				return x
-			}
-			x = p.binary(x, binaryOps[t.Kind], precRelational)
-		case token.BITAND, token.BITOR, token.LSHIFT, token.RSHIFT:
-			if precBitwise < min {
-				return x
-			}
-			x = p.binary(x, binaryOps[t.Kind], precBitwise)
-		case token.PLUS, token.MINUS:
-			if precAdd < min {
-				return x
-			}
-			op := ast.OpAdd
-			if t.Kind == token.MINUS {
-				op = ast.OpSub
-			}
-			x = p.binary(x, op, precAdd)
-		case token.STAR, token.SLASH, token.REM:
-			if precMul < min {
-				return x
-			}
-			x = p.binary(x, binaryOps[t.Kind], precMul)
-		case token.CONCAT:
-			if precConcat < min {
-				return x
-			}
-			x = p.binary(x, ast.OpConcat, precConcat)
-		case token.PTR:
 			// expr ::= expr PTR expr. The "->" and "->>" spellings share a
-			// token; the text distinguishes them.
-			if precConcat < min {
-				return x
+			// token; only the text tells them apart.
+			if t.Kind == token.PTR && t.Text == "->>" {
+				e.op = ast.OpPtr2
 			}
-			op := ast.OpPtr
-			if t.Text == "->>" {
-				op = ast.OpPtr2
-			}
-			x = p.binary(x, op, precConcat)
+			x = p.binary(x, e.op, e.prec)
+			continue
+		}
+		switch t.Kind {
 		case token.COLLATE:
 			// expr ::= expr COLLATE ids.
 			if precCollate < min {
@@ -647,11 +625,17 @@ func (p *parser) parseTypeToken() *ast.TypeName {
 		return nil
 	}
 	start := p.cur().Pos
-	var words []string
-	for token.IsIDS(p.cur().Kind) {
-		words = append(words, p.advance().Text)
+	// A type is almost always one word ("INTEGER", "TEXT"); only build a
+	// slice for the "UNSIGNED BIG INT" kind.
+	name := p.advance().Text
+	if token.IsIDS(p.cur().Kind) {
+		words := []string{name}
+		for token.IsIDS(p.cur().Kind) {
+			words = append(words, p.advance().Text)
+		}
+		name = strings.Join(words, " ")
 	}
-	n := &ast.TypeName{Name: strings.Join(words, " ")}
+	n := &ast.TypeName{Name: name}
 	if p.at(token.LP) {
 		p.advance()
 		n.Args = append(n.Args, p.parseSignedNumber())
@@ -728,6 +712,9 @@ func (p *parser) bindParam(t token.Token) ast.Expr {
 		} else {
 			p.nVar++
 			n.Number = p.nVar
+			if p.varNums == nil {
+				p.varNums = make(map[string]int)
+			}
 			p.varNums[t.Text] = p.nVar
 		}
 	}

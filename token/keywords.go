@@ -182,7 +182,7 @@ var keywordName = func() map[Kind]string {
 //
 // WINDOW, OVER and FILTER are deliberately absent: their keyword-versus-
 // identifier ambiguity is resolved in the tokenizer instead (see lexer).
-var fallback = map[Kind]bool{
+var fallbackSet = map[Kind]bool{
 	ABORT: true, ACTION: true, AFTER: true, ANALYZE: true, ASC: true,
 	ATTACH: true, BEFORE: true, BEGIN: true, BY: true, CASCADE: true,
 	CAST: true, COLUMNKW: true, CONFLICT: true, DATABASE: true,
@@ -201,6 +201,16 @@ var fallback = map[Kind]bool{
 	MATERIALIZED: true, REINDEX: true, RENAME: true, CTIME_KW: true,
 	IF: true,
 }
+
+// fallback is fallbackSet as a Kind-indexed array. The class predicates
+// below run on every name token, and an array load beats hashing.
+var fallback = func() [KindCount]bool {
+	var t [KindCount]bool
+	for k := range fallbackSet {
+		t[k] = true
+	}
+	return t
+}()
 
 // maxKeywordLen is the length of CURRENT_TIMESTAMP, the longest keyword.
 const maxKeywordLen = 17

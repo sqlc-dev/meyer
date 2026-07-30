@@ -80,7 +80,8 @@ func write(b *strings.Builder, n Node) {
 			if i == 0 {
 				x.kw(p.Raw)
 			} else {
-				x.raw("." + p.Raw)
+				x.raw(".")
+				x.raw(p.Raw)
 			}
 		}
 	case *Star:
@@ -195,7 +196,9 @@ func write(b *strings.Builder, n Node) {
 	case *TypeName:
 		x.kw(t.Name)
 		if len(t.Args) > 0 {
-			x.raw("(" + strings.Join(t.Args, ",") + ")")
+			x.raw("(")
+			x.raw(strings.Join(t.Args, ","))
+			x.raw(")")
 		}
 	case *FuncCall:
 		x.kw(t.Name.Raw)
@@ -473,6 +476,11 @@ func write(b *strings.Builder, n Node) {
 		writeColumnConstraint(b, t)
 	case *TableConstraint:
 		writeTableConstraint(b, t)
+	case *TableOption:
+		if t.Without {
+			x.kw("WITHOUT")
+		}
+		x.kw(t.Name.Raw)
 	case *IndexedColumn:
 		x.kw(t.Name.Raw)
 		if t.Collation != nil {
@@ -586,7 +594,9 @@ func write(b *strings.Builder, n Node) {
 		x.kw("USING")
 		x.kw(t.Module.Raw)
 		if t.HasArgs {
-			x.raw("(" + strings.Join(t.Args, ",") + ")")
+			x.raw("(")
+			x.raw(strings.Join(t.Args, ","))
+			x.raw(")")
 		}
 	case *AlterTableStmt:
 		writeAlterTable(b, t)
@@ -659,7 +669,9 @@ func write(b *strings.Builder, n Node) {
 		write(b, t.Name)
 		if t.HasValue {
 			if t.Paren {
-				x.raw("(" + t.Value + ")")
+				x.raw("(")
+				x.raw(t.Value)
+				x.raw(")")
 			} else {
 				x.kw("=")
 				x.kw(t.Value)
@@ -862,7 +874,7 @@ func writeInsert(b *strings.Builder, t *InsertStmt) {
 		x.kw("REPLACE")
 	} else {
 		x.kw("INSERT")
-		writeOrConflict(b, t.OrConflict)
+		writeConflict(b, "OR", t.OrConflict)
 	}
 	x.kw("INTO")
 	write(b, t.Table)
@@ -892,7 +904,7 @@ func writeUpdate(b *strings.Builder, t *UpdateStmt) {
 		write(b, t.With)
 	}
 	x.kw("UPDATE")
-	writeOrConflict(b, t.OrConflict)
+	writeConflict(b, "OR", t.OrConflict)
 	write(b, t.Table)
 	if t.Alias != nil {
 		x.kw("AS")
@@ -961,21 +973,14 @@ func writeReturning(b *strings.Builder, cols []*ResultColumn) {
 	}
 }
 
-func writeOrConflict(b *strings.Builder, a ConflictAction) {
+// writeConflict renders "orconf" (keyword "OR") or "onconf" (keyword
+// "ON CONFLICT"); the two differ only in that keyword.
+func writeConflict(b *strings.Builder, keyword string, a ConflictAction) {
 	if a == ConflictDefault {
 		return
 	}
 	x := w{b}
-	x.kw("OR")
-	x.kw(a.String())
-}
-
-func writeOnConflict(b *strings.Builder, a ConflictAction) {
-	if a == ConflictDefault {
-		return
-	}
-	x := w{b}
-	x.kw("ON CONFLICT")
+	x.kw(keyword)
 	x.kw(a.String())
 }
 
@@ -1011,10 +1016,7 @@ func writeCreateTable(b *strings.Builder, t *CreateTableStmt) {
 		if i > 0 {
 			x.raw(",")
 		}
-		if t.WithoutOpt[i] {
-			x.kw("WITHOUT")
-		}
-		x.kw(opt.Raw)
+		write(b, opt)
 	}
 }
 
@@ -1027,10 +1029,10 @@ func writeColumnConstraint(b *strings.Builder, t *ColumnConstraint) {
 	switch t.Kind {
 	case ColumnNull:
 		x.kw("NULL")
-		writeOnConflict(b, t.OnConflict)
+		writeConflict(b, "ON CONFLICT", t.OnConflict)
 	case ColumnNotNull:
 		x.kw("NOT NULL")
-		writeOnConflict(b, t.OnConflict)
+		writeConflict(b, "ON CONFLICT", t.OnConflict)
 	case ColumnPrimaryKey:
 		x.kw("PRIMARY KEY")
 		switch t.Order {
@@ -1039,13 +1041,13 @@ func writeColumnConstraint(b *strings.Builder, t *ColumnConstraint) {
 		case SortDesc:
 			x.kw("DESC")
 		}
-		writeOnConflict(b, t.OnConflict)
+		writeConflict(b, "ON CONFLICT", t.OnConflict)
 		if t.AutoIncrement {
 			x.kw("AUTOINCREMENT")
 		}
 	case ColumnUnique:
 		x.kw("UNIQUE")
-		writeOnConflict(b, t.OnConflict)
+		writeConflict(b, "ON CONFLICT", t.OnConflict)
 	case ColumnCheck:
 		x.kw("CHECK (")
 		write(b, t.Expr)
@@ -1087,17 +1089,17 @@ func writeTableConstraint(b *strings.Builder, t *TableConstraint) {
 			x.kw("AUTOINCREMENT")
 		}
 		x.raw(")")
-		writeOnConflict(b, t.OnConflict)
+		writeConflict(b, "ON CONFLICT", t.OnConflict)
 	case TableUnique:
 		x.kw("UNIQUE (")
 		writeOrdering(b, t.Columns)
 		x.raw(")")
-		writeOnConflict(b, t.OnConflict)
+		writeConflict(b, "ON CONFLICT", t.OnConflict)
 	case TableCheck:
 		x.kw("CHECK (")
 		write(b, t.Expr)
 		x.raw(")")
-		writeOnConflict(b, t.OnConflict)
+		writeConflict(b, "ON CONFLICT", t.OnConflict)
 	case TableForeignKey:
 		x.kw("FOREIGN KEY (")
 		for i, c := range t.FKColumns {
@@ -1197,7 +1199,7 @@ func writeAlterTable(b *strings.Builder, t *AlterTableStmt) {
 		column()
 		x.kw(t.Column.Raw)
 		x.kw("SET NOT NULL")
-		writeOnConflict(b, t.OnConflict)
+		writeConflict(b, "ON CONFLICT", t.OnConflict)
 	case AlterAddConstraintCheck:
 		x.kw("ADD")
 		if t.ConstraintName != nil {
@@ -1207,7 +1209,7 @@ func writeAlterTable(b *strings.Builder, t *AlterTableStmt) {
 		x.kw("CHECK (")
 		write(b, t.Expr)
 		x.raw(")")
-		writeOnConflict(b, t.OnConflict)
+		writeConflict(b, "ON CONFLICT", t.OnConflict)
 	}
 }
 

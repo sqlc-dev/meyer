@@ -41,16 +41,10 @@ type InsertStmt struct {
 func (*InsertStmt) stmtNode() {}
 func (n *InsertStmt) Children() []Node {
 	out := nodes(n.With, n.Table, n.Alias)
-	for _, c := range n.Columns {
-		out = append(out, c)
-	}
+	out = appendNodes(out, n.Columns)
 	out = append(out, nodes(n.Select)...)
-	for _, u := range n.Upserts {
-		out = append(out, u)
-	}
-	for _, r := range n.Returning {
-		out = append(out, r)
-	}
+	out = appendNodes(out, n.Upserts)
+	out = appendNodes(out, n.Returning)
 	return out
 }
 
@@ -69,13 +63,9 @@ type Upsert struct {
 
 func (n *Upsert) Children() []Node {
 	var out []Node
-	for _, t := range n.Target {
-		out = append(out, t)
-	}
+	out = appendNodes(out, n.Target)
 	out = append(out, nodes(n.TargetWhere)...)
-	for _, s := range n.Set {
-		out = append(out, s)
-	}
+	out = appendNodes(out, n.Set)
 	return append(out, nodes(n.Where)...)
 }
 
@@ -92,9 +82,7 @@ type SetPair struct {
 
 func (n *SetPair) Children() []Node {
 	out := make([]Node, 0, len(n.Columns)+1)
-	for _, c := range n.Columns {
-		out = append(out, c)
-	}
+	out = appendNodes(out, n.Columns)
 	return append(out, nodes(n.Value)...)
 }
 
@@ -123,16 +111,10 @@ type UpdateStmt struct {
 func (*UpdateStmt) stmtNode() {}
 func (n *UpdateStmt) Children() []Node {
 	out := nodes(n.With, n.Table, n.Alias, n.IndexedBy)
-	for _, s := range n.Set {
-		out = append(out, s)
-	}
-	for _, f := range n.From {
-		out = append(out, f)
-	}
+	out = appendNodes(out, n.Set)
+	out = appendNodes(out, n.From)
 	out = append(out, nodes(n.Where)...)
-	for _, r := range n.Returning {
-		out = append(out, r)
-	}
+	out = appendNodes(out, n.Returning)
 	return out
 }
 
@@ -155,8 +137,6 @@ type DeleteStmt struct {
 func (*DeleteStmt) stmtNode() {}
 func (n *DeleteStmt) Children() []Node {
 	out := nodes(n.With, n.Table, n.Alias, n.IndexedBy, n.Where)
-	for _, r := range n.Returning {
-		out = append(out, r)
-	}
+	out = appendNodes(out, n.Returning)
 	return out
 }
