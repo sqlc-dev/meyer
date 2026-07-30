@@ -1,0 +1,28 @@
+==== between-2.0
+
+  CREATE TABLE t1(x TEXT, y TEXT COLLATE nocase);
+  INSERT INTO t1 VALUES('0', 'abc');
+----
+stmt 0 ok
+stmt 50 err 1 -1 no such table: t1
+==== between-3.0
+
+  CREATE TABLE t1(x, y);
+  CREATE INDEX i1 ON t1(x);
+  INSERT INTO t1 VALUES(4, 4);
+  CREATE TABLE t2(a, b);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: main.t1
+stmt 53 err 1 -1 no such table: t1
+stmt 84 ok
+==== between-3.1
+
+  SELECT * FROM t1 LEFT JOIN t2 ON (x BETWEEN 1 AND 3);
+----
+stmt 0 err 1 -1 no such table: t1
+==== between-3.2
+
+  SELECT * FROM t1 LEFT JOIN t2 ON (x BETWEEN 5 AND 7);
+----
+stmt 0 err 1 -1 no such table: t1

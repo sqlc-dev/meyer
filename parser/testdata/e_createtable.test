@@ -1,0 +1,693 @@
+==== e_createtable-1.0
+
+  ATTACH 'test.db2' AS auxa;
+  ATTACH 'test.db3' AS auxb;
+----
+stmt 0 ok
+stmt 29 ok
+==== e_createtable-1.7.0
+
+  CREATE TABLE t1(x, y);
+  CREATE INDEX i1 ON t1(x);
+  CREATE VIEW  v1 AS SELECT * FROM t1;
+
+  CREATE TABLE auxa.tbl1(x, y);
+  CREATE INDEX auxa.idx1 ON tbl1(x);
+  CREATE VIEW auxa.view1 AS SELECT * FROM tbl1;
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: main.t1
+stmt 53 ok
+stmt 92 err 1 109 unknown database auxa
+stmt 125 err 1 141 unknown database auxa
+stmt 162 err 1 177 unknown database auxa
+==== e_createtable-1.8.0
+
+  CREATE TABLE t1(x, y);
+  CREATE INDEX i1 ON t1(x);
+  CREATE VIEW  v1 AS SELECT * FROM t1;
+  CREATE TABLE auxa.tbl1(x, y);
+  CREATE INDEX auxa.idx1 ON tbl1(x);
+  CREATE VIEW auxa.view1 AS SELECT * FROM tbl1;
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: main.t1
+stmt 53 ok
+stmt 92 err 1 108 unknown database auxa
+stmt 124 err 1 140 unknown database auxa
+stmt 161 err 1 176 unknown database auxa
+==== e_createtable-1.10.0
+
+  CREATE TABLE t1(x, y);
+  CREATE TABLE auxb.t2(x, y);
+
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    SELECT 1;
+  END;
+  CREATE TRIGGER auxb.tr2 AFTER INSERT ON t2 BEGIN
+    SELECT 1;
+  END;
+----
+stmt 0 ok
+stmt 25 err 1 41 unknown database auxb
+stmt 55 err 1 -1 no such table: main.t1
+stmt 123 err 1 141 unknown database auxb
+==== e_createtable-1.11.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(a, b);
+  CREATE TABLE auxa.t3(a, b);
+  CREATE TABLE auxa.t4(a, b);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 66 unknown database auxa
+stmt 80 err 1 96 unknown database auxa
+==== e_createtable-1.11.1.1
+
+  SELECT * FROM t1;
+  SELECT * FROM t2;
+  SELECT * FROM t3;
+  SELECT * FROM t4;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 20 err 1 -1 no such table: t2
+stmt 40 err 1 -1 no such table: t3
+stmt 60 err 1 -1 no such table: t4
+==== e_createtable-1.11.1.2
+ DROP TABLE t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== e_createtable-1.11.1.3
+ 
+  SELECT * FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== e_createtable-1.11.1.4
+ DROP TABLE t3
+----
+stmt 0 err 1 -1 no such table: t3
+==== e_createtable-1.11.1.5
+ 
+  SELECT * FROM t3
+----
+stmt 0 err 1 -1 no such table: t3
+==== e_createtable-1.11.2.1
+
+  SELECT name FROM sqlite_master;
+  SELECT name FROM auxa.sqlite_master;
+----
+stmt 0 ok
+stmt 34 err 1 -1 no such table: auxa.sqlite_master
+==== e_createtable-1.11.2.2
+ DROP TABLE t2
+----
+stmt 0 err 1 -1 no such table: t2
+==== e_createtable-1.11.2.3
+ DROP TABLE t4
+----
+stmt 0 err 1 -1 no such table: t4
+==== e_createtable-1.11.2.4
+
+  SELECT name FROM sqlite_master;
+  SELECT name FROM auxa.sqlite_master;
+----
+stmt 0 ok
+stmt 34 err 1 -1 no such table: auxa.sqlite_master
+==== e_createtable-2.0
+
+  CREATE TABLE t1(a, b, c);
+  CREATE TABLE t2(d, e, f);
+  CREATE TABLE t3(g BIGINT, h VARCHAR(10));
+  CREATE TABLE t4(i BLOB, j ANYOLDATA);
+  CREATE TABLE t5(k FLOAT, l INTEGER);
+  CREATE TABLE t6(m DEFAULT 10, n DEFAULT 5, PRIMARY KEY(m, n));
+  CREATE TABLE t7(x INTEGER PRIMARY KEY);
+  CREATE TABLE t8(o COLLATE nocase DEFAULT 'abc');
+  CREATE TABLE t9(p NOT NULL, q DOUBLE CHECK (q!=0), r STRING UNIQUE);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 56 ok
+stmt 100 ok
+stmt 140 ok
+stmt 179 ok
+stmt 244 ok
+stmt 286 ok
+stmt 337 ok
+==== e_createtable-2.3.2.1
+
+  INSERT INTO x1 DEFAULT VALUES;
+  INSERT INTO x2 DEFAULT VALUES;
+  INSERT INTO x3 DEFAULT VALUES;
+  INSERT INTO x4 DEFAULT VALUES;
+----
+stmt 0 err 1 -1 no such table: x1
+stmt 33 err 1 -1 no such table: x2
+stmt 66 err 1 -1 no such table: x3
+stmt 99 err 1 -1 no such table: x4
+==== e_createtable-2.3.2.2
+ SELECT * FROM x1
+----
+stmt 0 err 1 -1 no such table: x1
+==== e_createtable-2.3.2.3
+ SELECT * FROM x2
+----
+stmt 0 err 1 -1 no such table: x2
+==== e_createtable-2.3.2.4
+ SELECT * FROM x3
+----
+stmt 0 err 1 -1 no such table: x3
+==== e_createtable-2.3.2.5
+ SELECT * FROM x4
+----
+stmt 0 err 1 -1 no such table: x4
+==== e_createtable-2.4.0
+
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES('i',   'one');
+  INSERT INTO t1 VALUES('ii',  'two');
+  INSERT INTO t1 VALUES('iii', 'three');
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t1
+stmt 64 err 1 -1 no such table: t1
+stmt 103 err 1 -1 no such table: t1
+==== e_createtable-3.1.0
+
+  CREATE TABLE t1(x VARCHAR(10), y INTEGER, z DOUBLE);
+  CREATE TABLE t2(a DATETIME, b STRING, c REAL);
+  CREATE TABLE t3(o, t);
+----
+stmt 0 ok
+stmt 55 ok
+stmt 104 ok
+==== e_createtable-3.1.1
+
+  INSERT INTO t1 VALUES(14, 'quite a lengthy string', X'555655');
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 66 err 1 -1 no such table: t1
+==== e_createtable-3.1.2
+
+  INSERT INTO t2 VALUES('not a datetime', 13, '12:41:59');
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 no such table: t2
+stmt 59 err 1 -1 no such table: t2
+==== e_createtable-3.2.0
+ DELETE FROM t1; DELETE FROM t2;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 16 err 1 -1 no such table: t2
+==== e_createtable-3.3.1
+
+  CREATE TABLE t4(
+    a DEFAULT NULL,
+    b DEFAULT 'string constant',
+    c DEFAULT X'424C4F42',
+    d DEFAULT 1,
+    e DEFAULT -1,
+    f DEFAULT 3.14,
+    g DEFAULT -3.14,
+    h DEFAULT ( substr('abcd', 0, 2) || 'cd' ),
+    i DEFAULT CURRENT_TIME,
+    j DEFAULT CURRENT_DATE,
+    k DEFAULT CURRENT_TIMESTAMP
+  );
+----
+stmt 0 ok
+==== e_createtable-3.6.1
+
+  CREATE TABLE t5(
+    a DEFAULT NULL,  
+    b DEFAULT 'text value',  
+    c DEFAULT X'424C4F42',
+    d DEFAULT -45678.6,
+    e DEFAULT 394507
+  );
+----
+stmt 0 ok
+==== e_createtable-3.6.2
+
+  INSERT INTO t5 DEFAULT VALUES;
+  SELECT quote(a), quote(b), quote(c), quote(d), quote(e) FROM t5;
+----
+stmt 0 err 1 -1 no such table: t5
+stmt 33 err 1 -1 no such table: t5
+==== e_createtable-3.7.1
+
+  CREATE TABLE t6(a DEFAULT ( nextint() ), b DEFAULT ( nextint() ));
+----
+stmt 0 ok
+==== e_createtable-3.7.2
+
+  INSERT INTO t6 DEFAULT VALUES;
+  SELECT quote(a), quote(b) FROM t6;
+----
+stmt 0 err 1 -1 no such table: t6
+stmt 33 err 1 -1 no such table: t6
+==== e_createtable-3.7.3
+
+  INSERT INTO t6(a) VALUES('X');
+  SELECT quote(a), quote(b) FROM t6;
+----
+stmt 0 err 1 -1 no such table: t6
+stmt 33 err 1 -1 no such table: t6
+==== e_createtable-3.7.4
+
+  INSERT INTO t6(a) SELECT a FROM t6;
+  SELECT quote(a), quote(b) FROM t6;
+----
+stmt 0 err 1 -1 no such table: t6
+stmt 38 err 1 -1 no such table: t6
+==== e_createtable-3.8.1
+
+  CREATE TABLE t7(
+    a DEFAULT CURRENT_TIME, 
+    b DEFAULT CURRENT_DATE, 
+    c DEFAULT CURRENT_TIMESTAMP
+  );
+----
+stmt 0 ok
+==== e_createtable-3.8.2
+
+  INSERT INTO t7 DEFAULT VALUES;
+  SELECT quote(a), quote(b), quote(c) FROM t7;
+----
+stmt 0 err 1 -1 no such table: t7
+stmt 33 err 1 -1 no such table: t7
+==== e_createtable-3-9.1
+
+  CREATE TABLE t8(a COLLATE nocase, b COLLATE rtrim, c COLLATE binary, d);
+  INSERT INTO t8 VALUES('abc',   'abc',   'abc',   'abc');
+  INSERT INTO t8 VALUES('abc  ', 'abc  ', 'abc  ', 'abc  ');
+  INSERT INTO t8 VALUES('ABC  ', 'ABC  ', 'ABC  ', 'ABC  ');
+  INSERT INTO t8 VALUES('ABC',   'ABC',   'ABC',   'ABC');
+----
+stmt 0 ok
+stmt 75 err 1 -1 no such table: t8
+stmt 134 err 1 -1 no such table: t8
+stmt 195 err 1 -1 no such table: t8
+stmt 256 err 1 -1 no such table: t8
+==== e_createtable-3.11.4
+
+  CREATE TABLE t12(a, b, c);
+  INSERT INTO t12 VALUES(randomblob(30000),randomblob(30000),randomblob(30000));
+----
+stmt 0 ok
+stmt 29 err 1 -1 no such table: t12
+==== e_createtable-3.11.5
+
+  INSERT INTO t12 VALUES(randomblob(30001),randomblob(30000),randomblob(30000));
+----
+stmt 0 err 1 -1 no such table: t12
+==== 4.1.3
+
+  CREATE TABLE t6(a, b); --ok
+----
+stmt 0 ok
+==== 4.1.4
+
+  CREATE TABLE t7(a, b) WITHOUT ROWID; --Error, no PRIMARY KEY
+----
+stmt 0 err 1 -1 PRIMARY KEY missing on table t7
+==== 4.3.0
+
+  CREATE TABLE t1(x PRIMARY KEY, y);
+  INSERT INTO t1 VALUES(0,          'zero');
+  INSERT INTO t1 VALUES(45.5,       'one');
+  INSERT INTO t1 VALUES('brambles', 'two');
+  INSERT INTO t1 VALUES(X'ABCDEF',  'three');
+
+  CREATE TABLE t2(x, y, PRIMARY KEY(x, y));
+  INSERT INTO t2 VALUES(0,          'zero');
+  INSERT INTO t2 VALUES(45.5,       'one');
+  INSERT INTO t2 VALUES('brambles', 'two');
+  INSERT INTO t2 VALUES(X'ABCDEF',  'three');
+----
+stmt 0 ok
+stmt 37 err 1 -1 no such table: t1
+stmt 82 err 1 -1 no such table: t1
+stmt 126 err 1 -1 no such table: t1
+stmt 170 err 1 -1 no such table: t1
+stmt 216 ok
+stmt 261 err 1 -1 no such table: t2
+stmt 306 err 1 -1 no such table: t2
+stmt 350 err 1 -1 no such table: t2
+stmt 394 err 1 -1 no such table: t2
+==== 4.5.2
+
+  CREATE TABLE t3(s, u INTEGER PRIMARY KEY, v);
+  INSERT INTO t3 VALUES(1, NULL, 2);
+  INSERT INTO t3 VALUES('x', NULL, 'y');
+  SELECT u FROM t3;
+----
+stmt 0 ok
+stmt 48 err 1 -1 no such table: t3
+stmt 85 err 1 -1 no such table: t3
+stmt 126 err 1 -1 no such table: t3
+==== 4.5.3
+
+  INSERT INTO t3 VALUES(2, 5, 3);
+  UPDATE t3 SET u = NULL WHERE s = 2;
+----
+stmt 0 err 1 -1 no such table: t3
+stmt 34 err 1 -1 no such table: t3
+==== 4.5.4
+
+  CREATE TABLE t4(s, u INT PRIMARY KEY, v) WITHOUT ROWID;
+  INSERT INTO t4 VALUES(1, NULL, 2);
+----
+stmt 0 ok
+stmt 58 err 1 -1 no such table: t4
+==== 4.5.5
+
+  CREATE TABLE t5(s, u INT PRIMARY KEY NOT NULL, v);
+  INSERT INTO t5 VALUES(1, NULL, 2);
+----
+stmt 0 ok
+stmt 53 err 1 -1 no such table: t5
+==== 4.5.6
+
+  CREATE TABLE t6(s INT, u INT PRIMARY KEY, v INT) STRICT;
+  INSERT INTO t6 VALUES(1, NULL, 2);
+----
+stmt 0 ok
+stmt 59 err 1 -1 no such table: t6
+==== 4.5.7
+
+  CREATE TABLE t7(s INT, u INT PRIMARY KEY NOT NULL, v INT) STRICT;
+  INSERT INTO t7 VALUES(1, NULL, 2);
+----
+stmt 0 ok
+stmt 68 err 1 -1 no such table: t7
+==== 4.7.0
+
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(4.3, 5.5);
+  INSERT INTO t1 VALUES('reveal', 'variableness');
+  INSERT INTO t1 VALUES(X'123456', X'654321');
+
+  INSERT INTO t4 VALUES('xyx', 1, 1);
+  INSERT INTO t4 VALUES('xyx', 2, 1);
+  INSERT INTO t4 VALUES('uvw', 1, 1);
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 31 err 1 -1 no such table: t1
+stmt 66 err 1 -1 no such table: t1
+stmt 117 err 1 -1 no such table: t1
+stmt 164 err 1 -1 no such table: t4
+stmt 203 err 1 -1 no such table: t4
+stmt 241 err 1 -1 no such table: t4
+==== 4.10.0
+
+  CREATE TABLE t1(a, b PRIMARY KEY);
+  CREATE TABLE t2(a, b, c, UNIQUE(b, c));
+----
+stmt 0 ok
+stmt 37 ok
+==== 4.11
+
+  CREATE TABLE x1(a TEXT, b INTEGER CHECK( b>0 ));
+  CREATE TABLE t1(a TEXT, b INTEGER, CHECK( b>0 ));
+  INSERT INTO x1 VALUES('x', 'xx');
+  INSERT INTO x1 VALUES('y', 'yy');
+  INSERT INTO t1 SELECT * FROM x1;
+
+  CREATE TABLE x2(a CHECK( a||b ), b);
+  CREATE TABLE t2(a, b, CHECK( a||b ));
+  INSERT INTO x2 VALUES(1, 'xx');
+  INSERT INTO x2 VALUES(1, 'yy');
+  INSERT INTO t2 SELECT * FROM x2;
+----
+stmt 0 ok
+stmt 51 ok
+stmt 103 err 1 -1 no such table: x1
+stmt 139 err 1 -1 no such table: x1
+stmt 175 err 1 -1 no such table: t1
+stmt 210 ok
+stmt 250 ok
+stmt 290 err 1 -1 no such table: x2
+stmt 324 err 1 -1 no such table: x2
+stmt 358 err 1 -1 no such table: t2
+==== 4.14.0
+
+  INSERT INTO t1 VALUES('x', 'y');
+  INSERT INTO t1 VALUES('z', NULL);
+
+  INSERT INTO t2 VALUES('x', 'y');
+  INSERT INTO t2 VALUES('z', NULL);
+
+  INSERT INTO t3 VALUES('x', 'y', 'z');
+  INSERT INTO t3 VALUES(1, 2, 3);
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 35 err 1 -1 no such table: t1
+stmt 71 err 1 -1 no such table: t2
+stmt 107 err 1 -1 no such table: t2
+stmt 143 err 1 -1 no such table: t3
+stmt 184 err 1 -1 no such table: t3
+==== 4.15.0
+
+  CREATE TABLE t1_ab(a PRIMARY KEY ON CONFLICT ABORT, b);
+  CREATE TABLE t1_ro(a PRIMARY KEY ON CONFLICT ROLLBACK, b);
+  CREATE TABLE t1_ig(a PRIMARY KEY ON CONFLICT IGNORE, b);
+  CREATE TABLE t1_fa(a PRIMARY KEY ON CONFLICT FAIL, b);
+  CREATE TABLE t1_re(a PRIMARY KEY ON CONFLICT REPLACE, b);
+  CREATE TABLE t1_xx(a PRIMARY KEY, b);
+
+  INSERT INTO t1_ab VALUES(1, 'one');
+  INSERT INTO t1_ab VALUES(2, 'two');
+  INSERT INTO t1_ro SELECT * FROM t1_ab;
+  INSERT INTO t1_ig SELECT * FROM t1_ab;
+  INSERT INTO t1_fa SELECT * FROM t1_ab;
+  INSERT INTO t1_re SELECT * FROM t1_ab;
+  INSERT INTO t1_xx SELECT * FROM t1_ab;
+
+  CREATE TABLE t2_ab(a, b NOT NULL ON CONFLICT ABORT);
+  CREATE TABLE t2_ro(a, b NOT NULL ON CONFLICT ROLLBACK);
+  CREATE TABLE t2_ig(a, b NOT NULL ON CONFLICT IGNORE);
+  CREATE TABLE t2_fa(a, b NOT NULL ON CONFLICT FAIL);
+  CREATE TABLE t2_re(a, b NOT NULL ON CONFLICT REPLACE);
+  CREATE TABLE t2_xx(a, b NOT NULL);
+
+  INSERT INTO t2_ab VALUES(1, 'one');
+  INSERT INTO t2_ab VALUES(2, 'two');
+  INSERT INTO t2_ro SELECT * FROM t2_ab;
+  INSERT INTO t2_ig SELECT * FROM t2_ab;
+  INSERT INTO t2_fa SELECT * FROM t2_ab;
+  INSERT INTO t2_re SELECT * FROM t2_ab;
+  INSERT INTO t2_xx SELECT * FROM t2_ab;
+
+  CREATE TABLE t3_ab(a, b, UNIQUE(a, b) ON CONFLICT ABORT);
+  CREATE TABLE t3_ro(a, b, UNIQUE(a, b) ON CONFLICT ROLLBACK);
+  CREATE TABLE t3_ig(a, b, UNIQUE(a, b) ON CONFLICT IGNORE);
+  CREATE TABLE t3_fa(a, b, UNIQUE(a, b) ON CONFLICT FAIL);
+  CREATE TABLE t3_re(a, b, UNIQUE(a, b) ON CONFLICT REPLACE);
+  CREATE TABLE t3_xx(a, b, UNIQUE(a, b));
+
+  INSERT INTO t3_ab VALUES(1, 'one');
+  INSERT INTO t3_ab VALUES(2, 'two');
+  INSERT INTO t3_ro SELECT * FROM t3_ab;
+  INSERT INTO t3_ig SELECT * FROM t3_ab;
+  INSERT INTO t3_fa SELECT * FROM t3_ab;
+  INSERT INTO t3_re SELECT * FROM t3_ab;
+  INSERT INTO t3_xx SELECT * FROM t3_ab;
+----
+stmt 0 ok
+stmt 58 ok
+stmt 119 ok
+stmt 178 ok
+stmt 235 ok
+stmt 295 ok
+stmt 335 err 1 -1 no such table: t1_ab
+stmt 374 err 1 -1 no such table: t1_ab
+stmt 412 err 1 -1 no such table: t1_ro
+stmt 453 err 1 -1 no such table: t1_ig
+stmt 494 err 1 -1 no such table: t1_fa
+stmt 535 err 1 -1 no such table: t1_re
+stmt 576 err 1 -1 no such table: t1_xx
+stmt 617 ok
+stmt 673 ok
+stmt 731 ok
+stmt 787 ok
+stmt 841 ok
+stmt 898 ok
+stmt 935 err 1 -1 no such table: t2_ab
+stmt 974 err 1 -1 no such table: t2_ab
+stmt 1012 err 1 -1 no such table: t2_ro
+stmt 1053 err 1 -1 no such table: t2_ig
+stmt 1094 err 1 -1 no such table: t2_fa
+stmt 1135 err 1 -1 no such table: t2_re
+stmt 1176 err 1 -1 no such table: t2_xx
+stmt 1217 ok
+stmt 1278 ok
+stmt 1341 ok
+stmt 1402 ok
+stmt 1461 ok
+stmt 1523 ok
+stmt 1565 err 1 -1 no such table: t3_ab
+stmt 1604 err 1 -1 no such table: t3_ab
+stmt 1642 err 1 -1 no such table: t3_ro
+stmt 1683 err 1 -1 no such table: t3_ig
+stmt 1724 err 1 -1 no such table: t3_fa
+stmt 1765 err 1 -1 no such table: t3_re
+stmt 1806 err 1 -1 no such table: t3_xx
+==== 4.18.1
+
+  CREATE TABLE t4(a, b CHECK (b!=10));
+  INSERT INTO t4 VALUES(1, 2);
+  INSERT INTO t4 VALUES(3, 4);
+----
+stmt 0 ok
+stmt 39 err 1 -1 no such table: t4
+stmt 70 err 1 -1 no such table: t4
+==== 4.18.2
+ BEGIN; INSERT INTO t4 VALUES(5, 6)
+----
+stmt 0 ok
+stmt 7 err 1 -1 no such table: t4
+==== 4.18.3
+ 
+  INSERT INTO t4 SELECT a+4, b+4 FROM t4
+----
+stmt 0 err 1 -1 no such table: t4
+==== 4.18.5
+ SELECT * FROM t4
+----
+stmt 0 err 1 -1 no such table: t4
+==== 4.19.0
+
+  CREATE TABLE t5(a NOT NULL ON CONFLICT IGNORE, b NOT NULL ON CONFLICT ABORT);
+----
+stmt 0 ok
+==== 4.19.1
+ INSERT INTO t5 VALUES(NULL, 'not null')
+----
+stmt 0 err 1 -1 no such table: t5
+==== 4.19.2
+ SELECT * FROM t5
+----
+stmt 0 err 1 -1 no such table: t5
+==== 4.19.3
+ INSERT INTO t5 VALUES('not null', NULL)
+----
+stmt 0 err 1 -1 no such table: t5
+==== 4.19.4
+ SELECT * FROM t5
+----
+stmt 0 err 1 -1 no such table: t5
+==== 5.1.0
+
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES('one', 'first');
+  INSERT INTO t1 VALUES('two', 'second');
+  INSERT INTO t1 VALUES('three', 'third');
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t1
+stmt 66 err 1 -1 no such table: t1
+stmt 108 err 1 -1 no such table: t1
+==== 5.2.0
+
+  CREATE TABLE t2(oid, b);
+  CREATE TABLE t3(a, _rowid_);
+  CREATE TABLE t4(a, b, rowid);
+
+  INSERT INTO t2 VALUES('one', 'two');
+  INSERT INTO t2 VALUES('three', 'four');
+
+  INSERT INTO t3 VALUES('five', 'six');
+  INSERT INTO t3 VALUES('seven', 'eight');
+
+  INSERT INTO t4 VALUES('nine', 'ten', 'eleven');
+  INSERT INTO t4 VALUES('twelve', 'thirteen', 'fourteen');
+----
+stmt 0 ok
+stmt 27 ok
+stmt 58 ok
+stmt 90 err 1 -1 no such table: t2
+stmt 130 err 1 -1 no such table: t2
+stmt 172 err 1 -1 no such table: t3
+stmt 213 err 1 -1 no such table: t3
+stmt 256 err 1 -1 no such table: t4
+stmt 307 err 1 -1 no such table: t4
+==== 5.4.1
+
+  CREATE TABLE t6(pk INT primary key);
+  CREATE TABLE t7(pk BIGINT primary key);
+  CREATE TABLE t8(pk SHORT INTEGER primary key);
+  CREATE TABLE t9(pk UNSIGNED INTEGER primary key);
+----
+stmt 0 ok
+stmt 39 ok
+stmt 81 ok
+stmt 130 ok
+==== 5.4.3
+
+  INSERT INTO t6 VALUES('2.0');
+  INSERT INTO t7 VALUES('2.0');
+  INSERT INTO t8 VALUES('2.0');
+  INSERT INTO t9 VALUES('2.0');
+  SELECT typeof(pk), pk FROM t6;
+  SELECT typeof(pk), pk FROM t7;
+  SELECT typeof(pk), pk FROM t8;
+  SELECT typeof(pk), pk FROM t9;
+----
+stmt 0 err 1 -1 no such table: t6
+stmt 32 err 1 -1 no such table: t7
+stmt 64 err 1 -1 no such table: t8
+stmt 96 err 1 -1 no such table: t9
+stmt 128 err 1 -1 no such table: t6
+stmt 161 err 1 -1 no such table: t7
+stmt 194 err 1 -1 no such table: t8
+stmt 227 err 1 -1 no such table: t9
+==== 5.4.4.1
+ 
+  INSERT INTO t6 VALUES(2)
+----
+stmt 0 err 1 -1 no such table: t6
+==== 5.4.4.2
+ 
+  INSERT INTO t7 VALUES(2)
+----
+stmt 0 err 1 -1 no such table: t7
+==== 5.4.4.3
+ 
+  INSERT INTO t8 VALUES(2)
+----
+stmt 0 err 1 -1 no such table: t8
+==== 5.4.4.4
+ 
+  INSERT INTO t9 VALUES(2)
+----
+stmt 0 err 1 -1 no such table: t9
+==== 5.7.0
+
+  CREATE TABLE t10(a, b);
+  INSERT INTO t10 VALUES('ten', 10);
+
+  CREATE TABLE t11(a, b INTEGER PRIMARY KEY);
+  INSERT INTO t11 VALUES('ten', 10);
+----
+stmt 0 ok
+stmt 26 err 1 -1 no such table: t10
+stmt 63 ok
+stmt 110 err 1 -1 no such table: t11
+==== 5.9.0
+
+  CREATE TABLE t12(x INTEGER PRIMARY KEY, y);
+  INSERT INTO t12 VALUES(5, 'five');
+----
+stmt 0 ok
+stmt 46 err 1 -1 no such table: t12
+==== 5.10.0
+ DELETE FROM t12
+----
+stmt 0 err 1 -1 no such table: t12
+==== 5.11.0
+ DELETE FROM t12
+----
+stmt 0 err 1 -1 no such table: t12

@@ -1,0 +1,244 @@
+==== 2.0
+
+  SELECT window('hello world');
+----
+stmt 0 err 1 10 no such function: window
+==== 3.0
+
+  CREATE TABLE window(x COLLATE window);
+  INSERT INTO window VALUES('bob'), ('alice'), ('cate');
+  SELECT * FROM window ORDER BY x COLLATE window;
+----
+stmt 0 err 1 -1 no such collation sequence: window
+stmt 41 err 1 -1 no such table: window
+stmt 98 err 1 -1 no such table: window
+==== 3.1
+
+  DROP TABLE window;
+  CREATE TABLE x1(x);
+  INSERT INTO x1 VALUES('bob'), ('alice'), ('cate');
+  CREATE INDEX window ON x1(x COLLATE window);
+  SELECT * FROM x1 ORDER BY x COLLATE window;
+----
+stmt 0 err 1 -1 no such table: window
+stmt 21 ok
+stmt 43 err 1 -1 no such table: x1
+stmt 96 err 1 -1 no such table: main.x1
+stmt 143 err 1 -1 no such table: x1
+==== 4.0
+ CREATE TABLE t4(x, y);
+----
+stmt 0 ok
+==== 4.1
+ 
+  SELECT * FROM t4 window, t4;
+----
+stmt 0 err 1 -1 no such table: t4
+==== 5.0
+
+  CREATE TABLE over(x, over);
+  CREATE TABLE window(x, window);
+  INSERT INTO over VALUES(1, 2), (3, 4), (5, 6);
+  INSERT INTO window VALUES(1, 2), (3, 4), (5, 6);
+  SELECT sum(x) over FROM over
+----
+stmt 0 ok
+stmt 30 ok
+stmt 64 err 1 -1 no such table: over
+stmt 113 err 1 -1 no such table: window
+stmt 164 err 1 -1 no such table: over
+==== 5.1
+
+  SELECT sum(x) over over FROM over WINDOW over AS ()
+----
+stmt 0 err 1 -1 no such table: over
+==== 5.2
+
+  SELECT sum(over) over over over FROM over over WINDOW over AS (ORDER BY over)
+----
+stmt 0 err 1 -1 no such table: over
+==== 5.3
+
+  SELECT sum(over) over over over FROM over over WINDOW over AS (ORDER BY over);
+----
+stmt 0 err 1 -1 no such table: over
+==== 5.4
+
+  SELECT sum(window) OVER window window FROM window window window window AS (ORDER BY window);
+----
+stmt 0 err 1 -1 no such table: window
+==== 5.5
+
+  SELECT count(*) OVER win FROM over
+  WINDOW win AS (ORDER BY x ROWS BETWEEN +2 FOLLOWING AND +3 FOLLOWING)
+----
+stmt 0 err 1 -1 no such table: over
+==== 6.0
+
+    SELECT LIKE('!', '', '!') x WHERE x;
+----
+stmt 0 ok
+==== 6.1
+
+    SELECT LIKE("!","","!")""WHeRE"";
+----
+stmt 0 ok
+==== 6.2
+
+    SELECT LIKE("!","","!")""window"";
+----
+stmt 0 err 1 30 near "window": syntax error
+==== 7.0
+
+  CREATE TABLE t1(x TEXT);
+  CREATE INDEX i1 ON t1(x COLLATE nocase);
+  INSERT INTO t1 VALUES('');
+----
+stmt 0 ok
+stmt 27 err 1 -1 no such table: main.t1
+stmt 70 err 1 -1 no such table: t1
+==== 7.1
+
+    SELECT count(*) FROM t1 WHERE x LIKE '!' ESCAPE '!';
+----
+stmt 0 err 1 -1 no such table: t1
+==== 8.0
+
+  CREATE TABLE IF NOT EXISTS "sample" (
+      "id" INTEGER NOT NULL PRIMARY KEY, 
+      "counter" INTEGER NOT NULL, 
+      "value" REAL NOT NULL
+  );
+
+  INSERT INTO "sample" (counter, value) 
+  VALUES (1, 10.), (1, 20.), (2, 1.), (2, 3.), (3, 100.);
+----
+stmt 0 ok
+stmt 150 err 1 -1 no such table: sample
+==== 8.1
+
+  SELECT "counter", "value", RANK() OVER w AS "rank" 
+  FROM "sample"
+  WINDOW w AS (PARTITION BY "counter" ORDER BY "value" DESC) 
+  ORDER BY "counter", RANK() OVER w
+----
+stmt 0 err 1 -1 no such table: sample
+==== 8.2
+
+  SELECT "counter", "value", SUM("value") OVER 
+  (ORDER BY "id" ROWS 2 PRECEDING) 
+    FROM "sample" 
+  ORDER BY "id"
+----
+stmt 0 err 1 -1 no such table: sample
+==== 8.3
+
+  SELECT SUM("value") OVER 
+  (ORDER BY "id" ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) 
+    FROM "sample" 
+  ORDER BY "id"
+----
+stmt 0 err 1 -1 no such table: sample
+==== 9.0
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<5)
+  SELECT x, group_concat(x) OVER (ORDER BY x ROWS 2 PRECEDING)
+  FROM c;
+----
+stmt 0 ok
+==== 9.3
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<5)
+  SELECT count(DISTINCT x) OVER (ORDER BY x) FROM c;
+----
+stmt 0 err 1 -1 DISTINCT is not supported for window functions
+==== 9.4
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<5)
+  SELECT count() OVER (ORDER BY x RANGE UNBOUNDED FOLLOWING) FROM c;
+----
+stmt 0 err 1 126 near "FOLLOWING": syntax error
+==== 9.5
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<5)
+  SELECT count() OVER (ORDER BY x RANGE BETWEEN UNBOUNDED FOLLOWING AND UNBOUNDED FOLLOWING) FROM c;
+----
+stmt 0 err 1 134 near "FOLLOWING": syntax error
+==== 9.6
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<5)
+  SELECT count() OVER (ORDER BY x RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED PRECEDING) FROM c;
+----
+stmt 0 err 1 158 near "PRECEDING": syntax error
+==== 9.8.1
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<5)
+  SELECT count() OVER (
+      ORDER BY x ROWS BETWEEN a PRECEDING AND 2 FOLLOWING
+  ) FROM c;
+----
+stmt 0 ok
+==== 9.8.2
+
+  WITH RECURSIVE c(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM c WHERE x<5)
+  SELECT count() OVER (
+      ORDER BY x ROWS BETWEEN 2 PRECEDING AND a FOLLOWING
+  ) FROM c;
+----
+stmt 0 ok
+==== 10.0
+
+  WITH t1(a,b) AS (VALUES(1,2))
+  SELECT count() FILTER (where b<>5) OVER w1
+    FROM t1
+    WINDOW w1 AS (ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING);
+----
+stmt 0 ok
+==== 11.0
+
+  CREATE TABLE t1(a INT);
+  INSERT INTO t1 VALUES(10),(15),(20),(20),(25),(30),(30),(50);
+  CREATE TABLE t3(x INT, y VARCHAR);
+  INSERT INTO t3(x,y) VALUES(10,'ten'),('15','fifteen'),(30,'thirty');
+----
+stmt 0 ok
+stmt 26 err 1 -1 no such table: t1
+stmt 90 ok
+stmt 127 err 1 -1 no such table: t3
+==== 11.1
+
+  SELECT a, (SELECT y FROM t3 WHERE x=a) FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 11.2
+
+  SELECT a, (SELECT y FROM t3 WHERE x=a), sum(a) OVER (ORDER BY a)
+    FROM t1 ORDER BY a;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 11.3.1
+
+  SELECT a, sum(a) OVER win FROM t1
+  WINDOW win AS (ORDER BY a ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 11.3.2
+
+  SELECT a, sum(a) OVER win FROM t1
+  WINDOW win AS (ORDER BY a ROWS BETWEEN UNBOUNDED PRECEDING AND 0 FOLLOWING)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 11.3.3
+
+  SELECT a, sum(a) OVER win FROM t1
+  WINDOW win AS (ORDER BY a ROWS BETWEEN UNBOUNDED PRECEDING AND 0 PRECEDING)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 11.4.1
+
+  SELECT y, group_concat(y, '.') OVER win FROM t3
+  WINDOW win AS (
+    ORDER BY y RANGE BETWEEN UNBOUNDED PRECEDING AND 10 PRECEDING
+  );
+----
+stmt 0 err 1 -1 no such table: t3

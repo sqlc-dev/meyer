@@ -1,0 +1,239 @@
+==== e_update-0.0
+
+  ATTACH 'test.db2' AS aux;
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(a, b, c);
+  CREATE TABLE t3(a, b UNIQUE);
+  CREATE TABLE t6(x, y);
+  CREATE INDEX i1 ON t1(a);
+
+  CREATE TEMP TABLE t4(x, y);
+  CREATE TEMP TABLE t6(x, y);
+
+  CREATE TABLE aux.t1(a, b);
+  CREATE TABLE aux.t5(a, b);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 53 ok
+stmt 81 ok
+stmt 113 ok
+stmt 138 err 1 -1 no such table: main.t1
+stmt 166 ok
+stmt 197 ok
+stmt 227 err 1 244 unknown database aux
+stmt 257 err 1 273 unknown database aux
+==== e_update-1.1.0
+
+  INSERT INTO main.t1 VALUES(1, 'i');
+  INSERT INTO main.t1 VALUES(2, 'ii');
+  INSERT INTO main.t1 VALUES(3, 'iii');
+
+  INSERT INTO aux.t1 VALUES(1, 'I');
+  INSERT INTO aux.t1 VALUES(2, 'II');
+  INSERT INTO aux.t1 VALUES(3, 'III');
+----
+stmt 0 err 1 -1 no such table: main.t1
+stmt 38 err 1 -1 no such table: main.t1
+stmt 77 err 1 -1 no such table: main.t1
+stmt 117 err 1 -1 no such table: aux.t1
+stmt 155 err 1 -1 no such table: aux.t1
+stmt 193 err 1 -1 no such table: aux.t1
+==== e_update-1.2.0
+
+  DELETE FROM main.t1;
+  INSERT INTO main.t1 VALUES(1, 'i');
+  INSERT INTO main.t1 VALUES(2, 'ii');
+  INSERT INTO main.t1 VALUES(3, 'iii');
+----
+stmt 0 err 1 -1 no such table: main.t1
+stmt 23 err 1 -1 no such table: main.t1
+stmt 61 err 1 -1 no such table: main.t1
+stmt 100 err 1 -1 no such table: main.t1
+==== e_update-1.3.0
+
+  DELETE FROM main.t1;
+  INSERT INTO main.t1 VALUES(NULL, '');
+  INSERT INTO main.t1 VALUES(1, 'i');
+  INSERT INTO main.t1 VALUES(2, 'ii');
+  INSERT INTO main.t1 VALUES(3, 'iii');
+----
+stmt 0 err 1 -1 no such table: main.t1
+stmt 23 err 1 -1 no such table: main.t1
+stmt 63 err 1 -1 no such table: main.t1
+stmt 101 err 1 -1 no such table: main.t1
+stmt 140 err 1 -1 no such table: main.t1
+==== e_update-1.4.0
+
+  DELETE FROM main.t1;
+  INSERT INTO main.t1 VALUES(NULL, '');
+  INSERT INTO main.t1 VALUES(1, 'i');
+  INSERT INTO main.t1 VALUES(2, 'ii');
+  INSERT INTO main.t1 VALUES(3, 'iii');
+----
+stmt 0 err 1 -1 no such table: main.t1
+stmt 23 err 1 -1 no such table: main.t1
+stmt 63 err 1 -1 no such table: main.t1
+stmt 101 err 1 -1 no such table: main.t1
+stmt 140 err 1 -1 no such table: main.t1
+==== e_update-1.5.0
+
+  INSERT INTO t2(rowid, a, b, c) VALUES(1,  3, 1, 4);
+  INSERT INTO t2(rowid, a, b, c) VALUES(2,  1, 5, 9);
+  INSERT INTO t2(rowid, a, b, c) VALUES(3,  2, 6, 5);
+----
+stmt 0 err 1 -1 no such table: t2
+stmt 54 err 1 -1 no such table: t2
+stmt 108 err 1 -1 no such table: t2
+==== e_update-1.7.0
+
+  DELETE FROM t2;
+  INSERT INTO t2(rowid, a, b, c) VALUES(1,  3, 1, 4);
+  INSERT INTO t2(rowid, a, b, c) VALUES(2,  1, 5, 9);
+  INSERT INTO t2(rowid, a, b, c) VALUES(3,  2, 6, 5);
+----
+stmt 0 err 1 -1 no such table: t2
+stmt 18 err 1 -1 no such table: t2
+stmt 72 err 1 -1 no such table: t2
+stmt 126 err 1 -1 no such table: t2
+==== e_update-1.8.0
+
+  DELETE FROM t3;
+  INSERT INTO t3 VALUES(1, 'one');
+  INSERT INTO t3 VALUES(2, 'two');
+  INSERT INTO t3 VALUES(3, 'three');
+  INSERT INTO t3 VALUES(4, 'four');
+----
+stmt 0 err 1 -1 no such table: t3
+stmt 18 err 1 -1 no such table: t3
+stmt 53 err 1 -1 no such table: t3
+stmt 88 err 1 -1 no such table: t3
+stmt 125 err 1 -1 no such table: t3
+==== e_update-generated
+SELECT * FROM t3
+----
+stmt 0 err 1 -1 no such table: t3
+==== e_update-2.1.3
+
+  CREATE TRIGGER tr1 AFTER DELETE ON t4 BEGIN
+    UPDATE main.t1 SET a=1, b=2;
+  END;
+  DROP TRIGGER tr1;
+----
+stmt 0 err 1 -1 no such table: main.t4
+stmt 86 err 1 -1 no such trigger: tr1
+==== e_update-2.2.X
+
+  DROP TRIGGER tr1;
+  DROP TRIGGER aux.tr1;
+----
+stmt 0 err 1 -1 no such trigger: tr1
+stmt 20 err 1 -1 no such trigger: aux.tr1
+==== e_update-2.3.0
+
+  SELECT 'main', tbl_name FROM main.sqlite_master WHERE type = 'table';
+  SELECT 'temp', tbl_name FROM sqlite_temp_master WHERE type = 'table';
+  SELECT 'aux', tbl_name FROM aux.sqlite_master WHERE type = 'table';
+----
+stmt 0 ok
+stmt 72 ok
+stmt 144 err 1 -1 no such table: aux.sqlite_master
+==== e_update-2.3.1
+
+  DELETE FROM main.t6;
+  DELETE FROM temp.t6;
+  INSERT INTO main.t6 VALUES(1, 2);
+  INSERT INTO temp.t6 VALUES(1, 2);
+
+  CREATE TRIGGER temp.tr1 AFTER INSERT ON t4 BEGIN
+    UPDATE t6 SET x=x+1;
+  END;
+
+  INSERT INTO t4 VALUES(1, 2);
+  SELECT * FROM main.t6;
+  SELECT * FROM temp.t6;
+----
+stmt 0 err 1 -1 no such table: main.t6
+stmt 23 err 1 -1 no such table: temp.t6
+stmt 46 err 1 -1 no such table: main.t6
+stmt 82 err 1 -1 no such table: temp.t6
+stmt 118 err 1 -1 no such table: t4
+stmt 202 err 1 -1 no such table: t4
+stmt 234 err 1 -1 no such table: main.t6
+stmt 259 err 1 -1 no such table: temp.t6
+==== e_update-2.3.2
+
+  DELETE FROM main.t1;
+  DELETE FROM aux.t1;
+  INSERT INTO main.t1 VALUES(1, 2);
+  INSERT INTO aux.t1 VALUES(1, 2);
+
+  CREATE TRIGGER temp.tr2 AFTER DELETE ON t4 BEGIN
+    UPDATE t1 SET a=a+1;
+  END;
+
+  DELETE FROM t4;
+  SELECT * FROM main.t1;
+  SELECT * FROM aux.t1;
+----
+stmt 0 err 1 -1 no such table: main.t1
+stmt 23 err 1 -1 no such table: aux.t1
+stmt 45 err 1 -1 no such table: main.t1
+stmt 81 err 1 -1 no such table: aux.t1
+stmt 116 err 1 -1 no such table: t4
+stmt 200 err 1 -1 no such table: t4
+stmt 219 err 1 -1 no such table: main.t1
+stmt 244 err 1 -1 no such table: aux.t1
+==== e_update-2.3.3
+
+  DELETE FROM aux.t5;
+  INSERT INTO aux.t5 VALUES(1, 2);
+
+  INSERT INTO t4 VALUES('x', 'y');
+  CREATE TRIGGER temp.tr3 AFTER UPDATE ON t4 BEGIN
+    UPDATE t5 SET a=a+1;
+  END;
+
+  UPDATE t4 SET x=10;
+  SELECT * FROM aux.t5;
+----
+stmt 0 err 1 -1 no such table: aux.t5
+stmt 22 err 1 -1 no such table: aux.t5
+stmt 57 err 1 -1 no such table: t4
+stmt 93 err 1 -1 no such table: t4
+stmt 176 err 1 -1 no such table: t4
+stmt 199 err 1 -1 no such table: aux.t5
+==== e_update-3.1.0
+
+  CREATE TABLE t7(q, r, s);
+  INSERT INTO t7 VALUES(1, 'one',   'X');
+  INSERT INTO t7 VALUES(2, 'two',   'X');
+  INSERT INTO t7 VALUES(3, 'three', 'X');
+  INSERT INTO t7 VALUES(4, 'four',  'X');
+  INSERT INTO t7 VALUES(5, 'five',  'X');
+  INSERT INTO t7 VALUES(6, 'six',   'X');
+  INSERT INTO t7 VALUES(7, 'seven', 'X');
+  INSERT INTO t7 VALUES(8, 'eight', 'X');
+  INSERT INTO t7 VALUES(9, 'nine',  'X');
+  INSERT INTO t7 VALUES(10, 'ten',  'X');
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: t7
+stmt 70 err 1 -1 no such table: t7
+stmt 112 err 1 -1 no such table: t7
+stmt 154 err 1 -1 no such table: t7
+stmt 196 err 1 -1 no such table: t7
+stmt 238 err 1 -1 no such table: t7
+stmt 280 err 1 -1 no such table: t7
+stmt 322 err 1 -1 no such table: t7
+stmt 364 err 1 -1 no such table: t7
+stmt 406 err 1 -1 no such table: t7
+==== e_update-3.5.0
+
+  CREATE TABLE t8(x);
+  CREATE TRIGGER tr7 BEFORE UPDATE ON t7 BEGIN
+    INSERT INTO t8 VALUES(old.q);
+  END;
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: main.t7

@@ -1,0 +1,119 @@
+==== e_delete-0.0
+
+  CREATE TABLE t1(a, b);
+  CREATE INDEX i1 ON t1(a);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: main.t1
+==== e_delete-2.0
+
+  ATTACH 'test.db2' AS aux;
+  ATTACH 'test.db3' AS aux2;
+
+  CREATE TABLE temp.t7(a, b);   INSERT INTO temp.t7 VALUES(1, 2);
+  CREATE TABLE main.t7(a, b);   INSERT INTO main.t7 VALUES(3, 4);
+  CREATE TABLE aux.t7(a, b);    INSERT INTO aux.t7 VALUES(5, 6);
+  CREATE TABLE aux2.t7(a, b);   INSERT INTO aux2.t7 VALUES(7, 8);
+
+  CREATE TABLE main.t8(a, b);   INSERT INTO main.t8 VALUES(1, 2);
+  CREATE TABLE aux.t8(a, b);    INSERT INTO aux.t8 VALUES(3, 4);
+  CREATE TABLE aux2.t8(a, b);   INSERT INTO aux2.t8 VALUES(5, 6);
+
+  CREATE TABLE aux.t9(a, b);    INSERT INTO aux.t9 VALUES(1, 2);
+  CREATE TABLE aux2.t9(a, b);   INSERT INTO aux2.t9 VALUES(3, 4);
+
+  CREATE TABLE aux2.t10(a, b);  INSERT INTO aux2.t10 VALUES(1, 2);
+----
+stmt 0 ok
+stmt 28 ok
+stmt 57 ok
+stmt 88 err 1 -1 no such table: temp.t7
+stmt 124 ok
+stmt 154 err 1 -1 no such table: main.t7
+stmt 190 err 1 206 unknown database aux
+stmt 219 err 1 -1 no such table: aux.t7
+stmt 255 err 1 271 unknown database aux2
+stmt 285 err 1 -1 no such table: aux2.t7
+stmt 321 ok
+stmt 352 err 1 -1 no such table: main.t8
+stmt 388 err 1 404 unknown database aux
+stmt 417 err 1 -1 no such table: aux.t8
+stmt 453 err 1 469 unknown database aux2
+stmt 483 err 1 -1 no such table: aux2.t8
+stmt 519 err 1 536 unknown database aux
+stmt 549 err 1 -1 no such table: aux.t9
+stmt 585 err 1 601 unknown database aux2
+stmt 615 err 1 -1 no such table: aux2.t9
+stmt 651 err 1 668 unknown database aux2
+stmt 683 err 1 -1 no such table: aux2.t10
+==== e_delete-2.2.X
+
+  DROP TRIGGER main.tr1;
+  DROP TRIGGER aux.tr2;
+----
+stmt 0 err 1 -1 no such trigger: main.tr1
+stmt 25 err 1 -1 no such trigger: aux.tr2
+==== e_delete-2.3.0
+
+  DROP TRIGGER aux.tr1;
+  DROP TRIGGER main.tr1;
+  DELETE FROM main.t8 WHERE oid>1;
+  DELETE FROM aux.t8 WHERE oid>1;
+  INSERT INTO aux.t9 VALUES(1, 2);
+  INSERT INTO main.t7 VALUES(3, 4);
+----
+stmt 0 err 1 -1 no such trigger: aux.tr1
+stmt 24 err 1 -1 no such trigger: main.tr1
+stmt 49 err 1 -1 no such table: main.t8
+stmt 84 err 1 -1 no such table: aux.t8
+stmt 118 err 1 -1 no such table: aux.t9
+stmt 153 err 1 -1 no such table: main.t7
+==== e_delete-2.3.1
+
+  SELECT count(*) FROM temp.t7 UNION ALL SELECT count(*) FROM main.t7 UNION ALL
+  SELECT count(*) FROM aux.t7  UNION ALL SELECT count(*) FROM aux2.t7;
+
+  SELECT count(*) FROM main.t8 UNION ALL SELECT count(*) FROM aux.t8  
+  UNION ALL SELECT count(*) FROM aux2.t8;
+
+  SELECT count(*) FROM aux.t9  UNION ALL SELECT count(*) FROM aux2.t9;
+
+  SELECT count(*) FROM aux2.t10;
+----
+stmt 0 err 1 -1 no such table: aux2.t7
+stmt 151 err 1 -1 no such table: aux2.t8
+stmt 265 err 1 -1 no such table: aux2.t9
+stmt 337 err 1 -1 no such table: aux2.t10
+==== e_delete-2.3.2
+
+  CREATE TRIGGER temp.tr1 AFTER INSERT ON t7 BEGIN
+    DELETE FROM t7;
+    DELETE FROM t8;
+    DELETE FROM t9;
+    DELETE FROM t10;
+  END;
+  INSERT INTO temp.t7 VALUES('hello', 'world');
+----
+stmt 0 err 1 -1 no such table: t7
+stmt 139 err 1 -1 no such table: temp.t7
+==== e_delete-2.3.3
+
+  SELECT count(*) FROM temp.t7 UNION ALL SELECT count(*) FROM main.t7 UNION ALL
+  SELECT count(*) FROM aux.t7  UNION ALL SELECT count(*) FROM aux2.t7;
+
+  SELECT count(*) FROM main.t8 UNION ALL SELECT count(*) FROM aux.t8  
+  UNION ALL SELECT count(*) FROM aux2.t8;
+
+  SELECT count(*) FROM aux.t9  UNION ALL SELECT count(*) FROM aux2.t9;
+
+  SELECT count(*) FROM aux2.t10;
+----
+stmt 0 err 1 -1 no such table: aux2.t7
+stmt 151 err 1 -1 no such table: aux2.t8
+stmt 265 err 1 -1 no such table: aux2.t9
+stmt 337 err 1 -1 no such table: aux2.t10
+==== e_delete-2.4.0
+
+  CREATE INDEX i8 ON t8(a, b);
+----
+stmt 0 err 1 -1 no such table: main.t8

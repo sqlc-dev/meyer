@@ -1,0 +1,43 @@
+==== in3-1.1
+
+    CREATE TABLE t1(a PRIMARY KEY, b);
+    INSERT INTO t1 VALUES(1, 2);
+    INSERT INTO t1 VALUES(3, 4);
+    INSERT INTO t1 VALUES(5, 6);
+----
+stmt 0 ok
+stmt 39 err 1 -1 no such table: t1
+stmt 72 err 1 -1 no such table: t1
+stmt 105 err 1 -1 no such table: t1
+==== in3-2.2
+
+    SELECT rowid 
+    FROM t1 
+    WHERE rowid IN (SELECT rowid FROM t1 WHERE rowid IN (1, 2));
+----
+stmt 0 err 1 -1 no such table: t1
+==== in3-2.3
+
+    select rowid from t1 where rowid IN (-1,2,4)
+----
+stmt 0 err 1 -1 no such table: t1
+==== in3-2.4
+
+    SELECT rowid FROM t1 WHERE rowid IN 
+       (select rowid from t1 where rowid IN (-1,2,4))
+----
+stmt 0 err 1 -1 no such table: t1
+==== in3-4.6
+ DROP INDEX t3_i2
+----
+stmt 0 err 1 -1 no such index: t3_i2
+==== in3-5.1
+
+    CREATE TABLE Folders(
+      folderid INTEGER PRIMARY KEY, 
+      parentid INTEGER, 
+      rootid INTEGER, 
+      path VARCHAR(255)
+    );
+----
+stmt 0 ok

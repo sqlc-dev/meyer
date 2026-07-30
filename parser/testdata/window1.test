@@ -1,0 +1,2385 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b, c, d);
+  INSERT INTO t1 VALUES(1, 2, 3, 4);
+  INSERT INTO t1 VALUES(5, 6, 7, 8);
+  INSERT INTO t1 VALUES(9, 10, 11, 12);
+----
+stmt 0 ok
+stmt 31 err 1 -1 no such table: t1
+stmt 68 err 1 -1 no such table: t1
+stmt 105 err 1 -1 no such table: t1
+==== 1.1
+
+  SELECT sum(b) OVER () FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.2
+
+  SELECT a, sum(b) OVER () FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.3
+
+  SELECT a, 4 + sum(b) OVER () FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.4
+
+  SELECT a + 4 + sum(b) OVER () FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.5
+
+  SELECT a, sum(b) OVER (PARTITION BY c) FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 4.0
+
+  CREATE TABLE t2(a, b, c);
+  INSERT INTO t2 VALUES(0, 0, 0);
+  INSERT INTO t2 VALUES(1, 1, 1);
+  INSERT INTO t2 VALUES(2, 0, 2);
+  INSERT INTO t2 VALUES(3, 1, 0);
+  INSERT INTO t2 VALUES(4, 0, 1);
+  INSERT INTO t2 VALUES(5, 1, 2);
+  INSERT INTO t2 VALUES(6, 0, 0);
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: t2
+stmt 62 err 1 -1 no such table: t2
+stmt 96 err 1 -1 no such table: t2
+stmt 130 err 1 -1 no such table: t2
+stmt 164 err 1 -1 no such table: t2
+stmt 198 err 1 -1 no such table: t2
+stmt 232 err 1 -1 no such table: t2
+==== 4.1
+
+  SELECT a, sum(a) OVER (PARTITION BY b) FROM t2;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.2
+
+  SELECT a, sum(a) OVER (PARTITION BY b) FROM t2 ORDER BY a;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.3
+
+  SELECT a, sum(a) OVER () FROM t2 ORDER BY a;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.4
+
+  SELECT a, sum(a) OVER (ORDER BY a) FROM t2;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.5
+
+  SELECT a, sum(a) OVER (PARTITION BY b ORDER BY a) FROM t2 ORDER BY a
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.6
+
+  SELECT a, sum(a) OVER (PARTITION BY c ORDER BY a) FROM t2 ORDER BY a
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.7
+
+  SELECT a, sum(a) OVER (PARTITION BY b ORDER BY a DESC) FROM t2 ORDER BY a
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.8
+
+  SELECT a, 
+    sum(a) OVER (PARTITION BY b ORDER BY a DESC),
+    sum(a) OVER (PARTITION BY c ORDER BY a) 
+  FROM t2 ORDER BY a
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.9
+
+  SELECT a, 
+    sum(a) OVER (ORDER BY a), 
+    avg(a) OVER (ORDER BY a) 
+  FROM t2 ORDER BY a
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.10.1
+
+  SELECT a, 
+    count() OVER (ORDER BY a DESC),
+    string_agg(a, '.') OVER (ORDER BY a DESC) 
+  FROM t2 ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t2
+==== 4.10.2
+
+  SELECT a, 
+    count(*) OVER (ORDER BY a DESC),
+    group_concat(a, '.') OVER (ORDER BY a DESC) 
+  FROM t2 ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t2
+==== 5.1
+
+  SELECT ntile(0) OVER (ORDER BY a) FROM t2;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 5.2
+
+  SELECT ntile(-1) OVER (ORDER BY a) FROM t2;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 5.3
+
+  SELECT ntile('zbc') OVER (ORDER BY a) FROM t2;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 5.4
+
+  CREATE TABLE t4(a, b);
+  SELECT ntile(1) OVER (ORDER BY a) FROM t4;
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t4
+==== 6.1
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(7), (6), (5), (4), (3), (2), (1);
+
+  CREATE TABLE t2(x);
+  INSERT INTO t2 VALUES('b'), ('a');
+
+  SELECT x, count(*) OVER (ORDER BY x) FROM t1;
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: t1
+stmt 80 ok
+stmt 103 err 1 -1 no such table: t2
+stmt 140 err 1 -1 no such table: t1
+==== 6.2
+
+  SELECT * FROM t2, (SELECT x, count(*) OVER (ORDER BY x) FROM t1)
+  ORDER BY 1, 2;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 6.3
+
+  SELECT x, lag(x) FILTER (WHERE (x%2)=0) OVER w FROM t1 
+  WINDOW w AS (ORDER BY x)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.0
+
+  CREATE TABLE t1(x, y);
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(3, 4);
+  INSERT INTO t1 VALUES(5, 6);
+  INSERT INTO t1 VALUES(7, 8);
+  INSERT INTO t1 VALUES(9, 10);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t1
+stmt 56 err 1 -1 no such table: t1
+stmt 87 err 1 -1 no such table: t1
+stmt 118 err 1 -1 no such table: t1
+stmt 149 err 1 -1 no such table: t1
+==== 7.1.1
+
+  SELECT nth_value(x, 1) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.1.2
+
+  SELECT * FROM t1 WHERE nth_value(x, 1) OVER (ORDER BY y);
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.1.3
+
+  SELECT count(*) FROM t1 GROUP BY y HAVING nth_value(x, 1) OVER (ORDER BY y);
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.1.4
+
+  SELECT count(*) FROM t1 GROUP BY nth_value(x, 1) OVER (ORDER BY y);
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.1.5
+
+  SELECT count(*) FROM t1 LIMIT nth_value(x, 1) OVER ();
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.1.6
+
+  SELECT trim(x) OVER (ORDER BY y) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.1.7
+
+  SELECT max(x) OVER abc FROM t1 WINDOW def AS (ORDER BY y);
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.1.8
+
+  SELECT row_number(x) OVER () FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.2
+
+  SELECT 
+    lead(y) OVER win, 
+    lead(y, 2) OVER win, 
+    lead(y, 3, 'default') OVER win
+  FROM t1
+  WINDOW win AS (ORDER BY x)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.3
+
+  SELECT row_number() OVER (ORDER BY x) FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.4
+
+  SELECT 
+    row_number() OVER win,
+    lead(x) OVER win
+  FROM t1
+  WINDOW win AS (ORDER BY x ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 8.0
+
+  CREATE TABLE t3(a, b, c);
+
+  WITH s(i) AS ( VALUES(1) UNION ALL SELECT i+1 FROM s WHERE i<6 )
+  INSERT INTO t3 SELECT i, i, i FROM s;
+
+  CREATE VIEW v1 AS SELECT
+    sum(b) OVER (ORDER BY c),
+    min(b) OVER (ORDER BY c),
+    max(b) OVER (ORDER BY c)
+  FROM t3;
+
+  CREATE VIEW v2 AS SELECT
+    sum(b) OVER win,
+    min(b) OVER win,
+    max(b) OVER win
+  FROM t3
+  WINDOW win AS (ORDER BY c);
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: t3
+stmt 136 ok
+stmt 264 ok
+==== 8.1.1
+
+  SELECT * FROM v1
+----
+stmt 0 err 1 -1 no such table: v1
+==== 8.1.2
+
+  SELECT * FROM v2
+----
+stmt 0 err 1 -1 no such table: v2
+==== 8.2.1
+
+  SELECT * FROM v1
+----
+stmt 0 err 1 -1 no such table: v1
+==== 8.2.2
+
+  SELECT * FROM v2
+----
+stmt 0 err 1 -1 no such table: v2
+==== 9.0
+
+  CREATE TABLE t4(x, y);
+  INSERT INTO t4 VALUES(1, 'g');
+  INSERT INTO t4 VALUES(2, 'i');
+  INSERT INTO t4 VALUES(3, 'l');
+  INSERT INTO t4 VALUES(4, 'g');
+  INSERT INTO t4 VALUES(5, 'a');
+
+  CREATE TABLE t5(x, y, m);
+  CREATE TRIGGER t4i AFTER INSERT ON t4 BEGIN
+    DELETE FROM t5;
+    INSERT INTO t5 
+      SELECT x, y, max(y) OVER xyz FROM t4
+      WINDOW xyz AS (PARTITION BY (x%2) ORDER BY x);
+  END;
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t4
+stmt 58 err 1 -1 no such table: t4
+stmt 91 err 1 -1 no such table: t4
+stmt 124 err 1 -1 no such table: t4
+stmt 157 err 1 -1 no such table: t4
+stmt 190 ok
+stmt 219 err 1 -1 no such table: main.t4
+==== 9.1.1
+
+  SELECT x, y, max(y) OVER xyz FROM t4
+      WINDOW xyz AS (PARTITION BY (x%2) ORDER BY x) ORDER BY 1
+----
+stmt 0 err 1 -1 no such table: t4
+==== 9.1.2
+
+  INSERT INTO t4 VALUES(6, 'm');
+  SELECT x, y, max(y) OVER xyz FROM t4
+      WINDOW xyz AS (PARTITION BY (x%2) ORDER BY x) ORDER BY 1
+----
+stmt 0 err 1 -1 no such table: t4
+stmt 33 err 1 -1 no such table: t4
+==== 9.1.3
+
+  SELECT * FROM t5 ORDER BY 1
+----
+stmt 0 err 1 -1 no such table: t5
+==== 9.2
+
+  WITH aaa(x, y, z) AS (
+    SELECT x, y, max(y) OVER xyz FROM t4
+    WINDOW xyz AS (PARTITION BY (x%2) ORDER BY x)
+  )
+  SELECT * FROM aaa ORDER BY 1;
+----
+stmt 0 err 1 -1 no such table: t4
+==== 9.3
+
+  WITH aaa(x, y, z) AS (
+    SELECT x, y, max(y) OVER xyz FROM t4
+    WINDOW xyz AS (ORDER BY x)
+  )
+  SELECT *, min(z) OVER (ORDER BY x) FROM aaa ORDER BY 1;
+----
+stmt 0 err 1 -1 no such table: t4
+==== 9.4
+
+  -- 2021-04-17 dbsqlfuzz d9cf66100064952b66951845dfab41de1c124611
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a,b,c,d);
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t2(x,y);
+  CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t2(x,y)
+      SELECT a, max(d) OVER w1 FROM t1
+        WINDOW w1 AS (PARTITION BY EXISTS(SELECT 1 FROM t1 WHERE c=?1) );
+  END;
+----
+stmt 0 ok
+stmt 94 ok
+stmt 122 ok
+stmt 149 ok
+stmt 173 err 1 -1 no such table: main.t1
+==== 9.4.2
+
+  CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t1(a,b) 
+        SELECT a, max(d) OVER w1 FROM t1
+        WINDOW w1 AS (
+          ORDER BY a ROWS BETWEEN ? PRECEDING AND UNBOUNDED FOLLOWING
+        );
+  END;
+----
+stmt 0 err 1 -1 no such table: main.t1
+==== 9.4.3
+
+  CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t1(a,b) 
+        SELECT a, max(d) OVER w1 FROM t1
+        WINDOW w1 AS (
+          ORDER BY a ROWS BETWEEN UNBOUNDED PRECEDING AND ? FOLLOWING
+        );
+  END;
+----
+stmt 0 err 1 -1 no such table: main.t1
+==== 10.0
+
+  CREATE TABLE sales(emp TEXT PRIMARY KEY, region, total);
+  INSERT INTO sales VALUES
+      ('Alice',     'North', 34),
+      ('Frank',     'South', 22),
+      ('Charles',   'North', 45),
+      ('Darrell',   'South', 8),
+      ('Grant',     'South', 23),
+      ('Brad' ,     'North', 22),
+      ('Elizabeth', 'South', 99),
+      ('Horace',    'East',   1);
+----
+stmt 0 ok
+stmt 59 err 1 -1 no such table: sales
+==== 10.1
+
+  SELECT emp, region, total FROM (
+    SELECT 
+      emp, region, total,
+      row_number() OVER (PARTITION BY region ORDER BY total DESC) AS rank
+    FROM sales
+  ) WHERE rank<=2 ORDER BY region, total DESC
+----
+stmt 0 err 1 -1 no such table: sales
+==== 10.2
+
+  SELECT emp, region, sum(total) OVER win FROM sales
+  WINDOW win AS (PARTITION BY region ORDER BY total)
+----
+stmt 0 err 1 -1 no such table: sales
+==== 10.3
+
+  SELECT emp, region, sum(total) OVER win FROM sales
+  WINDOW win AS (PARTITION BY region ORDER BY total)
+  LIMIT 5
+----
+stmt 0 err 1 -1 no such table: sales
+==== 10.4
+
+  SELECT emp, region, sum(total) OVER win FROM sales
+  WINDOW win AS (PARTITION BY region ORDER BY total)
+  LIMIT 5 OFFSET 2
+----
+stmt 0 err 1 -1 no such table: sales
+==== 10.5
+
+  SELECT emp, region, sum(total) OVER win FROM sales
+  WINDOW win AS (
+    PARTITION BY region ORDER BY total 
+    ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
+  )
+----
+stmt 0 err 1 -1 no such table: sales
+==== 10.6
+
+  SELECT emp, region, sum(total) OVER win FROM sales
+  WINDOW win AS (
+    PARTITION BY region ORDER BY total 
+    ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING
+  ) LIMIT 5 OFFSET 2
+----
+stmt 0 err 1 -1 no such table: sales
+==== 10.7
+
+  SELECT emp, region, (
+    SELECT sum(total) OVER (
+      ORDER BY total RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) || outer.emp FROM sales
+  ) FROM sales AS outer;
+----
+stmt 0 err 1 -1 no such table: sales
+==== 10.8
+
+  SELECT emp, region, (
+    SELECT sum(total) FILTER (WHERE sales.emp!=outer.emp) OVER (
+      ORDER BY total RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+    ) FROM sales
+  ) FROM sales AS outer;
+----
+stmt 0 err 1 -1 no such table: sales
+==== 11.0
+ CREATE TABLE t6(a, b, c);
+----
+stmt 0 ok
+==== 11.1
+
+  CREATE INDEX t6i ON t6(a) WHERE sum(b) OVER ();
+----
+stmt 0 err 1 -1 no such table: main.t6
+==== 11.2
+
+  CREATE INDEX t6i ON t6(a) WHERE lead(b) OVER ();
+----
+stmt 0 err 1 -1 no such table: main.t6
+==== 11.3
+
+  CREATE INDEX t6i ON t6(sum(b) OVER ());
+----
+stmt 0 err 1 -1 no such table: main.t6
+==== 11.4
+
+  CREATE INDEX t6i ON t6(lead(b) OVER ());
+----
+stmt 0 err 1 -1 no such table: main.t6
+==== 12.100
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(id INT, b VARCHAR, c VARCHAR);
+  INSERT INTO t1 VALUES(1, 'A', 'one');
+  INSERT INTO t1 VALUES(2, 'B', 'two');
+  INSERT INTO t1 VALUES(3, 'C', 'three');
+  INSERT INTO t1 VALUES(4, 'D', 'one');
+  INSERT INTO t1 VALUES(5, 'E', 'two');
+  SELECT id, b, lead(c,1) OVER(ORDER BY c) AS x 
+    FROM t1 WHERE id>1
+   ORDER BY b LIMIT 1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 76 err 1 -1 no such table: t1
+stmt 116 err 1 -1 no such table: t1
+stmt 156 err 1 -1 no such table: t1
+stmt 198 err 1 -1 no such table: t1
+stmt 238 err 1 -1 no such table: t1
+stmt 278 err 1 -1 no such table: t1
+==== 12.110
+
+  INSERT INTO t1 VALUES(6, 'F', 'three');
+  INSERT INTO t1 VALUES(7, 'G', 'one');
+  SELECT id, b, lead(c,1) OVER(ORDER BY c) AS x
+    FROM t1 WHERE id>1
+   ORDER BY b LIMIT 2;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 42 err 1 -1 no such table: t1
+stmt 82 err 1 -1 no such table: t1
+==== 13.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a int, b int);
+  INSERT INTO t1 VALUES(1,11);
+  INSERT INTO t1 VALUES(2,12);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 60 err 1 -1 no such table: t1
+stmt 91 err 1 -1 no such table: t1
+==== 13.2.1
+
+  SELECT a, rank() OVER(ORDER BY b) FROM t1;
+  SELECT a, rank() OVER(ORDER BY b DESC) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 45 err 1 -1 no such table: t1
+==== 13.2.2
+
+  SELECT a, rank() OVER(ORDER BY b) FROM t1
+    UNION ALL
+  SELECT a, rank() OVER(ORDER BY b DESC) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 13.3
+
+  SELECT a, rank() OVER(ORDER BY b) FROM t1
+    UNION 
+  SELECT a, rank() OVER(ORDER BY b DESC) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 13.4
+
+  SELECT a, rank() OVER(ORDER BY b) FROM t1
+    EXCEPT 
+  SELECT a, rank() OVER(ORDER BY b DESC) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 13.5
+
+  SELECT a, rank() OVER(ORDER BY b) FROM t1
+    INTERSECT 
+  SELECT a, rank() OVER(ORDER BY b DESC) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 14.0
+
+  SELECT * FROM(
+    SELECT * FROM (SELECT 1 AS c) WHERE c IN (
+        SELECT (row_number() OVER()) FROM (VALUES (0))
+    )
+  );
+----
+stmt 0 ok
+==== 14.1
+
+  CREATE TABLE t1(x); INSERT INTO t1(x) VALUES(12345);
+  CREATE TABLE t2(c); INSERT INTO t2(c) VALUES(1);
+  SELECT y, y+1, y+2 FROM (
+    SELECT c IN (
+      SELECT (row_number() OVER()) FROM t1
+    ) AS y FROM t2
+  );
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: t1
+stmt 55 ok
+stmt 77 err 1 -1 no such table: t2
+stmt 106 err 1 -1 no such table: t2
+==== 15.0
+
+  WITH t(id, parent) AS (
+  SELECT CAST(1 AS INT), CAST(NULL AS INT)
+  UNION ALL
+  SELECT 2, NULL
+  UNION ALL
+  SELECT 3, 1
+  UNION ALL
+  SELECT 4, 1
+  UNION ALL
+  SELECT 5, 2
+  UNION ALL
+  SELECT 6, 2
+  ), q AS (
+  SELECT t.*, ROW_NUMBER() OVER (ORDER BY t.id) AS rn
+    FROM t
+   WHERE parent IS NULL
+   UNION ALL
+  SELECT t.*, ROW_NUMBER() OVER (ORDER BY t.id) AS rn
+    FROM q
+    JOIN t
+      ON t.parent = q.id
+  )
+  SELECT *
+    FROM q;
+----
+stmt 0 err 1 -1 cannot use window functions in recursive queries
+==== 15.1
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES('a'), ('b'), ('c');
+  CREATE TABLE t2(a, b);
+  INSERT INTO t2 VALUES('X', 1), ('X', 2), ('Y', 2), ('Y', 3);
+  SELECT x, (
+    SELECT sum(b)
+      OVER (PARTITION BY a ROWS BETWEEN UNBOUNDED PRECEDING
+                                    AND UNBOUNDED FOLLOWING)
+    FROM t2 WHERE b<x
+  ) FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 76 err 1 -1 no such table: t1
+stmt 120 ok
+stmt 145 err 1 -1 no such table: t2
+stmt 208 err 1 -1 no such table: t1
+==== 15.2
+
+  SELECT(
+    WITH c AS(
+      VALUES(1)
+    ) SELECT '' FROM c,c
+  ) x WHERE x+x;
+----
+stmt 0 ok
+==== 16.0
+
+  CREATE TABLE t7(a,b); 
+  INSERT INTO t7(rowid, a, b) VALUES
+      (1, 1, 3),
+      (2, 10, 4),
+      (3, 100, 2);
+----
+stmt 0 ok
+stmt 24 err 1 -1 no such table: t7
+==== 16.1
+
+  SELECT rowid, sum(a) OVER (PARTITION BY b IN (SELECT rowid FROM t7)) FROM t7;
+----
+stmt 0 err 1 -1 no such table: t7
+==== 16.2
+
+  SELECT rowid, sum(a) OVER w1 FROM t7 
+  WINDOW w1 AS (PARTITION BY b IN (SELECT rowid FROM t7));
+----
+stmt 0 err 1 -1 no such table: t7
+==== 17.0
+
+  CREATE TABLE t8(a);
+  INSERT INTO t8 VALUES(1), (2), (3);
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: t8
+==== 17.1
+
+  SELECT +sum(0) OVER () ORDER BY +sum(0) OVER ();
+----
+stmt 0 ok
+==== 17.2
+
+  select +sum(a) OVER () FROM t8 ORDER BY +sum(a) OVER () DESC;
+----
+stmt 0 err 1 -1 no such table: t8
+==== 17.3
+
+  SELECT 10+sum(a) OVER (ORDER BY a) 
+  FROM t8 
+  ORDER BY 10+sum(a) OVER (ORDER BY a) DESC;
+----
+stmt 0 err 1 -1 no such table: t8
+==== 18.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b TEXT, c TEXT, d INTEGER);
+  INSERT INTO t1 VALUES(1, 'odd',  'one',   1);
+  INSERT INTO t1 VALUES(2, 'even', 'two',   2);
+  INSERT INTO t1 VALUES(3, 'odd',  'three', 3);
+  INSERT INTO t1 VALUES(4, 'even', 'four',  4);
+  INSERT INTO t1 VALUES(5, 'odd',  'five',  5);
+  INSERT INTO t1 VALUES(6, 'even', 'six',   6);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 96 err 1 -1 no such table: t1
+stmt 144 err 1 -1 no such table: t1
+stmt 192 err 1 -1 no such table: t1
+stmt 240 err 1 -1 no such table: t1
+stmt 288 err 1 -1 no such table: t1
+stmt 336 err 1 -1 no such table: t1
+==== 18.3.1
+
+  SELECT string_agg(c, '.') OVER (PARTITION BY b ORDER BY c)
+  FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 18.3.2
+
+  SELECT group_concat(c, '.') OVER (win1 ORDER BY c)
+  FROM t1
+  WINDOW win1 AS (PARTITION BY b)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 18.3.3
+
+  SELECT string_agg(c, '.') OVER win2
+  FROM t1
+  WINDOW win1 AS (PARTITION BY b),
+         win2 AS (win1 ORDER BY c)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 18.3.4
+
+  SELECT group_concat(c, '.') OVER (win2)
+  FROM t1
+  WINDOW win1 AS (PARTITION BY b),
+         win2 AS (win1 ORDER BY c)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 18.3.5
+
+  SELECT string_agg(c, '.') OVER win5
+  FROM t1
+  WINDOW win1 AS (PARTITION BY b),
+         win2 AS (win1),
+         win3 AS (win2),
+         win4 AS (win3),
+         win5 AS (win4 ORDER BY c)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 19.0
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES
+    (1, 1), (2, 2), (3, 3), (4, 4), (5, 5),
+    ('a', 6), ('b', 7), ('c', 8), ('d', 9), ('e', 10);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t1
+==== 19.1
+
+  SELECT a, sum(b) OVER (ORDER BY a) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 19.2.1
+
+  SELECT a, sum(b) OVER (
+    ORDER BY a RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 19.2.2
+
+  SELECT a, sum(b) OVER (
+    ORDER BY a DESC RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING
+  ) FROM t1 ORDER BY a ASC;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 19.3.1
+
+  SELECT a, sum(b) OVER (
+    ORDER BY a RANGE BETWEEN 2 PRECEDING AND 1 FOLLOWING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 19.3.2
+
+  SELECT a, sum(b) OVER (
+    ORDER BY a DESC RANGE BETWEEN 1 PRECEDING AND 2 FOLLOWING
+  ) FROM t1 ORDER BY a ASC;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 20.0
+
+  CREATE TABLE t1(a, b);
+  INSERT INTO t1 VALUES
+    (NULL, 100), (NULL, 100), 
+    (1, 1), (2, 2), (3, 3), (4, 4), (5, 5),
+    ('a', 6), ('b', 7), ('c', 8), ('d', 9), ('e', 10);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t1
+==== 20.1
+
+  SELECT a, sum(b) OVER (ORDER BY a) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 20.2.1
+
+  SELECT a, sum(b) OVER (
+    ORDER BY a RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 20.2.2
+
+  SELECT a, sum(b) OVER (
+    ORDER BY a DESC RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING
+  ) FROM t1 ORDER BY a ASC;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 20.3.1
+
+  SELECT a, sum(b) OVER (
+    ORDER BY a RANGE BETWEEN 2 PRECEDING AND 1 FOLLOWING
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 20.3.2
+
+  SELECT a, sum(b) OVER (
+    ORDER BY a DESC RANGE BETWEEN 1 PRECEDING AND 2 FOLLOWING
+  ) FROM t1 ORDER BY a ASC;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 21.0
+
+  CREATE TABLE keyword_tab(
+    current, exclude, filter, following, groups, no, others, over,
+    partition, preceding, range, ties, unbounded, window
+  );
+----
+stmt 0 ok
+==== 21.1
+
+  SELECT
+    current, exclude, filter, following, groups, no, others, over,
+    partition, preceding, range, ties, unbounded, window
+  FROM keyword_tab
+----
+stmt 0 err 1 -1 no such table: keyword_tab
+==== 23.0
+
+  CREATE TABLE t5(a, b, c);
+  CREATE INDEX t5ab ON t5(a, b);
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: main.t5
+==== 24.1
+
+  SELECT sum(44) OVER ()
+----
+stmt 0 ok
+==== 24.2
+
+  SELECT lead(44) OVER ()
+----
+stmt 0 ok
+==== 25.0
+
+  CREATE TABLE t1 ( t1_id INTEGER PRIMARY KEY );
+  CREATE TABLE t2 ( t2_id INTEGER PRIMARY KEY );
+  CREATE TABLE t3 ( t3_id INTEGER PRIMARY KEY );
+
+  INSERT INTO t1 VALUES(1),  (3), (5);
+  INSERT INTO t2 VALUES      (3), (5);
+  INSERT INTO t3 VALUES(10), (11), (12);
+----
+stmt 0 ok
+stmt 49 ok
+stmt 98 ok
+stmt 147 err 1 -1 no such table: t1
+stmt 187 err 1 -1 no such table: t2
+stmt 226 err 1 -1 no such table: t3
+==== 25.1
+
+  SELECT t1.* FROM t1, t2 WHERE 
+    t1_id=t2_id AND t1_id IN (
+        SELECT t1_id + row_number() OVER ( ORDER BY t1_id ) FROM t3
+    )
+----
+stmt 0 err 1 -1 no such table: t1
+==== 25.2
+
+  SELECT t1.* FROM t1, t2 WHERE 
+    t1_id=t2_id AND t1_id IN (
+        SELECT         row_number() OVER ( ORDER BY t1_id ) FROM t3
+    )
+----
+stmt 0 err 1 -1 no such table: t1
+==== 26.0
+
+  CREATE TABLE t1(x);
+  CREATE TABLE t2(c);
+----
+stmt 0 ok
+stmt 22 ok
+==== 26.1
+
+  SELECT ( SELECT row_number() OVER () FROM ( SELECT c FROM t1 ) ) FROM t2
+----
+stmt 0 err 1 -1 no such table: t2
+==== 26.2
+
+  INSERT INTO t1 VALUES(1), (2), (3), (4);
+  INSERT INTO t2 VALUES(2), (6), (8), (4);
+  SELECT c, c IN ( 
+    SELECT row_number() OVER () FROM ( SELECT c FROM t1 )
+  ) FROM t2
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 43 err 1 -1 no such table: t2
+stmt 86 err 1 -1 no such table: t2
+==== 26.3
+
+  DELETE FROM t1;
+  DELETE FROM t2;
+
+  INSERT INTO t2 VALUES(1), (2), (3), (4);
+  INSERT INTO t1 VALUES(1), (1), (2), (3), (3), (3), (3), (4), (4);
+
+  SELECT c, c IN ( 
+    SELECT row_number() OVER () FROM ( SELECT 1 FROM t1 WHERE x=c )
+  ) FROM t2
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t2
+stmt 36 err 1 -1 no such table: t2
+stmt 80 err 1 -1 no such table: t1
+stmt 148 err 1 -1 no such table: t2
+==== 27.0
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(NULL), (1), (2), (3), (4), (5);
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: t1
+==== 27.1
+
+  SELECT min(x) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 27.2
+
+  SELECT min(x) OVER win FROM t1
+  WINDOW win AS (ORDER BY rowid ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 28.1.1
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b CHAR(1), c CHAR(2), d ANY);
+  INSERT INTO t1 VALUES (3, 'C', 'cc', 1.0);
+  INSERT INTO t1 VALUES (13,'M', 'cc', NULL);
+----
+stmt 0 ok
+stmt 71 err 1 -1 no such table: t1
+stmt 116 err 1 -1 no such table: t1
+==== 28.1.2
+
+  SELECT string_agg(b,'') OVER w1 FROM t1
+    WINDOW w1 AS (ORDER BY a RANGE BETWEEN 3 PRECEDING AND 1 PRECEDING)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 28.2.1
+
+  CREATE TABLE t2(a TEXT, b INTEGER);
+  INSERT INTO t2 VALUES('A', NULL);
+  INSERT INTO t2 VALUES('B', NULL);
+----
+stmt 0 ok
+stmt 38 err 1 -1 no such table: t2
+stmt 74 err 1 -1 no such table: t2
+==== 28.2.1.dup1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b CHAR(1), c CHAR(2), d ANY);
+  INSERT INTO t1 VALUES
+    (10,'J', 'cc', NULL),
+    (11,'K', 'cc', 'xyz'),
+    (13,'M', 'cc', NULL);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 98 err 1 -1 no such table: t1
+==== 28.2.2
+
+  SELECT a, b, c, quote(d), group_concat(b,'') OVER w1, '|' FROM t1
+    WINDOW w1 AS
+    (ORDER BY d DESC RANGE BETWEEN 7.0 PRECEDING AND 2.5 PRECEDING)
+    ORDER BY c, d, a;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 29.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b CHAR(1), c CHAR(2), d ANY);
+  INSERT INTO t1 VALUES
+    (1, 'A', 'aa', 2.5),
+    (2, 'B', 'bb', 3.75),
+    (3, 'C', 'cc', 1.0),
+    (4, 'D', 'cc', 8.25),
+    (5, 'E', 'bb', 6.5),
+    (6, 'F', 'aa', 6.5),
+    (7, 'G', 'aa', 6.0),
+    (8, 'H', 'bb', 9.0),
+    (9, 'I', 'aa', 3.75),
+    (10,'J', 'cc', NULL),
+    (11,'K', 'cc', 'xyz'),
+    (12,'L', 'cc', 'xyZ'),
+    (13,'M', 'cc', NULL);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 98 err 1 -1 no such table: t1
+==== 29.2
+
+  SELECT a, b, c, quote(d), group_concat(b,'') OVER w1, '|' FROM t1
+    WINDOW w1 AS
+    (PARTITION BY c ORDER BY d DESC
+     RANGE BETWEEN 7.0 PRECEDING AND 2.5 PRECEDING)
+    ORDER BY c, d, a;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 30.0
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES('BB','aa',399);
+  SELECT
+    count () OVER win1 NOT BETWEEN 'a' AND 'mmm',
+    count () OVER win3
+  FROM t1
+  WINDOW win1 AS (ORDER BY a GROUPS BETWEEN 4 PRECEDING AND 1 FOLLOWING
+                  EXCLUDE CURRENT ROW),
+         win2 AS (PARTITION BY b ORDER BY a),
+         win3 AS (win2 RANGE BETWEEN 5.2 PRECEDING AND true PRECEDING );
+----
+stmt 0 ok
+stmt 27 ok
+stmt 55 err 1 -1 no such table: t1
+stmt 95 err 1 -1 no such table: t1
+==== 31.1
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t2(c, d);
+  CREATE TABLE t3(e, f);
+
+  INSERT INTO t1 VALUES(1, 1);
+  INSERT INTO t2 VALUES(1, 1);
+  INSERT INTO t3 VALUES(1, 1);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 ok
+stmt 75 err 1 -1 no such table: t1
+stmt 107 err 1 -1 no such table: t2
+stmt 138 err 1 -1 no such table: t3
+==== 31.2
+
+  SELECT d IN (SELECT sum(c) OVER (ORDER BY e+c) FROM t3) FROM (
+    SELECT * FROM t2
+  );
+----
+stmt 0 err 1 -1 no such table: t2
+==== 31.3
+
+  SELECT d IN (SELECT sum(c) OVER (PARTITION BY d ORDER BY e+c) FROM t3) FROM (
+    SELECT * FROM t2
+  );
+----
+stmt 0 err 1 -1 no such table: t2
+==== 31.3.dup1
+
+  SELECT d IN (
+    SELECT sum(c) OVER ( ROWS BETWEEN d FOLLOWING AND UNBOUNDED FOLLOWING) 
+    FROM t3
+  )
+  FROM (
+    SELECT * FROM t2
+  );
+----
+stmt 0 err 1 -1 no such table: t2
+==== 31.3.dup2
+
+  SELECT d IN (
+    SELECT sum(c) OVER ( ROWS BETWEEN CURRENT ROW AND c FOLLOWING) 
+    FROM t3
+  )
+  FROM (
+    SELECT * FROM t2
+  );
+----
+stmt 0 err 1 -1 no such table: t2
+==== 32.10
+
+    CREATE VIEW a AS SELECT NULL INTERSECT SELECT NULL ORDER BY s() OVER R;
+    CREATE TABLE a0 AS SELECT 0;
+    ALTER TABLE a0 RENAME TO S;
+----
+stmt 0 ok
+stmt 76 ok
+stmt 109 err 1 -1 no such table: a0
+==== 33.1
+
+  CREATE TABLE t1(aa, bb);
+  INSERT INTO t1 VALUES(1, 2);
+  INSERT INTO t1 VALUES(5, 6);
+  CREATE TABLE t2(x);
+  INSERT INTO t2 VALUES(1);
+----
+stmt 0 ok
+stmt 27 err 1 -1 no such table: t1
+stmt 58 err 1 -1 no such table: t1
+stmt 89 ok
+stmt 111 err 1 -1 no such table: t2
+==== 33.2
+
+  SELECT (SELECT DISTINCT sum(aa) OVER() FROM t1 ORDER BY 1), x FROM t2 
+  ORDER BY 1;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 34.1
+
+  CREATE TABLE t1(a,b,c);
+----
+stmt 0 ok
+==== 34.2
+
+  SELECT avg(a) OVER (
+      ORDER BY (SELECT sum(b) OVER ()
+        FROM t1 ORDER BY (
+          SELECT total(d) OVER (ORDER BY c)
+          FROM (SELECT 1 AS d) ORDER BY 1
+          )
+        )
+      )
+  FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 35.0
+
+  SELECT * WINDOW f AS () ORDER BY name COLLATE nocase;
+----
+stmt 0 err 1 -1 no tables specified
+==== 35.1
+
+  VALUES(1) INTERSECT SELECT * WINDOW f AS () ORDER BY x COLLATE nocase;
+----
+stmt 0 err 1 -1 no tables specified
+==== 35.2
+
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(1), (2), (3);
+  VALUES(1) INTERSECT 
+  SELECT sum(x) OVER f FROM t1 WINDOW f AS (ORDER BY x) ORDER BY 1;
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: t1
+stmt 60 err 1 -1 no such table: t1
+==== 35.3
+
+  VALUES(8) EXCEPT 
+  SELECT sum(x) OVER f FROM t1 WINDOW f AS (ORDER BY x) ORDER BY 1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 35.4
+
+  VALUES(1) UNION 
+  SELECT sum(x) OVER f FROM t1 WINDOW f AS (ORDER BY x) ORDER BY 1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 36.10
+
+  VALUES(count(*)OVER());
+----
+stmt 0 ok
+==== 36.20
+
+  VALUES(count(*)OVER()),(2);
+----
+stmt 0 ok
+==== 36.30
+
+  VALUES(2),(count(*)OVER());
+----
+stmt 0 ok
+==== 36.40
+
+  VALUES(2),(3),(count(*)OVER()),(4),(5);
+----
+stmt 0 ok
+==== 37.10
+
+  CREATE TABLE t0(a UNIQUE, b PRIMARY KEY);
+  CREATE VIEW v0(c) AS SELECT max((SELECT count(a)OVER(ORDER BY 1))) FROM t0;
+  SELECT c FROM v0 WHERE c BETWEEN 10 AND 20;
+----
+stmt 0 ok
+stmt 44 ok
+stmt 122 err 1 -1 no such table: v0
+==== 37.20
+
+  DROP VIEW v0;
+  CREATE VIEW v0(c) AS SELECT max((SELECT count(a)OVER(ORDER BY 1234))) FROM t0;
+  SELECT c FROM v0 WHERE c BETWEEN -10 AND 20;
+----
+stmt 0 err 1 -1 no such view: v0
+stmt 16 ok
+stmt 97 err 1 -1 no such table: v0
+==== 38.10
+
+  CREATE TABLE t0(c0);
+  CREATE TABLE t1(c0, c1 UNIQUE);
+  INSERT INTO t0(c0) VALUES(1);
+  INSERT INTO t1(c0,c1) VALUES(2,3);
+  SELECT COUNT(*) FROM t0, t1 WHERE (SELECT AVG(0) FILTER(WHERE t1.c1));
+----
+stmt 0 ok
+stmt 23 ok
+stmt 57 err 1 -1 no such table: t0
+stmt 89 err 1 -1 no such table: t1
+stmt 126 err 1 -1 no such table: t0
+==== 38.20
+
+  SELECT COUNT(*), AVG(1) FILTER(WHERE t1.c1) FROM t0, t1;
+----
+stmt 0 err 1 -1 no such table: t0
+==== 38.30
+
+  SELECT COUNT(*) FROM t0, t1 WHERE (SELECT AVG(1) FILTER(WHERE t1.c1));
+----
+stmt 0 err 1 -1 no such table: t0
+==== 39.1
+
+  CREATE TABLE t0(c0 UNIQUE);
+----
+stmt 0 ok
+==== 39.2
+
+  SELECT FIRST_VALUE(0) OVER();
+----
+stmt 0 ok
+==== 39.3
+
+  SELECT * FROM t0 WHERE(c0, 0) IN(SELECT FIRST_VALUE(0) OVER(), 0);
+----
+stmt 0 err 1 -1 no such table: t0
+==== 39.4
+
+  SELECT * FROM t0 WHERE (t0.c0, 1) IN(SELECT NTILE(1) OVER(), 0 FROM t0);
+----
+stmt 0 err 1 -1 no such table: t0
+==== 40.1
+
+    CREATE VIRTUAL TABLE t0 USING rtree(c0, c1, c2);
+    SELECT * FROM t0
+     WHERE ((0,0) IN (SELECT COUNT(*),LAG(5)OVER(PARTITION BY 0) FROM t0),0)<=(c1,0);
+----
+stmt 0 ok
+stmt 53 err 1 -1 no such table: t0
+==== 41.1
+
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES(NULL,'bb',355);
+  INSERT INTO t1 VALUES('CC','aa',158);
+  INSERT INTO t1 VALUES('GG','bb',929);
+  INSERT INTO t1 VALUES('FF','Rb',574);
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: t1
+stmt 68 err 1 -1 no such table: t1
+stmt 108 err 1 -1 no such table: t1
+stmt 148 err 1 -1 no such table: t1
+==== 41.2
+
+  SELECT min(c) OVER (
+    ORDER BY a RANGE BETWEEN 5.2 PRECEDING AND 0.1 PRECEDING
+  ) FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 41.2.dup1
+
+  SELECT min(c) OVER (
+    ORDER BY a RANGE BETWEEN 5.2 PRECEDING AND 0.1 PRECEDING
+  ) << 100 FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 41.3
+
+  SELECT
+    min(c) OVER win3 << first_value(c) OVER win3,
+    min(c) OVER win3 << first_value(c) OVER win3
+  FROM t1
+  WINDOW win3 AS (
+    PARTITION BY 6 ORDER BY a RANGE BETWEEN 5.2 PRECEDING AND 0.1 PRECEDING
+  );
+----
+stmt 0 err 1 -1 no such table: t1
+==== 42.1
+
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES(1, 1, 1);
+  INSERT INTO t1 VALUES(2, 2, 2);
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: t1
+stmt 62 err 1 -1 no such table: t1
+==== 42.2
+
+  SELECT * FROM t1 WHERE (0, 0) IN ( SELECT count(*), 0 FROM t1 )
+----
+stmt 0 err 1 -1 no such table: t1
+==== 42.3
+
+  SELECT * FROM t1 WHERE (2, 0) IN ( SELECT count(*), 0 FROM t1 )
+----
+stmt 0 err 1 -1 no such table: t1
+==== 42.3.dup1
+
+  SELECT count(*), max(a) OVER () FROM t1 GROUP BY c;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 42.4
+
+  SELECT sum(a), max(b) OVER () FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 42.5
+
+  CREATE TABLE t2(a, b);
+  INSERT INTO t2 VALUES('a', 1);
+  INSERT INTO t2 VALUES('a', 2);
+  INSERT INTO t2 VALUES('a', 3);
+  INSERT INTO t2 VALUES('b', 4);
+  INSERT INTO t2 VALUES('b', 5);
+  INSERT INTO t2 VALUES('b', 6);
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: t2
+stmt 58 err 1 -1 no such table: t2
+stmt 91 err 1 -1 no such table: t2
+stmt 124 err 1 -1 no such table: t2
+stmt 157 err 1 -1 no such table: t2
+stmt 190 err 1 -1 no such table: t2
+==== 42.6
+
+  SELECT a, sum(b), sum( sum(b) ) OVER (ORDER BY a) FROM t2 GROUP BY a;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 42.7
+
+  SELECT sum(b), sum( sum(b) ) OVER (ORDER BY a) FROM t2;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 43.1.1
+
+  CREATE TABLE t1(x INTEGER PRIMARY KEY);
+  INSERT INTO t1 VALUES (10);
+----
+stmt 0 ok
+stmt 42 err 1 -1 no such table: t1
+==== 43.1.2
+
+  SELECT count() OVER() AS m FROM t1 ORDER BY (SELECT m);
+----
+stmt 0 err 1 -1 no such table: t1
+==== 43.2.1
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b INTEGER);
+  INSERT INTO t1(a, b) VALUES(1,  10); -- 10
+  INSERT INTO t1(a, b) VALUES(2,  15); -- 25
+  INSERT INTO t1(a, b) VALUES(3,  -5); -- 20
+  INSERT INTO t1(a, b) VALUES(4,  -5); -- 15
+  INSERT INTO t1(a, b) VALUES(5,  20); -- 35
+  INSERT INTO t1(a, b) VALUES(6, -11); -- 24
+----
+stmt 0 ok
+stmt 53 err 1 -1 no such table: t1
+stmt 92 err 1 -1 no such table: t1
+stmt 137 err 1 -1 no such table: t1
+stmt 182 err 1 -1 no such table: t1
+stmt 227 err 1 -1 no such table: t1
+stmt 272 err 1 -1 no such table: t1
+==== 43.2.2
+
+  SELECT a, sum(b) OVER (ORDER BY a) AS abc FROM t1 ORDER BY 2
+----
+stmt 0 err 1 -1 no such table: t1
+==== 43.2.3
+
+  SELECT a, sum(b) OVER (ORDER BY a) AS abc FROM t1 ORDER BY abc
+----
+stmt 0 err 1 -1 no such table: t1
+==== 43.2.4
+
+  SELECT a, sum(b) OVER (ORDER BY a) AS abc FROM t1 ORDER BY abc+5
+----
+stmt 0 err 1 -1 no such table: t1
+==== 43.2.5
+
+  SELECT a, sum(b) OVER (ORDER BY a) AS abc FROM t1 ORDER BY (SELECT abc)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 43.2.6
+
+  SELECT a, 1+sum(b) OVER (ORDER BY a) AS abc FROM t1 ORDER BY (SELECT abc)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 44.1
+
+  CREATE TABLE t0(c0);
+----
+stmt 0 ok
+==== 44.2.1
+
+  SELECT ntile(0) OVER ();
+----
+stmt 0 ok
+==== 44.2.2
+
+  SELECT (0, 0) IN(SELECT MIN(c0), NTILE(0) OVER()) FROM t0;
+----
+stmt 0 err 1 -1 no such table: t0
+==== 44.3.1
+
+  SELECT ntile(1) OVER ();
+----
+stmt 0 ok
+==== 44.3.2
+
+  SELECT (0, 0) IN(SELECT MIN(c0), NTILE(1) OVER()) FROM t0;
+----
+stmt 0 err 1 -1 no such table: t0
+==== 44.4.2
+
+  INSERT INTO t0 VALUES(2), (1), (0);
+  SELECT (0, 1) IN(SELECT MIN(c0), NTILE(1) OVER()) FROM t0;
+----
+stmt 0 err 1 -1 no such table: t0
+stmt 38 err 1 -1 no such table: t0
+==== 45.1
+
+  CREATE TABLE t0(x);
+  CREATE TABLE t1(a);
+  INSERT INTO t1 VALUES(1000);
+  INSERT INTO t1 VALUES(1000);
+  INSERT INTO t0 VALUES(10000);
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 no such table: t1
+stmt 75 err 1 -1 no such table: t1
+stmt 106 err 1 -1 no such table: t0
+==== 45.2
+
+  SELECT * FROM (
+      SELECT sum (a) OVER() FROM t1 UNION ALL SELECT x FROM t0
+  );
+----
+stmt 0 err 1 -1 no such table: t0
+==== 46.1
+
+  CREATE TABLE t1 (a);
+  CREATE INDEX i1 ON t1(a);
+
+  INSERT INTO t1 VALUES (10);
+----
+stmt 0 ok
+stmt 23 err 1 -1 no such table: main.t1
+stmt 51 err 1 -1 no such table: t1
+==== 46.2
+
+  SELECT (SELECT sum(a) OVER(ORDER BY a)) FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 46.3
+
+  SELECT * FROM t1 WHERE (SELECT sum(a) OVER(ORDER BY a));
+----
+stmt 0 err 1 -1 no such table: t1
+==== 46.4
+
+  SELECT * FROM t1 NATURAL JOIN t1
+    WHERE a=1
+    OR ((SELECT sum(a)OVER(ORDER BY a)) AND a<=10)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 47.0
+
+  CREATE TABLE t1(
+      a,
+      e,
+      f,
+      g UNIQUE,
+      h UNIQUE
+  );
+----
+stmt 0 ok
+==== 47.1
+
+  CREATE VIEW t2(k) AS
+     SELECT e FROM t1 WHERE g = 'abc' OR h BETWEEN 10 AND f;
+----
+stmt 0 ok
+==== 47.2
+
+  SELECT 234 FROM t2
+    WHERE k=1
+    OR (SELECT k FROM t2 WHERE (SELECT sum(a) OVER() FROM t1 GROUP BY 1));
+----
+stmt 0 err 1 -1 no such table: t2
+==== 48.0
+
+  CREATE TABLE t1(a);
+  INSERT INTO t1 VALUES(1);
+  INSERT INTO t1 VALUES(2);
+  INSERT INTO t1 VALUES(3);
+  SELECT (SELECT max(x)OVER(ORDER BY x) + min(x)OVER(ORDER BY x))
+    FROM (SELECT (SELECT sum(a) FROM t1) AS x FROM t1);
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: t1
+stmt 50 err 1 -1 no such table: t1
+stmt 78 err 1 -1 no such table: t1
+stmt 106 err 1 -1 no such table: t1
+==== 48.1
+
+  SELECT (SELECT max(x)OVER(ORDER BY x) + min(x)OVER(ORDER BY x))
+    FROM (SELECT (SELECT sum(a) FROM t1 GROUP BY a) AS x FROM t1);
+----
+stmt 0 err 1 -1 no such table: t1
+==== 49.1
+
+  CREATE TABLE t1 (a PRIMARY KEY);
+  INSERT INTO t1 VALUES(1);
+----
+stmt 0 ok
+stmt 35 err 1 -1 no such table: t1
+==== 49.2
+
+  SELECT b AS c FROM (
+    SELECT a AS b FROM (
+      SELECT a FROM t1 WHERE a=1 OR (SELECT sum(a) OVER ())
+    ) 
+    WHERE b=1 OR b<10
+  ) 
+  WHERE c=1 OR c>=10;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 50.0
+
+  CREATE TABLE t1 (a DOUBLE PRIMARY KEY);
+  INSERT INTO t1 VALUES(10.0);
+----
+stmt 0 ok
+stmt 42 err 1 -1 no such table: t1
+==== 50.1
+
+  SELECT * FROM t1 WHERE a%1 OR (SELECT sum(a) OVER (ORDER BY a%2))
+----
+stmt 0 err 1 -1 no such table: t1
+==== 50.2
+
+  SELECT * FROM (
+    SELECT * FROM t1 WHERE a%1 OR (SELECT sum(a) OVER (ORDER BY a%2))
+  ) 
+  WHERE a=1 OR ( (SELECT sum(a) OVER (ORDER BY a%4)) AND a<=10 )
+----
+stmt 0 err 1 -1 no such table: t1
+==== 50.3
+
+  SELECT a FROM (
+    SELECT * FROM (
+      SELECT * FROM t1 WHERE a%1 OR (SELECT sum(a) OVER (ORDER BY a%2))
+    ) 
+    WHERE a=1 OR ( (SELECT sum(a) OVER (ORDER BY a%4)) AND a<=10 )
+  ) 
+  WHERE a=1 OR a=10.0
+----
+stmt 0 err 1 -1 no such table: t1
+==== 50.4
+
+  SELECT a FROM (
+    SELECT * FROM (
+      SELECT * FROM t1 WHERE a%1 OR (SELECT sum(a) OVER (ORDER BY a%2))
+    ) 
+    WHERE a=1 OR ( (SELECT sum(a) OVER (ORDER BY a%4)) AND a<=10 )
+  ) 
+  WHERE a=1 OR ((SELECT sum(a) OVER(ORDER BY a%8)) AND 10<=a)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 50.5
+
+SELECT * FROM (SELECT * FROM t1 NATURAL JOIN t1 WHERE a%1 OR ((SELECT sum(a)OVER(ORDER BY a)) AND a<=10)) NATURAL JOIN t1 WHERE a=1 OR ((SELECT sum((SELECT * FROM (SELECT * FROM (SELECT * FROM t1 NATURAL JOIN t1 WHERE a%1 OR ((SELECT sum(a)OVER(ORDER BY a)) AND a<=10)) NATURAL JOIN t1 WHERE a=1 OR ((SELECT sum((SELECT * FROM t1 NATURAL JOIN t1 WHERE a=1 OR ((SELECT sum(a)OVER(ORDER BY a)) AND a<=10)))OVER(ORDER BY a% 1 )) AND a<=10)) NATURAL JOIN t1 WHERE a=1 OR ((SELECT sum(a)OVER(ORDER BY a)) AND 10<=a)))OVER(ORDER BY a%5)) AND a<=10);
+----
+stmt 0 err 1 -1 no such table: t1
+==== 51.1
+
+  CREATE TABLE a(b, c);
+  SELECT c FROM a GROUP BY c
+    HAVING(SELECT(sum(b) OVER(ORDER BY b),
+                  sum(b) OVER(PARTITION BY min(DISTINCT c), c ORDER BY b)));
+----
+stmt 0 ok
+stmt 24 err 1 -1 no such table: a
+==== 52.1
+
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES('AA','bb',356);
+  INSERT INTO t1 VALUES('CC','aa',158);
+  INSERT INTO t1 VALUES('BB','aa',399);
+  INSERT INTO t1 VALUES('FF','bb',938);
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: t1
+stmt 68 err 1 -1 no such table: t1
+stmt 108 err 1 -1 no such table: t1
+stmt 148 err 1 -1 no such table: t1
+==== 52.2
+
+  SELECT
+    count() OVER win1,
+    sum(c) OVER win2, 
+    first_value(c) OVER win2,
+    count(a) OVER (ORDER BY b)
+      FROM t1
+      WINDOW
+      win1 AS (ORDER BY a),
+    win2 AS (PARTITION BY 6 ORDER BY a
+        RANGE BETWEEN 5 PRECEDING AND 0 PRECEDING );
+----
+stmt 0 err 1 -1 no such table: t1
+==== 52.3
+
+SELECT
+  count() OVER (),
+  sum(c) OVER win2, 
+  first_value(c) OVER win2,
+  count(a) OVER (ORDER BY b)
+FROM t1
+WINDOW
+  win1 AS (ORDER BY a),
+  win2 AS (PARTITION BY 6 COLLATE binary ORDER BY a
+           RANGE BETWEEN 5 PRECEDING AND 0 PRECEDING );
+----
+stmt 0 err 1 -1 no such table: t1
+==== 52.4
+
+  SELECT
+    count() OVER win1,
+    sum(c) OVER win2, 
+    first_value(c) OVER win2,
+    count(a) OVER (ORDER BY b)
+  FROM t1
+  WINDOW
+    win1 AS (ORDER BY a),
+    win2 AS (PARTITION BY 6 COLLATE binary ORDER BY a
+             RANGE BETWEEN 5 PRECEDING AND 0 PRECEDING );
+----
+stmt 0 err 1 -1 no such table: t1
+==== 53.0
+
+  CREATE TABLE a(c UNIQUE);
+  INSERT INTO a VALUES(4),(0),(9),(-9);
+  SELECT a.c
+    FROM a
+    JOIN a AS b ON a.c=4
+    JOIN a AS e ON a.c=e.c
+   WHERE a.c=(SELECT (SELECT coalesce(lead(2) OVER(),0) + sum(d.c))
+                FROM a AS d
+               WHERE a.c);
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: a
+stmt 68 err 1 -1 no such table: a
+==== 54.1
+
+  CREATE TABLE t1(a VARCHAR(20), b FLOAT);
+  INSERT INTO t1 VALUES('1',10.0);
+----
+stmt 0 ok
+stmt 43 err 1 -1 no such table: t1
+==== 54.2
+
+  SELECT * FROM ( 
+    SELECT sum(b) OVER() AS c FROM t1 
+      UNION
+    SELECT b AS c FROM t1
+  ) WHERE c>10;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 54.3
+
+  INSERT INTO t1 VALUES('2',5.0);
+  INSERT INTO t1 VALUES('3',15.0);
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 34 err 1 -1 no such table: t1
+==== 54.4
+
+  SELECT * FROM ( 
+    SELECT sum(b) OVER() AS c FROM t1 
+      UNION
+    SELECT b AS c FROM t1
+  ) WHERE c>10;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 55.1
+
+   CREATE TABLE a(b);
+   SELECT
+      (SELECT b FROM a
+        GROUP BY b
+        HAVING (SELECT COUNT()OVER() + lead(b)OVER(ORDER BY SUM(DISTINCT b) + b))
+      ) 
+    FROM a
+  UNION
+   SELECT 99
+    ORDER BY 1;
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: a
+==== 56.1
+
+  CREATE TABLE t1(a, b INTEGER); 
+  CREATE TABLE t2(c, d);
+----
+stmt 0 ok
+stmt 33 ok
+==== 56.2
+
+  SELECT avg(b) FROM t1 
+    UNION ALL 
+  SELECT min(c) OVER () FROM t2 
+  ORDER BY nosuchcolumn;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 57.1
+
+  CREATE TABLE t4(a, b, c, d, e);
+----
+stmt 0 ok
+==== 57.2
+
+  SELECT b FROM t4
+  UNION
+  SELECT a FROM t4
+  ORDER BY (
+    SELECT sum(x) OVER() FROM (
+      SELECT c AS x FROM t4
+      UNION
+      SELECT d FROM t4
+      ORDER BY (SELECT e FROM t4)
+    )
+  );
+----
+stmt 0 err 1 -1 no such table: t4
+==== 57.1.dup1
+
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO t1 VALUES(NULL,NULL,NULL);
+  SELECT 
+    sum(a),
+    min(b) OVER (),
+    count(c) OVER (ORDER BY b)
+  FROM t1;
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: t1
+stmt 69 err 1 -1 no such table: t1
+==== 57.2.dup1
+
+  CREATE TABLE v0 ( v1 INTEGER PRIMARY KEY ) ; 
+  INSERT INTO v0 VALUES ( 10 ) ; 
+  SELECT DISTINCT v1, lead(v1) OVER() FROM v0 GROUP BY v1 ORDER BY 2;
+----
+stmt 0 ok
+stmt 47 err 1 -1 no such table: v0
+stmt 81 err 1 -1 no such table: v0
+==== 57.3
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a);
+  INSERT INTO t1(a) VALUES(22);
+  CREATE TABLE t3(y);
+  INSERT INTO t3(y) VALUES(5),(11),(-9);
+  SELECT (
+    SELECT max(y) OVER( ORDER BY (SELECT x FROM (SELECT sum(y) AS x FROM t1)))
+  )
+  FROM t3;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 39 err 1 -1 no such table: t1
+stmt 71 ok
+stmt 93 err 1 -1 no such table: t3
+stmt 134 err 1 -1 no such table: t3
+==== 58.1
+
+  CREATE TABLE a(a, b, c);
+  INSERT INTO a VALUES(1, 2, 3);
+  INSERT INTO a VALUES(4, 5, 6);
+  SELECT sum(345+b)      OVER (ORDER BY b),
+         sum(avg(678)) OVER (ORDER BY c) FROM a;
+----
+stmt 0 ok
+stmt 27 err 1 -1 no such table: a
+stmt 60 err 1 -1 no such table: a
+stmt 93 err 1 -1 no such table: a
+==== 59.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x INTEGER PRIMARY KEY);
+  INSERT INTO t1 VALUES (123);
+  SELECT
+     ntile( (SELECT sum(x)) ) OVER(ORDER BY x),
+     min(x) OVER(ORDER BY x)
+    FROM t1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 69 err 1 -1 no such table: t1
+stmt 100 err 1 -1 no such table: t1
+==== 60.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1 (x INTEGER PRIMARY KEY);
+  INSERT INTO t1 VALUES (99);
+  SELECT EXISTS(SELECT count(*) OVER() FROM t1 ORDER BY sum(x) OVER());
+----
+stmt 0 ok
+stmt 27 ok
+stmt 70 err 1 -1 no such table: t1
+stmt 100 err 1 -1 no such table: t1
+==== 61.1
+
+CREATE TABLE t1(a);
+INSERT INTO t1 VALUES(5),(NULL),('seventeen');
+SELECT (SELECT max(x)OVER(ORDER BY x) % min(x)OVER(ORDER BY CASE x WHEN 889 THEN x WHEN x THEN x END)) FROM (SELECT (SELECT sum(CAST(a IN(SELECT (SELECT max(x)OVER(ORDER BY CASE x WHEN 889 THEN 299 WHEN 863 THEN 863 END)) FROM (SELECT (SELECT sum(CAST((SELECT (SELECT max(x)OVER(ORDER BY x) / min(x)OVER(ORDER BY CASE x WHEN 889 THEN 299 WHEN -true THEN 863 END)) FROM (SELECT (SELECT sum(CAST(a IN(SELECT (SELECT max(x) & sum ( a )OVER(ORDER BY CASE x WHEN -8 THEN 299 WHEN 863 THEN 863 END)) FROM (SELECT (SELECT sum(CAST(a AS )) FROM t1) AS x FROM t1)) AS t1 )) FROM t1) AS x FROM t1)) AS x )) FROM t1) AS x FROM t1)) AS real)) FROM t1) AS x FROM t1);
+----
+stmt 0 ok
+stmt 20 err 1 -1 no such table: t1
+stmt 67 err 1 -1 no such table: t1
+==== window1-generated
+
+    SELECT 
+      (SELECT max(x)OVER(ORDER BY x) / min(x) OVER() ) 
+    FROM (
+      SELECT (SELECT sum(a) FROM t1 ) AS x FROM t1
+    )
+----
+stmt 0 err 1 -1 no such table: t1
+==== 61.3.0
+
+  CREATE TABLE t1(a);
+  CREATE TABLE t2(y);
+----
+stmt 0 ok
+stmt 22 ok
+==== 61.3.1
+
+  SELECT (
+    SELECT count(a) OVER ( ORDER BY (SELECT sum(y) FROM t2) )
+         + total(a) OVER() 
+  )
+  FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 61.4.2
+
+  SELECT (
+    SELECT count(a) OVER ( ORDER BY sum(a) )
+         + total(a) OVER() 
+  )
+  FROM t1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 61.4.3
+
+  SELECT 
+    sum(a) OVER ( ORDER BY a ) 
+  FROM t1 
+  ORDER BY (SELECT sum(a) FROM t2)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 61.4.4
+
+  SELECT 
+    sum(a) OVER ( ORDER BY a ) 
+  FROM t1 
+  ORDER BY (SELECT sum(y) FROM t2)
+----
+stmt 0 err 1 -1 no such table: t1
+==== 62.1
+
+  CREATE TABLE t1(a VARCHAR(20), b FLOAT);
+  INSERT INTO t1 VALUES('1',10.0);
+----
+stmt 0 ok
+stmt 43 err 1 -1 no such table: t1
+==== 62.2
+
+  SELECT * FROM ( 
+      SELECT sum(b) OVER() AS c FROM t1 
+      UNION
+      SELECT b AS c FROM t1
+      ) WHERE c>10;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 62.3
+
+  INSERT INTO t1 VALUES('2',5.0);
+  INSERT INTO t1 VALUES('3',15.0);
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 34 err 1 -1 no such table: t1
+==== 62.4
+
+  SELECT * FROM ( 
+      SELECT sum(b) OVER() AS c FROM t1 
+      UNION
+      SELECT b AS c FROM t1
+      ) WHERE c>10;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 63.1
+
+  CREATE TABLE t1(b, x);
+  CREATE TABLE t2(c, d);
+  CREATE TABLE t3(e, f);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 ok
+==== 63.2
+
+  SELECT max(b) OVER(
+      ORDER BY SUM(
+        (SELECT c FROM t2 UNION SELECT x ORDER BY c)
+      )
+  ) FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 63.3
+
+  SELECT sum(b) over(
+      ORDER BY (
+        SELECT max(b) OVER(
+          ORDER BY sum(
+            (SELECT x AS c UNION SELECT 1234 ORDER BY c)
+          )
+        ) AS e
+        ORDER BY e
+      )
+    )
+  FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 64.1
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+  INSERT INTO t1 VALUES(1, 'abcd');
+  INSERT INTO t1 VALUES(2, 'BCDE');
+  INSERT INTO t1 VALUES(3, 'cdef');
+  INSERT INTO t1 VALUES(4, 'DEFG');
+----
+stmt 0 ok
+stmt 45 err 1 -1 no such table: t1
+stmt 81 err 1 -1 no such table: t1
+stmt 117 err 1 -1 no such table: t1
+stmt 153 err 1 -1 no such table: t1
+==== 64.2
+
+  SELECT rowid, max(b COLLATE nocase)||'' 
+  FROM t1 
+  GROUP BY rowid
+  ORDER BY max(b COLLATE nocase)||'';
+----
+stmt 0 err 1 -1 no such table: t1
+==== 64.3
+
+  SELECT count() OVER (), rowid, max(b COLLATE nocase)||'' 
+  FROM t1 
+  GROUP BY rowid
+  ORDER BY max(b COLLATE nocase)||'';
+----
+stmt 0 err 1 -1 no such table: t1
+==== 64.4
+
+  SELECT count() OVER (), rowid, max(b COLLATE nocase)
+  FROM t1 
+  GROUP BY rowid
+  ORDER BY max(b COLLATE nocase);
+----
+stmt 0 err 1 -1 no such table: t1
+==== 65.1
+
+  CREATE TABLE t1(c1);
+  INSERT INTO t1 VALUES('abcd');
+----
+stmt 0 ok
+stmt 23 err 1 -1 no such table: t1
+==== 65.2
+
+  SELECT max(c1 COLLATE nocase) IN (SELECT 'aBCd') FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 65.3
+
+  SELECT 
+     count() OVER (), 
+     group_concat(c1 COLLATE nocase) IN (SELECT 'aBCd') FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 65.4
+
+  SELECT COUNT() OVER () LIKE lead(102030) OVER(
+      ORDER BY sum('abcdef' COLLATE nocase) IN (SELECT 54321) 
+  )
+  FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 66.1
+
+  CREATE TABLE t1(a INTEGER);
+  INSERT INTO t1 VALUES(3578824042033200656);
+  INSERT INTO t1 VALUES(3029012920382354029);
+----
+stmt 0 ok
+stmt 30 err 1 -1 no such table: t1
+stmt 76 err 1 -1 no such table: t1
+==== 66.3
+
+  CREATE TABLE t2(a INTEGER);
+  INSERT INTO t2 VALUES(45);
+  INSERT INTO t2 VALUES(30);
+----
+stmt 0 ok
+stmt 30 err 1 -1 no such table: t2
+stmt 59 err 1 -1 no such table: t2
+==== 67.0
+
+  CREATE TABLE t1(a, b, c);
+  CREATE TABLE t2(a, b, c);
+----
+stmt 0 ok
+stmt 28 ok
+==== 67.1
+
+  SELECT a,c,b FROM t1 INTERSECT SELECT a,b,c FROM t1 ORDER BY (             
+      SELECT nth_value(a,2) OVER w1 
+      WINDOW w1 AS ( ORDER BY ((SELECT 1 FROM v1)) )
+  )
+----
+stmt 0 err 1 -1 no such table: t1
+==== 67.2
+
+  SELECT a,c,b FROM t1 INTERSECT SELECT a,b,c FROM t1 ORDER BY (             
+      SELECT nth_value(a,2) OVER w1 
+      WINDOW w1 AS ( ORDER BY ((SELECT 1 FROM t2)) )
+  )
+----
+stmt 0 err 1 -1 no such table: t1
+==== 68.0
+
+  CREATE TABLE t1(a,b);
+  INSERT INTO t1(a,b) VALUES(0,0),(1,1),(2,4),(3,9),(4,99);
+  SELECT rowid, a, b, sum(a)OVER() FROM t1 ORDER BY count(b);
+----
+stmt 0 ok
+stmt 24 err 1 -1 no such table: t1
+stmt 84 err 1 -1 no such table: t1
+==== 69.0
+
+  CREATE TABLE t1(a,b);
+  CREATE INDEX t1ba ON t1(b,a);
+  SELECT * FROM t1 WHERE b = (SELECT b FROM t1 ORDER BY lead(b) OVER () AND sum(a));
+----
+stmt 0 ok
+stmt 24 err 1 -1 no such table: main.t1
+stmt 56 err 1 -1 no such table: t1
+==== 69.1
+
+  SELECT * FROM t1 WHERE b >= (SELECT b FROM t1 ORDER BY lead(b) OVER () AND sum(a));
+----
+stmt 0 err 1 -1 no such table: t1
+==== 69.2
+
+  SELECT * FROM t1 WHERE b <= (SELECT b FROM t1 ORDER BY lead(b) OVER () AND sum(a));
+----
+stmt 0 err 1 -1 no such table: t1
+==== 70.0
+
+  CREATE TABLE t1(a);
+----
+stmt 0 ok
+==== 70.1
+
+  SELECT substr(a,4,lag(a,7) OVER(PARTITION BY 'cf23' ORDER BY 2)) AS ca0 FROM t1 ORDER BY ca0;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 70.2
+
+  SELECT substr(a,4,lag(a,7) OVER(PARTITION BY 'cf23' ORDER BY likely(2))) AS ca0 FROM t1 ORDER BY ca0;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 71.0
+
+  CREATE TABLE t0(a);
+  SELECT a FROM t0, (SELECT a AS b FROM t0)
+   WHERE (a,1)=(SELECT 2,2 UNION SELECT sum(b),max(b) OVER(ORDER BY b) ORDER BY 2)
+     AND b=4
+   ORDER BY b;
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: t0
+==== 72.1
+
+  CREATE TABLE dual(dummy);  INSERT INTO dual VALUES('X');
+  CREATE VIEW v1(x,y) AS SELECT RANK() OVER (PARTITION BY 0), SUM(0) FROM dual;
+  SELECT * FROM v1 WHERE true;
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: dual
+stmt 59 ok
+stmt 139 err 1 -1 no such table: v1
+==== 72.0
+
+  CREATE TABLE t0(c0);
+  INSERT INTO t0(c0) VALUES (0);
+  CREATE VIEW v0(c0) AS SELECT TOTAL(0) OVER (PARTITION BY t0.c0) FROM t0;
+----
+stmt 0 ok
+stmt 23 err 1 -1 no such table: t0
+stmt 56 ok
+==== 72.1.dup1
+
+  SELECT COUNT(*) FROM (
+      SELECT TOTAL(0) OVER (PARTITION BY t0.c0) FROM t0
+      )
+  WHERE ('1' IS NOT ('abcde' NOTNULL));
+----
+stmt 0 err 1 -1 no such table: t0
+==== 73.0
+
+  CREATE TABLE t1(a INT);
+  INSERT INTO t1(a) VALUES(1),(2),(4);
+  CREATE VIEW t2(b,c) AS SELECT * FROM t1 JOIN t1 A ORDER BY sum(0) OVER(PARTITION BY 0);
+  CREATE TRIGGER x1 INSTEAD OF UPDATE ON t2 BEGIN SELECT true; END;
+----
+stmt 0 ok
+stmt 26 err 1 -1 no such table: t1
+stmt 65 ok
+stmt 155 err 1 -1 no such table: main.t2
+==== 73.1
+
+  SELECT * FROM t2;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 73.2
+
+  UPDATE t2 SET c=99 WHERE b=4 RETURNING *;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 73.3
+
+  SELECT *, nth_value(15,2) OVER() FROM t2, t1 WHERE b=4;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 73.4
+
+  UPDATE t2 SET c=nth_value(15,2) OVER() FROM (SELECT * FROM t1) WHERE b=4 RETURNING *;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 73.5
+
+  DROP TRIGGER x1;
+----
+stmt 0 err 1 -1 no such trigger: x1
+==== 73.6
+
+  UPDATE t2 SET c=99 WHERE b=4 RETURNING *;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 73.7
+
+  UPDATE t2 SET c=nth_value(15,2) OVER() FROM (SELECT * FROM t1) WHERE b=4 RETURNING *;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 74.0
+
+  CREATE TABLE t1 (a INT, b INT);
+  CREATE TABLE t2 (c INT, d INT);
+  CREATE INDEX idx ON t1(abs(a));
+  INSERT INTO t1 VALUES(1,2),(3,4);
+  INSERT INTO t2 VALUES(5,6),(7,8);
+----
+stmt 0 ok
+stmt 34 ok
+stmt 68 err 1 -1 no such table: main.t1
+stmt 102 err 1 -1 no such table: t1
+stmt 138 err 1 -1 no such table: t2
+==== 74.1
+
+  SELECT (
+    SELECT count( a ) FROM t2 LIMIT 1
+  )
+  FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 74.2
+
+  SELECT (
+    SELECT count( a+c ) FROM t2 LIMIT 1
+  )
+  FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 74.3
+
+  SELECT (
+    SELECT count( ( SELECT(sum(0) OVER(ORDER BY c, abs(a))) ) )
+      FROM t2 GROUP BY c LIMIT 1
+  ) 
+  FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 74.4
+
+  /* Original test case reported in https://sqlite.org/forum/forumpost/bad532820c
+  CREATE TABLE v0 (c1);
+  CREATE INDEX i ON v0 (c1, c1=1);
+  SELECT 0 FROM v0 AS a1
+   WHERE (SELECT count((SELECT(sum(0) OVER(PARTITION BY(c1), (a1.c1=1) ))))
+            FROM v0
+           GROUP BY hex(0))
+     AND a1.c1=0;
+----
+==== 75.0
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INT, b INT);
+  CREATE INDEX t1x ON t1(a+b);
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 50 err 1 -1 no such table: main.t1
+==== 75.1
+
+  SELECT count((SELECT count(a0.a+a0.b) ORDER BY sum(0) OVER (PARTITION BY 0)))
+    FROM t1 AS a0 JOIN t1 AS a1
+   GROUP BY a1.a;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 76.0
+
+  CREATE TABLE t1(a INT, b INT);
+  INSERT INTO t1(a,b) VALUES (111,222),(111,223),(118,229);
+  CREATE INDEX t1a ON t1(a);
+  CREATE TABLE t2(x INT);
+  INSERT INTO t2 VALUES (333),(444),(555);
+----
+stmt 0 ok
+stmt 33 err 1 -1 no such table: t1
+stmt 93 err 1 -1 no such table: main.t1
+stmt 122 ok
+stmt 148 err 1 -1 no such table: t2
+==== 76.1
+
+  SELECT c, (SELECT c + sum(1) OVER ()) AS "res"
+    FROM t2 LEFT JOIN (SELECT +a AS c FROM t1) AS v1 ON true
+   GROUP BY c
+   ORDER by c;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 76.2
+
+  CREATE TABLE t3(x);
+  CREATE TABLE t4(y);
+  INSERT INTO t3 VALUES(100), (200), (400);
+  INSERT INTO t4 VALUES(100), (300), (400);
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 no such table: t3
+stmt 88 err 1 -1 no such table: t4
+==== 76.3
+
+  SELECT (SELECT y+sum(0) OVER ()) FROM t3 LEFT JOIN t4 ON x=y;
+----
+stmt 0 err 1 -1 no such table: t3
+==== 76.4
+
+  SELECT (SELECT y+sum(0) OVER ()) FROM t3 LEFT JOIN t4 ON x=y GROUP BY x;
+----
+stmt 0 err 1 -1 no such table: t3
+==== 76.5
+
+  SELECT (SELECT max(y)+sum(0) OVER ()) FROM t3 LEFT JOIN t4 ON x=y GROUP BY x;
+----
+stmt 0 err 1 -1 no such table: t3
+==== 77.1
+
+  CREATE TABLE t1(x INT);
+  CREATE INDEX t1x ON t1(likely(x));
+  INSERT INTO t1 VALUES(1),(2),(4),(8);
+----
+stmt 0 ok
+stmt 26 err 1 -1 no such table: main.t1
+stmt 63 err 1 -1 no such table: t1
+==== 77.2
+
+  SELECT max(~likely(x)) FILTER (WHERE true) FROM t1 INDEXED BY t1x GROUP BY x;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 78.1
+
+  SELECT quote(group_concat(x) OVER ()) FROM (SELECT '' AS x);
+----
+stmt 0 ok
+==== 78.2
+
+  SELECT quote(group_concat(x) OVER (
+      ORDER BY y RANGE BETWEEN 1 FOLLOWING AND 2 FOLLOWING
+    )) FROM (SELECT 'abc' AS x, 1 AS y);
+----
+stmt 0 ok
+==== 79.0
+
+  CREATE TABLE t0 (c0 INTEGER );
+  INSERT INTO t0 VALUES(1);
+  INSERT INTO t0 VALUES(2);
+  INSERT INTO t0 VALUES(3);
+----
+stmt 0 ok
+stmt 33 err 1 -1 no such table: t0
+stmt 61 err 1 -1 no such table: t0
+stmt 89 err 1 -1 no such table: t0
+==== 79.1
+
+  SELECT COUNT(*) 
+  OVER ( ROWS BETWEEN 0 FOLLOWING AND 100 FOLLOWING) 
+  FROM t0;
+----
+stmt 0 err 1 -1 no such table: t0
+==== 79.2
+
+  SELECT COUNT(*) 
+  OVER ( ORDER BY c0 RANGE BETWEEN 0 FOLLOWING AND 10_000_000_000 FOLLOWING ) 
+  FROM t0;
+----
+stmt 0 err 1 -1 no such table: t0
+==== 79.3
+
+  SELECT sum(c0), COUNT(*) 
+  OVER ( ORDER BY c0 RANGE BETWEEN 0 FOLLOWING AND 10_000_000_000 FOLLOWING ) 
+  FROM t0;
+----
+stmt 0 err 1 -1 no such table: t0

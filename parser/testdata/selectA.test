@@ -1,0 +1,1454 @@
+==== selectA-1.0
+
+    CREATE TABLE t1(a,b,c COLLATE NOCASE);
+    INSERT INTO t1 VALUES(1,'a','a');
+    INSERT INTO t1 VALUES(9.9, 'b', 'B');
+    INSERT INTO t1 VALUES(NULL, 'C', 'c');
+    INSERT INTO t1 VALUES('hello', 'd', 'D');
+    INSERT INTO t1 VALUES(x'616263', 'e', 'e');
+    SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 43 err 1 -1 no such table: t1
+stmt 81 err 1 -1 no such table: t1
+stmt 123 err 1 -1 no such table: t1
+stmt 166 err 1 -1 no such table: t1
+stmt 212 err 1 -1 no such table: t1
+stmt 260 err 1 -1 no such table: t1
+==== selectA-1.1
+
+    CREATE TABLE t2(x,y,z COLLATE NOCASE);
+    INSERT INTO t2 VALUES(NULL,'U','u');
+    INSERT INTO t2 VALUES('mad', 'Z', 'z');
+    INSERT INTO t2 VALUES(x'68617265', 'm', 'M');
+    INSERT INTO t2 VALUES(5.2e6, 'X', 'x');
+    INSERT INTO t2 VALUES(-23, 'Y', 'y');
+    SELECT * FROM t2;
+----
+stmt 0 ok
+stmt 43 err 1 -1 no such table: t2
+stmt 84 err 1 -1 no such table: t2
+stmt 128 err 1 -1 no such table: t2
+stmt 178 err 1 -1 no such table: t2
+stmt 222 err 1 -1 no such table: t2
+stmt 264 err 1 -1 no such table: t2
+==== selectA-1.2
+
+    CREATE TABLE t3(a,b,c COLLATE NOCASE);
+    INSERT INTO t3 SELECT * FROM t1;
+    INSERT INTO t3 SELECT * FROM t2;
+    INSERT INTO t3 SELECT * FROM t1;
+    INSERT INTO t3 SELECT * FROM t2;
+    INSERT INTO t3 SELECT * FROM t1;
+    INSERT INTO t3 SELECT * FROM t2;
+    SELECT count(*) FROM t3;
+----
+stmt 0 ok
+stmt 43 err 1 -1 no such table: t3
+stmt 80 err 1 -1 no such table: t3
+stmt 117 err 1 -1 no such table: t3
+stmt 154 err 1 -1 no such table: t3
+stmt 191 err 1 -1 no such table: t3
+stmt 228 err 1 -1 no such table: t3
+stmt 265 err 1 -1 no such table: t3
+==== selectA-2.1
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.2
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.3
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.4
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.5
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.6
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE DESC,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.7
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.8
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.9
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.10
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY c COLLATE BINARY DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.11
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.12
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.13
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.14
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.15
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY b COLLATE NOCASE,a,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.16
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY b COLLATE NOCASE DESC,a,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.17
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.18
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.19
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.20
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY c COLLATE BINARY DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.21
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.22
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.23
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.24
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.25
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.26
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE DESC,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.27
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.28
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.29
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.30
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY c COLLATE BINARY DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.31
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.32
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.33
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.34
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.35
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY y COLLATE NOCASE,x,z
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.36
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY y COLLATE NOCASE DESC,x,z
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.37
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.38
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.39
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.40
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY z COLLATE BINARY DESC,x,y
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.41
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.42
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.43
+
+    SELECT a,b,c FROM t1 WHERE b>='d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.44
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.45
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.46
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.47
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.48
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.49
+
+    SELECT a,b,c FROM t1 WHERE b>='d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.50
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.51
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.52
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.53
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY b, a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.54
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.55
+
+    SELECT a,b,c FROM t1 WHERE b>='d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY b DESC, c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.56
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY b, c DESC, a
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.57
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY b COLLATE NOCASE
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.58
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.59
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY c, a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.60
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.61
+
+    SELECT a,b,c FROM t1 WHERE b>='d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY c COLLATE BINARY, b DESC, c, a, b, c, a, b, c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.62
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY c DESC, a
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.63
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY c COLLATE NOCASE
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.64
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.65
+
+    SELECT a,b,c FROM t3 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY c COLLATE NOCASE
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-2.66
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t3
+    ORDER BY c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.67
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t3 WHERE b<'d'
+    ORDER BY c DESC, a
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.68
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b<'d'
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT b,c,a FROM t3
+    ORDER BY c DESC, a
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.69
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT b,c,a FROM t3
+    ORDER BY c COLLATE NOCASE
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.70
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t1
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT b,c,a FROM t3
+    ORDER BY c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.71
+
+    SELECT a,b,c FROM t1 WHERE b<'d'
+    INTERSECT SELECT a,b,c FROM t1
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT b,c,a FROM t3
+    INTERSECT SELECT a,b,c FROM t1
+    EXCEPT SELECT x,y,z FROM t2
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT y,x,z FROM t2
+    INTERSECT SELECT a,b,c FROM t1
+    EXCEPT SELECT c,b,a FROM t3
+    ORDER BY c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.72
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.73
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.74
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.75
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.76
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.77
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE DESC,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.78
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.79
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.80
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.81
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY c COLLATE BINARY DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.82
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.83
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.84
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.85
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.86
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY y COLLATE NOCASE,x,z
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.87
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY y COLLATE NOCASE DESC,x,z
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.88
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.89
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.90
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.91
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY z COLLATE BINARY DESC,x,y
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.92
+
+    SELECT x,y,z FROM t2
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT c,b,a FROM t1
+    UNION SELECT a,b,c FROM t3
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT c,b,a FROM t1
+    UNION SELECT a,b,c FROM t3
+    ORDER BY y COLLATE NOCASE DESC,x,z
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-2.93
+
+    SELECT upper((SELECT c FROM t1 UNION SELECT z FROM t2 ORDER BY 1));
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.94
+
+    SELECT lower((SELECT c FROM t1 UNION ALL SELECT z FROM t2 ORDER BY 1));
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.95
+
+    SELECT lower((SELECT c FROM t1 INTERSECT SELECT z FROM t2 ORDER BY 1));
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-2.96
+
+    SELECT lower((SELECT z FROM t2 EXCEPT SELECT c FROM t1 ORDER BY 1));
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.0
+
+    CREATE UNIQUE INDEX t1a ON t1(a);
+    CREATE UNIQUE INDEX t1b ON t1(b);
+    CREATE UNIQUE INDEX t1c ON t1(c);
+    CREATE UNIQUE INDEX t2x ON t2(x);
+    CREATE UNIQUE INDEX t2y ON t2(y);
+    CREATE UNIQUE INDEX t2z ON t2(z);
+    SELECT name FROM sqlite_master WHERE type='index'
+----
+stmt 0 err 1 -1 no such table: main.t1
+stmt 38 err 1 -1 no such table: main.t1
+stmt 76 err 1 -1 no such table: main.t1
+stmt 114 err 1 -1 no such table: main.t2
+stmt 152 err 1 -1 no such table: main.t2
+stmt 190 err 1 -1 no such table: main.t2
+stmt 228 ok
+==== selectA-3.1
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.2
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.3
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.4
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.5
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.6
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE DESC,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.7
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.8
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.9
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.10
+
+    SELECT a,b,c FROM t1 UNION ALL SELECT x,y,z FROM t2
+    ORDER BY c COLLATE BINARY DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.11
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.12
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.13
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.14
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.15
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY b COLLATE NOCASE,a,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.16
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY b COLLATE NOCASE DESC,a,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.17
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.18
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.19
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.20
+
+    SELECT x,y,z FROM t2 UNION ALL SELECT a,b,c FROM t1
+    ORDER BY c COLLATE BINARY DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.21
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.22
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.23
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.24
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.25
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.26
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE DESC,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.27
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.28
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.29
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.30
+
+    SELECT a,b,c FROM t1 UNION SELECT x,y,z FROM t2
+    ORDER BY c COLLATE BINARY DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.31
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.32
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.33
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.34
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.35
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY y COLLATE NOCASE,x,z
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.36
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY y COLLATE NOCASE DESC,x,z
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.37
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.38
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.39
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.40
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t1
+    ORDER BY z COLLATE BINARY DESC,x,y
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.41
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.42
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.43
+
+    SELECT a,b,c FROM t1 WHERE b>='d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.44
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.45
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.46
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.47
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.48
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.49
+
+    SELECT a,b,c FROM t1 WHERE b>='d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.50
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.51
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.52
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.53
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY b, a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.54
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.55
+
+    SELECT a,b,c FROM t1 WHERE b>='d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY b DESC, c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.56
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY b, c DESC, a
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.57
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY b COLLATE NOCASE
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.58
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY b
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.59
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY c, a DESC
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.60
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b>='d'
+    ORDER BY c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.61
+
+    SELECT a,b,c FROM t1 WHERE b>='d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY c COLLATE BINARY, b DESC, c, a, b, c, a, b, c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.62
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY c DESC, a
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.63
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY c COLLATE NOCASE
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.64
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t1
+    ORDER BY c
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.65
+
+    SELECT a,b,c FROM t3 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    ORDER BY c COLLATE NOCASE
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.66
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t3
+    ORDER BY c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.67
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t3 WHERE b<'d'
+    ORDER BY c DESC, a
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.68
+
+    SELECT a,b,c FROM t1 EXCEPT SELECT a,b,c FROM t1 WHERE b<'d'
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT b,c,a FROM t3
+    ORDER BY c DESC, a
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.69
+
+    SELECT a,b,c FROM t1 INTERSECT SELECT a,b,c FROM t1 WHERE b<'d'
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT b,c,a FROM t3
+    ORDER BY c COLLATE NOCASE
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.70
+
+    SELECT a,b,c FROM t1 WHERE b<'d' INTERSECT SELECT a,b,c FROM t1
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT b,c,a FROM t3
+    ORDER BY c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.71
+
+    SELECT a,b,c FROM t1 WHERE b<'d'
+    INTERSECT SELECT a,b,c FROM t1
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT b,c,a FROM t3
+    INTERSECT SELECT a,b,c FROM t1
+    EXCEPT SELECT x,y,z FROM t2
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT y,x,z FROM t2
+    INTERSECT SELECT a,b,c FROM t1
+    EXCEPT SELECT c,b,a FROM t3
+    ORDER BY c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.72
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.73
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.74
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.75
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.76
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.77
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY b COLLATE NOCASE DESC,a,c
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.78
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.79
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.80
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.81
+
+    SELECT a,b,c FROM t3 UNION SELECT x,y,z FROM t2
+    ORDER BY c COLLATE BINARY DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.82
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY a,b,c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.83
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY a DESC,b,c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.84
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY a,c,b
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.85
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY b,a,c
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.86
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY y COLLATE NOCASE,x,z
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.87
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY y COLLATE NOCASE DESC,x,z
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.88
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY c,b,a
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.89
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY c,a,b
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.90
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY c DESC,a,b
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.91
+
+    SELECT x,y,z FROM t2 UNION SELECT a,b,c FROM t3
+    ORDER BY z COLLATE BINARY DESC,x,y
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.92
+
+    SELECT x,y,z FROM t2
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT c,b,a FROM t1
+    UNION SELECT a,b,c FROM t3
+    INTERSECT SELECT a,b,c FROM t3
+    EXCEPT SELECT c,b,a FROM t1
+    UNION SELECT a,b,c FROM t3
+    ORDER BY y COLLATE NOCASE DESC,x,z
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.93
+
+    SELECT upper((SELECT c FROM t1 UNION SELECT z FROM t2 ORDER BY 1));
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.94
+
+    SELECT lower((SELECT c FROM t1 UNION ALL SELECT z FROM t2 ORDER BY 1));
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.95
+
+    SELECT lower((SELECT c FROM t1 INTERSECT SELECT z FROM t2 ORDER BY 1));
+----
+stmt 0 err 1 -1 no such table: t2
+==== selectA-3.96
+
+    SELECT lower((SELECT z FROM t2 EXCEPT SELECT c FROM t1 ORDER BY 1));
+----
+stmt 0 err 1 -1 no such table: t1
+==== selectA-3.97
+
+    SELECT upper((SELECT x FROM (
+      SELECT x,y,z FROM t2
+      INTERSECT SELECT a,b,c FROM t3
+      EXCEPT SELECT c,b,a FROM t1
+      UNION SELECT a,b,c FROM t3
+      INTERSECT SELECT a,b,c FROM t3
+      EXCEPT SELECT c,b,a FROM t1
+      UNION SELECT a,b,c FROM t3
+      ORDER BY y COLLATE NOCASE DESC,x,z)))
+----
+stmt 0 err 1 -1 no such table: t3
+==== selectA-3.98
+
+  WITH RECURSIVE
+    xyz(n) AS (
+      SELECT upper((SELECT x FROM (
+        SELECT x,y,z FROM t2
+        INTERSECT SELECT a,b,c FROM t3
+        EXCEPT SELECT c,b,a FROM t1
+        UNION SELECT a,b,c FROM t3
+        INTERSECT SELECT a,b,c FROM t3
+        EXCEPT SELECT c,b,a FROM t1
+        UNION SELECT a,b,c FROM t3
+        ORDER BY y COLLATE NOCASE DESC,x,z)))
+      UNION ALL
+      SELECT n || '+' FROM xyz WHERE length(n)<5
+    )
+  SELECT n FROM xyz ORDER BY +n;
+----
+stmt 0 err 1 -1 no such table: t3
+==== 4.1.1
+
+  CREATE TABLE t4(a, b);
+  CREATE TABLE t5(c, d);
+
+  INSERT INTO t5 VALUES(1, 'x');
+  INSERT INTO t5 VALUES(2, 'x');
+  INSERT INTO t4 VALUES(3, 'x');
+  INSERT INTO t4 VALUES(4, 'x');
+
+  CREATE INDEX i1 ON t4(a);
+  CREATE INDEX i2 ON t5(c);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 no such table: t5
+stmt 84 err 1 -1 no such table: t5
+stmt 117 err 1 -1 no such table: t4
+stmt 150 err 1 -1 no such table: t4
+stmt 183 err 1 -1 no such table: main.t4
+stmt 212 err 1 -1 no such table: main.t5
+==== 4.1.3
+
+  SELECT c, d FROM t5 
+  UNION ALL
+  SELECT a, b FROM t4 WHERE f()==f()
+  ORDER BY 1,2
+----
+stmt 0 err 1 -1 no such table: t4
+==== 4.2.1
+
+  CREATE TABLE t6(a, b);
+  CREATE TABLE t7(c, d);
+
+  INSERT INTO t7 VALUES(2, 9);
+  INSERT INTO t6 VALUES(3, 0);
+  INSERT INTO t6 VALUES(4, 1);
+  INSERT INTO t7 VALUES(5, 6);
+  INSERT INTO t6 VALUES(6, 0);
+  INSERT INTO t7 VALUES(7, 6);
+
+  CREATE INDEX i6 ON t6(a);
+  CREATE INDEX i7 ON t7(c);
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 no such table: t7
+stmt 82 err 1 -1 no such table: t6
+stmt 113 err 1 -1 no such table: t6
+stmt 144 err 1 -1 no such table: t7
+stmt 175 err 1 -1 no such table: t6
+stmt 206 err 1 -1 no such table: t7
+stmt 237 err 1 -1 no such table: main.t6
+stmt 266 err 1 -1 no such table: main.t7
+==== 4.2.2
+
+  SELECT c, f(d,c,d,c,d) FROM t7
+  UNION ALL
+  SELECT a, b FROM t6 
+  ORDER BY 1,2
+----
+stmt 0 err 1 -1 no such table: t6
+==== 5.0
+
+  CREATE TABLE t8(a, b);
+  CREATE TABLE t9(c, d);
+----
+stmt 0 ok
+stmt 25 ok
+==== 5.4
+
+  SELECT * FROM t8 UNION SELECT * FROM t9 ORDER BY a+b COLLATE NOCASE
+----
+stmt 0 err 1 -1 no such table: t9
+==== 6.1
+
+  DROP TABLE IF EXISTS t1;
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t1(a INTEGER);
+  CREATE TABLE t2(b TEXT);
+  INSERT INTO t2(b) VALUES('12345');
+  SELECT * FROM (SELECT a FROM t1 UNION SELECT b FROM t2) WHERE a=a;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 54 ok
+stmt 84 ok
+stmt 111 err 1 -1 no such table: t2
+stmt 148 err 1 -1 no such table: t2
+==== 7.1
+
+  CREATE TABLE t1(c1);     INSERT INTO t1 VALUES(12),(123),(1234),(NULL),('abc');
+  CREATE TABLE t2(c2);     INSERT INTO t2 VALUES(44),(55),(123);
+  CREATE TABLE t3(c3,c4);  INSERT INTO t3 VALUES(66,1),(123,2),(77,3);
+  CREATE VIEW t4 AS SELECT c3 FROM t3;
+  CREATE VIEW t5 AS SELECT c3 FROM t3 ORDER BY c4;
+----
+stmt 0 ok
+stmt 23 err 1 -1 no such table: t1
+stmt 82 ok
+stmt 105 err 1 -1 no such table: t2
+stmt 147 ok
+stmt 173 err 1 -1 no such table: t3
+stmt 218 ok
+stmt 257 ok
+==== 7.2
+
+  SELECT * FROM t1, t2 WHERE c1=(SELECT 123 INTERSECT SELECT c2 FROM t4) AND c1=123;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.3
+
+  SELECT * FROM t1, t2 WHERE c1=(SELECT 123 INTERSECT SELECT c2 FROM t5) AND c1=123;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 7.4
+
+  CREATE TABLE a(b);
+  CREATE VIEW c(d) AS SELECT b FROM a ORDER BY b;
+  SELECT sum(d) OVER( PARTITION BY(SELECT 0 FROM c JOIN a WHERE b =(SELECT b INTERSECT SELECT d FROM c) AND b = 123)) FROM c;
+----
+stmt 0 ok
+stmt 21 ok
+stmt 71 err 1 -1 no such table: c
+==== 8.0
+
+  CREATE TABLE x1(x);
+  CREATE TABLE t1(a, b, c, d);
+  CREATE INDEX t1a ON t1(a);
+  CREATE INDEX t1b ON t1(b);
+----
+stmt 0 ok
+stmt 22 ok
+stmt 53 err 1 -1 no such table: main.t1
+stmt 82 err 1 -1 no such table: main.t1
+==== 8.1
+
+      SELECT 'ABCD' FROM t1 
+      WHERE (a=? OR b=?) 
+      AND (0 OR (SELECT 'xyz' INTERSECT SELECT a ORDER BY 1))
+----
+stmt 0 err 1 -1 no such table: t1
+==== 9.0
+
+  CREATE TABLE t1(a COLLATE nocase);
+  CREATE TABLE t2(b COLLATE nocase);
+
+  INSERT INTO t1 VALUES('ABC');
+  INSERT INTO t2 VALUES('abc');
+----
+stmt 0 ok
+stmt 37 ok
+stmt 74 err 1 -1 no such table: t1
+stmt 107 err 1 -1 no such table: t2
+==== 9.1
+
+  SELECT a FROM t1 INTERSECT SELECT b FROM t2;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 9.2
+
+  SELECT * FROM (
+      SELECT a FROM t1 INTERSECT SELECT b FROM t2
+  ) WHERE a||'' = 'ABC';
+----
+stmt 0 err 1 -1 no such table: t2

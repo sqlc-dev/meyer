@@ -1,0 +1,213 @@
+==== expr-1.127
+
+  SELECT 1 IS #1;
+----
+stmt 0 err 1 -1 near "#1": syntax error
+==== expr-7.1
+SELECT * FROM test1 ORDER BY a
+----
+stmt 0 err 1 -1 no such table: test1
+==== expr-8.1
+SELECT CURRENT_TIME
+----
+stmt 0 ok
+==== expr-8.2
+SELECT CURRENT_DATE
+----
+stmt 0 ok
+==== expr-8.3
+SELECT CURRENT_TIMESTAMP
+----
+stmt 0 ok
+==== expr-8.4
+SELECT CURRENT_TIME==time('now');
+----
+stmt 0 ok
+==== expr-8.5
+SELECT CURRENT_DATE==date('now');
+----
+stmt 0 ok
+==== expr-8.6
+SELECT CURRENT_TIMESTAMP==datetime('now');
+----
+stmt 0 ok
+==== expr-9.1
+SELECT round(-('-'||'123'))
+----
+stmt 0 ok
+==== expr-10.1
+SELECT 'abc' LIKE 'abc' ESCAPE ''
+----
+stmt 0 ok
+==== expr-10.2
+SELECT 'abc' LIKE 'abc' ESCAPE 'ab'
+----
+stmt 0 ok
+==== expr-11.1
+SELECT typeof(9223372036854775807)
+----
+stmt 0 ok
+==== expr-11.2
+SELECT typeof(00000009223372036854775807)
+----
+stmt 0 ok
+==== expr-11.3
+SELECT typeof(+9223372036854775807)
+----
+stmt 0 ok
+==== expr-11.4
+SELECT typeof(+000000009223372036854775807)
+----
+stmt 0 ok
+==== expr-11.5
+SELECT typeof(9223372036854775808)
+----
+stmt 0 ok
+==== expr-11.6
+SELECT typeof(00000009223372036854775808)
+----
+stmt 0 ok
+==== expr-11.7
+SELECT typeof(+9223372036854775808)
+----
+stmt 0 ok
+==== expr-11.8
+SELECT typeof(+0000009223372036854775808)
+----
+stmt 0 ok
+==== expr-11.11
+SELECT typeof(-9223372036854775808)
+----
+stmt 0 ok
+==== expr-11.12
+SELECT typeof(-00000009223372036854775808)
+----
+stmt 0 ok
+==== expr-11.13
+SELECT typeof(-9223372036854775809)
+----
+stmt 0 ok
+==== expr-11.14
+SELECT typeof(-00000009223372036854775809)
+----
+stmt 0 ok
+==== expr-12.1
+
+    SELECT (CASE a>4 THEN 1 ELSE 0 END) FROM test1;
+----
+stmt 0 err 1 22 near "THEN": syntax error
+==== expr-12.2
+
+    SELECT (CASE WHEN a>4 THEN 1 ELSE 0) FROM test1;
+----
+stmt 0 err 1 40 near ")": syntax error
+==== expr-13.2
+
+      SELECT 0+'9223372036854775807'
+----
+stmt 0 ok
+==== expr-13.3
+
+      SELECT '9223372036854775807'+0
+----
+stmt 0 ok
+==== expr-13.8
+
+  SELECT "" <= '';
+----
+stmt 0 ok
+==== expr-13.9
+
+  SELECT '' <= "";
+----
+stmt 0 ok
+==== expr-14.1
+
+  DROP TABLE IF EXISTS t1;
+  CREATE TABLE t1(x);
+  INSERT INTO t1 VALUES(0),(1),(NULL),(0.5),('1x'),('0x');
+  SELECT count(*) FROM t1
+   WHERE (x OR (8==9)) != (CASE WHEN x THEN 1 ELSE 0 END);
+----
+stmt 0 ok
+stmt 27 ok
+stmt 49 err 1 -1 no such table: t1
+stmt 108 err 1 -1 no such table: t1
+==== expr-14.2
+
+  SELECT count(*) FROM t1
+   WHERE (x OR (8==9)) != (NOT NOT x);
+----
+stmt 0 err 1 -1 no such table: t1
+==== expr-14.3
+
+  SELECT sum(NOT x) FROM t1
+   WHERE x
+----
+stmt 0 err 1 -1 no such table: t1
+==== expr-14.4
+
+  SELECT sum(CASE WHEN x THEN 0 ELSE 1 END) FROM t1
+   WHERE x
+----
+stmt 0 err 1 -1 no such table: t1
+==== expr-generated
+
+    DROP TABLE IF EXISTS t1;
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(0),(1),(NULL),(0.5),('1x'),('0x');
+----
+stmt 0 ok
+stmt 29 ok
+stmt 53 err 1 -1 no such table: t1
+==== expr-generated.dup1
+
+    SELECT count(*) FROM t1
+     WHERE (x OR (8==9)) != (CASE WHEN x THEN 1 ELSE 0 END);
+----
+stmt 0 err 1 -1 no such table: t1
+==== expr-generated.dup2
+
+    SELECT count(*) FROM t1
+     WHERE (x OR (8==9)) != (NOT NOT x);
+----
+stmt 0 err 1 -1 no such table: t1
+==== expr-generated.dup3
+
+    SELECT sum(NOT x) FROM t1
+     WHERE x
+----
+stmt 0 err 1 -1 no such table: t1
+==== expr-generated.dup4
+
+    SELECT sum(CASE WHEN x THEN 0 ELSE 1 END) FROM t1
+     WHERE x
+----
+stmt 0 err 1 -1 no such table: t1
+==== expr-16.1
+
+  CREATE TABLE t1(a,b,c);
+  CREATE TABLE dual(dummy);
+  INSERT INTO dual VALUES('X');
+----
+stmt 0 ok
+stmt 26 ok
+stmt 54 err 1 -1 no such table: dual
+==== expr-16.100
+
+  SELECT implies_nonnull_row( (b=1 AND 0)>(b=3 AND 0),a)
+  FROM dual LEFT JOIN t1;
+----
+stmt 0 err 1 -1 no such table: dual
+==== expr-16.101
+
+  SELECT implies_nonnull_row( (b=1 AND 0)>(b=3 AND a=4),a)
+  FROM dual LEFT JOIN t1;
+----
+stmt 0 err 1 -1 no such table: dual
+==== expr-16.102
+
+  SELECT implies_nonnull_row( (b=1 AND a=2)>(b=3 AND a=4),a)
+  FROM dual LEFT JOIN t1;
+----
+stmt 0 err 1 -1 no such table: dual

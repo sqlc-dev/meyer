@@ -1,0 +1,28 @@
+==== 1
+
+  BEGIN TRANSACTION;
+  CREATE TABLE t1(a, b, c);
+  INSERT INTO "t1" VALUES(1,'one','I');
+  CREATE TABLE t2(d, e, f);
+  INSERT INTO "t2" VALUES(5,'ten','XX');
+  INSERT INTO "t2" VALUES(6,NULL,NULL);
+
+  CREATE INDEX i1 ON t1(b, a);
+  COMMIT;
+----
+stmt 0 ok
+stmt 21 ok
+stmt 49 err 1 -1 no such table: t1
+stmt 89 ok
+stmt 117 err 1 -1 no such table: t2
+stmt 158 err 1 -1 no such table: t2
+stmt 198 err 1 -1 no such table: main.t1
+stmt 230 ok
+==== 2
+
+  SELECT * FROM t2
+  UNION ALL 
+  SELECT * FROM t1 WHERE a<5 
+  ORDER BY 2, 1
+----
+stmt 0 err 1 -1 no such table: t1

@@ -1,0 +1,395 @@
+==== upsert1-100
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b TEXT, c DEFAULT 0);
+  CREATE UNIQUE INDEX t1x1 ON t1(b);
+  INSERT INTO t1(a,b) VALUES(1,2) ON CONFLICT DO NOTHING;
+  INSERT INTO t1(a,b) VALUES(1,99),(99,2) ON CONFLICT DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 63 err 1 -1 no such table: main.t1
+stmt 100 err 1 -1 no such table: t1
+stmt 158 err 1 -1 no such table: t1
+stmt 224 err 1 -1 no such table: t1
+==== upsert1-101
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b) VALUES(2,3) ON CONFLICT(a) DO NOTHING;
+  INSERT INTO t1(a,b) VALUES(2,99) ON CONFLICT(a) DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 79 err 1 -1 no such table: t1
+stmt 141 err 1 -1 no such table: t1
+==== upsert1-102
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b) VALUES(3,4) ON CONFLICT(b) DO NOTHING;
+  INSERT INTO t1(a,b) VALUES(99,4) ON CONFLICT(b) DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 79 err 1 -1 no such table: t1
+stmt 141 err 1 -1 no such table: t1
+==== upsert1-110
+
+  INSERT INTO t1(a,b) VALUES(5,6) ON CONFLICT(x) DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 61 err 1 -1 no such table: t1
+==== upsert1-120
+
+  INSERT INTO t1(a,b) VALUES(5,6) ON CONFLICT(c) DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 61 err 1 -1 no such table: t1
+==== upsert1-130
+
+  INSERT INTO t1(a,b) VALUES(5,6) ON CONFLICT(b COLLATE nocase) DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 76 err 1 -1 no such table: t1
+==== upsert1-140
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b) VALUES(5,6) ON CONFLICT(b COLLATE binary) DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 94 err 1 -1 no such table: t1
+==== upsert1-200
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b INT, c DEFAULT 0);
+  CREATE UNIQUE INDEX t1x1 ON t1(a+b);
+  INSERT INTO t1(a,b) VALUES(7,8) ON CONFLICT(a+b) DO NOTHING;
+  INSERT INTO t1(a,b) VALUES(8,7),(9,6) ON CONFLICT(a+b) DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 79 err 1 -1 no such table: main.t1
+stmt 118 err 1 -1 no such table: t1
+stmt 181 err 1 -1 no such table: t1
+stmt 250 err 1 -1 no such table: t1
+==== upsert1-201
+
+  INSERT INTO t1(a,b) VALUES(8,7),(9,6) ON CONFLICT(a) DO NOTHING;
+----
+stmt 0 err 1 -1 no such table: t1
+==== upsert1-210
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b) VALUES(9,10) ON CONFLICT(a+(+b)) DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 85 err 1 -1 no such table: t1
+==== upsert1-300
+
+  DROP INDEX t1x1;
+  DELETE FROM t1;
+  CREATE UNIQUE INDEX t1x1 ON t1(b) WHERE b>10;
+  INSERT INTO t1(a,b) VALUES(1,2),(3,2) ON CONFLICT(b) DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such index: t1x1
+stmt 19 err 1 -1 no such table: t1
+stmt 37 err 1 -1 no such table: main.t1
+stmt 85 err 1 -1 no such table: t1
+stmt 152 err 1 -1 no such table: t1
+==== upsert1-310
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b) VALUES(1,2),(3,2) ON CONFLICT(b) WHERE b!=10 DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 97 err 1 -1 no such table: t1
+==== upsert1-320
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b) VALUES(1,2),(3,2),(4,20),(5,20)
+         ON CONFLICT(b) WHERE b>10 DO NOTHING;
+  SELECT *, 'x' FROM t1 ORDER BY b, a;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 119 err 1 -1 no such table: t1
+==== upsert1-400
+
+  DROP TABLE IF EXISTS t2;
+  CREATE TABLE t2(a TEXT UNIQUE, b INT DEFAULT 1);
+  INSERT INTO t2(a) VALUES('one'),('two'),('three');
+  PRAGMA count_changes=ON;
+  INSERT INTO t2(a) VALUES('one'),('one'),('three'),('four')
+      ON CONFLICT(a) DO UPDATE SET b=b+1;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 78 err 1 -1 no such table: t2
+stmt 131 ok
+stmt 158 err 1 -1 no such table: t2
+==== upsert1-410
+
+  PRAGMA count_changes=OFF;
+  SELECT a, b FROM t2 ORDER BY a;
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: t2
+==== upsert1-500
+
+  DROP TABLE t1;
+  CREATE TABLE t1(x INTEGER PRIMARY KEY, y INT UNIQUE);
+  INSERT INTO t1(x,y) SELECT 1,2 WHERE true
+    ON CONFLICT(x) DO UPDATE SET y=max(t1.y,excluded.y) AND true;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 73 err 1 -1 no such table: t1
+stmt 183 err 1 -1 no such table: t1
+==== upsert1-600
+
+  DROP TABLE t1;
+  CREATE TABLE t1(b UNIQUE, a INT PRIMARY KEY) WITHOUT ROWID;
+  INSERT OR IGNORE INTO t1(a) VALUES('1') ON CONFLICT(a) DO NOTHING;
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 79 err 1 -1 no such table: t1
+stmt 148 ok
+==== upsert1-610
+
+  DELETE FROM t1;
+  INSERT OR IGNORE INTO t1(a) VALUES('1'),(1) ON CONFLICT(a) DO NOTHING;
+  PRAGMA integrity_check;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 91 ok
+==== upsert1-700
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INTEGER PRIMARY KEY, b INT, c INT, d INT, e INT);
+  CREATE UNIQUE INDEX t1b ON t1(b);
+  CREATE UNIQUE INDEX t1e ON t1(e);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,33,44,5)
+    ON CONFLICT(e) DO UPDATE SET c=excluded.c;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 87 err 1 -1 no such table: main.t1
+stmt 123 err 1 -1 no such table: main.t1
+stmt 159 err 1 -1 no such table: t1
+stmt 206 err 1 -1 no such table: t1
+stmt 301 err 1 -1 no such table: t1
+==== upsert1-710
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,33,44,5)
+    ON CONFLICT(a) DO UPDATE SET c=excluded.c;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 65 err 1 -1 no such table: t1
+stmt 160 err 1 -1 no such table: t1
+==== upsert1-720
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,33,44,5)
+    ON CONFLICT(b) DO UPDATE SET c=excluded.c;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 65 err 1 -1 no such table: t1
+stmt 160 err 1 -1 no such table: t1
+==== upsert1-730
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INT, b INT, c INT, d INT, e INT);
+  CREATE UNIQUE INDEX t1a ON t1(a);
+  CREATE UNIQUE INDEX t1b ON t1(b);
+  CREATE UNIQUE INDEX t1e ON t1(e);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,33,44,5)
+    ON CONFLICT(e) DO UPDATE SET c=excluded.c;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 71 err 1 -1 no such table: main.t1
+stmt 107 err 1 -1 no such table: main.t1
+stmt 143 err 1 -1 no such table: main.t1
+stmt 179 err 1 -1 no such table: t1
+stmt 226 err 1 -1 no such table: t1
+stmt 321 err 1 -1 no such table: t1
+==== upsert1-740
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,33,44,5)
+    ON CONFLICT(a) DO UPDATE SET c=excluded.c;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 65 err 1 -1 no such table: t1
+stmt 160 err 1 -1 no such table: t1
+==== upsert1-750
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,33,44,5)
+    ON CONFLICT(b) DO UPDATE SET c=excluded.c;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 65 err 1 -1 no such table: t1
+stmt 160 err 1 -1 no such table: t1
+==== upsert1-760
+
+  DROP TABLE t1;
+  CREATE TABLE t1(a INT PRIMARY KEY, b INT, c INT, d INT, e INT) WITHOUT ROWID;
+  CREATE UNIQUE INDEX t1a ON t1(a);
+  CREATE UNIQUE INDEX t1b ON t1(b);
+  CREATE UNIQUE INDEX t1e ON t1(e);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,33,44,5)
+    ON CONFLICT(e) DO UPDATE SET c=excluded.c;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 17 ok
+stmt 97 err 1 -1 no such table: main.t1
+stmt 133 err 1 -1 no such table: main.t1
+stmt 169 err 1 -1 no such table: main.t1
+stmt 205 err 1 -1 no such table: t1
+stmt 252 err 1 -1 no such table: t1
+stmt 347 err 1 -1 no such table: t1
+==== upsert1-770
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,33,44,5)
+    ON CONFLICT(a) DO UPDATE SET c=excluded.c;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 65 err 1 -1 no such table: t1
+stmt 160 err 1 -1 no such table: t1
+==== upsert1-780
+
+  DELETE FROM t1;
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,3,4,5);
+  INSERT INTO t1(a,b,c,d,e) VALUES(1,2,33,44,5)
+    ON CONFLICT(b) DO UPDATE SET c=excluded.c;
+  SELECT * FROM t1;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+stmt 65 err 1 -1 no such table: t1
+stmt 160 err 1 -1 no such table: t1
+==== upsert1-800
+
+  DROP TABLE IF EXISTS t0;
+  CREATE TABLE t0(c0 REAL UNIQUE, c1);
+  CREATE UNIQUE INDEX test800i0 ON t0(0 || c1);
+  INSERT INTO t0(c0, c1) VALUES (1, 2),  (2, 1);
+  INSERT INTO t0(c0) VALUES (1) ON CONFLICT(c0) DO UPDATE SET c1=excluded.c0;
+  PRAGMA integrity_check;
+  REINDEX;
+----
+stmt 0 ok
+stmt 27 ok
+stmt 66 err 1 -1 no such table: main.t0
+stmt 114 err 1 -1 no such table: t0
+stmt 163 err 1 -1 no such table: t0
+stmt 241 ok
+stmt 267 ok
+==== upsert1-900
+
+  CREATE VIEW t1(a) AS SELECT 1;
+  CREATE TRIGGER t1r1 INSTEAD OF INSERT ON t1 BEGIN
+     SELECT 2;
+  END;
+----
+stmt 0 ok
+stmt 33 err 1 -1 no such table: main.t1
+==== upsert1-910
+
+  INSERT INTO t1 VALUES(3) ON CONFLICT(x) DO NOTHING;
+----
+stmt 0 err 1 -1 no such table: t1
+==== upsert1-1000
+
+  CREATE TABLE t0(c0 PRIMARY KEY, c1, c2 UNIQUE) WITHOUT ROWID;
+  INSERT OR FAIL INTO t0(c2) VALUES (0), (NULL)
+    ON CONFLICT(c2) DO UPDATE SET c1 = c0;
+----
+stmt 0 ok
+stmt 64 err 1 -1 no such table: t0
+==== upsert1-1100
+
+  CREATE TABLE t1(a INTEGER PRIMARY KEY ON CONFLICT REPLACE, b UNIQUE);
+  INSERT INTO t1(b) VALUES(22);
+  INSERT INTO t1 VALUES(2,22) ON CONFLICT (b) DO NOTHING;
+  SELECT * FROM t1;
+----
+stmt 0 ok
+stmt 72 err 1 -1 no such table: t1
+stmt 104 err 1 -1 no such table: t1
+stmt 162 err 1 -1 no such table: t1
+==== upsert1-1200
+
+  CREATE TABLE t1(a INT, b INT);
+  CREATE UNIQUE INDEX t1x ON t1(b+3);
+----
+stmt 0 ok
+stmt 33 err 1 -1 no such table: main.t1
+==== upsert1-1210
+
+  INSERT INTO t1(a,b) VALUES(1,2) ON CONFLICT(b+?1) DO NOTHING;
+----
+stmt 0 err 1 -1 no such table: t1
+==== upsert1-1300
+
+  CREATE TABLE t1(x INT, y TEXT);
+  INSERT INTO t1 VALUES
+    (11, printf('%.9000c','a')),
+    (11, printf('%.9000c','a')),
+    (33, printf('%.9000c','b')),
+    (33, printf('%.9000c','b'));
+  CREATE TABLE t2(x INT UNIQUE, y TEXT);
+  CREATE TRIGGER r1 BEFORE UPDATE ON t2 BEGIN
+    SELECT raise(ABORT,'Incorrect old.y value passed to trigger!')
+     WHERE old.y != new.y;
+    /* ^^^ This trigger will fire and cause the ABORT if the problem has
+    ** not been fixed, or if there is a regression. */
+  END;
+  INSERT INTO t2(x, y) SELECT x, y FROM t1
+   WHERE true
+   ON CONFLICT (x) DO UPDATE SET y = excluded.y;
+----
+stmt 0 ok
+stmt 34 err 1 -1 no such table: t1
+stmt 190 ok
+stmt 231 err 1 -1 no such table: main.t2
+stmt 506 err 1 -1 no such table: t2

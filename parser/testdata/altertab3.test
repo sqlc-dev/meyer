@@ -1,0 +1,770 @@
+==== 1.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    SELECT sum(b) OVER w FROM t1 WINDOW w AS (ORDER BY a);
+  END;
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: main.t1
+==== 1.1
+
+  ALTER TABLE t1 RENAME a TO aaa;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 1.2
+
+  SELECT sql FROM sqlite_master WHERE name='tr1'
+----
+stmt 0 ok
+==== 1.3
+
+  INSERT INTO t1 VALUES(1, 2);
+----
+stmt 0 err 1 -1 no such table: t1
+==== 2.0
+
+  CREATE TABLE t1(a,b,c);
+  CREATE TABLE t2(a,b,c);
+  CREATE TRIGGER r1 AFTER INSERT ON t1 WHEN new.a NOT NULL BEGIN
+    SELECT a,b, a name FROM t1 
+      INTERSECT 
+    SELECT a,b,c FROM t1 WHERE b>='d' ORDER BY name;
+    SELECT new.c;
+  END;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 52 err 1 -1 no such table: main.t1
+==== 2.1
+
+  ALTER TABLE t1 RENAME TO t1x;
+  SELECT sql FROM sqlite_master WHERE name = 'r1';
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 32 ok
+==== 3.0
+
+  CREATE TABLE t1(a, b, c, d);
+  CREATE VIEW v1 AS SELECT * FROM t1 WHERE a=1 OR (b IN ());
+----
+stmt 0 ok
+stmt 31 ok
+==== 3.1
+
+  ALTER TABLE t1 RENAME b TO bbb;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 3.2
+
+  SELECT sql FROM sqlite_master WHERE name = 'v1'
+----
+stmt 0 ok
+==== 4.0
+
+  CREATE TABLE t1(a, b);
+  CREATE TABLE t3(e, f);
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO t2 VALUES(new.a, new.b);
+  END;
+----
+stmt 0 ok
+stmt 25 ok
+stmt 50 err 1 -1 no such table: main.t1
+==== 4.1.2
+
+  BEGIN;
+    ALTER TABLE t3 RENAME TO t4;
+----
+stmt 0 ok
+stmt 9 err 1 -1 no such table: t3
+==== 4.1.2.dup1
+
+  COMMIT;
+----
+stmt 0 ok
+==== 4.1.3
+
+  SELECT type, name, tbl_name, sql 
+  FROM sqlite_master WHERE type='table' AND name!='t1';
+----
+stmt 0 ok
+==== 4.2.1
+
+  BEGIN;
+    ALTER TABLE t3 RENAME e TO eee;
+----
+stmt 0 ok
+stmt 9 err 1 -1 no such table: t3
+==== 4.2.2
+
+  COMMIT;
+----
+stmt 0 ok
+==== 4.2.3
+
+  SELECT type, name, tbl_name, sql 
+  FROM sqlite_master WHERE type='table' AND name!='t1';
+----
+stmt 0 ok
+==== 5.0
+
+  CREATE TABLE t1 (
+      c1 integer, c2, PRIMARY KEY(c1 collate rtrim),
+      UNIQUE(c2)
+  )
+----
+stmt 0 ok
+==== 5.1
+
+  ALTER TABLE t1 RENAME c1 TO c3;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 6.0
+
+  CREATE TEMPORARY TABLE Table0 (
+    Col0 INTEGER, 
+    PRIMARY KEY(Col0 COLLATE RTRIM), 
+    FOREIGN KEY (Col0) REFERENCES Table0
+  );
+----
+stmt 0 ok
+==== 6.1
+
+  ALTER TABLE Table0 RENAME Col0 TO Col0;
+----
+stmt 0 err 1 -1 no such table: Table0
+==== 7.1.0
+
+  CREATE TABLE t1(a,b,c);
+  CREATE TRIGGER AFTER INSERT ON t1 BEGIN
+    SELECT a, rank() OVER w1 FROM t1
+    WINDOW w1 AS (PARTITION BY b, percent_rank() OVER w1);
+  END;
+----
+stmt 0 ok
+stmt 26 err 1 -1 no such table: main.t1
+==== 7.1.2
+
+  ALTER TABLE t1 RENAME TO t1x;
+  SELECT sql FROM sqlite_master;
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 32 ok
+==== 7.2.1
+
+  DROP TRIGGER after;
+  CREATE TRIGGER AFTER INSERT ON t1x BEGIN
+    SELECT a, rank() OVER w1 FROM t1x
+    WINDOW w1 AS (PARTITION BY b, percent_rank() OVER w1 ORDER BY d);
+  END;
+----
+stmt 0 err 1 -1 no such trigger: after
+stmt 22 err 1 -1 no such table: main.t1x
+==== 7.2.2
+
+  ALTER TABLE t1x RENAME TO t1;
+----
+stmt 0 err 1 -1 no such table: t1x
+==== 8.0
+
+  CREATE TABLE t0(c0);
+  CREATE INDEX i0 ON t0('1' IN ());
+----
+stmt 0 ok
+stmt 23 err 1 -1 no such table: main.t0
+==== 8.1
+
+  ALTER TABLE t0 RENAME TO t1;
+  SELECT sql FROM sqlite_master;
+----
+stmt 0 err 1 -1 no such table: t0
+stmt 31 ok
+==== 8.2.1
+
+  CREATE TABLE t2 (c0);
+  CREATE INDEX i2 ON t2((LIKELIHOOD(c0, 1.0) IN ()));
+  ALTER TABLE t2 RENAME COLUMN c0 TO c1;
+----
+stmt 0 ok
+stmt 24 err 1 -1 no such table: main.t2
+stmt 78 err 1 -1 no such table: t2
+==== 8.2.2
+
+  SELECT sql FROM sqlite_master WHERE tbl_name = 't2';
+----
+stmt 0 ok
+==== 9.1
+
+  CREATE TABLE t1(a,b,c);
+  CREATE TRIGGER AFTER INSERT ON t1 WHEN new.a NOT NULL BEGIN
+    SELECT true WHERE (SELECT a, b FROM (t1)) IN ();
+  END;
+----
+stmt 0 ok
+stmt 26 err 1 -1 no such table: main.t1
+==== 9.2
+
+  ALTER TABLE t1 RENAME TO t1x;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 10.1
+
+  CREATE TABLE t1(a, b, c);
+  CREATE TABLE t2(a, b, c);
+  CREATE VIEW v1 AS SELECT * FROM t1 WHERE (
+    SELECT t1.a FROM t1, t2
+  ) IN () OR t1.a=5;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 56 ok
+==== 10.2
+
+  ALTER TABLE t2 RENAME TO t3;
+  SELECT sql FROM sqlite_master WHERE name='v1';
+----
+stmt 0 err 1 -1 no such table: t2
+stmt 31 ok
+==== 11.1
+
+  CREATE TABLE t1(
+      a,b,c,d,e,f,g,h,j,jj,jjb,k,aa,bb,cc,dd,ee DEFAULT 3.14,
+      ff DEFAULT('hiccup'),Wg NOD NULL DEFAULT(false)
+  );
+
+  CREATE TRIGGER b AFTER INSERT ON t1 WHEN new.a BEGIN
+    SELECT a, sum() w3 FROM t1 
+    WINDOW b AS (ORDER BY NOT EXISTS(SELECT 1 FROM abc));
+  END;
+----
+stmt 0 ok
+stmt 140 err 1 -1 no such table: main.t1
+==== 11.2
+
+  ALTER TABLE t1 RENAME TO t1x;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 11.3
+
+  DROP TRIGGER b;
+  CREATE TRIGGER b AFTER INSERT ON t1 WHEN new.a BEGIN
+    SELECT a, sum() w3 FROM t1 
+    WINDOW b AS (ORDER BY NOT EXISTS(SELECT 1 FROM t1));
+  END;
+----
+stmt 0 err 1 -1 no such trigger: b
+stmt 18 err 1 -1 no such table: main.t1
+==== 11.4
+
+  ALTER TABLE t1 RENAME TO t1x;
+  SELECT sql FROM sqlite_master WHERE name = 'b';
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 32 ok
+==== 12.1
+
+CREATE TABLE t1(a,b,c,d,e,f,g,h,j,jj,Zjj,k,aQ,bb,cc,dd,ee DEFAULT 3.14,
+ff DEFAULT('hiccup'),gg NOD NULL DEFAULT(false));
+CREATE TRIGGER AFTER INSERT ON t1 WHEN new.a NOT NULL BEGIN
+
+SELECT b () OVER , dense_rank() OVER d, d () OVER w1
+FROM t1
+WINDOW
+w1 AS
+( w1 ORDER BY d
+ROWS BETWEEN 2 NOT IN(SELECT a, sum(d) w2,max(d)OVER FROM t1
+WINDOW
+w1 AS
+(PARTITION BY d
+ROWS BETWEEN '' PRECEDING AND false FOLLOWING),
+d AS
+(PARTITION BY b ORDER BY d
+ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+) PRECEDING AND 1 FOLLOWING),
+w2 AS
+(PARTITION BY b ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW),
+w3 AS
+(PARTITION BY b ORDER BY d
+ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING)
+;
+SELECT a, sum(d) w2,max(d)OVER FROM t1
+WINDOW
+w1 AS
+(PARTITION BY d
+ROWS BETWEEN '' PRECEDING AND false FOLLOWING),
+d AS
+(PARTITION BY b ORDER BY d
+ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+;
+
+END;
+----
+stmt 0 ok
+stmt 122 err 1 -1 no such table: main.t1
+==== 12.2
+
+  ALTER TABLE t1 RENAME TO t1x;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 13.1
+
+  CREATE TABLE t1(a);
+  CREATE TRIGGER r1 INSERT ON t1 BEGIN
+    SELECT a(*) OVER (ORDER BY (SELECT 1)) FROM t1;
+  END;
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: main.t1
+==== 13.2
+
+  ALTER TABLE t1 RENAME TO t1x;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 14.1
+
+  CREATE TABLE t1(a);
+  CREATE TABLE t2(b);
+  CREATE TRIGGER AFTER INSERT ON t1 BEGIN
+    SELECT sum() FILTER (WHERE (SELECT sum() FILTER (WHERE 0)) AND a);
+  END;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 no such table: main.t1
+==== 14.2
+
+  ALTER TABLE t1 RENAME TO t1x;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 16.1
+
+  CREATE TABLE t1(x);
+  CREATE TRIGGER AFTER INSERT ON t1 BEGIN
+    SELECT (WITH t2 AS (WITH t3 AS (SELECT true)
+          SELECT * FROM t3 ORDER BY true COLLATE nocase)
+        SELECT 11);
+
+    WITH t4 AS (SELECT * FROM t1) SELECT 33;
+  END;
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: main.t1
+==== 16.2
+
+  ALTER TABLE t1 RENAME TO t1x;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 17.1
+
+  CREATE TABLE t1(a,b,c);
+  CREATE TRIGGER AFTER INSERT ON t1 WHEN new.a NOT NULL BEGIN
+    SELECT a () FILTER (WHERE a>0) FROM t1;
+  END;
+----
+stmt 0 ok
+stmt 26 err 1 -1 no such table: main.t1
+==== 17.2
+
+  ALTER TABLE t1 RENAME TO t1x;
+  ALTER TABLE t1x RENAME a TO aaa;
+  SELECT sql FROM sqlite_master WHERE type='trigger';
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 32 err 1 -1 no such table: t1x
+stmt 67 ok
+==== 18.1
+
+  CREATE TABLE t1(a,b);
+  CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN
+    SELECT a, b FROM t1
+    INTERSECT SELECT b,a FROM t1
+    ORDER BY b IN (
+        SELECT a UNION SELECT b
+        FROM t1
+        ORDER BY b COLLATE nocase
+        )
+    ;
+  END;
+----
+stmt 0 ok
+stmt 24 err 1 -1 no such table: main.t1
+==== 18.2
+
+    SELECT a, b FROM t1
+    INTERSECT 
+    SELECT b,a FROM t1
+    ORDER BY b IN (
+        SELECT a UNION SELECT b
+        FROM t1
+        ORDER BY b COLLATE nocase
+        );
+----
+stmt 0 err 1 -1 no such table: t1
+==== 18.3
+
+  ALTER TABLE t1 RENAME TO t1x;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 19.0
+
+  CREATE TABLE a(a,h CONSTRAINT a UNIQUE ON CONFLICT FAIL,CONSTRAINT a);
+----
+stmt 0 ok
+==== altertab3-generated
+
+    ALTER TABLE a RENAME TO g;
+----
+stmt 0 err 1 -1 no such table: a
+==== 20.10
+
+  CREATE TABLE s(a, b, c);
+  CREATE INDEX k ON s( (WITH s AS( SELECT * ) VALUES(2) ) IN () );
+  ALTER TABLE s RENAME a TO a2;
+----
+stmt 0 ok
+stmt 27 err 1 -1 no such table: main.s
+stmt 94 err 1 -1 no such table: s
+==== 21.1
+
+  CREATE TABLE s(col);
+  CREATE VIEW v AS SELECT ( 
+    WITH x(a) AS(SELECT * FROM s) VALUES(RIGHT) 
+  ) IN() ; 
+  CREATE TABLE a(a);
+  ALTER TABLE a RENAME a TO b;
+----
+stmt 0 ok
+stmt 23 ok
+stmt 112 ok
+stmt 134 err 1 -1 no such table: a
+==== 22.1
+
+  CREATE TABLE t1(a);
+  CREATE VIEW v2(b) AS SELECT * FROM v2;
+----
+stmt 0 ok
+stmt 22 ok
+==== 22.2
+
+  ALTER TABLE t1 RENAME TO t4;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 22.3
+
+  DROP VIEW v2;
+  CREATE VIEW v2(b) AS WITH t3 AS (SELECT b FROM v2) SELECT * FROM t3;
+----
+stmt 0 err 1 -1 no such view: v2
+stmt 16 ok
+==== 22.4
+
+  ALTER TABLE t1 RENAME TO t4;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 22.5
+
+  DROP VIEW v2;
+  CREATE VIEW v2(b) AS WITH t3 AS (SELECT b FROM v2) VALUES(1);
+----
+stmt 0 err 1 -1 no such view: v2
+stmt 16 ok
+==== 22.6
+
+  ALTER TABLE t1 RENAME TO t4;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 23.1
+
+  CREATE TABLE t1(x);
+  CREATE TRIGGER r1 AFTER INSERT ON t1 BEGIN
+    UPDATE t1 SET (c,d)=((SELECT 1 FROM t1 JOIN t2 ON b=x),1);
+  END;
+----
+stmt 0 ok
+stmt 22 err 1 -1 no such table: main.t1
+==== 23.2
+
+  ALTER TABLE t1 RENAME TO t1x;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 23.1.dup1
+
+  CREATE TABLE v0 (a);
+  CREATE VIEW v2 (v3) AS 
+    WITH x1 AS (SELECT * FROM v2) 
+    SELECT v3 AS x, v3 AS y FROM v2;
+----
+stmt 0 ok
+stmt 23 ok
+==== 23.2.dup1
+
+  SELECT * FROM v2
+----
+stmt 0 err 1 -1 no such table: v2
+==== 23.3
+
+  ALTER TABLE v0 RENAME TO t3 ;
+----
+stmt 0 err 1 -1 no such table: v0
+==== 24.1
+
+  CREATE TABLE v0 (v1); 
+  CREATE TABLE v2 (v3 INTEGER UNIQUE ON CONFLICT ABORT); 
+  CREATE TRIGGER x AFTER INSERT ON v2 WHEN ( 
+      ( SELECT v1 AS PROMO_REVENUE FROM v2 JOIN v0 USING ( VALUE ) ) AND 0 ) 
+  BEGIN 
+    DELETE FROM v2; 
+  END;
+----
+stmt 0 ok
+stmt 24 ok
+stmt 82 err 1 -1 no such table: main.v2
+==== 24.2
+
+  ALTER TABLE v0 RENAME TO x ;
+----
+stmt 0 err 1 -1 no such table: v0
+==== 24.3
+
+  DROP TRIGGER x;
+  CREATE TRIGGER x AFTER INSERT ON v2 WHEN (
+    0 AND (SELECT rowid FROM v0)
+  ) BEGIN
+    DELETE FROM v2;
+  END;
+----
+stmt 0 err 1 -1 no such trigger: x
+stmt 18 err 1 -1 no such table: main.v2
+==== 24.4
+
+  ALTER TABLE v0 RENAME TO xyz;
+  SELECT sql FROM sqlite_master WHERE type='trigger'
+----
+stmt 0 err 1 -1 no such table: v0
+stmt 32 ok
+==== 25.1
+
+  CREATE TABLE t1(a, b, c);
+  CREATE TABLE t2(a, b, c);
+  CREATE TRIGGER ttt AFTER INSERT ON t1 BEGIN
+    UPDATE t1 SET a=t2.a FROM t2 WHERE t1.a=t2.a; 
+  END;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 56 err 1 -1 no such table: main.t1
+==== 26.1
+
+  CREATE TABLE t1(x);
+
+  CREATE TABLE t3(y);
+  CREATE TABLE t4(z);
+
+  CREATE TRIGGER tr1 INSERT ON t3 BEGIN
+    UPDATE t3 SET y=z FROM (SELECT z FROM t4);
+  END;
+
+  CREATE TRIGGER tr2 INSERT ON t3 BEGIN
+    UPDATE t3 SET y=abc FROM (SELECT x AS abc FROM t1);
+  END;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 45 ok
+stmt 67 err 1 -1 no such table: main.t3
+stmt 162 err 1 -1 no such table: main.t3
+==== 26.2
+
+  ALTER TABLE t1 RENAME TO t2;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 26.3
+
+  ALTER TABLE t2 RENAME x TO xx;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 26.4
+
+  SELECT sql FROM sqlite_schema WHERE name='tr2'
+----
+stmt 0 ok
+==== 26.5
+
+  CREATE TABLE t1(xx);
+  CREATE TRIGGER xx INSERT ON t1 BEGIN
+     UPDATE t1 SET xx=xx FROM(SELECT xx);
+  END;
+----
+stmt 0 ok
+stmt 23 err 1 -1 no such table: main.t1
+==== 26.6
+
+  ALTER TABLE t1 RENAME TO t2;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 27.1
+
+  CREATE TABLE t1(a, b AS ((WITH w1 (xyz) AS  ( SELECT t1.b FROM t1 )  SELECT 123) IN ()), c);
+----
+stmt 0 ok
+==== 27.2
+
+  ALTER TABLE t1 DROP COLUMN c;
+  SELECT sql FROM sqlite_schema WHERE name = 't1';
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 32 ok
+==== 28.1
+
+  CREATE TABLE t1(a,b,c,d);
+  CREATE TRIGGER AFTER INSERT ON t1 BEGIN
+    UPDATE t1 SET (c,d)=(a,b);
+  END;
+  ALTER TABLE t1 RENAME TO t2;
+----
+stmt 0 ok
+stmt 28 err 1 -1 no such table: main.t1
+stmt 108 err 1 -1 no such table: t1
+==== 28.2
+
+  SELECT sql FROM sqlite_schema WHERE type='trigger'
+----
+stmt 0 ok
+==== 29.1
+
+  CREATE TABLE t1(x, y);
+  CREATE TRIGGER Trigger1 DELETE ON t1 
+  BEGIN 
+    SELECT t1.*, t1.x FROM t1 ORDER BY t1.x;
+  END;
+----
+stmt 0 ok
+stmt 25 err 1 -1 no such table: main.t1
+==== 29.2
+
+  ALTER TABLE t1 RENAME x TO z;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 29.3
+
+  ALTER TABLE t1 RENAME TO t2;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 29.4
+
+  CREATE TRIGGER tr2 AFTER DELETE ON t2 BEGIN
+    SELECT z, y FROM (
+      SELECT t2.* FROM t2
+    );
+  END;
+----
+stmt 0 err 1 -1 no such table: main.t2
+==== 29.5
+
+  DELETE FROM t2
+----
+stmt 0 err 1 -1 no such table: t2
+==== 29.6
+
+  ALTER TABLE t2 RENAME TO t3;
+----
+stmt 0 err 1 -1 no such table: t2
+==== 29.7
+
+  SELECT sql FROM sqlite_schema WHERE type='trigger'
+----
+stmt 0 ok
+==== 30.0
+
+  CREATE TABLE t1(a, b);
+  CREATE VIEW v1 AS 
+      SELECT ( VALUES(a), (b) ) FROM (
+        SELECT a, b FROM t1
+      )
+  ;
+----
+stmt 0 ok
+stmt 25 ok
+==== 30.1
+
+  SELECT * FROM v1
+----
+stmt 0 err 1 -1 no such table: v1
+==== 30.1.dup1
+
+  ALTER TABLE t1 RENAME TO t2;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 30.2
+
+  SELECT sql FROM sqlite_schema WHERE type='view'
+----
+stmt 0 ok
+==== 31.0
+
+  CREATE TABLE t1(ii INTEGER PRIMARY KEY, tt INTEGER, rr REAL);
+  WITH s(i) AS (
+    SELECT 1 UNION ALL SELECT i+1 FROM s WHERE i<50000
+  )
+  INSERT INTO t1 SELECT NULL, i, 5.0 FROM s;
+----
+stmt 0 ok
+stmt 64 err 1 -1 no such table: t1
+==== 31.2
+
+  SELECT rr FROM t1 LIMIT 1
+----
+stmt 0 err 1 -1 no such table: t1
+==== 32.1.0
+
+  CREATE TABLE t1(
+      a INT,
+      b INT,
+      -- comment with comma
+      c INT
+  );
+----
+stmt 0 ok
+==== 32.1.1
+
+  ALTER TABLE t1 DROP COLUMN c;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 32.1.2
+
+  SELECT sql FROM sqlite_schema
+----
+stmt 0 ok
+==== 32.2.0
+
+  CREATE TABLE t1(
+      a INT,
+      b INT,
+      -- comment with, comma
+      c INT
+  );
+----
+stmt 0 ok
+==== 32.2.1
+
+  ALTER TABLE t1 DROP COLUMN c;
+----
+stmt 0 err 1 -1 no such table: t1
+==== 32.2.2
+
+  SELECT sql FROM sqlite_schema
+----
+stmt 0 ok
+==== 33.1
+
+  CREATE TABLE x1(a TEXT, b INTEGER, c CHECK(c!=0));
+----
+stmt 0 ok
+==== 33.2
+
+  ALTER TABLE x1 DROP COLUMN b;
+  SELECT sql FROM sqlite_schema;
+----
+stmt 0 err 1 -1 no such table: x1
+stmt 32 ok

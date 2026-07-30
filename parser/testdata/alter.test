@@ -1,0 +1,446 @@
+==== alter-1.8.2
+
+      CREATE TABLE t4(a PRIMARY KEY, b, c);
+      CREATE TABLE aux.t4(a PRIMARY KEY, b, c);
+      CREATE INDEX i4 ON t4(b);
+      CREATE INDEX aux.i4 ON t4(b);
+----
+stmt 0 ok
+stmt 44 err 1 64 unknown database aux
+stmt 92 err 1 -1 no such table: main.t4
+stmt 124 err 1 144 unknown database aux
+==== alter-1.8.3
+
+      INSERT INTO t4 VALUES('main', 'main', 'main');
+      INSERT INTO aux.t4 VALUES('aux', 'aux', 'aux');
+      SELECT * FROM t4 WHERE a = 'main';
+----
+stmt 0 err 1 -1 no such table: t4
+stmt 53 err 1 -1 no such table: aux.t4
+stmt 107 err 1 -1 no such table: t4
+==== alter-1.8.4
+
+      ALTER TABLE t4 RENAME TO t5;
+      SELECT * FROM t4 WHERE a = 'aux';
+----
+stmt 0 err 1 -1 no such table: t4
+stmt 35 err 1 -1 no such table: t4
+==== alter-1.8.5
+
+      SELECT * FROM t5;
+----
+stmt 0 err 1 -1 no such table: t5
+==== alter-1.8.6
+
+      SELECT * FROM t5 WHERE b = 'main';
+----
+stmt 0 err 1 -1 no such table: t5
+==== alter-1.8.7
+
+      ALTER TABLE aux.t4 RENAME TO t5;
+      SELECT * FROM aux.t5 WHERE b = 'aux';
+----
+stmt 0 err 1 -1 no such table: aux.t4
+stmt 39 err 1 -1 no such table: aux.t5
+==== alter-1.9.1
+
+    CREATE TABLE tbl1   (a, b, c);
+    INSERT INTO tbl1 VALUES(1, 2, 3);
+----
+stmt 0 ok
+stmt 35 err 1 -1 no such table: tbl1
+==== alter-1.9.2
+
+    SELECT * FROM tbl1;
+----
+stmt 0 err 1 -1 no such table: tbl1
+==== alter-1.9.3
+
+    ALTER TABLE tbl1 RENAME TO tbl2;
+    SELECT * FROM tbl2;
+----
+stmt 0 err 1 -1 no such table: tbl1
+stmt 37 err 1 -1 no such table: tbl2
+==== alter-1.9.4
+
+    DROP TABLE tbl2;
+----
+stmt 0 err 1 -1 no such table: tbl2
+==== alter-2.1
+
+    ALTER TABLE none RENAME TO hi;
+----
+stmt 0 err 1 -1 no such table: none
+==== alter-2.4
+
+    ALTER TABLE SqLiTe_master RENAME TO master;
+----
+stmt 0 err 1 -1 table sqlite_master may not be altered
+==== alter-2.5
+
+    ALTER TABLE t3 RENAME TO sqlite_t3;
+----
+stmt 0 err 1 -1 no such table: t3
+==== alter-2.6
+
+    ALTER TABLE t3 ADD COLUMN (ALTER TABLE t3 ADD COLUMN);
+----
+stmt 0 err 1 31 near "(": syntax error
+==== alter-3.1.0
+
+    CREATE TABLE t6(a, b, c);
+    -- Different case for the table name in the trigger.
+    CREATE TRIGGER trig1 AFTER INSERT ON T6 BEGIN
+      SELECT trigfunc('trig1', new.a, new.b, new.c);
+    END;
+----
+stmt 0 ok
+stmt 30 err 1 -1 no such table: main.T6
+==== alter-3.1.3
+
+    DROP TRIGGER trig1;
+----
+stmt 0 err 1 -1 no such trigger: trig1
+==== alter-3.1.6
+
+    DROP TRIGGER trig2;
+----
+stmt 0 err 1 -1 no such trigger: trig2
+==== alter-3.2.1
+
+      ATTACH 'test3.db' AS ON;
+----
+stmt 0 err 1 28 near "ON": syntax error
+==== alter-3.2.2
+
+      ATTACH 'test3.db' AS 'ON';
+----
+stmt 0 ok
+==== alter-3.2.3
+
+      CREATE TABLE ON.t1(a, b, c);
+----
+stmt 0 err 1 20 near "ON": syntax error
+==== alter-3.2.4
+
+      CREATE TABLE 'ON'.t1(a, b, c);
+----
+stmt 0 err 1 20 unknown database 'ON'
+==== alter-3.2.4.dup1
+
+      CREATE TABLE 'ON'.ON(a, b, c);
+----
+stmt 0 err 1 25 near "ON": syntax error
+==== alter-3.2.5
+
+      CREATE TABLE 'ON'.'ON'(a, b, c);
+----
+stmt 0 err 1 20 unknown database 'ON'
+==== alter-3.2.6
+
+    CREATE TABLE t10(a, ON, c);
+----
+stmt 0 err 1 25 near "ON": syntax error
+==== alter-3.2.7
+
+    CREATE TABLE t10(a, 'ON', c);
+----
+stmt 0 ok
+==== alter-3.2.8
+
+    CREATE TRIGGER trig4 AFTER INSERT ON ON BEGIN SELECT 1; END;
+----
+stmt 0 err 1 42 near "ON": syntax error
+==== alter-3.2.9
+
+      CREATE TRIGGER 'on'.trig4 AFTER INSERT ON 'ON' BEGIN SELECT 1; END;
+----
+stmt 0 err 1 22 unknown database 'on'
+==== alter-3.2.10
+
+    DROP TABLE t10;
+----
+stmt 0 err 1 -1 no such table: t10
+==== alter-3.3.7
+
+    DROP TABLE tbl3;
+----
+stmt 0 err 1 -1 no such table: tbl3
+==== alter-3.3.8
+
+      SELECT * FROM temp.sqlite_master WHERE type = 'trigger';
+----
+stmt 0 ok
+==== alter-4.1
+
+    CREATE TABLE tbl1(a INTEGER PRIMARY KEY AUTOINCREMENT);
+    INSERT INTO tbl1 VALUES(10);
+----
+stmt 0 ok
+stmt 60 err 1 -1 no such table: tbl1
+==== alter-4.2
+
+    INSERT INTO tbl1 VALUES(NULL);
+    SELECT a FROM tbl1;
+----
+stmt 0 err 1 -1 no such table: tbl1
+stmt 35 err 1 -1 no such table: tbl1
+==== alter-4.3
+
+    ALTER TABLE tbl1 RENAME TO tbl2;
+    DELETE FROM tbl2;
+    INSERT INTO tbl2 VALUES(NULL);
+    SELECT a FROM tbl2;
+----
+stmt 0 err 1 -1 no such table: tbl1
+stmt 37 err 1 -1 no such table: tbl2
+stmt 59 err 1 -1 no such table: tbl2
+stmt 94 err 1 -1 no such table: tbl2
+==== alter-4.4
+
+    DROP TABLE tbl2;
+----
+stmt 0 err 1 -1 no such table: tbl2
+==== alter-5.1
+
+    CREATE TABLE tbl1(a, b, c);
+    INSERT INTO tbl1 VALUES('x', 'y', 'z');
+----
+stmt 0 ok
+stmt 32 err 1 -1 no such table: tbl1
+==== alter-8.1
+
+    CREATE TABLE t2(a INTEGER);
+    INSERT INTO t2 VALUES(1);
+    INSERT INTO t2 VALUES(1);
+    INSERT INTO t2 VALUES(2);
+    ALTER TABLE t2 ADD COLUMN b INTEGER DEFAULT 9;
+    SELECT sum(b) FROM t2;
+----
+stmt 0 ok
+stmt 32 err 1 -1 no such table: t2
+stmt 62 err 1 -1 no such table: t2
+stmt 92 err 1 -1 no such table: t2
+stmt 122 err 1 -1 no such table: t2
+stmt 173 err 1 -1 no such table: t2
+==== alter-8.2
+
+    SELECT a, sum(b) FROM t2 GROUP BY a;
+----
+stmt 0 err 1 -1 no such table: t2
+==== alter-9.1
+SELECT SQLITE_RENAME_COLUMN(0,0,0,0,0,0,0,0,0)
+----
+stmt 0 err 1 7 no such function: SQLITE_RENAME_COLUMN
+==== alter-9.3
+
+  SELECT sqlite_rename_table(0,0,0,0,0,0,0);
+----
+stmt 0 err 1 10 no such function: sqlite_rename_table
+==== alter-10.2
+SELECT name FROM sqlite_master WHERE name GLOB 'sqlite_autoindex*'
+----
+stmt 0 ok
+==== alter-10.4
+SELECT name FROM sqlite_master WHERE name GLOB 'sqlite_autoindex*'
+----
+stmt 0 ok
+==== alter-12.1
+
+    CREATE TABLE t12(a, b, c);
+    CREATE VIEW v1 AS SELECT * FROM t12;
+----
+stmt 0 ok
+stmt 31 ok
+==== alter-12.2
+
+    ALTER TABLE v1 RENAME TO v2;
+----
+stmt 0 err 1 -1 no such table: v1
+==== alter-12.3
+ SELECT * FROM v1;
+----
+stmt 0 err 1 -1 no such table: v1
+==== alter-12.5
+ 
+    ALTER TABLE v1 ADD COLUMN new_column;
+----
+stmt 0 err 1 -1 no such table: v1
+==== alter-13.1
+
+    CREATE TABLE /* hi */ t3102a(x);
+    CREATE TABLE t3102b -- comment
+    (y);
+    CREATE INDEX t3102c ON t3102a(x);
+    SELECT name FROM sqlite_master WHERE name GLOB 't3102*' ORDER BY 1;
+----
+stmt 0 ok
+stmt 37 ok
+stmt 81 err 1 -1 no such table: main.t3102a
+stmt 119 ok
+==== alter-13.2
+
+    ALTER TABLE t3102a RENAME TO t3102a_rename;
+    SELECT name FROM sqlite_master WHERE name GLOB 't3102*' ORDER BY 1;
+----
+stmt 0 err 1 -1 no such table: t3102a
+stmt 48 ok
+==== alter-13.3
+
+    ALTER TABLE t3102b RENAME TO t3102b_rename;
+    SELECT name FROM sqlite_master WHERE name GLOB 't3102*' ORDER BY 1;
+----
+stmt 0 err 1 -1 no such table: t3102b
+stmt 48 ok
+==== alter-14.1
+
+    CREATE TABLE t3651(a UNIQUE);
+    INSERT INTO t3651 VALUES(5);
+    ALTER TABLE t3651 ADD COLUMN b UNIQUE;
+----
+stmt 0 ok
+stmt 34 err 1 -1 no such table: t3651
+stmt 67 err 1 -1 no such table: t3651
+==== alter-14.2
+
+    ALTER TABLE t3651 ADD COLUMN b PRIMARY KEY;
+----
+stmt 0 err 1 -1 no such table: t3651
+==== alter-16.1
+
+  CREATE TABLE t16a(a TEXT, b REAL, c INT, PRIMARY KEY(a,b)) WITHOUT rowid;
+  INSERT INTO t16a VALUES('abc',1.25,99);
+  ALTER TABLE t16a ADD COLUMN d TEXT DEFAULT 'xyzzy';
+  INSERT INTO t16a VALUES('cba',5.5,98,'fizzle');
+  SELECT * FROM t16a ORDER BY a;
+----
+stmt 0 ok
+stmt 76 err 1 -1 no such table: t16a
+stmt 118 err 1 -1 no such table: t16a
+stmt 172 err 1 -1 no such table: t16a
+stmt 222 err 1 -1 no such table: t16a
+==== alter-16.2
+
+  ALTER TABLE t16a RENAME TO t16a_rn;
+  SELECT * FROM t16a_rn ORDER BY a;
+----
+stmt 0 err 1 -1 no such table: t16a
+stmt 38 err 1 -1 no such table: t16a_rn
+==== alter-17.100
+
+    CREATE TABLE t1(a INTEGER PRIMARY KEY, b);
+    CREATE VIRTUAL TABLE t2 USING rtree(id,x0,x1);
+    INSERT INTO t1 VALUES(1,'apple'),(2,'fig'),(3,'pear');
+    INSERT INTO t2 VALUES(1,1.0,2.0),(2,2.0,3.0),(3,1.5,3.5);
+    CREATE TRIGGER r1 AFTER UPDATE ON t1 BEGIN
+      DELETE FROM t2 WHERE id = OLD.a;
+    END;
+    ALTER TABLE t1 RENAME TO t3;
+    UPDATE t3 SET b='peach' WHERE a=2;
+    SELECT * FROM t2 ORDER BY 1;
+----
+stmt 0 ok
+stmt 47 ok
+stmt 98 err 1 -1 no such table: t1
+stmt 157 err 1 -1 no such table: t2
+stmt 219 err 1 -1 no such table: main.t1
+stmt 314 err 1 -1 no such table: t1
+stmt 347 err 1 -1 no such table: t3
+stmt 386 err 1 -1 no such table: t2
+==== alter-18.1
+
+  CREATE TABLE t1(a,b,c);
+  CREATE TABLE log(a INTEGER PRIMARY KEY,b,c);
+  CREATE TRIGGER tr1 AFTER INSERT ON t1 BEGIN
+    INSERT INTO logx(a,b,c) VALUES(new.a,new.b,new.c)
+    ON CONFLICT(a) DO UPDATE SET c=excluded.c, b=new.b;
+  END;
+  ALTER TABLE log RENAME COLUMN a TO x;
+----
+stmt 0 ok
+stmt 26 ok
+stmt 73 err 1 -1 no such table: main.t1
+stmt 236 err 1 -1 no such table: log
+==== alter-19.1
+
+  CREATE TABLE t1(x);
+  CREATE TABLE t2(c);
+  CREATE TRIGGER r1 AFTER INSERT ON t2 BEGIN
+    UPDATE t2 SET (c)=(
+       EXISTS(SELECT 1 WHERE (WITH cte1(a) AS (SELECT 1 FROM t1 WHERE (SELECT 1 WHERE (WITH cte2(b) AS (VALUES(1))SELECT b FROM cte2)))SELECT a FROM cte1))
+    );
+  END;
+  ALTER TABLE t2 RENAME TO t3;
+----
+stmt 0 ok
+stmt 22 ok
+stmt 44 err 1 -1 no such table: main.t2
+stmt 283 err 1 -1 no such table: t2
+==== alter-19.2
+
+  SELECT name FROM sqlite_schema WHERE sql LIKE '%t2%';
+----
+stmt 0 ok
+==== alter-19.3
+
+  SELECT name FROM sqlite_schema WHERE sql LIKE '%t3%' ORDER BY name;
+----
+stmt 0 ok
+==== alter-20.1
+
+  CREATE TABLE t1(a INT) STRICT;
+  INSERT INTO t1(a) VALUES(45);
+----
+stmt 0 ok
+stmt 33 err 1 -1 no such table: t1
+==== alter-20.2
+
+  ALTER TABLE t1 ADD COLUMN b TEXT DEFAULT x'313233';
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter-20.2.dup1
+
+  DELETE FROM t1;
+  ALTER TABLE t1 ADD COLUMN b TEXT DEFAULT x'313233';
+----
+stmt 0 err 1 -1 no such table: t1
+stmt 18 err 1 -1 no such table: t1
+==== alter-20.3
+
+  INSERT INTO t1(a) VALUES(45);
+----
+stmt 0 err 1 -1 no such table: t1
+==== alter-21.1
+
+  CREATE TABLE t1(a,b,c,d);
+  CREATE TABLE t2(a,b,c,d,x);
+  CREATE TRIGGER r1 AFTER INSERT ON t2 BEGIN
+    SELECT unknown_function(a ORDER BY (SELECT group_concat(DISTINCT a ORDER BY a) FROM t1)) FROM t1;
+  END;
+  ALTER TABLE t2 RENAME TO e;
+----
+stmt 0 ok
+stmt 28 ok
+stmt 58 err 1 -1 no such table: main.t2
+stmt 212 err 1 -1 no such table: t2
+==== alter-21.2
+
+  SELECT name, type FROM sqlite_schema ORDER BY name;
+----
+stmt 0 ok
+==== alter-21.3
+
+  DROP TRIGGER r1;
+  CREATE TRIGGER r2 AFTER INSERT ON e BEGIN
+    SELECT unknown_function(a ORDER BY (SELECT group_concat(a ORDER BY a) FROM (SELECT b FROM t1))) FROM t1;
+  END;
+  ALTER TABLE e RENAME TO t99;
+----
+stmt 0 err 1 -1 no such trigger: r1
+stmt 19 err 1 -1 no such table: main.e
+stmt 179 err 1 -1 no such table: e
+==== alter-21.4
+
+  SELECT name, type FROM sqlite_schema ORDER BY name;
+----
+stmt 0 ok
