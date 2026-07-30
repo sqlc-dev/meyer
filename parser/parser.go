@@ -49,7 +49,8 @@ func Parse(ctx context.Context, r io.Reader) ([]ast.Stmt, error) {
 
 // ParseString parses a complete SQL script.
 func ParseString(src string) (stmts []ast.Stmt, err error) {
-	p := newParser(src)
+	// newParser is inside the recover: it reads the first token, and an
+	// input that starts with an illegal one fails there.
 	defer func() {
 		if r := recover(); r != nil {
 			b, ok := r.(bail)
@@ -59,7 +60,7 @@ func ParseString(src string) (stmts []ast.Stmt, err error) {
 			stmts, err = nil, b.err
 		}
 	}()
-	return p.parseScript(), nil
+	return newParser(src).parseScript(), nil
 }
 
 // ParseStatement parses exactly one statement and rejects trailing input.
@@ -76,7 +77,6 @@ func ParseStatement(src string) (ast.Stmt, error) {
 
 // ParseExpr parses a single expression. It exists for tests and tooling.
 func ParseExpr(src string) (expr ast.Expr, err error) {
-	p := newParser(src)
 	defer func() {
 		if r := recover(); r != nil {
 			b, ok := r.(bail)
@@ -86,6 +86,7 @@ func ParseExpr(src string) (expr ast.Expr, err error) {
 			expr, err = nil, b.err
 		}
 	}()
+	p := newParser(src)
 	e := p.parseExpr(precLowest)
 	if !p.at(token.EOF) {
 		p.syntaxError()
@@ -103,7 +104,31 @@ type parser struct {
 
 	nVar    int            // bind parameters seen so far
 	varNums map[string]int // named parameters already assigned a number
+
+	depth int // current nesting depth, guarded by enter/leave
 }
+
+// maxDepth bounds recursion. Unlike SQLite, whose LALR stack is heap
+// allocated and simply stops growing, meyer recurses on the goroutine
+// stack, where running out is a fatal, unrecoverable runtime error rather
+// than something a caller could handle. The limit is far above anything
+// SQLite itself accepts -- it gives up at a nesting of roughly 2,500 -- so
+// in practice this only fires on input SQLite rejects too. The deepest any
+// case in the vendored corpus reaches is 32.
+const maxDepth = 10000
+
+// enter and leave bracket the recursive descent's cycles: expressions,
+// selects and FROM items. Nothing else in the grammar can nest without
+// passing through one of them.
+func (p *parser) enter() {
+	p.depth++
+	if p.depth > maxDepth {
+		// SQLite's %stack_overflow block reports this same message.
+		p.fail("Recursion limit", p.cur().Pos)
+	}
+}
+
+func (p *parser) leave() { p.depth-- }
 
 func newParser(src string) *parser {
 	p := &parser{src: src, toks: lexer.Lex(src), varNums: map[string]int{}}

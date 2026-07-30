@@ -56,6 +56,8 @@ func (p *parser) parseSelect() *ast.SelectStmt {
 //	selectnowith ::= selectnowith multiselect_op oneselect.
 //	multiselect_op ::= UNION. / UNION ALL. / EXCEPT|INTERSECT.
 func (p *parser) parseSelectNoWith() *ast.SelectStmt {
+	p.enter()
+	defer p.leave()
 	start := p.cur().Pos
 	n := &ast.SelectStmt{Cores: []ast.SelectCore{p.parseOneSelect()}}
 	for {
@@ -270,6 +272,8 @@ func joinTypeOf(words []string) ast.JoinType {
 //	seltablist ::= stl_prefix LP select RP as on_using.
 //	seltablist ::= stl_prefix LP seltablist RP as on_using.
 func (p *parser) parseTableRef(join *ast.JoinOperator) *ast.TableRef {
+	p.enter()
+	defer p.leave()
 	start := p.cur().Pos
 	if join != nil {
 		start = join.Pos()

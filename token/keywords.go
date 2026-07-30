@@ -1,7 +1,5 @@
 package token
 
-import "strings"
-
 // keywords maps the upper-case spelling of every SQLite keyword to its token
 // kind. Transcribed from aKeywordTable[] in tool/mkkeywordhash.c, resolved
 // for the feature set of the pinned build (see parser/testdata/README.md):
@@ -204,10 +202,28 @@ var fallback = map[Kind]bool{
 	IF: true,
 }
 
+// maxKeywordLen is the length of CURRENT_TIMESTAMP, the longest keyword.
+const maxKeywordLen = 17
+
 // Lookup returns the keyword kind for an identifier spelling, or ID if it is
 // not a keyword. Matching is ASCII case-insensitive, as in keywordCode().
+//
+// The upper-casing is done into a stack array rather than with
+// strings.ToUpper, because this runs once per identifier token and the
+// compiler turns m[string(b[:n])] into an allocation-free lookup.
 func Lookup(name string) Kind {
-	if k, ok := keywords[strings.ToUpper(name)]; ok {
+	if len(name) > maxKeywordLen {
+		return ID
+	}
+	var buf [maxKeywordLen]byte
+	for i := 0; i < len(name); i++ {
+		c := name[i]
+		if c >= 'a' && c <= 'z' {
+			c -= 'a' - 'A'
+		}
+		buf[i] = c
+	}
+	if k, ok := keywords[string(buf[:len(name)])]; ok {
 		return k
 	}
 	return ID

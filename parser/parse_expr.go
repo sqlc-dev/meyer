@@ -40,6 +40,8 @@ const (
 // parseExpr parses an expression, consuming operators of precedence min and
 // above.
 func (p *parser) parseExpr(min int) ast.Expr {
+	p.enter()
+	defer p.leave()
 	return p.parseOperators(p.parsePrefix(), min)
 }
 
