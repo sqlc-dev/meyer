@@ -139,8 +139,34 @@ type field struct {
 	value reflect.Value
 }
 
+// meaningfulZero reports whether a zero value still says something. Several
+// enums have a meaningful zero -- FrameBoundType(0) is UNBOUNDED PRECEDING,
+// TableConstraintKind(0) is PRIMARY KEY -- and omitting those would make a
+// snapshot ambiguous. An enum whose zero means "absent" says so in its
+// String, which is exactly the ones worth leaving out.
+func meaningfulZero(v reflect.Value) bool {
+	// Only enums: a nil node pointer also implements Stringer, and calling
+	// String on it is a crash rather than an answer.
+	switch v.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+	default:
+		return false
+	}
+	s, ok := v.Interface().(fmt.Stringer)
+	if !ok {
+		return false
+	}
+	switch s.String() {
+	case "", "none", "default", "unspecified":
+		return false
+	}
+	return true
+}
+
 // fields selects the fields worth printing: zero values are omitted so that
-// a dump shows what a statement said rather than what it did not.
+// a dump shows what a statement said rather than what it did not, except
+// where the zero value is itself the statement (see meaningfulZero).
 func (d *dumper) fields(v reflect.Value) []field {
 	t := v.Type()
 	var out []field
@@ -160,7 +186,7 @@ func (d *dumper) fields(v reflect.Value) []field {
 		if sf.Name == "Raw" && !d.opts.Raw {
 			continue
 		}
-		if fv.IsZero() {
+		if fv.IsZero() && !meaningfulZero(fv) {
 			continue
 		}
 		out = append(out, field{sf.Name, fv})

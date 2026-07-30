@@ -69,6 +69,11 @@ func LineCol(src string, offset int) (line, col int) {
 }
 
 // Parse reads SQL from r and returns one ast.Stmt per statement.
+//
+// The context is accepted so the signature matches the sibling parsers
+// sqlc uses, and is not consulted: parsing is a bounded, allocation-light
+// pass over the input, and the recursion limit keeps even hostile input
+// from taking long enough to be worth cancelling.
 func Parse(ctx context.Context, r io.Reader) ([]ast.Stmt, error) {
 	src, err := io.ReadAll(r)
 	if err != nil {

@@ -1199,6 +1199,7 @@ SelectStmt{
           Span: 985:989
           Expr: Literal{
             Span: 985:989
+            Kind: LiteralKind(NULL)
             Value: "NULL"
             Raw: "NULL"
           }
@@ -1289,6 +1290,7 @@ SelectStmt{
           Span: 1057:1058
           Expr: BindParam{
             Span: 1057:1058
+            Kind: ParamKind(?)
             Number: 1
             Raw: "?"
           }

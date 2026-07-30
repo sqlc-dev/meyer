@@ -198,6 +198,7 @@ CreateTableStmt{
                   Name: "full"
                   Raw: "full"
                 }
+                Action: ForeignKeyAction(NO ACTION)
               }
             ]
           }
@@ -295,6 +296,7 @@ CreateTableStmt{
         Name: "pk"
         Raw: "pk"
       }
+      Kind: TableConstraintKind(PRIMARY KEY)
       Columns: [
         OrderingTerm{
           Span: 447:448
@@ -743,6 +745,7 @@ AlterTableStmt{
       Raw: "t"
     }
   }
+  Action: AlterAction(RENAME TO)
   NewName: Ident{
     Span: 1126:1127
     Name: "u"

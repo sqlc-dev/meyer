@@ -1,5 +1,6 @@
 BeginStmt{
   Span: 58:64
+  Type: TransactionType(DEFERRED)
 }
 BeginStmt{
   Span: 65:98

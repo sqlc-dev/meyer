@@ -112,13 +112,19 @@ func main() {
 			for src := range work {
 				for _, m := range mutations(src, *per, rng) {
 					check(r, m, rep)
-					// A second edit reaches shapes one cannot: two
-					// unbalanced brackets, a keyword in a position only
-					// another edit could open up.
+					// Further edits reach shapes one cannot: two unbalanced
+					// brackets, a keyword in a position only another edit
+					// could open up. Each round builds on the last.
+					cur := m
 					for d := 1; d < *depth; d++ {
-						for _, m2 := range mutations(m, 2, rng) {
+						next := mutations(cur, 2, rng)
+						if len(next) == 0 {
+							break
+						}
+						for _, m2 := range next {
 							check(r, m2, rep)
 						}
+						cur = next[0]
 					}
 				}
 			}

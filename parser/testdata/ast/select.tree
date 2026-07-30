@@ -942,6 +942,7 @@ SelectStmt{
           Frame: FrameType(RANGE)
           StartBound: FrameBound{
             Span: 807:826
+            Type: FrameBoundType(UNBOUNDED PRECEDING)
           }
           EndBound: FrameBound{
             Span: 831:842
