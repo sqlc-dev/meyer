@@ -323,7 +323,7 @@ func SplitDiffers(sql string) bool {
 				return true
 			}
 		default:
-			if strings.Contains(t.Text, ";") && !completeUnderstands(t) {
+			if text := t.Text(sql); strings.Contains(text, ";") && !completeUnderstands(t, text) {
 				return true
 			}
 		}
@@ -337,12 +337,12 @@ func SplitDiffers(sql string) bool {
 // An unterminated one it does not: in ":v('(%d)',changes());" the tokenizer
 // swallows the first quote into the bind parameter and finds a string
 // starting at the second, while sqlite3_complete pairs the two.
-func completeUnderstands(t token.Token) bool {
+func completeUnderstands(t token.Token, text string) bool {
 	switch t.Kind {
 	case token.STRING, token.BLOB:
 		return true
 	case token.ID:
-		switch t.Text[0] {
+		switch text[0] {
 		case '"', '`', '[':
 			return true
 		}

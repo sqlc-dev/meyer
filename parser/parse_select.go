@@ -73,7 +73,7 @@ func (p *parser) parseSelectNoWith() *ast.SelectStmt {
 			}
 		case token.EXCEPT, token.INTERSECT:
 			p.advance()
-			op = ast.CompoundOp{Op: strings.ToUpper(t.Text)}
+			op = ast.CompoundOp{Op: strings.ToUpper(p.text(t))}
 		default:
 			n.Span = ast.Span{Start: start, Stop: p.prevEnd()}
 			return n
@@ -193,7 +193,7 @@ func (p *parser) parseAlias() (*ast.Ident, bool) {
 		return p.expectName(), true
 	}
 	if token.IsIDS(p.cur().Kind) {
-		return identOf(p.advance()), false
+		return p.identOf(p.advance()), false
 	}
 	return nil, false
 }
@@ -225,9 +225,9 @@ func (p *parser) tryJoinOperator() *ast.JoinOperator {
 		return &ast.JoinOperator{Span: spanOf(t), Type: ast.JoinInner | ast.JoinComma}
 	case token.JOIN:
 		p.advance()
-		return &ast.JoinOperator{Span: spanOf(t), Type: ast.JoinInner, Words: []string{t.Text}}
+		return &ast.JoinOperator{Span: spanOf(t), Type: ast.JoinInner, Words: []string{p.text(t)}}
 	case token.JOIN_KW:
-		words := []string{p.advance().Text}
+		words := []string{p.text(p.advance())}
 		for i := 0; i < 2 && !p.at(token.JOIN); i++ {
 			words = append(words, p.expectName().Raw)
 		}

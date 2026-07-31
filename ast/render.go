@@ -16,6 +16,7 @@ import "strings"
 // String renders n as SQL.
 func String(n Node) string {
 	var b strings.Builder
+	b.Grow(sizeHint(n))
 	write(&b, n)
 	return b.String()
 }
@@ -23,11 +24,28 @@ func String(n Node) string {
 // Statements renders a whole script, one statement per line.
 func Statements(stmts []Stmt) string {
 	var b strings.Builder
+	n := 0
+	for _, s := range stmts {
+		n += sizeHint(s) + 2 // ";\n"
+	}
+	b.Grow(n)
 	for _, s := range stmts {
 		write(&b, s)
 		b.WriteString(";\n")
 	}
 	return b.String()
+}
+
+// sizeHint estimates the rendered length of n from the source it was parsed
+// from, which it is within a few bytes of: rendering rewrites the whitespace
+// and nothing else. It saves a strings.Builder the four doublings a short
+// statement would otherwise cost. A node built by hand rather than parsed
+// has no span, and gets no hint.
+func sizeHint(n Node) int {
+	if size := n.End() - n.Pos(); size > 0 {
+		return size
+	}
+	return 0
 }
 
 func (n *SelectStmt) String() string             { return String(n) }

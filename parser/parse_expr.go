@@ -129,7 +129,7 @@ func (p *parser) parseOperators(x ast.Expr, min int, stopAtAnd bool) ast.Expr {
 			}
 			// expr ::= expr PTR expr. The "->" and "->>" spellings share a
 			// token; only the text tells them apart.
-			if t.Kind == token.PTR && t.Text == "->>" {
+			if t.Kind == token.PTR && p.text(t) == "->>" {
 				e.op = ast.OpPtr2
 			}
 			x = p.binary(x, e.op, e.prec)
@@ -257,7 +257,7 @@ func (p *parser) parseIs(x ast.Expr) ast.Expr {
 //	expr ::= expr likeop expr. [LIKE_KW]
 //	expr ::= expr likeop expr ESCAPE expr. [LIKE_KW]
 func (p *parser) parseLike(x ast.Expr, not bool) ast.Expr {
-	op := identOf(p.advance())
+	op := p.identOf(p.advance())
 	n := &ast.LikeExpr{Op: op, Not: not, X: x}
 	n.Y = p.parseExpr(precCompare + 1)
 	if p.at(token.ESCAPE) {
@@ -392,7 +392,7 @@ func (p *parser) parsePrimary() ast.Expr {
 			return p.parseQualifiedRef()
 		}
 		p.advance()
-		return identOf(t)
+		return p.identOf(t)
 	}
 	p.syntaxError()
 	return nil
@@ -411,21 +411,22 @@ func (p *parser) parseTerm() ast.Expr {
 	switch t.Kind {
 	case token.NULL:
 		p.advance()
-		return &ast.Literal{Span: spanOf(t), Kind: ast.LitNull, Value: t.Text, Raw: t.Text}
+		return literalOf(t, ast.LitNull, p.text(t))
 	case token.INTEGER:
 		p.advance()
-		return &ast.Literal{Span: spanOf(t), Kind: ast.LitInteger, Value: t.Text, Raw: t.Text}
+		return literalOf(t, ast.LitInteger, p.text(t))
 	case token.FLOAT:
 		p.advance()
-		return &ast.Literal{Span: spanOf(t), Kind: ast.LitFloat, Value: t.Text, Raw: t.Text}
+		return literalOf(t, ast.LitFloat, p.text(t))
 	case token.BLOB:
 		p.advance()
-		return &ast.Literal{Span: spanOf(t), Kind: ast.LitBlob, Value: t.Text, Raw: t.Text}
+		return literalOf(t, ast.LitBlob, p.text(t))
 	case token.STRING:
 		p.advance()
+		raw := p.text(t)
 		return &ast.Literal{
 			Span: spanOf(t), Kind: ast.LitString,
-			Value: dequote(t.Text, '\''), Raw: t.Text,
+			Value: dequote(raw, '\''), Raw: raw,
 		}
 	case token.QNUMBER:
 		// The grammar action dequotes the digit separators and rejects a
@@ -436,19 +437,20 @@ func (p *parser) parseTerm() ast.Expr {
 		if strings.ContainsAny(value, ".eE") && !strings.HasPrefix(strings.ToLower(value), "0x") {
 			kind = ast.LitFloat
 		}
-		return &ast.Literal{Span: spanOf(t), Kind: kind, Value: value, Raw: t.Text}
+		return &ast.Literal{Span: spanOf(t), Kind: kind, Value: value, Raw: p.text(t)}
 	case token.CTIME_KW:
 		// CTIME_KW falls back to ID elsewhere, but here it has a shift
 		// action, so it is always the keyword.
 		p.advance()
+		raw := p.text(t)
 		kind := ast.LitCurrentTimestamp
-		switch strings.ToUpper(t.Text) {
+		switch strings.ToUpper(raw) {
 		case "CURRENT_DATE":
 			kind = ast.LitCurrentDate
 		case "CURRENT_TIME":
 			kind = ast.LitCurrentTime
 		}
-		return &ast.Literal{Span: spanOf(t), Kind: kind, Value: t.Text, Raw: t.Text}
+		return literalOf(t, kind, raw)
 	}
 	p.syntaxError()
 	return nil
@@ -482,7 +484,10 @@ func (p *parser) parseParenExpr() ast.Expr {
 //
 //	expr ::= nm DOT nm. / expr ::= nm DOT nm DOT nm.
 func (p *parser) parseQualifiedRef() ast.Expr {
-	parts := []*ast.Ident{p.expectName()}
+	// A reference is db.table.column at most, so the slice is sized once
+	// rather than grown twice.
+	parts := make([]*ast.Ident, 1, 3)
+	parts[0] = p.expectName()
 	p.expect(token.DOT)
 	parts = append(parts, p.expectName())
 	if p.at(token.DOT) {
@@ -536,7 +541,7 @@ func (p *parser) parseRaise() ast.Expr {
 		n.Action = "IGNORE"
 		p.advance()
 	case token.ROLLBACK, token.ABORT, token.FAIL:
-		n.Action = strings.ToUpper(p.advance().Text)
+		n.Action = strings.ToUpper(p.text(p.advance()))
 		p.expect(token.COMMA)
 		n.Message = p.parseExpr(precLowest)
 	default:
@@ -554,7 +559,7 @@ func (p *parser) parseRaise() ast.Expr {
 //	expr ::= idj LP distinct exprlist ORDER BY sortlist RP filter_over.
 //	expr ::= idj LP STAR RP filter_over.
 func (p *parser) parseFuncCall() ast.Expr {
-	name := identOf(p.advance())
+	name := p.identOf(p.advance())
 	n := &ast.FuncCall{Name: name}
 	p.expect(token.LP)
 	if p.at(token.STAR) {
@@ -627,11 +632,11 @@ func (p *parser) parseTypeToken() *ast.TypeName {
 	start := p.cur().Pos
 	// A type is almost always one word ("INTEGER", "TEXT"); only build a
 	// slice for the "UNSIGNED BIG INT" kind.
-	name := p.advance().Text
+	name := p.text(p.advance())
 	if token.IsIDS(p.cur().Kind) {
 		words := []string{name}
 		for token.IsIDS(p.cur().Kind) {
-			words = append(words, p.advance().Text)
+			words = append(words, p.text(p.advance()))
 		}
 		name = strings.Join(words, " ")
 	}
@@ -658,12 +663,12 @@ func (p *parser) parseTypeToken() *ast.TypeName {
 func (p *parser) parseSignedNumber() string {
 	var sign string
 	if p.at(token.PLUS) || p.at(token.MINUS) {
-		sign = p.advance().Text
+		sign = p.text(p.advance())
 	}
 	if !p.at(token.INTEGER) && !p.at(token.FLOAT) {
 		p.syntaxError()
 	}
-	return sign + p.advance().Text
+	return sign + p.text(p.advance())
 }
 
 // bindParam builds a BindParam and assigns its number the way
@@ -679,18 +684,19 @@ func (p *parser) bindParam(t token.Token) ast.Expr {
 	// "SELECT #1 #1" is reported at the second reference, not the first.
 	// Deferring the error reproduces that, since a real syntax error later
 	// in the statement aborts the parse and wins on its own.
-	if len(t.Text) >= 2 && t.Text[0] == '#' && t.Text[1] >= '0' && t.Text[1] <= '9' {
-		p.defer_(`near "`+t.Text+`": syntax error`, t.Pos)
+	raw := p.text(t)
+	if len(raw) >= 2 && raw[0] == '#' && raw[1] >= '0' && raw[1] <= '9' {
+		p.defer_(`near "`+raw+`": syntax error`, t.Pos)
 	}
-	n := &ast.BindParam{Span: spanOf(t), Raw: t.Text}
+	n := &ast.BindParam{Span: spanOf(t), Raw: raw}
 	switch {
-	case t.Text == "?":
+	case raw == "?":
 		n.Kind = ast.ParamAnon
 		p.nVar++
 		n.Number = p.nVar
-	case t.Text[0] == '?':
+	case raw[0] == '?':
 		n.Kind = ast.ParamNumber
-		v, err := strconv.Atoi(t.Text[1:])
+		v, err := strconv.Atoi(raw[1:])
 		if err == nil {
 			n.Number = v
 			if v > p.nVar {
@@ -698,7 +704,7 @@ func (p *parser) bindParam(t token.Token) ast.Expr {
 			}
 		}
 	default:
-		switch t.Text[0] {
+		switch raw[0] {
 		case ':':
 			n.Kind = ast.ParamColon
 		case '@':
@@ -706,8 +712,8 @@ func (p *parser) bindParam(t token.Token) ast.Expr {
 		default:
 			n.Kind = ast.ParamDollar
 		}
-		n.Name = t.Text[1:]
-		if v, ok := p.varNums[t.Text]; ok {
+		n.Name = raw[1:]
+		if v, ok := p.varNums[raw]; ok {
 			n.Number = v
 		} else {
 			p.nVar++
@@ -715,7 +721,7 @@ func (p *parser) bindParam(t token.Token) ast.Expr {
 			if p.varNums == nil {
 				p.varNums = make(map[string]int)
 			}
-			p.varNums[t.Text] = p.nVar
+			p.varNums[raw] = p.nVar
 		}
 	}
 	return n
@@ -726,7 +732,7 @@ func (p *parser) bindParam(t token.Token) ast.Expr {
 // two digits. It reproduces sqlite3DequoteNumber, including its habit of
 // reporting the partially rewritten token rather than the original.
 func (p *parser) dequoteNumber(t token.Token) string {
-	in := []byte(t.Text)
+	in := []byte(p.text(t))
 	buf := append([]byte(nil), in...)
 	bHex := len(in) > 1 && in[0] == '0' && (in[1] == 'x' || in[1] == 'X')
 	isok := func(c byte) bool {
@@ -753,4 +759,9 @@ func (p *parser) dequoteNumber(t token.Token) string {
 
 func isHexDigit(c byte) bool {
 	return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
+}
+
+// literalOf builds the literals whose value is their own spelling.
+func literalOf(t token.Token, kind ast.LiteralKind, raw string) *ast.Literal {
+	return &ast.Literal{Span: spanOf(t), Kind: kind, Value: raw, Raw: raw}
 }

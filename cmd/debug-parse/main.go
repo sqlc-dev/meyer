@@ -46,7 +46,7 @@ func main() {
 
 	if *tokens {
 		for _, t := range lexer.Lex(src) {
-			fmt.Printf("%5d-%-5d %-10s %q\n", t.Pos, t.End, t.Kind, t.Text)
+			fmt.Printf("%5d-%-5d %-10s %q\n", t.Pos, t.End, t.Kind, t.Text(src))
 		}
 		return
 	}

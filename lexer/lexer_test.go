@@ -27,7 +27,7 @@ func texts(src string) []string {
 	toks := Lex(src)
 	out := make([]string, 0, len(toks))
 	for _, t := range toks[:len(toks)-1] {
-		out = append(out, t.Text)
+		out = append(out, t.Text(src))
 	}
 	return out
 }
@@ -86,7 +86,7 @@ func TestQuoting(t *testing.T) {
 	}
 	for _, tt := range tests {
 		toks := Lex(tt.src)
-		if len(toks) != 2 || toks[0].Kind != tt.kind || toks[0].Text != tt.text {
+		if len(toks) != 2 || toks[0].Kind != tt.kind || toks[0].Text(tt.src) != tt.text {
 			t.Errorf("Lex(%q) = %v, want one %v %q", tt.src, toks[:len(toks)-1], tt.kind, tt.text)
 		}
 	}
@@ -182,7 +182,7 @@ func TestVariables(t *testing.T) {
 	}
 	for _, tt := range tests {
 		toks := Lex(tt.src)
-		if len(toks) != 2 || toks[0].Kind != tt.kind || toks[0].Text != tt.text {
+		if len(toks) != 2 || toks[0].Kind != tt.kind || toks[0].Text(tt.src) != tt.text {
 			t.Errorf("Lex(%q) = %v, want one %v %q", tt.src, toks[:len(toks)-1], tt.kind, tt.text)
 		}
 	}
@@ -274,7 +274,7 @@ func TestWindowKeywordResolution(t *testing.T) {
 		}
 		if toks[tt.at].Kind != tt.want {
 			t.Errorf("Lex(%q)[%d] = %v %q, want %v",
-				tt.src, tt.at, toks[tt.at].Kind, toks[tt.at].Text, tt.want)
+				tt.src, tt.at, toks[tt.at].Kind, toks[tt.at].Text(tt.src), tt.want)
 		}
 	}
 }
@@ -286,8 +286,8 @@ func TestSpansCoverTheInput(t *testing.T) {
 		if tk.Kind == token.EOF {
 			continue
 		}
-		if got := src[tk.Pos:tk.End]; got != tk.Text {
-			t.Errorf("token %d: span %d:%d is %q, but Text is %q", i, tk.Pos, tk.End, got, tk.Text)
+		if tk.Pos < 0 || tk.Pos >= tk.End || tk.End > len(src) {
+			t.Errorf("token %d: span %d:%d is not a range within %d bytes", i, tk.Pos, tk.End, len(src))
 		}
 		if i > 0 && tk.Pos < toks[i-1].End {
 			t.Errorf("token %d starts at %d, before the previous token ended at %d",

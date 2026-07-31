@@ -10,20 +10,83 @@ meyer is being built to replace the ANTLR-generated SQLite parser in
 [sqlc](https://github.com/sqlc-dev/sqlc). See [PLAN.md](PLAN.md) for the
 architecture and [CLAUDE.md](CLAUDE.md) for the development workflow.
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/sqlc-dev/meyer.svg)](https://pkg.go.dev/github.com/sqlc-dev/meyer)
+
 ## Usage
 
-```go
-stmts, err := parser.Parse(ctx, strings.NewReader("SELECT id FROM users WHERE id = ?"))
+```sh
+go get github.com/sqlc-dev/meyer
 ```
 
-`ParseString` and `ParseStatement` take a string; `ParseExpr` parses a single
-expression. A rejected input returns a `*parser.Error` carrying SQLite's
-exact message and the byte offset of the fault.
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+
+	"github.com/sqlc-dev/meyer/ast"
+	"github.com/sqlc-dev/meyer/parser"
+)
+
+func main() {
+	const src = `SELECT u.name, count(o.id) FROM users u
+	  JOIN orders o ON o.user_id = u.id
+	 WHERE u.created_at > :since`
+
+	stmts, err := parser.ParseString(src)
+	if err != nil {
+		var perr *parser.Error
+		if errors.As(err, &perr) {
+			fmt.Printf("%s at byte %d\n", perr.Message, perr.Offset)
+		}
+		return
+	}
+
+	for _, stmt := range stmts {
+		ast.Walk(stmt, func(n ast.Node) bool {
+			switch n := n.(type) {
+			case *ast.TableRef:
+				if n.Name != nil {
+					fmt.Println("table:", n.Name.Name.Name)
+				}
+			case *ast.BindParam:
+				fmt.Printf("param: %s at %d:%d\n", n.Raw, n.Pos(), n.End())
+			}
+			return true
+		})
+	}
+}
+```
+
+```
+table: users
+table: orders
+param: :since at 100:106
+```
+
+`ParseString` and `ParseStatement` take a string, `Parse` takes an
+`io.Reader`, and `ParseExpr` parses a single expression. A rejected input
+returns a `*parser.Error` carrying SQLite's exact message and the byte offset
+of the fault; its `Error()` renders as `line:column: message`.
+
+```go
+_, err := parser.ParseString("SELECT FROM t")
+fmt.Println(err) // 1:8: near "FROM": syntax error
+```
 
 Every node embeds `ast.Span`, so `Pos()` and `End()` give byte offsets into
 the original input — sqlc slices the source with them to find `-- name:`
 comments and to report errors, so they are load-bearing rather than
-diagnostic.
+diagnostic. `ast.String` and `ast.Statements` render a tree back to SQL,
+which is a re-parseable rendering rather than a formatter.
+
+The full API is on
+[pkg.go.dev](https://pkg.go.dev/github.com/sqlc-dev/meyer): `parser` for the
+entry points, [`ast`](https://pkg.go.dev/github.com/sqlc-dev/meyer/ast) for
+the node set, and [`lexer`](https://pkg.go.dev/github.com/sqlc-dev/meyer/lexer)
+and [`token`](https://pkg.go.dev/github.com/sqlc-dev/meyer/token) if you want
+the token stream on its own.
 
 To see what the parser did with something:
 
@@ -36,7 +99,7 @@ go run ./cmd/debug-parse -render -f query.sql            # re-rendered SQL
 ## Status
 
 The parser covers the whole grammar of the pinned SQLite release and passes
-the full corpus: **20,971 of 20,971 cases**, extracted from every test script
+the full corpus: **21,326 of 21,326 cases**, extracted from every test script
 in SQLite's own test suite.
 
 Still to come, from [PLAN.md](PLAN.md): the sqlc integration itself, and the
