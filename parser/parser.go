@@ -91,10 +91,10 @@ type Options struct {
 	// UpdateDeleteLimit accepts ORDER BY and LIMIT on UPDATE and DELETE,
 	// as SQLITE_ENABLE_UPDATE_DELETE_LIMIT does. The pinned build defines
 	// neither it nor SQLITE_UDL_CAPABLE_PARSER, so those clauses are a
-	// syntax error by default -- but the option is common enough (Android's
-	// SQLite ships with it, and it is what updateDeleteLimitError in
-	// parse.y exists to complain about) that the clauses have to be
-	// parseable on request.
+	// syntax error by default. The option selects grammar rules, so a
+	// database built with it can only be built from canonical sources --
+	// which also means meyer cannot tell from the SQL alone, and the caller
+	// has to say.
 	//
 	//	cmd ::= with DELETE FROM xfullname indexed_opt where_opt_ret
 	//	        orderby_opt limit_opt.
