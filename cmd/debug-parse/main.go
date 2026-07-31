@@ -10,6 +10,7 @@
 //	go run ./cmd/debug-parse 'SELECT 1'
 //	go run ./cmd/debug-parse -tokens 'SELECT 1'
 //	go run ./cmd/debug-parse -f query.sql
+//	go run ./cmd/debug-parse -update-delete-limit 'DELETE FROM t LIMIT 1'
 //	echo 'SELECT 1' | go run ./cmd/debug-parse
 //
 // A parse error is printed with a caret under the offending byte, in the
@@ -36,6 +37,8 @@ func main() {
 		tokens    = flag.Bool("tokens", false, "print the token stream instead of the tree")
 		render    = flag.Bool("render", false, "print the tree rendered back to SQL")
 		positions = flag.Bool("pos", true, "include byte spans in the tree")
+		udl       = flag.Bool("update-delete-limit", false,
+			"accept ORDER BY and LIMIT on UPDATE and DELETE, as SQLITE_ENABLE_UPDATE_DELETE_LIMIT does")
 	)
 	flag.Parse()
 
@@ -51,7 +54,7 @@ func main() {
 		return
 	}
 
-	stmts, err := parser.ParseString(src)
+	stmts, err := parser.Options{UpdateDeleteLimit: *udl}.ParseString(src)
 	if err != nil {
 		var pe *parser.Error
 		if errors.As(err, &pe) {

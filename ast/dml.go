@@ -90,10 +90,13 @@ func (n *SetPair) Children() []Node {
 //
 //	cmd ::= with UPDATE orconf xfullname indexed_opt SET setlist from
 //	        where_opt_ret.
+//	cmd ::= with UPDATE orconf xfullname indexed_opt SET setlist from
+//	        where_opt_ret orderby_opt limit_opt.
 //
-// The pinned build defines neither SQLITE_ENABLE_UPDATE_DELETE_LIMIT nor
-// SQLITE_UDL_CAPABLE_PARSER, so UPDATE has no ORDER BY or LIMIT at all: they
-// are a plain syntax error rather than a grammar-action message.
+// The second form is the one SQLITE_ENABLE_UPDATE_DELETE_LIMIT compiles in.
+// The pinned build defines neither it nor SQLITE_UDL_CAPABLE_PARSER, so
+// OrderBy and Limit are only ever set for a parse that asked for them with
+// parser.Options.UpdateDeleteLimit; without it they are a syntax error.
 type UpdateStmt struct {
 	Span
 	With       *With           `json:"with,omitempty"`
@@ -106,6 +109,8 @@ type UpdateStmt struct {
 	From       []*TableRef     `json:"from,omitempty"`
 	Where      Expr            `json:"where,omitempty"`
 	Returning  []*ResultColumn `json:"returning,omitempty"`
+	OrderBy    []*OrderingTerm `json:"orderBy,omitempty"`
+	Limit      *Limit          `json:"limit,omitempty"`
 }
 
 func (*UpdateStmt) stmtNode() {}
@@ -115,14 +120,19 @@ func (n *UpdateStmt) Children() []Node {
 	out = appendNodes(out, n.From)
 	out = append(out, nodes(n.Where)...)
 	out = appendNodes(out, n.Returning)
-	return out
+	out = appendNodes(out, n.OrderBy)
+	return append(out, nodes(n.Limit)...)
 }
 
 // DeleteStmt is a DELETE statement.
 //
 //	cmd ::= with DELETE FROM xfullname indexed_opt where_opt_ret.
+//	cmd ::= with DELETE FROM xfullname indexed_opt where_opt_ret orderby_opt
+//	        limit_opt.
 //
-// As for UPDATE, the pinned build's DELETE takes no ORDER BY or LIMIT.
+// As for UPDATE, the second form is the one
+// SQLITE_ENABLE_UPDATE_DELETE_LIMIT compiles in, and OrderBy and Limit are
+// set only for a parse made with parser.Options.UpdateDeleteLimit.
 type DeleteStmt struct {
 	Span
 	With       *With           `json:"with,omitempty"`
@@ -132,11 +142,14 @@ type DeleteStmt struct {
 	NotIndexed bool            `json:"notIndexed,omitempty"`
 	Where      Expr            `json:"where,omitempty"`
 	Returning  []*ResultColumn `json:"returning,omitempty"`
+	OrderBy    []*OrderingTerm `json:"orderBy,omitempty"`
+	Limit      *Limit          `json:"limit,omitempty"`
 }
 
 func (*DeleteStmt) stmtNode() {}
 func (n *DeleteStmt) Children() []Node {
 	out := nodes(n.With, n.Table, n.Alias, n.IndexedBy, n.Where)
 	out = appendNodes(out, n.Returning)
-	return out
+	out = appendNodes(out, n.OrderBy)
+	return append(out, nodes(n.Limit)...)
 }

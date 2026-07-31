@@ -170,10 +170,13 @@ func (p *parser) parseSetList() []*ast.SetPair {
 //
 //	cmd ::= with UPDATE orconf xfullname indexed_opt SET setlist from
 //	        where_opt_ret.
+//	cmd ::= with UPDATE orconf xfullname indexed_opt SET setlist from
+//	        where_opt_ret orderby_opt limit_opt.
 func (p *parser) parseUpdate(with *ast.With, start int) ast.Stmt {
 	n := &ast.UpdateStmt{With: with}
 	p.updateCore(n)
 	n.Where, n.Returning = p.parseWhereOptRet()
+	n.OrderBy, n.Limit = p.parseUpdateDeleteLimit()
 	n.Span = p.span(start)
 	return n
 }
@@ -196,12 +199,43 @@ func (p *parser) updateCore(n *ast.UpdateStmt) {
 // parseDelete implements the DELETE command.
 //
 //	cmd ::= with DELETE FROM xfullname indexed_opt where_opt_ret.
+//	cmd ::= with DELETE FROM xfullname indexed_opt where_opt_ret orderby_opt
+//	        limit_opt.
 func (p *parser) parseDelete(with *ast.With, start int) ast.Stmt {
 	n := &ast.DeleteStmt{With: with}
 	p.deleteCore(n)
 	n.Where, n.Returning = p.parseWhereOptRet()
+	n.OrderBy, n.Limit = p.parseUpdateDeleteLimit()
 	n.Span = p.span(start)
 	return n
+}
+
+// parseUpdateDeleteLimit implements the "orderby_opt limit_opt" tail that
+// UPDATE and DELETE grow when SQLite is compiled with
+// SQLITE_ENABLE_UPDATE_DELETE_LIMIT. Without Options.UpdateDeleteLimit the
+// pinned build's rules are in force, where the statement simply ends: ORDER
+// or LIMIT is then a token no rule can shift, and the caller's own end-of-
+// statement check reports it.
+//
+// A build with SQLITE_UDL_CAPABLE_PARSER but not the option itself is a
+// third behaviour -- it parses the clauses and then rejects them from a
+// grammar action, "syntax error near \"ORDER BY\"" -- which meyer does not
+// model: it accepts exactly the SQL its caller's database accepts, and no
+// database accepts less than one of these two.
+//
+//	orderby_opt ::= . / orderby_opt ::= ORDER BY sortlist.
+//	limit_opt ::= . / LIMIT expr. / LIMIT expr OFFSET expr. / LIMIT expr COMMA expr.
+func (p *parser) parseUpdateDeleteLimit() ([]*ast.OrderingTerm, *ast.Limit) {
+	if !p.opts.UpdateDeleteLimit {
+		return nil, nil
+	}
+	var order []*ast.OrderingTerm
+	if p.at(token.ORDER) {
+		p.advance()
+		p.expect(token.BY)
+		order = p.parseSortList()
+	}
+	return order, p.parseLimit()
 }
 
 // deleteCore reads "DELETE FROM xfullname indexed_opt", everything a DELETE

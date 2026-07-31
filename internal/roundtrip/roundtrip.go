@@ -32,9 +32,14 @@ type Result struct {
 // Equality is structural: byte spans and the Raw fields differ after a round
 // trip by construction, and the renderer promises nothing about them, so
 // dump.Structure leaves both out.
-func Check(stmts []ast.Stmt) Result {
+func Check(stmts []ast.Stmt) Result { return CheckWith(parser.Options{}, stmts) }
+
+// CheckWith is Check for a tree that was parsed with opts. The rendering is
+// re-parsed with the same options, because a clause an option unlocked --
+// an UPDATE's LIMIT, say -- can only be read back with that option on.
+func CheckWith(opts parser.Options, stmts []ast.Stmt) Result {
 	rendered := ast.Statements(stmts)
-	again, err := parser.ParseString(rendered)
+	again, err := opts.ParseString(rendered)
 	if err != nil {
 		return Result{Rendered: rendered, Reason: "rendered SQL does not parse: " + err.Error()}
 	}

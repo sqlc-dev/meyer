@@ -76,6 +76,36 @@ func LineCol(src string, offset int) (line, col int) {
 	return line, offset - start + 1
 }
 
+// Options turns on grammar that SQLite itself has only when it is compiled
+// with the matching build option.
+//
+// The zero value is the pinned build the corpus is generated from, and is
+// what the package-level entry points parse with, so conformance is
+// unaffected by anything here. A field is only ever a fork in SQLite's own
+// grammar, never a dialect meyer invents: the point is that a caller aimed
+// at a database built with the option can parse the SQL that database
+// accepts.
+//
+//	stmts, err := parser.Options{UpdateDeleteLimit: true}.ParseString(src)
+type Options struct {
+	// UpdateDeleteLimit accepts ORDER BY and LIMIT on UPDATE and DELETE,
+	// as SQLITE_ENABLE_UPDATE_DELETE_LIMIT does. The pinned build defines
+	// neither it nor SQLITE_UDL_CAPABLE_PARSER, so those clauses are a
+	// syntax error by default -- but the option is common enough (Android's
+	// SQLite ships with it, and it is what updateDeleteLimitError in
+	// parse.y exists to complain about) that the clauses have to be
+	// parseable on request.
+	//
+	//	cmd ::= with DELETE FROM xfullname indexed_opt where_opt_ret
+	//	        orderby_opt limit_opt.
+	//	cmd ::= with UPDATE orconf xfullname indexed_opt SET setlist from
+	//	        where_opt_ret orderby_opt limit_opt.
+	//
+	// Trigger bodies are unaffected in either build: trigger_cmd has no
+	// orderby_opt or limit_opt to gate.
+	UpdateDeleteLimit bool
+}
+
 // Parse reads SQL from r and returns one ast.Stmt per statement.
 //
 // The context is accepted so the signature matches the sibling parsers
@@ -83,15 +113,23 @@ func LineCol(src string, offset int) (line, col int) {
 // pass over the input, and the recursion limit keeps even hostile input
 // from taking long enough to be worth cancelling.
 func Parse(ctx context.Context, r io.Reader) ([]ast.Stmt, error) {
+	return Options{}.Parse(ctx, r)
+}
+
+// Parse is Parse with these options.
+func (o Options) Parse(ctx context.Context, r io.Reader) ([]ast.Stmt, error) {
 	src, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
-	return ParseString(string(src))
+	return o.ParseString(string(src))
 }
 
 // ParseString parses a complete SQL script.
-func ParseString(src string) (stmts []ast.Stmt, err error) {
+func ParseString(src string) ([]ast.Stmt, error) { return Options{}.ParseString(src) }
+
+// ParseString is ParseString with these options.
+func (o Options) ParseString(src string) (stmts []ast.Stmt, err error) {
 	// newParser is inside the recover: it reads the first token, and an
 	// input that starts with an illegal one fails there.
 	defer func() {
@@ -103,12 +141,15 @@ func ParseString(src string) (stmts []ast.Stmt, err error) {
 			stmts, err = nil, b.err
 		}
 	}()
-	return newParser(src).parseScript(), nil
+	return newParser(src, o).parseScript(), nil
 }
 
 // ParseStatement parses exactly one statement and rejects trailing input.
-func ParseStatement(src string) (ast.Stmt, error) {
-	stmts, err := ParseString(src)
+func ParseStatement(src string) (ast.Stmt, error) { return Options{}.ParseStatement(src) }
+
+// ParseStatement is ParseStatement with these options.
+func (o Options) ParseStatement(src string) (ast.Stmt, error) {
+	stmts, err := o.ParseString(src)
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +160,9 @@ func ParseStatement(src string) (ast.Stmt, error) {
 }
 
 // ParseExpr parses a single expression. It exists for tests and tooling.
+//
+// There is no Options form: no option reaches an expression, since the
+// grammar they fork is always a statement's.
 func ParseExpr(src string) (expr ast.Expr, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -129,7 +173,7 @@ func ParseExpr(src string) (expr ast.Expr, err error) {
 			expr, err = nil, b.err
 		}
 	}()
-	p := newParser(src)
+	p := newParser(src, Options{})
 	e := p.parseExpr(precLowest)
 	if !p.at(token.EOF) {
 		p.syntaxError()
@@ -145,6 +189,7 @@ type parser struct {
 	src  string
 	toks []token.Token
 	i    int
+	opts Options
 
 	nVar    int            // bind parameters seen so far
 	varNums map[string]int // named parameters already assigned a number, if any
@@ -182,8 +227,8 @@ func (p *parser) enter() {
 
 func (p *parser) leave() { p.depth-- }
 
-func newParser(src string) *parser {
-	p := &parser{src: src, toks: lexer.Lex(src)}
+func newParser(src string, opts Options) *parser {
+	p := &parser{src: src, toks: lexer.Lex(src), opts: opts}
 	p.checkIllegal()
 	return p
 }
