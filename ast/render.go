@@ -945,6 +945,7 @@ func writeUpdate(b *strings.Builder, t *UpdateStmt) {
 		write(b, t.Where)
 	}
 	writeReturning(b, t.Returning)
+	writeUpdateDeleteLimit(b, t.OrderBy, t.Limit)
 }
 
 func writeDelete(b *strings.Builder, t *DeleteStmt) {
@@ -964,6 +965,20 @@ func writeDelete(b *strings.Builder, t *DeleteStmt) {
 		write(b, t.Where)
 	}
 	writeReturning(b, t.Returning)
+	writeUpdateDeleteLimit(b, t.OrderBy, t.Limit)
+}
+
+// writeUpdateDeleteLimit renders the ORDER BY and LIMIT an UPDATE or DELETE
+// carries only when it was parsed with parser.Options.UpdateDeleteLimit. The
+// rendering is re-parseable under the same option, and under no other.
+func writeUpdateDeleteLimit(b *strings.Builder, order []*OrderingTerm, limit *Limit) {
+	if len(order) > 0 {
+		w{b}.kw("ORDER BY")
+		writeOrdering(b, order)
+	}
+	if limit != nil {
+		write(b, limit)
+	}
 }
 
 func writeIndexedBy(b *strings.Builder, by *Ident, notIndexed bool) {

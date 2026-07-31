@@ -75,6 +75,18 @@ _, err := parser.ParseString("SELECT FROM t")
 fmt.Println(err) // 1:8: near "FROM": syntax error
 ```
 
+Those entry points parse what the pinned SQLite build parses. Where SQLite's
+own grammar forks on a build option, `parser.Options` has the same entry
+points as methods, so a caller aimed at a database built differently can
+parse the SQL that database accepts:
+
+```go
+// ORDER BY and LIMIT on UPDATE and DELETE, as SQLITE_ENABLE_UPDATE_DELETE_LIMIT
+// compiles in. Without it -- the default, and the pinned build -- they are a
+// syntax error, which is what SQLite reports too.
+stmts, err := parser.Options{UpdateDeleteLimit: true}.ParseString("DELETE FROM t ORDER BY x LIMIT 1")
+```
+
 Every node embeds `ast.Span`, so `Pos()` and `End()` give byte offsets into
 the original input — sqlc slices the source with them to find `-- name:`
 comments and to report errors, so they are load-bearing rather than

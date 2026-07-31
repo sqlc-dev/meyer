@@ -23,6 +23,12 @@ https://sqlite.org/lang.html.
   side: no nonterminal of the vendored grammar may go unmentioned.
 - Error messages must match SQLite's parser byte-for-byte
   (`near "X": syntax error`, `unrecognized token: "X"`, `incomplete input`).
+- Grammar that a build option turns on — `SQLITE_ENABLE_UPDATE_DELETE_LIMIT`
+  so far — is a `parser.Options` field, off by default: the corpus is
+  generated from the pinned build, so the default has to stay exactly where
+  that build is. Expectations for an option come from a SQLite compiled with
+  it, which takes a Lemon run rather than a `-D` on the amalgamation; the
+  recipe is at the top of `parser/options_test.go`.
 
 ## The corpus
 

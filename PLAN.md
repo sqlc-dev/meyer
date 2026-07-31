@@ -212,6 +212,16 @@ them — meyer implements exactly what that build accepts, including
 CONSTRAINT` forms if (and only if) the pinned build has them. When the pin
 advances, `cmd/regenerate` re-derives expectations and diffs are reviewed.
 
+A gate that real deployments turn on is a second matter, because the pinned
+build is not the only SQLite sqlc is ever pointed at. Those get a field on
+`parser.Options`, defaulting to the pinned build's answer so conformance is
+untouched, and are opt-in per parse:
+`SQLITE_ENABLE_UPDATE_DELETE_LIMIT` (`Options.UpdateDeleteLimit`) is the
+first — ORDER BY and LIMIT on UPDATE and DELETE. Each one has to be a fork
+in SQLite's own grammar, never a dialect meyer invents, and has to be
+verified the same way everything else is: against a build with the option
+on.
+
 ### 4. Positions are load-bearing (sqlc integration)
 
 teesql has no positions at all; doubleclick's `End()` is vestigial. meyer
