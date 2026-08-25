@@ -144,6 +144,42 @@ func (o Options) ParseString(src string) (stmts []ast.Stmt, err error) {
 	return newParser(src, o).parseScript(), nil
 }
 
+// File is a parsed SQL script together with the source trivia the grammar
+// never sees, so a caller that needs both — a formatter putting comments
+// back where they came from — gets them from the one lexer pass parsing
+// already makes.
+type File struct {
+	Stmts []ast.Stmt
+
+	// Trivia holds the runs of whitespace and comments, in source order,
+	// as SPACE and COMMENT tokens; Token.Text recovers each run verbatim.
+	// "Trivia" is Roslyn's name — the C# compiler calls the channel of
+	// source text that does not affect syntax "syntax trivia", and
+	// swift-syntax and rust-analyzer use the same term. Together with the
+	// parsed tokens, trivia tiles the consumed input exactly.
+	Trivia []token.Token
+}
+
+// ParseFile parses a complete SQL script and keeps its trivia.
+func ParseFile(src string) (*File, error) { return Options{}.ParseFile(src) }
+
+// ParseFile is ParseFile with these options.
+func (o Options) ParseFile(src string) (f *File, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			b, ok := r.(bail)
+			if !ok {
+				panic(r)
+			}
+			f, err = nil, b.err
+		}
+	}()
+	toks, trivia := lexer.LexFile(src)
+	p := &parser{src: src, toks: toks, opts: o}
+	p.checkIllegal()
+	return &File{Stmts: p.parseScript(), Trivia: trivia}, nil
+}
+
 // ParseStatement parses exactly one statement and rejects trailing input.
 func ParseStatement(src string) (ast.Stmt, error) { return Options{}.ParseStatement(src) }
 

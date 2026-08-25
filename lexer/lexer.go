@@ -23,12 +23,32 @@ import (
 // A NUL byte terminates the input, matching SQLite, whose tokenizer walks a
 // NUL-terminated buffer.
 func Lex(src string) []token.Token {
+	toks, _ := lex(src, false)
+	return toks
+}
+
+// LexFile splits src into tokens like Lex, and also returns the trivia Lex
+// drops: the runs of whitespace and comments, in source order, as SPACE and
+// COMMENT tokens. "Trivia" is Roslyn's name — the C# compiler calls the
+// channel of source text the grammar never sees "syntax trivia", and
+// swift-syntax and rust-analyzer use the same term — adopted here because
+// meyer's consumers (formatters) speak it too.
+//
+// Tokens and trivia together tile the consumed input exactly: every byte
+// before the EOF token's position belongs to exactly one token or trivia
+// span, in order, with no overlap. Both slices come from the single pass
+// Lex already makes; nothing is scanned twice.
+func LexFile(src string) (tokens, trivia []token.Token) {
+	return lex(src, true)
+}
+
+func lex(src string, keepTrivia bool) (toks, trivia []token.Token) {
 	// Across the corpus SQL runs to 3.7 bytes per token including the
 	// separators, but the mean is the wrong statistic to size from: what
 	// costs is the tail that has to grow and copy. A divisor of three
 	// covers 93% of cases in one allocation where four covers 80%, for
 	// about seventeen tokens of slack apiece.
-	toks := make([]token.Token, 0, len(src)/3+8)
+	toks = make([]token.Token, 0, len(src)/3+8)
 	i := 0
 	ambiguous := false
 	for i < len(src) {
@@ -45,6 +65,8 @@ func Lex(src string) []token.Token {
 				ambiguous = true
 			}
 			toks = append(toks, token.Token{Kind: kind, Pos: i, End: i + n})
+		} else if keepTrivia {
+			trivia = append(trivia, token.Token{Kind: kind, Pos: i, End: i + n})
 		}
 		i += n
 	}
@@ -55,7 +77,7 @@ func Lex(src string) []token.Token {
 		resolveWindowKeywords(toks)
 	}
 	toks = append(toks, token.Token{Kind: token.EOF, Pos: i, End: i})
-	return toks
+	return toks, trivia
 }
 
 // resolveWindowKeywords implements analyzeWindowKeyword, analyzeOverKeyword
