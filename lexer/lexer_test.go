@@ -351,3 +351,52 @@ func TestLexNeverLoops(t *testing.T) {
 		}
 	}
 }
+
+// TestLexFile pins the trivia channel: the tokens match Lex exactly, the
+// trivia holds only SPACE and COMMENT runs, and both together tile the
+// consumed input with no gap and no overlap.
+func TestLexFile(t *testing.T) {
+	for _, src := range []string{
+		"SELECT 1",
+		"SELECT 1 -- one\n, 2 /* two */;",
+		"-- leading\nSELECT /* mid */ 'a''b' [c d];",
+		"/* unterminated",
+		"SELECT 1;\n\n-- trailing",
+		"",
+	} {
+		toks, trivia := LexFile(src)
+		if !slices.Equal(toks, Lex(src)) {
+			t.Errorf("LexFile(%q) tokens differ from Lex", src)
+		}
+		for _, tr := range trivia {
+			if tr.Kind != token.SPACE && tr.Kind != token.COMMENT {
+				t.Errorf("LexFile(%q): trivia kind %v", src, tr.Kind)
+			}
+		}
+		// Merge the two ordered span lists and require a perfect tiling of
+		// [0, EOF.Pos).
+		at := 0
+		ti, vi := 0, 0
+		body := toks[:len(toks)-1] // drop the zero-width EOF
+		for ti < len(body) || vi < len(trivia) {
+			var next token.Token
+			switch {
+			case ti == len(body):
+				next, vi = trivia[vi], vi+1
+			case vi == len(trivia):
+				next, ti = body[ti], ti+1
+			case body[ti].Pos < trivia[vi].Pos:
+				next, ti = body[ti], ti+1
+			default:
+				next, vi = trivia[vi], vi+1
+			}
+			if next.Pos != at {
+				t.Fatalf("LexFile(%q): tiling broken at %d, next span starts at %d", src, at, next.Pos)
+			}
+			at = next.End
+		}
+		if eof := toks[len(toks)-1]; at != eof.Pos {
+			t.Fatalf("LexFile(%q): tiling ends at %d, EOF at %d", src, at, eof.Pos)
+		}
+	}
+}
